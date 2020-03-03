@@ -1,5 +1,27 @@
+@import url('https://fonts.googleapis.com/css?family=Oswald|Roboto&display=swap');
+
 @tailwind base;
 
 @tailwind components;
+
+body {
+    @apply text-gray-600 font-roboto;
+}
+
+h1, h2, h3 {
+    @apply text-gray-500 font-oswald;
+}
+
+div.input {
+    @apply mb-4;
+}
+
+input {
+    @apply border border-gray-300 bg-gray-100 rounded px-4 py-2 w-full;
+}
+
+button, .button {
+    @apply bg-primary text-white font-bold px-4 py-2 rounded;
+}
 
 @tailwind utilities;

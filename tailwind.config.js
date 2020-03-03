@@ -3,7 +3,15 @@ const { colors } = require('tailwindcss/defaultTheme');
 module.exports = {
   theme: {
     extend: {
+      fontFamily: {
+        'roboto': ['Roboto'],
+        'oswald': ['Oswald'],
+      },
       colors: {
+        'primary': '#c8272c',
+      },
+      flex: {
+        '2': '2 2 0%',
       },
       zIndex: {
         '5': '5',

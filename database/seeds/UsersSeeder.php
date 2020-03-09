@@ -4,7 +4,7 @@ use Illuminate\Database\Seeder;
 
 use App\User;
 
-class UsersTableSeeder extends Seeder
+class UsersSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,11 +16,12 @@ class UsersTableSeeder extends Seeder
         $mike = new User;
         $mike->name = 'Mike Minckler';
         $mike->email = 'mike.minckler@brentwood.ca';
-        $mike->password = bcrypt(Str::random(8));
+        //$mike->password = bcrypt(Str::random(8));
+        $mike->password = bcrypt('q');
         $mike->email_verified_at = now();
         $mike->save();
 
-        //$mike->assignRole('admin');
+        $mike->addRole('admin');
 
         $brent = new User;
         $brent->name = 'Brent lee';
@@ -28,5 +29,7 @@ class UsersTableSeeder extends Seeder
         $brent->password = bcrypt(Str::random(8));
         $brent->email_verified_at = now();
         $brent->save();
+
+        $mike->addRole('admin');
     }
 }

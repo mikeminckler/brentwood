@@ -14,3 +14,12 @@
 Route::get('/', 'PagesController@load');
 Auth::routes();
 
+
+Route::group(['middleware' => ['auth']], function () {
+
+    Route::post('/pages', 'PagesController@index')->name('pages.index');
+    Route::post('/pages/create', 'PagesController@store')->name('pages.store');
+
+    Route::post('/editing-toggle', 'SessionsController@editingToggle')->name('editing-toggle');
+
+});

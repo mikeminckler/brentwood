@@ -14,11 +14,11 @@
     <div id="app" class="relative flex-1 flex flex-col">
 
         <div class="border-r-4 border-primary fixed h-screen md:w-1/3"></div>
-        <div class="flex items-center">
+        <div id="header" class="flex items-center relative z-5">
 
             <div class="flex-1">
                 <div class="p-8 flex items-center justify-center">
-                    <img src="images/logo.svg" class="h-12" />
+                    <a href="/"><img src="images/logo.svg" class="h-12" /></a>
                 </div>
             </div>
 
@@ -31,6 +31,11 @@
                             @csrf
                             <button class="link">Logout</button>
                         </form>
+
+                        @if (auth()->user()->hasRole('editor'))
+                            <div class="button ml-4" @click="toggleEditing">Edit</div>
+                        @endif
+
                     @endauth
 
                     @guest
@@ -40,11 +45,11 @@
             </div>
         </div>
 
-        <div class="p-4 flex-1 flex flex-col">
+        <div id="content" class="p-4 flex-1 flex flex-col relative z-5">
             @yield ('content')
         </div>
 
-        <div class="flex items-center">
+        <div id="footer" class="flex items-center relative z-5">
 
             <div class="flex-1 flex justify-center">
                 <div class="p-8">

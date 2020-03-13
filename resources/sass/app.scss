@@ -1,15 +1,27 @@
-@import url('https://fonts.googleapis.com/css?family=Oswald|Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Oswald:300|Roboto&display=swap');
 
 @tailwind base;
 
 @tailwind components;
 
+:root {
+    --transition-time: 200ms;
+}
+
 body {
     @apply text-gray-600 font-roboto;
 }
 
+a {
+    @apply text-primary;
+}
+
 h1, h2, h3 {
-    @apply text-gray-500 font-oswald;
+    @apply text-gray-500 font-oswald my-4;
+}
+
+h1 {
+    @apply text-4xl;
 }
 
 div.input {
@@ -17,11 +29,60 @@ div.input {
 }
 
 input {
-    @apply border border-gray-300 bg-gray-100 rounded px-4 py-2 w-full;
+    @apply border border-gray-300 bg-gray-100 px-4 py-2 w-full;
 }
 
 button, .button {
-    @apply bg-primary text-white font-bold px-4 py-2 rounded;
+    @apply flex bg-primary text-white font-bold px-4 py-1 cursor-pointer;
+}
+
+.button-icon {
+    @apply h-8 w-8 flex justify-center items-center cursor-pointer;
+}
+
+.button-icon.active {
+    @apply bg-primary text-white;
+}
+
+.button-icon.disabled {
+    @apply bg-gray-200 text-primary border-primary border;
+}
+
+.success {
+    @apply text-green-500;
+}
+
+.error {
+    @apply text-red-600;
+}
+
+.warning {
+    @apply text-orange-600;
+}
+
+.caret {
+    transition: transform var(--transition-time) ease-out;
+}
+
+.rotate90 {
+    transform: rotate(90deg);
+}
+
+@keyframes fade {
+    0% {
+        opacity: 0;
+    }
+    100%   {
+        opacity: 1;
+    }
+}
+
+.fade-enter-active {
+    animation: fade var(--transition-time) ease-out;
+}
+
+.fade-leave-active {
+    animation: fade var(--transition-time) reverse;
 }
 
 @tailwind utilities;

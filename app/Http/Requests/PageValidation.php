@@ -31,7 +31,9 @@ class PageValidation extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
+            'name' => 'required|string',
+            'parent_page_id' => 'required|integer|min:1|exists:pages,id',
+            'order' => 'required|integer',
         ];
     }
 }

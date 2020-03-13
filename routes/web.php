@@ -11,15 +11,16 @@
 |
 */
 
-Route::get('/', 'PagesController@load');
 Auth::routes();
 
+Route::get('/pages', 'PagesController@index')->name('pages.index');
 
 Route::group(['middleware' => ['auth']], function () {
 
-    Route::post('/pages', 'PagesController@index')->name('pages.index');
     Route::post('/pages/create', 'PagesController@store')->name('pages.store');
-
+    Route::post('/pages/{id}', 'PagesController@store')->name('pages.update')->where('id', '\d+');
     Route::post('/editing-toggle', 'SessionsController@editingToggle')->name('editing-toggle');
 
 });
+
+Route::get('{page}', 'PagesController@load')->name('pages.load')->where('page', '.*');

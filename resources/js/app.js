@@ -9,9 +9,28 @@ Object.defineProperty(Vue.prototype, "$http", { value: axios });
 
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
-//Object.defineProperty(Vue.prototype, "$eventer", { value: new Vue() });
+Object.defineProperty(Vue.prototype, "$eventer", { value: new Vue() });
+
+import store from './Store';
+
+import ContentEditor from '@/Components/ContentEditor.vue'
+import EditingButton from '@/Components/EditingButton.vue'
+import Feedback from '@/Components/Feedback.vue'
+import PageTree from '@/Components/PageTree.vue'
+import PageList from '@/Components/PageList.vue'
+import Processing from '@/Components/Processing.vue'
+
+Vue.component('page-list', PageList);
 
 const app = new Vue({
     el: "#app",
-    //render: h => h(app),
+    store,
+    
+    components: {
+        'content-editor': ContentEditor,
+        'editing-button': EditingButton,
+        'feedback': Feedback,
+        'page-tree': PageTree,
+        'processing': Processing,
+    }
 });

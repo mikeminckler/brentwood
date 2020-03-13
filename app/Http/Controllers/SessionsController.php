@@ -15,10 +15,16 @@ class SessionsController extends Controller
 
         if (session()->has('editing')) {
             session()->forget('editing'); 
-            return response()->json(['success' => 'Editing Disabled']);
+            return response()->json([
+                'success' => 'Editing Disabled',
+                'editing' => false,
+            ]);
         } else {
             session()->put('editing', true);
-            return response()->json(['success' => 'Editing Enabled']);
+            return response()->json([
+                'success' => 'Editing Enabled',
+                'editing' => true,
+            ]);
         }
     }
 }

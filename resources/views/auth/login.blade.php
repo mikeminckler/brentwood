@@ -13,7 +13,7 @@
                 <img src="/images/logo.svg" class="h-24" />
             </div>
 
-            <div class="border border-gray-200 rounded-lg mt-8 p-4 w-full">
+            <div class="border border-gray-200 rounded-lg mt-8 p-4 w-full bg-white">
                 <form method="POST" action="/login">
                     @csrf
 

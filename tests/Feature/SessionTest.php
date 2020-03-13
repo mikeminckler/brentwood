@@ -29,9 +29,19 @@ class SessionTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Editing Enabled',
+                'editing' => true,
              ]);
 
         $this->assertTrue(session()->has('editing'));
+
+        $this->post(route('editing-toggle'))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Editing Disabled',
+                'editing' => false,
+             ]);
+
+        $this->assertFalse(session()->has('editing'));
 
     }
 }

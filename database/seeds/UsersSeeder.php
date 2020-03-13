@@ -26,10 +26,11 @@ class UsersSeeder extends Seeder
         $brent = new User;
         $brent->name = 'Brent lee';
         $brent->email = 'brent.lee@brentwood.bc.ca';
-        $brent->password = bcrypt(Str::random(8));
+        //$brent->password = bcrypt(Str::random(8));
+        $brent->password = bcrypt('q');
         $brent->email_verified_at = now();
         $brent->save();
 
-        $mike->addRole('admin');
+        $brent->addRole('admin');
     }
 }

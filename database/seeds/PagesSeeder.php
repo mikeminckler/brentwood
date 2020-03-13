@@ -3,6 +3,7 @@
 use Illuminate\Database\Seeder;
 
 use App\Page;
+use Illuminate\Support\Arr;
 
 class PagesSeeder extends Seeder
 {
@@ -14,13 +15,20 @@ class PagesSeeder extends Seeder
     public function run()
     {
         $pages = [
-            'Home',
+            ['name' => 'Home', 'slug' => '/', 'parent_name' => ''],
         ];
 
-        foreach ($pages as $name) {
+        $count = 0;
+        foreach ($pages as $page_data) {
+            $parent = Page::where('name', Arr::get($page_data, 'parent_name'))->first();
+
             $page = new Page;
-            $page->name = $name;
+            $page->name = Arr::get($page_data, 'name');
+            $page->slug = Arr::get($page_data, 'slug');
+            $page->parent_page_id = $parent ? $parent->id : 0;
+            $page->order = $count;
             $page->save();
+            $count++;
         }
     }
 }

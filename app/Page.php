@@ -44,6 +44,8 @@ class Page extends Model
         $page->order = requestInput('order');
         $page->save();
 
+        $page->saveContentElements($input);
+
         cache()->tags([cache_name($page)])->flush();
         return $page;    
     }
@@ -71,7 +73,7 @@ class Page extends Model
         }
 
         if ($this->parent_page_id > 0) {
-            $parent_page = Page::find($this->parent_page_id);
+            $parent_page = Page::findOrFail($this->parent_page_id);
             
             while ($parent_page->id != 1) {
                 $slug = Str::kebab($parent_page->name).'/'.$slug;
@@ -101,5 +103,55 @@ class Page extends Model
     public function contentElements() 
     {
         return $this->hasMany(ContentElement::class);
+    }
+
+    public function saveContentElements($input) 
+    {
+        if (Arr::get($input, 'content_elements')) {
+            foreach (Arr::get($input, 'content_elements') as $content_data) {
+                $content_element = (new ContentElement)->saveContentElement(Arr::get($content_data, 'id'), $content_data, $this);
+            }
+        }
+
+        return $this;
+    }
+
+    public function versions() 
+    {
+        return $this->hasMany(Version::class);   
+    }
+
+    public function publishedVersion() 
+    {
+        return $this->belongsTo(Version::class, 'published_version_id');   
+    }
+
+    public function getPublishedAtAttribute() 
+    {
+        return $this->publishedVersion->published_at;   
+    }
+
+    public function publish() 
+    {
+        $draft_version = $this->getDraftVersion();
+        $draft_version->publish();
+        $this->published_version_id = $draft_version->id;
+        $this->save();
+
+        cache()->tags([cache_name($this), cache_name($draft_version)])->flush();
+        return $this;
+    }
+
+    public function getDraftVersion() 
+    {
+        $draft_version = $this->versions()->whereNull('published_at')->first();
+        if ($draft_version) {
+            return $draft_version;
+        } else {
+            return (new Version)->saveVersion(null, [
+                'name' => $this->versions()->count() + 1,
+                'page_id' => $this->id,
+            ]);
+        }
     }
 }

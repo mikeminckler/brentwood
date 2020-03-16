@@ -22,7 +22,7 @@
 
         <div class="relative flex-1 flex flex-col">
 
-            <div class="border-r-4 border-primary absolute top-0 h-full md:w-1/3 z-2"></div>
+            <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-2"></div>
 
             <div id="header" class="flex items-center sticky z-2 top-0 bg-gray-100">
 
@@ -62,6 +62,7 @@
             <div id="footer" class="relative">
                 <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba(247,218,199,1), rgba(245,205,175,0));" ></div>
                 <div class="absolute w-full h-full overflow-hidden">
+                    <img src="/images/footer_fg.png" class="w-full h-full object-cover z-5 absolute" />
                     <img src="/images/footer_bg.jpg" class="w-full h-full object-cover" />
                 </div>
                 <div class="flex items-center relative z-1 mt-16 mb-64">

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateContentElementsTable extends Migration
+class CreateVersionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateContentElementsTable extends Migration
      */
     public function up()
     {
-        Schema::create('content_elements', function (Blueprint $table) {
+        Schema::create('versions', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('name');
             $table->unsignedBigInteger('page_id');
-            $table->morphs('content');
-            $table->unsignedBigInteger('version_id');
+            $table->dateTime('published_at')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateContentElementsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('content_elements');
+        Schema::dropIfExists('versions');
     }
 }

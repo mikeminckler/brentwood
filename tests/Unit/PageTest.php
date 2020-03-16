@@ -7,6 +7,8 @@ use Illuminate\Foundation\Testing\WithFaker;
 
 use App\Page;
 use App\ContentElement;
+use App\TextBlock;
+use App\Version;
 
 class PageTest extends TestCase
 {
@@ -111,7 +113,7 @@ class PageTest extends TestCase
     public function a_page_can_have_many_content_elements()
     {
         $page = factory(Page::class)->create();
-        $content_element = factory(ContentElement::class)->create([
+        $content_element = factory(ContentElement::class)->states('text-block')->create([
             'page_id' => $page->id,
         ]);
 
@@ -124,12 +126,17 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_save_its_content_elements()
     {
-        $content_element_input = factory(ContentElement::class)->states('text-block')->raw();
-        
         $input = [
-            'content_elements' => [json_encode($content_element)],
+            'content_elements' => [
+                [
+                    'id' => 0,
+                    'type' => 'text-block',
+                    'content_data' => factory(TextBlock::class)->raw(),
+                ],
+            ],
         ];
 
+        $page = factory(Page::class)->create();
         $page->saveContentElements($input);
         $page->refresh();
 
@@ -137,4 +144,52 @@ class PageTest extends TestCase
         $content_element = $page->contentElements->first();
     }
 
+    /** @test **/
+    public function a_page_can_get_its_draft_version()
+    {
+        $page = factory(Page::class)->create();
+
+        $this->assertInstanceOf(Page::class, $page);
+        $draft_version = $page->getDraftVersion();
+        $this->assertInstanceOf(Version::class, $draft_version);
+    }
+
+    /** @test **/
+    public function a_page_has_a_published_version()
+    {
+        $page = factory(Page::class)->states('published')->create();   
+        $this->assertNotNull($page->published_version_id);
+        $this->assertNotNull($page->publishedVersion);
+        $this->assertInstanceOf(Version::class, $page->publishedVersion);
+    }
+
+    /** @test **/
+    public function a_page_can_be_published()
+    {
+        $page = factory(Page::class)->create();   
+        $page->publish();
+        $this->assertNotNull($page->published_version_id);
+        $this->assertNotNull($page->publishedVersion);
+        $this->assertInstanceOf(Version::class, $page->publishedVersion);
+        $this->assertNotNull($page->publishedVersion->published_at);
+        $this->assertNotNull($page->published_at);
+    }
+
+    /** @test **/
+    public function a_page_has_many_versions()
+    {
+        $page = factory(Page::class)->create();
+        $version = factory(Version::class)->create([
+            'page_id' => $page->id,
+        ]);
+        $page->refresh();
+        $this->assertTrue($page->versions->contains('id', $version->id));
+    }
+
+    /** @test **/
+    public function if_a_page_doesnt_have_a_draft_version_one_is_created()
+    {
+        $page = factory(Page::class)->create();
+        $this->assertInstanceOf(Version::class, $page->getDraftVersion());
+    }
 }

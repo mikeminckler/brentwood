@@ -18,6 +18,7 @@ class CreatePagesTable extends Migration
             $table->string('name')->index();
             $table->string('slug')->nullable();
             $table->bigInteger('parent_page_id');
+            $table->bigInteger('published_version_id')->nullable();
             $table->integer('order');
             $table->softDeletes();
             $table->timestamps();

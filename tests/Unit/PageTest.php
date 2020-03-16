@@ -9,6 +9,7 @@ use App\Page;
 use App\ContentElement;
 use App\TextBlock;
 use App\Version;
+use App\Menu;
 
 class PageTest extends TestCase
 {
@@ -131,7 +132,7 @@ class PageTest extends TestCase
                 [
                     'id' => 0,
                     'type' => 'text-block',
-                    'content_data' => factory(TextBlock::class)->raw(),
+                    'content' => factory(TextBlock::class)->raw(),
                 ],
             ],
         ];
@@ -191,5 +192,12 @@ class PageTest extends TestCase
     {
         $page = factory(Page::class)->create();
         $this->assertInstanceOf(Version::class, $page->getDraftVersion());
+    }
+
+    /** @test **/
+    public function a_page_can_be_unlisted_from_the_menu()
+    {
+        $page = factory(Page::class)->states('unlisted')->create();
+        $this->assertEquals(1, $page->unlisted);
     }
 }

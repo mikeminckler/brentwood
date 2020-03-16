@@ -33,6 +33,7 @@ class PageValidation extends FormRequest
         return [
             'name' => 'required|string',
             'parent_page_id' => 'required|integer|min:1|exists:pages,id',
+            'unlisted' => 'boolean',
             'order' => 'required|integer',
         ];
     }

@@ -1,7 +1,8 @@
 <template>
 
-    <div v-if="editingEnabled"
+    <div v-if="editing"
         class="bg-gray-100 border-r border-gray-300 pt-8"
+        style="width: 300px"
     >
         <page-list :page="homePage" :key="homePage.id"></page-list>
     </div>
@@ -11,10 +12,11 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback'
+    import PageList from '@/Components/PageList.vue'
 
     export default {
 
-        props: ['editing'],
+        props: [],
         mixins: [Feedback],
 
         data() {
@@ -23,24 +25,25 @@
             }
         },
 
+        components: {
+            'page-list': PageList,
+        },
+
         computed: {
-            editingEnabled() {
+            editing() {
                 return this.$store.state.editing;
             }
         },
 
         watch: {
-            editingEnabled() {
-                if (this.editingEnabled) {
+            editing() {
+                if (this.editing) {
                     this.loadPageTree();
                 }
             }
         },
 
         mounted() {
-            if (this.editing) {
-                this.$store.dispatch('setEditing', this.editing);
-            }
 
             /**
             * here we setup a listener to refresh the page tree
@@ -55,6 +58,10 @@
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('refresh-page-tree', listener);
             });
+
+            if (this.editing) {
+                this.loadPageTree();
+            }
         },
 
         methods: {

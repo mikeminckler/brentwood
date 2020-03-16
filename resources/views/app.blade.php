@@ -14,15 +14,16 @@
 
     <div id="app" class="relative flex-1 flex">
 
-        @if(session()->has('editing'))
-            <content-editor :current-page='@json($page)'></content-editor>
-        @endif
-
-        <page-tree :editing="{{ session()->has('editing') ? 'true' : 'false' }}"></page-tree>
+        <page-tree v-if="$store.state.editing"></page-tree>
 
         <div class="relative flex-1 flex flex-col">
 
             <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-2"></div>
+
+            <page-editor 
+                :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
+                :current-page='@json($page ?? '')'
+            ></page-editor>
 
             <div id="header" class="flex items-center sticky z-2 top-0 bg-gray-100">
 
@@ -37,7 +38,9 @@
 
                     <nav class="flex-1 flex items-center px-8">
                         @foreach ($menu as $menu_page)
-                            <a href="{{ $menu_page->full_slug }}" class="font-oswald text-lg ml-8 first:ml-0">{{ $menu_page->name }}</a>
+                            @if (!$menu_page->unlisted)
+                                <a href="{{ $menu_page->full_slug }}" class="font-oswald text-lg ml-8 first:ml-0">{{ $menu_page->name }}</a>
+                            @endif
                         @endforeach 
                     </nav>
 

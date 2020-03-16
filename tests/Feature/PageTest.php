@@ -114,6 +114,47 @@ class PageTest extends TestCase
     }
 
     /** @test **/
+    public function a_page_can_be_unlisted()
+    {
+        $page = factory(Page::class)->create();
+        $input = factory(Page::class)->raw([
+            'unlisted' => true,
+        ]);
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+        $this->postJson(route('pages.update', ['id' => $page->id]), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Page Saved',
+                'full_slug' => $page->refresh()->full_slug,
+            ]);
+
+        $page->refresh();
+
+        $this->assertEquals(1, $page->unlisted);
+
+        $input = factory(Page::class)->raw([
+            'unlisted' => false,
+        ]);
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+        $this->postJson(route('pages.update', ['id' => $page->id]), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Page Saved',
+                'full_slug' => $page->refresh()->full_slug,
+            ]);
+
+        $page->refresh();
+
+        $this->assertEquals(0, $page->unlisted);
+    }
+
+    /** @test **/
     public function a_page_gets_404_response_if_no_page_can_be_found()
     {
         $slug = Str::random(8);   

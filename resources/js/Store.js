@@ -11,11 +11,27 @@ const store = new Vuex.Store({
             active: false,
             text: '',
         },
+        page: {
+            id: 0,
+            name: '',
+            parent_page_id: '',
+            unlisted: 0,
+            order: 0,
+            content_elements: [],
+        },
     },
 
     mutations: {
         setEditing(state, editing) {
             state.editing = editing;
+        },
+
+        setPage(state, page) {
+            state.page = page;
+        },
+
+        addContentElement(state, contentElement) {
+            state.page.content_elements.push(contentElement);
         },
 
         addFeedback (state, item) {
@@ -47,6 +63,14 @@ const store = new Vuex.Store({
     actions: {
         setEditing({ commit, state }, editing) {
             commit('setEditing', editing);
+        },
+
+        setPage({ commit, state }, page) {
+            commit('setPage', page);
+        },
+
+        addContentElement({ commit, state }, contentElement) {
+            commit('addContentElement', contentElement);
         },
 
         addFeedback({ commit, state }, feedback) {

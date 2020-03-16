@@ -1,9 +1,12 @@
 <template>
 
-    <div class="fixed w-full bottom-0 z-50 flex items-center border-t border-b bg-gray-200 p-2" v-if="editingEnabled">
+    <div class="w-full z-20 flex items-center border-t border-b bg-gray-200 p-2" v-if="editing">
 
-        <div class="flex-1 flex">
-            <div class=""><input type="text" v-model="page.name" @change="savePage()" /></div>
+        <div class="flex-1 flex items-center">
+            <div class=""><input type="text" v-model="page.name" @enter="savePage" @change="savePage()" /></div>
+            <div class="">
+                <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> 
+            </div>
         </div>
 
         <div class="">
@@ -19,24 +22,26 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback'
+    import CheckboxInput from '@/Components/CheckboxInput'
 
     export default {
 
         mixins: [Feedback],
-        props: ['currentPage'],
+        props: ['currentPage', 'editingEnabled'],
         data() {
             return {
-                page: {
-                    id: 0,
-                    name: '',
-                    parent_page_id: '',
-                    order: 0,
-                },
             }
         },
 
+        components: {
+            'checkbox-input': CheckboxInput,
+        },
+
         computed: {
-            editingEnabled() {
+            page() {
+                return this.$store.state.page;
+            },
+            editing() {
                 return this.$store.state.editing;
             },
         },
@@ -47,7 +52,11 @@
              * and set it as the page to edit so that the pages properties 
              * will be reactive
              */
-            this.page = this.currentPage;
+            this.$store.dispatch('setPage', this.currentPage);
+
+            if (this.editingEnabled) {
+                this.$store.dispatch('setEditing', this.editingEnabled);
+            }
         },
 
         methods: {
@@ -57,7 +66,9 @@
                 let input = {
                     name: 'Untitled Page',
                     parent_page_id: this.page.id,
+                    unlisted: true,
                     order: 1,
+                    content_elements: [],
                 }
 
                 this.$http.post('/pages/create', input).then( response => {
@@ -73,11 +84,14 @@
                 let input = {
                     name: this.page.name,
                     parent_page_id: this.page.parent_page_id,
+                    unlisted: this.page.unlisted ? true : false,
                     order: this.page.order,
+                    content_elements: this.page.content_elements,
                 };
 
                 this.$http.post('/pages/' + this.page.id, input).then( response => {
-                    this.$eventer.$emit('refresh-page-tree');
+                    //this.$eventer.$emit('refresh-page-tree');
+                    window.location = response.data.page.full_slug;
                     this.processSuccess(response);
                 }, error => {
                     this.processErrors(error.response);

@@ -10,7 +10,7 @@ use App\ContentElement;
 
 class Page extends Model
 {
-    protected $with = ['pages'];
+    protected $with = ['pages', 'contentElements'];
     protected $appends = ['full_slug'];
 
     public function savePage($id = null, $input) 
@@ -41,7 +41,8 @@ class Page extends Model
             }
         }
 
-        $page->order = requestInput('order');
+        $page->order = Arr::get($input, 'order');
+        $page->unlisted = Arr::get($input, 'unlisted') == true ? true : false;
         $page->save();
 
         $page->saveContentElements($input);
@@ -108,8 +109,8 @@ class Page extends Model
     public function saveContentElements($input) 
     {
         if (Arr::get($input, 'content_elements')) {
-            foreach (Arr::get($input, 'content_elements') as $content_data) {
-                $content_element = (new ContentElement)->saveContentElement(Arr::get($content_data, 'id'), $content_data, $this);
+            foreach (Arr::get($input, 'content_elements') as $content_element) {
+                $content_element = (new ContentElement)->saveContentElement(Arr::get($content_element, 'id'), $content_element, $this);
             }
         }
 

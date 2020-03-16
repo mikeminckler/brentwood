@@ -13,21 +13,21 @@ Object.defineProperty(Vue.prototype, "$eventer", { value: new Vue() });
 
 import store from './Store';
 
-import ContentEditor from '@/Components/ContentEditor.vue'
+import PageEditor from '@/Components/PageEditor.vue'
 import EditingButton from '@/Components/EditingButton.vue'
 import Feedback from '@/Components/Feedback.vue'
 import PageTree from '@/Components/PageTree.vue'
-import PageList from '@/Components/PageList.vue'
 import Processing from '@/Components/Processing.vue'
 
-Vue.component('page-list', PageList);
+import AddContent from '@/Components/AddContent.vue'
+Vue.component('add-content', AddContent);
 
 const app = new Vue({
     el: "#app",
     store,
     
     components: {
-        'content-editor': ContentEditor,
+        'page-editor': PageEditor,
         'editing-button': EditingButton,
         'feedback': Feedback,
         'page-tree': PageTree,

@@ -32,3 +32,9 @@ $factory->state(Page::class, 'published', function ($faker) {
         'published_version_id' => factory(Version::class)->states('published')->create()->id,
     ];
 });
+
+$factory->state(Page::class, 'unlisted', function ($faker) {
+    return [
+        'unlisted' => 1,
+    ];
+});

@@ -19,7 +19,7 @@ class ContentElementTest extends TestCase
         $input = [
             'id' => 0,
             'type' => 'text-block',
-            'content_data' => $text_block,
+            'content' => $text_block,
         ];
 
         $page = factory(Page::class)->create();

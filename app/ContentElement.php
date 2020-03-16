@@ -13,6 +13,9 @@ use App\TextBlock;
 
 class ContentElement extends Model
 {
+
+    protected $with = ['content'];
+
     public function saveContentElement($id = null, $input, Page $page) 
     {
         $update = false;
@@ -27,7 +30,7 @@ class ContentElement extends Model
 
         $content_class = 'App\\'.Str::studly(Arr::get($input, 'type'));
 
-        $content = (new $content_class)->saveContent(Arr::get($input, 'content_data'));
+        $content = (new $content_class)->saveContent(Arr::get($input, 'content'));
 
         $content_element->content_id = $content->id;
         $content_element->content_type = get_class($content);

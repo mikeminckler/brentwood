@@ -16,7 +16,7 @@ const store = new Vuex.Store({
             name: '',
             parent_page_id: '',
             unlisted: 0,
-            order: 0,
+            sort_order: 0,
             content_elements: [],
         },
     },

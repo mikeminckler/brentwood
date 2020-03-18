@@ -41,7 +41,7 @@ class Page extends Model
             }
         }
 
-        $page->order = Arr::get($input, 'order');
+        $page->sort_order = Arr::get($input, 'sort_order');
         $page->unlisted = Arr::get($input, 'unlisted') == true ? true : false;
         $page->save();
 
@@ -110,7 +110,7 @@ class Page extends Model
     {
         if (Arr::get($input, 'content_elements')) {
             foreach (Arr::get($input, 'content_elements') as $content_element) {
-                $content_element = (new ContentElement)->saveContentElement(Arr::get($content_element, 'id'), $content_element, $this);
+                $content_element = (new ContentElement)->saveContentElement(Arr::get($content_element, 'id'), $content_element);
             }
         }
 

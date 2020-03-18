@@ -21,6 +21,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/pages/{id}', 'PagesController@store')->name('pages.update')->where('id', '\d+');
     Route::post('/editing-toggle', 'SessionsController@editingToggle')->name('editing-toggle');
 
+    Route::post('/content-elements/create', 'ContentElementsController@store')->name('content-elements.store');
 });
 
 Route::get('{page}', 'PagesController@load')->name('pages.load')->where('page', '.*');

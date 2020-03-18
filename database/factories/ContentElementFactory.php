@@ -12,6 +12,7 @@ use App\TextBlock;
 $factory->define(ContentElement::class, function (Faker $faker) {
     return [
         'page_id' => factory(Page::class)->create()->id,
+        'sort_order' => $faker->randomNumber(1),
         'version_id' => factory(Version::class)->create()->id,
     ];
 });

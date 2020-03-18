@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PageValidation extends FormRequest
+class TextBlockValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,13 +13,6 @@ class PageValidation extends FormRequest
      */
     public function authorize()
     {
-        if (!auth()->check()) {
-            return false;
-        }
-
-        if (auth()->user()->hasRole('editor')) {
-            return true;
-        }
         return false;
     }
 
@@ -31,10 +24,8 @@ class PageValidation extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
-            'parent_page_id' => 'required|integer|min:1|exists:pages,id',
-            'unlisted' => 'boolean',
-            'sort_order' => 'required|integer',
+            'header' => 'required',
+            'body' => 'required',
         ];
     }
 }

@@ -26,7 +26,7 @@ class PagesSeeder extends Seeder
             $page->name = Arr::get($page_data, 'name');
             $page->slug = Arr::get($page_data, 'slug');
             $page->parent_page_id = $parent ? $parent->id : 0;
-            $page->order = $count;
+            $page->sort_order = $count;
             $page->save();
             $count++;
         }

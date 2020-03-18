@@ -15,20 +15,22 @@ class ContentElementTest extends TestCase
     public function a_content_element_can_be_created()
     {
 
+        $page = factory(Page::class)->create();
         $text_block = factory(TextBlock::class)->raw();
         $input = [
             'id' => 0,
             'type' => 'text-block',
+            'page_id' => $page->id,
             'content' => $text_block,
+            'sort_order' => 1,
         ];
 
-        $page = factory(Page::class)->create();
-
-        $content_element = (new ContentElement)->saveContentElement(null, $input, $page);
+        $content_element = (new ContentElement)->saveContentElement(null, $input);
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
 
         $this->assertEquals($page->id, $content_element->page->id);
+        $this->assertEquals(1, $content_element->sort_order);
         $this->assertEquals(Arr::get($text_block, 'header'), $content_element->content->header);
         $this->assertEquals(Arr::get($text_block, 'body'), $content_element->content->body);
 

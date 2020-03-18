@@ -30,7 +30,7 @@ class PageTest extends TestCase
             ->assertJsonValidationErrors([
                 'name',
                 'parent_page_id',
-                'order',
+                'sort_order',
             ]);
 
         $this->withoutExceptionHandling();
@@ -45,7 +45,7 @@ class PageTest extends TestCase
 
         $this->assertEquals( Arr::get($input, 'name'), $page->name);
         $this->assertEquals( Arr::get($input, 'parent_page_id'), $page->parent_page_id);
-        $this->assertEquals( Arr::get($input, 'order'), $page->order);
+        $this->assertEquals( Arr::get($input, 'sort_order'), $page->sort_order);
     }
 
     /** @test **/
@@ -95,7 +95,7 @@ class PageTest extends TestCase
             ->assertJsonValidationErrors([
                 'name',
                 'parent_page_id',
-                'order',
+                'sort_order',
             ]);
 
         $this->withoutExceptionHandling();
@@ -110,7 +110,7 @@ class PageTest extends TestCase
 
         $this->assertEquals( Arr::get($input, 'name'), $page->name);
         $this->assertEquals( Arr::get($input, 'parent_page_id'), $page->parent_page_id);
-        $this->assertEquals( Arr::get($input, 'order'), $page->order);
+        $this->assertEquals( Arr::get($input, 'sort_order'), $page->sort_order);
     }
 
     /** @test **/
@@ -179,7 +179,7 @@ class PageTest extends TestCase
             'name' => $this->faker->firstName,
             'slug' => $this->faker->firstName,
             'parent_page_id' => factory(Page::class)->create(['parent_page_id' => $this->faker->numberBetween(1000,100000)])->id,
-            'order' => $this->faker->numberBetween(10,100),
+            'sort_order' => $this->faker->numberBetween(10,100),
         ];
 
         $this->postJson(route('pages.update', ['id' => $home_page->id]), $input)

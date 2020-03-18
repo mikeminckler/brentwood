@@ -67,7 +67,7 @@
                     name: 'Untitled Page',
                     parent_page_id: this.page.id,
                     unlisted: true,
-                    order: 1,
+                    sort_order: this.page.pages.length + 1,
                     content_elements: [],
                 }
 
@@ -85,7 +85,7 @@
                     name: this.page.name,
                     parent_page_id: this.page.parent_page_id,
                     unlisted: this.page.unlisted ? true : false,
-                    order: this.page.order,
+                    sort_order: this.page.sort_order,
                     content_elements: this.page.content_elements,
                 };
 

@@ -127,17 +127,18 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_save_its_content_elements()
     {
+        $page = factory(Page::class)->create();
+        $content_element_input = factory(ContentElement::class)->states('text-block')->raw([
+            'page_id' => $page->id,
+        ]);
+        $content_element_input['type'] = 'text-block';
+        $content_element_input['content'] = factory(TextBlock::class)->raw();
         $input = [
             'content_elements' => [
-                [
-                    'id' => 0,
-                    'type' => 'text-block',
-                    'content' => factory(TextBlock::class)->raw(),
-                ],
+                $content_element_input,
             ],
         ];
 
-        $page = factory(Page::class)->create();
         $page->saveContentElements($input);
         $page->refresh();
 

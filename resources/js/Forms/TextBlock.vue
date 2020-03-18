@@ -1,11 +1,20 @@
 <template>
 
-    <div class="m-4 p-4 bg-gray-200 ">
-        <div class="mb-4">
-            <input type="text" v-model="content.header" @change="saveContent()" placeholder="Header" />
+    <div class="flex">
+
+        <div class="flex-1">
         </div>
 
-        <editor v-model="content.body" @input="saveContent()"></editor>
+        <div class="flex-2">
+            <div class="m-4 p-4 pb-2 bg-gray-200 ">
+                <div class="mb-4">
+                    <input type="text" v-model="content.header" @change="saveContent()" placeholder="Header" />
+                </div>
+
+                <editor v-model="content.body" @input="saveContent()"></editor>
+            </div>
+        </div>
+
     </div>
 
 </template>
@@ -39,11 +48,13 @@
         },
 
         methods: {
+
             saveContent: _.debounce( function() {
 
-                console.log('SAVE');
+                this.$emit('save');
                 
             }, 1000),
+
         },
 
     }

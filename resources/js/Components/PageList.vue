@@ -22,6 +22,10 @@
     export default {
         props: ['page'],
 
+        components: {
+            'page-list': () => import(/* webpackChunkName: "page-list" */ '@/Components/PageList'),
+        },
+
         data() {
             return {
                 expanded: true,

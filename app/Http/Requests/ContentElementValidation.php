@@ -4,7 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PageValidation extends FormRequest
+use Illuminate\Support\Str;
+
+class ContentElementValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -30,11 +32,24 @@ class PageValidation extends FormRequest
      */
     public function rules()
     {
-        return [
-            'name' => 'required|string',
-            'parent_page_id' => 'required|integer|min:1|exists:pages,id',
-            'unlisted' => 'boolean',
+
+        if (!requestInput('type')) {
+            return [
+                'type' => 'required',
+            ];
+        }
+
+        $content_class = '\App\\Http\\Requests\\'.Str::studly(requestInput('type')).'Validation';
+
+        $rules = collect([
+            'page_id' => 'required|exists:pages,id',
             'sort_order' => 'required|integer',
-        ];
+        ])->merge(
+            collect((new $content_class)->rules())->mapWithKeys(function ($rule, $field) {
+                return ['content.'.$field => $rule];
+            })
+        )->all();
+
+        return $rules;
     }
 }

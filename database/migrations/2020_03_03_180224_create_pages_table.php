@@ -19,7 +19,7 @@ class CreatePagesTable extends Migration
             $table->string('slug')->nullable();
             $table->bigInteger('parent_page_id');
             $table->bigInteger('published_version_id')->nullable();
-            $table->integer('order');
+            $table->integer('sort_order');
             $table->boolean('unlisted')->default(false);
             $table->softDeletes();
             $table->timestamps();

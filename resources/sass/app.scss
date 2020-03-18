@@ -21,7 +21,11 @@ h1, h2, h3 {
 }
 
 h1 {
-    @apply text-4xl;
+    @apply text-4xl p-4;
+}
+
+h2 {
+    @apply text-2xl p-4;
 }
 
 div.input {

@@ -17,6 +17,7 @@ class CreateContentElementsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('page_id');
             $table->morphs('content');
+            $table->integer('sort_order');
             $table->unsignedBigInteger('version_id');
             $table->timestamps();
         });

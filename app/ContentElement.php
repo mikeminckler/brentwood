@@ -16,7 +16,9 @@ class ContentElement extends Model
 
     protected $with = ['content'];
 
-    public function saveContentElement($id = null, $input, Page $page) 
+    protected $appends = ['type'];
+
+    public function saveContentElement($id = null, $input) 
     {
         $update = false;
         if ($id) {
@@ -26,7 +28,10 @@ class ContentElement extends Model
             $content_element = new ContentElement;
         }
 
+        $page = Page::findOrFail(Arr::get($input, 'page_id'));
+
         $content_element->page_id = $page->id;
+        $content_element->sort_order = Arr::get($input, 'sort_order');
 
         $content_class = 'App\\'.Str::studly(Arr::get($input, 'type'));
 

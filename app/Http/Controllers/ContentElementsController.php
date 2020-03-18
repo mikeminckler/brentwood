@@ -29,7 +29,6 @@ class ContentElementsController extends Controller
         return response()->json([
             'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Saved',
             'content_element' => $content_element,
-            'html' => view('content-elements.'.$content_element->type, ['content' => $content_element->content])->render(),
         ]);
     }
 }

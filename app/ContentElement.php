@@ -15,7 +15,6 @@ class ContentElement extends Model
 {
 
     protected $with = ['content'];
-
     protected $appends = ['type'];
 
     public function saveContentElement($id = null, $input) 
@@ -45,6 +44,8 @@ class ContentElement extends Model
 
         $content_element->save();
 
+        // refresh the content element so that it updates its content
+        $content_element->refresh();
         cache()->tags([cache_name($content_element)])->flush();
         return $content_element;
     }
@@ -63,4 +64,11 @@ class ContentElement extends Model
     {
         return Str::kebab(class_basename($this->content));
     }
+
+    /*
+    public function getHtmlAttribute() 
+    {
+        return view('content-elements.'.$this->type, ['content' => $this->content])->render();
+    }
+     */
 }

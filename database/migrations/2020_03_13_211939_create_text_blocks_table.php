@@ -15,7 +15,7 @@ class CreateTextBlocksTable extends Migration
     {
         Schema::create('text_blocks', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('header');
+            $table->string('header')->nullable();
             $table->mediumText('body');
             $table->timestamps();
         });

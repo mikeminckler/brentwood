@@ -22,6 +22,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/editing-toggle', 'SessionsController@editingToggle')->name('editing-toggle');
 
     Route::post('/content-elements/create', 'ContentElementsController@store')->name('content-elements.store');
+    Route::post('/content-elements/{id}', 'ContentElementsController@store')->name('content-elements.update');
+
+    Route::post('/file-uploads/create', 'FileUploadsController@store')->name('file-uploads.create');
+    Route::post('/file-uploads/pre-validate', 'FileUploadsController@preValidateFile')->name('file-uploads.pre-validate');
+    Route::post('/file-uploads/{id}/destroy', 'FileUploadsController@destroy')->name('file-uploads.destroy')->where('id', '\d+');
 });
 
 Route::get('{page}', 'PagesController@load')->name('pages.load')->where('page', '.*');

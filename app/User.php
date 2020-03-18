@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;      
 
 use App\Role;
+use App\FileUpload;
 
 class User extends Authenticatable
 {
@@ -99,5 +100,10 @@ class User extends Authenticatable
         }
 
         return $this->roles->contains('id', $role->id);
+    }
+
+    public function fileUploads()
+    {
+        return $this->morphMany(FileUpload::class, 'fileable');
     }
 }

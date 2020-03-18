@@ -4,7 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TextBlockValidation extends FormRequest
+use App\FileUpload;
+
+class FileUploadValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +15,7 @@ class TextBlockValidation extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -24,8 +26,7 @@ class TextBlockValidation extends FormRequest
     public function rules()
     {
         return [
-            //'header' => 'required',
-            'body' => 'required',
+            'file' => 'required|max:'.(new FileUpload)->max_size.'|mimes:jpeg,png,pdf'
         ];
     }
 }

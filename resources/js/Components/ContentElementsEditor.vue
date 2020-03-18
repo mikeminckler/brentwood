@@ -1,6 +1,6 @@
 <template>
 
-    <div class="">
+    <div class="relative">
 
         <transition-group name="new-content">
             <form-content-element 
@@ -12,10 +12,16 @@
             </form-content-element>
         </transition-group>
 
-        <div class="flex">
+        <div class="flex w-full bg-gray-200 p-2 relative z-2 shadow mt-4 items-center">
+            <div class="font-semibold">Create New</div>
             <div class="button mx-2" @click="addTextBlock">
-                <div class="pr-2"><i class="fas fa-plus"></i></div>
+                <div class="pr-2"><i class="fas fa-align-justify"></i></div>
                 <div>Text</div>
+            </div>
+
+            <div class="button mx-2" @click="addPhotoBlock">
+                <div class="pr-2"><i class="fas fa-file-image"></i></div>
+                <div>Photos</div>
             </div>
         </div>
 
@@ -38,7 +44,7 @@
                 return this.$store.state.page.content_elements;
             },
             sortedContentElments() {
-                return this.$lodash.orderBy(this.contentElements, ['sort_order', 'id'], ['desc', 'asc']);
+                return this.$lodash.orderBy(this.contentElements, ['sort_order', 'id'], ['asc', 'asc']);
             },
         },
 
@@ -56,22 +62,41 @@
 
             },
 
-            addTextBlock: function() {
-
-                let contentElement = {
+            newContentElement: function() {
+                return {
                     id: '0.' + this.$store.state.page.content_elements.length,
-                    type: 'text-block',
                     page_id: this.$store.state.page.id,
                     sort_order: this.$store.state.page.content_elements.length + 1,
-                    content: {
-                        header: '',
-                        body: '',
-                    }
+                };
+            },
+
+            addTextBlock: function() {
+
+                let contentElement = this.newContentElement();
+
+                contentElement.type = 'text-block';
+                contentElement.content = {
+                    id: 0,
+                    header: '',
+                    body: '',
                 };
 
                 this.$store.dispatch('addContentElement', contentElement);
 
-            }
+            },
+
+            addPhotoBlock: function() {
+                
+                let contentElement = this.newContentElement();
+
+                contentElement.type = 'photo-block';
+                contentElement.content = {
+                    id: 0,
+                    photos: [],
+                };
+
+                this.$store.dispatch('addContentElement', contentElement);
+            },
         },
 
     }

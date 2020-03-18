@@ -15,6 +15,7 @@
 
     import Feedback from '@/Mixins/Feedback';
     import TextBlock from '@/Forms/TextBlock.vue';
+    import PhotoBlock from '@/Forms/PhotoBlock.vue';
 
     export default {
 
@@ -24,6 +25,7 @@
 
         components: {
             'text-block': TextBlock,
+            'photo-block': PhotoBlock,
         },
 
         data() {

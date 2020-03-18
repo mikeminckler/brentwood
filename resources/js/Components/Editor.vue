@@ -3,8 +3,8 @@
     <div class="relative mb-4 w-full">
 
         <transition name="text-sm">
-            <div class="label" v-if="text">
-                <label>{{ label ? label : placeholder }}</label>
+            <div class="label" v-if="text && label">
+                <label>{{ label }}</label>
             </div>
         </transition>
 
@@ -13,7 +13,7 @@
                 <transition name="editor-menu-bar">
 
                     <div v-show="showMenu">
-                        <div class="rounded-t text-sm flex bg-gray-100 p-1 border-t border-l border-r items-center" >
+                        <div class="rounded-t text-sm flex p-1 items-center" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
                             <div class="menubar__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold" ><i class="fas fa-bold"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.italic() }" @click="commands.italic" ><i class="fas fa-italic"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.strike() }" @click="commands.strike" ><i class="fas fa-strikethrough"></i></div>
@@ -36,8 +36,7 @@
 
         </editor-menu-bar>
 
-
-        <div class="relative bg-gray-100 border px-4 py-2">
+        <div class="relative editor" :class="showBg ? 'bg-gray-100 border px-4 py-2' : ''">
 
             <editor-menu-bubble class="absolute z-10 h-full w-full bg-gray-100 top-0 left-0 rounded" :editor="editor" @hide="hideLinkMenu" v-slot="{ commands, isActive, getMarkAttrs, menu }">
 
@@ -56,7 +55,7 @@
 
             </editor-menu-bubble>
 
-            <div class="placeholder absolute pointer-events-none" v-if="!text && (placeholder || label)">{{ placeholder ? placeholder : label }}</div>
+            <div class="placeholder absolute pointer-events-none z-2" :class="showBg ? '' : 'pt-4'" v-if="!text && (placeholder || label)">{{ placeholder ? placeholder : label }}</div>
 
             <editor-content class="editor__content" :editor="editor" />
 
@@ -97,7 +96,7 @@
             EditorMenuBubble,
         },
 
-        props: ['value', 'placeholder', 'label', 'focus'],
+        props: ['value', 'placeholder', 'label', 'focus', 'showBg'],
 
         data() {
             return {

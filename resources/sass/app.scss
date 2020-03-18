@@ -16,24 +16,48 @@ a {
     @apply text-primary;
 }
 
-h1, h2, h3 {
-    @apply text-gray-500 font-oswald my-4;
+h1, h2, h3, .h1, .h2, .h3 {
+    @apply font-oswald p-0 m-0 pt-4;
 }
 
-h1 {
-    @apply text-4xl p-4;
+h1, .h1 {
+    @apply text-4xl;
 }
 
-h2 {
-    @apply text-2xl p-4;
+h2, .h2 {
+    @apply text-3xl;
 }
 
-div.input {
-    @apply mb-4;
+h3, .h3 {
+    @apply text-2xl;
 }
 
-input {
-    @apply border border-gray-300 bg-gray-100 px-4 py-2 w-full;
+p {
+    @apply p-0 m-0 pt-4;
+}
+
+input, .editor {
+    @apply w-full bg-transparent border border-transparent;
+}
+
+input:hover, input:focus, .editor:hover, .editor:focus {
+    @apply bg-white border-gray-300;
+}
+
+input::placeholder, .placeholder {
+    @apply text-gray-500 opacity-100 italic;
+}
+
+.form {
+
+    & div.input {
+        @apply mb-4;
+    }
+
+    & input {
+        @apply border border-gray-300 bg-gray-100 px-4 py-2 w-full;
+    }
+
 }
 
 button, .button {
@@ -70,6 +94,13 @@ button, .button {
 
 .rotate90 {
     transform: rotate(90deg);
+}
+
+/* CONTENT */
+
+
+.text-block {
+    @apply px-8;
 }
 
 /* EDITOR */

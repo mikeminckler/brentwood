@@ -23,45 +23,54 @@
                 :current-page='@json($page ?? '')'
             ></page-editor>
 
+
+            <div id="header" class="flex justify-center sticky z-3 top-0 bg-gray-100">
+                
+                <div class="flex w-full relative max-w-6xl">
+
+                    <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-3"></div>
+
+                    <div class="md:flex-1">
+                        <div class="p-8 flex items-center justify-center">
+                            <a href="/"><img src="images/logo.svg" class="h-12 hidden md:block" /></a>
+                            <a href="/"><img src="images/icon.svg" class="h-12 block md:hidden" /></a>
+                        </div>
+                    </div>
+
+                    <div class="flex-2 flex">
+
+                        <nav class="flex-1 flex items-center px-8">
+                            @foreach ($menu as $menu_page)
+                                @if (!$menu_page->unlisted)
+                                    <a href="{{ $menu_page->full_slug }}" class="font-oswald text-lg ml-8 first:ml-0">{{ $menu_page->name }}</a>
+                                @endif
+                            @endforeach 
+                        </nav>
+
+                        <div class="p-8 flex items-center justify-end">
+
+                            <a href="/apply-now" class="button ml-4 whitespace-no-wrap">Apply Now</a>
+
+                            @auth
+                                @if (auth()->user()->hasRole('editor'))
+                                    <editing-button class="ml-4"></editing-button>
+                                @endif
+                            @endauth
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
             <div class="items-center flex-1 flex flex-col relative" style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 50%, rgba(247,218,199,1));"> 
 
                 <div class="flex flex-1 flex-col w-full max-w-6xl relative">
 
                     <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-2"></div>
-
-                    <div id="header" class="flex items-center sticky z-2 top-0 bg-gray-100">
-
-                        <div class="md:flex-1">
-                            <div class="p-8 flex items-center justify-center">
-                                <a href="/"><img src="images/logo.svg" class="h-12 hidden md:block" /></a>
-                                <a href="/"><img src="images/icon.svg" class="h-12 block md:hidden" /></a>
-                            </div>
-                        </div>
-
-                        <div class="flex-2 flex">
-
-                            <nav class="flex-1 flex items-center px-8">
-                                @foreach ($menu as $menu_page)
-                                    @if (!$menu_page->unlisted)
-                                        <a href="{{ $menu_page->full_slug }}" class="font-oswald text-lg ml-8 first:ml-0">{{ $menu_page->name }}</a>
-                                    @endif
-                                @endforeach 
-                            </nav>
-
-                            <div class="p-8 flex items-center justify-end">
-
-                                <a href="/apply-now" class="button ml-4 whitespace-no-wrap">Apply Now</a>
-
-                                @auth
-                                    @if (auth()->user()->hasRole('editor'))
-                                        <editing-button class="ml-4"></editing-button>
-                                    @endif
-                                @endauth
-
-                            </div>
-                        </div>
-                    </div>
-
 
                     <div id="content" class="flex-1 flex flex-col relative">
                         @yield ('content')

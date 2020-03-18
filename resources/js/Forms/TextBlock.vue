@@ -6,13 +6,18 @@
         </div>
 
         <div class="flex-2">
-            <div class="m-4 p-4 pb-2 bg-gray-200 ">
-                <div class="mb-4">
+
+            <div class="text-block">
+                <div class="h2">
                     <input type="text" v-model="content.header" @change="saveContent()" placeholder="Header" />
                 </div>
 
-                <editor v-model="content.body" @input="saveContent()"></editor>
+                <editor v-model="content.body" 
+                        @input="saveContent()"
+                        placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                ></editor>
             </div>
+
         </div>
 
     </div>

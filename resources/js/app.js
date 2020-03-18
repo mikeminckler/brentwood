@@ -19,8 +19,8 @@ import Feedback from '@/Components/Feedback.vue'
 import PageTree from '@/Components/PageTree.vue'
 import Processing from '@/Components/Processing.vue'
 
-import AddContent from '@/Components/AddContent.vue'
-Vue.component('add-content', AddContent);
+import ContentElementsEditor from '@/Components/ContentElementsEditor.vue'
+Vue.component('content-elements-editor', ContentElementsEditor);
 
 const app = new Vue({
     el: "#app",

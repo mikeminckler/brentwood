@@ -56,4 +56,13 @@ class ContentElementTest extends TestCase
         $content_element = factory(ContentElement::class)->states('text-block')->create();
         $this->assertEquals('text-block', $content_element->type);
     }
+
+    /*
+    public function a_content_element_has_an_html_attribute()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $html = view('content-elements.'.$content_element->type, ['content' => $content_element->content])->render();
+        $this->assertEquals($html, $content_element->html);
+    }
+    */
 }

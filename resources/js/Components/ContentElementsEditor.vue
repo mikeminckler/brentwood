@@ -93,6 +93,14 @@
                 contentElement.content = {
                     id: 0,
                     photos: [],
+                    columns: 1,
+                    height: 33,
+                    padding: false,
+                    show_text: false,
+                    header: '',
+                    body: '',
+                    text_order: 1,
+                    text_span: 1,
                 };
 
                 this.$store.dispatch('addContentElement', contentElement);

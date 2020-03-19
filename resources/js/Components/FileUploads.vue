@@ -14,7 +14,7 @@
         />
 
         <transition-group name="uploading" tag="div" class="">
-            <div class="bg-gray-300 odd:bg-gray-100 mb-2 overflow-hidden rounded" 
+            <div class="bg-gray-300 odd:bg-gray-100 mt-2 overflow-hidden rounded" 
                 v-for="(file, index) in files" 
                 :key="file.id" 
                 v-if="!show ? (file.id >= 1 ? false : true) : true"
@@ -22,7 +22,7 @@
 
                 <div class="relative w-full flex items-center">
                     <div class="absolute bg-green-200 absolute h-full top-0"  
-                        v-if="file.progress != 100" 
+                         v-if="file.progress <= 100" 
                         :style="'width: ' + file.progress + '%; transition: width 1000ms linear;'"></div>
                     <div class="whitespace-no-wrap flex-1 relative z-10 px-2 py-1 font-semibold">{{ file.name }}</div>
                     <div class="whitespace-no-wrap relative z-10 px-2 py-1">{{ formatBytes(file.size) }}</div>

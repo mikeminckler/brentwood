@@ -14,55 +14,58 @@
 
     <div id="app" class="relative flex-1 flex">
 
-        <page-tree v-if="$store.state.editing"></page-tree>
+        <div class="relative">
+            <page-tree v-if="$store.state.editing"></page-tree>
+        </div>
 
         <div class="relative flex-1 flex flex-col">
 
-            <page-editor 
-                :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
-                :current-page='@json($page ?? '')'
-            ></page-editor>
+            <div class="sticky top-0 z-3">
+                <page-editor 
+                    :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
+                    :current-page='@json($page ?? '')'
+                ></page-editor>
 
+                <div id="header" class="flex justify-center relative bg-gray-100">
+                    
+                    <div class="flex w-full relative max-w-6xl">
 
-            <div id="header" class="flex justify-center sticky z-3 top-0 bg-gray-100">
-                
-                <div class="flex w-full relative max-w-6xl">
+                        <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-3"></div>
 
-                    <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-3"></div>
-
-                    <div class="md:flex-1">
-                        <div class="p-8 flex items-center justify-center">
-                            <a href="/"><img src="images/logo.svg" class="h-12 hidden md:block" /></a>
-                            <a href="/"><img src="images/icon.svg" class="h-12 block md:hidden" /></a>
+                        <div class="md:flex-1">
+                            <div class="p-8 flex items-center justify-center">
+                                <a href="/"><img src="images/logo.svg" class="h-12 hidden md:block" /></a>
+                                <a href="/"><img src="images/icon.svg" class="h-12 block md:hidden" /></a>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="flex-2 flex">
+                        <div class="flex-2 flex">
 
-                        <nav class="flex-1 flex items-center px-8">
-                            @foreach ($menu as $menu_page)
-                                @if (!$menu_page->unlisted)
-                                    <a href="{{ $menu_page->full_slug }}" class="font-oswald text-lg ml-8 first:ml-0">{{ $menu_page->name }}</a>
-                                @endif
-                            @endforeach 
-                        </nav>
+                            <nav class="flex-1 flex items-center px-8">
+                                @foreach ($menu as $menu_page)
+                                    @if (!$menu_page->unlisted)
+                                        <a href="{{ $menu_page->full_slug }}" class="font-oswald text-lg ml-8 first:ml-0">{{ $menu_page->name }}</a>
+                                    @endif
+                                @endforeach 
+                            </nav>
 
-                        <div class="p-8 flex items-center justify-end">
+                            <div class="p-8 flex items-center justify-end">
 
-                            <a href="/apply-now" class="button ml-4 whitespace-no-wrap">Apply Now</a>
+                                <a href="/apply-now" class="button ml-4 whitespace-no-wrap">Apply Now</a>
 
-                            @auth
-                                @if (auth()->user()->hasRole('editor'))
-                                    <editing-button class="ml-4"></editing-button>
-                                @endif
-                            @endauth
+                                @auth
+                                    @if (auth()->user()->hasRole('editor'))
+                                        <editing-button class="ml-4"></editing-button>
+                                    @endif
+                                @endauth
+
+                            </div>
 
                         </div>
 
                     </div>
 
                 </div>
-
             </div>
 
 

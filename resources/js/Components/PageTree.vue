@@ -1,7 +1,7 @@
 <template>
 
     <div v-if="editing"
-        class="bg-gray-100 border-r border-gray-300 pt-8"
+        class="bg-gray-100 border-r border-gray-300 pt-8 sticky top-0"
         style="width: 300px"
     >
         <page-list :page="homePage" :key="homePage.id"></page-list>

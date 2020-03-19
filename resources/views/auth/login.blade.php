@@ -9,9 +9,7 @@
 
         <div class="w-full max-w-md flex flex-col items-center">
 
-            <div class="">
-                <img src="/images/logo.svg" class="h-24" />
-            </div>
+            <h1>Login</h1>
 
             <div class="border border-gray-200 rounded-lg mt-8 p-4 w-full bg-white form">
                 <form method="POST" action="/login">

@@ -6,6 +6,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 use Illuminate\Support\Str;
 
+use App\ContentElement;
+
 class ContentElementValidation extends FormRequest
 {
     /**
@@ -19,9 +21,11 @@ class ContentElementValidation extends FormRequest
             return false;
         }
 
-        if (auth()->user()->hasRole('editor')) {
-            return true;
+        if ($this->route('id')) {
+            $content_element = ContentElement::findorFail($this->route('id'));
+            return $this->user()->can('update', $content_element);
         }
+        return $this->user()->can('create', ContentElement::class);
         return false;
     }
 

@@ -4,6 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+use App\Page;
+
 class PageValidation extends FormRequest
 {
     /**
@@ -17,10 +19,12 @@ class PageValidation extends FormRequest
             return false;
         }
 
-        if (auth()->user()->hasRole('editor')) {
-            return true;
+        if ($this->route('id')) {
+            $page = Page::findorFail($this->route('id'));
+            return $this->user()->can('update', $page);
         }
-        return false;
+        return $this->user()->can('create', Page::class);
+
     }
 
     /**

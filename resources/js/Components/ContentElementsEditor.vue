@@ -52,13 +52,16 @@
 
             updateContentElement: function(data, contentElement) {
 
-                let index = this.$lodash.findIndex( this.content_elements, c => {
+                console.log('UPDATE CE: ' + data.id);
+
+                let ce = this.$lodash.find( this.content_elements, c => {
                     return c.id === contentElement.id;
                 });
 
-                this.contentElements.splice(index, 1);
+                this.$lodash.merge(ce, data);
 
-                this.contentElements.push(data);
+                //this.contentElements.splice(index, 1);
+                //this.contentElements.push(data);
 
             },
 

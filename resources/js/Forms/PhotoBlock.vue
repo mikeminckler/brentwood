@@ -50,7 +50,7 @@
                     ></editor>
                 </div>
 
-                <div class="absolute bottom-0 flex text-xl justify-between w-full">
+                <div class="absolute bottom-0 flex text-xl">
 
                     <div class="flex">
                         <transition name="slide-icon">
@@ -206,6 +206,9 @@
         },
 
         watch: {
+            content() {
+                this.saveContent();
+            },
             photos() {
                 this.saveContent();
             },
@@ -226,7 +229,7 @@
         methods: {
 
             saveContent: _.debounce( function() {
-                //this.$emit('save');
+                this.$emit('save');
             }, 1000),
 
             /*
@@ -303,7 +306,7 @@
                 });
 
                 photo.sort_order++;
-                nextPhoto.sort_order--;
+                nextPhoto.sort_order = photo.sort_order - 1;
             },
 
             decreaseOrder: function(photo) {
@@ -312,12 +315,12 @@
                 });
 
                 photo.sort_order--;
-                prevPhoto.sort_order++;
+                prevPhoto.sort_order = photo.sort_order + 1;
             },
 
             setLayout: function() {
 
-                if (this.photos.length == 1) {
+                if (this.photos.length === 1) {
 
                     this.content.columns = 1;
                     this.content.height = 33;
@@ -325,10 +328,24 @@
 
                 }
 
+                if (this.photos.length === 2) {
 
-            }
+                    this.content.columns = 2;
+                    this.content.height = 50;
+                    this.content.padding = false;
 
-            /*
+                }
+
+                if (this.photos.length === 3) {
+
+                    this.content.columns = 3;
+                    this.content.height = 50;
+                    this.content.padding = false;
+
+                }
+
+            },
+
             removePhoto: function(photo, index) {
 
                 if (photo.id  >= 1) {
@@ -340,12 +357,8 @@
 
                             this.processSuccess(response);
 
-                            if (this.multiple) {
-                                let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
-                                this.uploads.splice(uploadIndex, 1);
-                            } else {
-                                this.uploads = {};
-                            }
+                            let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
+                            this.uploads.splice(uploadIndex, 1);
                             this.photos.splice(index, 1);
 
                         }, function (error) {
@@ -356,17 +369,13 @@
 
                 } else {
 
-                    if (this.multiple) {
-                        let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
-                        this.uploads.splice(uploadIndex, 1);
-                    } else {
-                        this.uploads = {};
-                    }
+                    let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
+                    this.uploads.splice(uploadIndex, 1);
                     this.photos.splice(index, 1);
 
                 }
             },
-            */
+            
         },
 
     }

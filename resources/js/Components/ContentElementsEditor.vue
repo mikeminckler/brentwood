@@ -2,12 +2,11 @@
 
     <div class="relative">
 
-        <transition-group name="new-content">
+        <transition-group name="content-elements" tag="div" class="relative">
             <form-content-element 
                 v-for="(contentElement, index) in sortedContentElments"
                 :key="contentElement.type + '-' + contentElement.id"
                 :value="contentElement"
-                @input="updateContentElement($event, contentElement)"
             >
             </form-content-element>
         </transition-group>
@@ -32,8 +31,12 @@
 <script>
 
     import ContentElement from '@/Forms/ContentElement.vue';
+    import ContentElements from '@/Mixins/ContentElements';
+    import Feedback from '@/Mixins/Feedback';
 
     export default {
+
+        mixins: [Feedback, ContentElements],
 
         components: {
             'form-content-element': ContentElement,
@@ -50,27 +53,17 @@
 
         methods: {
 
-            updateContentElement: function(data, contentElement) {
-
-                console.log('UPDATE CE: ' + data.id);
-
-                let ce = this.$lodash.find( this.content_elements, c => {
-                    return c.id === contentElement.id;
-                });
-
-                this.$lodash.merge(ce, data);
-
-                //this.contentElements.splice(index, 1);
-                //this.contentElements.push(data);
-
-            },
-
             newContentElement: function() {
                 return {
                     id: '0.' + this.$store.state.page.content_elements.length,
                     page_id: this.$store.state.page.id,
                     sort_order: this.$store.state.page.content_elements.length + 1,
+                    unlisted: false,
                 };
+            },
+
+            saveNewContentElement: function(contentElement) {
+                this.saveContentElement(contentElement, true);
             },
 
             addTextBlock: function() {
@@ -81,10 +74,10 @@
                 contentElement.content = {
                     id: 0,
                     header: '',
-                    body: '',
+                    body: '<p></p>',
                 };
 
-                this.$store.dispatch('addContentElement', contentElement);
+                this.saveNewContentElement(contentElement);
 
             },
 
@@ -104,9 +97,10 @@
                     body: '',
                     text_order: 1,
                     text_span: 1,
+                    text_style: '',
                 };
 
-                this.$store.dispatch('addContentElement', contentElement);
+                this.saveNewContentElement(contentElement);
             },
         },
 
@@ -115,7 +109,7 @@
 
 <style>
 
-@keyframes new-content {
+@keyframes content-elements {
     0% {
         opacity: 0;
         max-height: 0px;
@@ -126,12 +120,16 @@
     }
 }
 
-.new-content-enter-active {
-    animation: new-content var(--transition-time) ease-out;
+.content-elements-enter-active {
+    animation: content-elements var(--transition-time) ease-out;
 }
 
-.new-content-leave-active {
-    animation: new-content var(--transition-time) reverse;
+.content-elements-leave-active {
+    animation: content-elements var(--transition-time) reverse;
+}
+
+.content-elements-move {
+    transition: transform var(--transition-time);
 }
 
 </style>

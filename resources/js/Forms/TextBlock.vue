@@ -7,7 +7,7 @@
 
         <div class="flex-2">
 
-            <div class="text-block">
+            <div class="text-block columns-2">
                 <div class="h2">
                     <input type="text" v-model="content.header" @change="saveContent()" placeholder="Header" />
                 </div>

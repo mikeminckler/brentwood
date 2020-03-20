@@ -23,6 +23,7 @@ class ContentElementTest extends TestCase
             'page_id' => $page->id,
             'content' => $text_block,
             'sort_order' => 1,
+            'unlisted' => false,
         ];
 
         $content_element = (new ContentElement)->saveContentElement(null, $input);
@@ -31,6 +32,7 @@ class ContentElementTest extends TestCase
 
         $this->assertEquals($page->id, $content_element->page->id);
         $this->assertEquals(1, $content_element->sort_order);
+        $this->assertEquals(0, $content_element->unlisted);
         $this->assertEquals(Arr::get($text_block, 'header'), $content_element->content->header);
         $this->assertEquals(Arr::get($text_block, 'body'), $content_element->content->body);
 

@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
 use App\ContentElement;
+use App\ContentElementTrait;
 
 class TextBlock extends Model
 {
+
+    use ContentElementTrait;
+
     public function saveContent($input) 
     {
         $update = false;
@@ -28,8 +32,4 @@ class TextBlock extends Model
         return $text_block;
     }
 
-    public function contentElement() 
-    {
-        return $this->morphOne(ContentElement::class, 'content');
-    }
 }

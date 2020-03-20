@@ -31,6 +31,7 @@ class ContentElement extends Model
 
         $content_element->page_id = $page->id;
         $content_element->sort_order = Arr::get($input, 'sort_order');
+        $content_element->unlisted = Arr::get($input, 'unlisted');
 
         $content_class = 'App\\'.Str::studly(Arr::get($input, 'type'));
 

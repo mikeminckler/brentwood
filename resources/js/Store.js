@@ -7,6 +7,7 @@ const store = new Vuex.Store({
     state: {
         editing: false,
         feedback: [],
+        saving: [],
         processing: {
             active: false,
             text: '',
@@ -24,6 +25,15 @@ const store = new Vuex.Store({
     mutations: {
         setEditing(state, editing) {
             state.editing = editing;
+        },
+
+        startSaving(state, saving) {
+            state.saving.push(saving);
+        },
+
+        completeSaving(state, saving) {
+            let index = state.saving.findIndex(save => save === saving);
+            state.saving.splice(index, 1);
         },
 
         setPage(state, page) {
@@ -63,6 +73,14 @@ const store = new Vuex.Store({
     actions: {
         setEditing({ commit, state }, editing) {
             commit('setEditing', editing);
+        },
+
+        startSaving({ commit, state }, saving) {
+            commit('startSaving', saving);
+        },
+
+        completeSaving({ commit, state }, saving) {
+            commit('completeSaving', saving);
         },
 
         setPage({ commit, state }, page) {

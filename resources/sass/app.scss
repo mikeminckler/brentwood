@@ -36,6 +36,12 @@ p {
     @apply p-0 m-0 py-4;
 }
 
+.columns-2 {
+    & p {
+        column-count: 2;
+    }
+}
+
 p:last-child {
 }
 
@@ -48,7 +54,7 @@ p:last-child {
     }
 }
 
-.photo-block-icons {
+.content-element-icons {
     @apply cursor-pointer px-2 py-1 mb-2 flex items-center justify-center;
 }
 
@@ -57,11 +63,16 @@ input, .editor {
 }
 
 input:hover, input:focus, .editor:hover, .editor:focus {
-    @apply bg-white border-gray-300;
+    @apply border-gray-300;
 }
 
-input::placeholder, .placeholder {
-    @apply text-gray-500 opacity-100 italic;
+input::placeholder, .placeholder, input::placeholder:hover, .placeholder:hover {
+    @apply opacity-100 italic;
+}
+
+.photo-block-text-blue, .photo-block-text-gray {
+    & input::placeholder, .placeholder, .placeholder:hover {
+    }
 }
 
 .form {
@@ -114,9 +125,16 @@ button, .button {
 
 /* CONTENT */
 
-
 .text-block {
-    @apply px-8;
+    @apply p-8;
+}
+
+.photo-block-text-blue {
+    @apply text-white bg-blue-400;
+}
+
+.photo-block-text-gray {
+    @apply text-white bg-gray-500;
 }
 
 /* EDITOR */
@@ -152,6 +170,19 @@ button, .button {
 
 .fade-leave-active {
     animation: fade var(--transition-time) reverse;
+}
+
+.spin {
+    animation: rotating 1s linear infinite;
+}
+
+@keyframes rotating {
+    0% {
+        transform: rotate(0deg);
+    }
+    100%   {
+        transform: rotate(360deg);
+    }
 }
 
 @tailwind utilities;

@@ -24,6 +24,7 @@ class CreatePhotoBlocksTable extends Migration
             $table->mediumText('body')->nullable();
             $table->integer('text_order')->nullable();
             $table->integer('text_span')->nullable();
+            $table->string('text_style')->nullable();
 
             $table->timestamps();
         });

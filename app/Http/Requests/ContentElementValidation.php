@@ -48,6 +48,7 @@ class ContentElementValidation extends FormRequest
         $rules = collect([
             'page_id' => 'required|exists:pages,id',
             'sort_order' => 'required|integer',
+            'unlisted' => 'required|boolean',
         ])->merge(
             collect((new $content_class)->rules())->mapWithKeys(function ($rule, $field) {
                 return ['content.'.$field => $rule];

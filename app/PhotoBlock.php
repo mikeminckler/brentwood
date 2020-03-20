@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use App\PhotoBlock;
 use App\Photo;
 use Illuminate\Support\Arr;
+use App\ContentElementTrait;
 
 class PhotoBlock extends Model
 {
+    use ContentElementTrait;
+
+    protected $with = ['photos'];
+
     public function saveContent($input) 
     {
         $update = false;
@@ -28,6 +33,7 @@ class PhotoBlock extends Model
         $photo_block->body = Arr::get($input, 'body');
         $photo_block->text_order = Arr::get($input, 'text_order');
         $photo_block->text_span = Arr::get($input, 'text_span');
+        $photo_block->text_style = Arr::get($input, 'text_style');
 
         $photo_block->save();
 

@@ -13,7 +13,7 @@
                 <transition name="editor-menu-bar">
 
                     <div v-show="showMenu">
-                        <div class="rounded-t text-sm flex p-1 items-center" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
+                        <div class="rounded-t text-sm flex p-1 items-center text-gray-700" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
                             <div class="menubar__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold" ><i class="fas fa-bold"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.italic() }" @click="commands.italic" ><i class="fas fa-italic"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.strike() }" @click="commands.strike" ><i class="fas fa-strikethrough"></i></div>

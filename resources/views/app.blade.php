@@ -14,13 +14,17 @@
 
     <div id="app" class="relative flex-1 flex">
 
-        <div class="relative">
-            <page-tree v-if="$store.state.editing"></page-tree>
+        <div class="relative" v-if="$store.state.editing">
+            <div class="sticky top-0">
+                <saving-indicator></saving-indicator>
+                <page-tree></page-tree>
+            </div>
         </div>
 
         <div class="relative flex-1 flex flex-col">
 
             <div class="sticky top-0 z-3">
+
                 <page-editor 
                     :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
                     :current-page='@json($page ?? '')'

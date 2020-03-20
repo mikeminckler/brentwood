@@ -5,6 +5,7 @@
 use App\PhotoBlock;
 use Faker\Generator as Faker;
 use App\Photo;
+use App\ContentElement;
 
 $factory->define(PhotoBlock::class, function (Faker $faker) {
     return [
@@ -15,13 +16,12 @@ $factory->define(PhotoBlock::class, function (Faker $faker) {
     ];
 });
 
-/*
 $factory->afterCreating(PhotoBlock::class, function ($photo_block, $faker) {
-    $photo = factory(Photo::class)->create([
-        'photo_block_id' => $photo_block->id,
+    $content_element = factory(ContentElement::class)->create([
+        'content_id' => $photo_block->id,
+        'content_type' => get_class($photo_block),
     ]);
 });
- */
 
 $factory->state(PhotoBlock::class, 'with-text', function ($faker) {
     return [
@@ -29,5 +29,6 @@ $factory->state(PhotoBlock::class, 'with-text', function ($faker) {
         'body' => $faker->paragraph,
         'text_order' => 1,
         'text_span' => 1,
+        'text_style' => 1,
     ];
 });

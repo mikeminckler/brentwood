@@ -24,15 +24,16 @@ class PhotoBlockValidation extends FormRequest
     public function rules()
     {
         return [
-            'photos' => 'required',
+            //'photos' => 'required',
             'columns' => 'required|integer',
             'height' => 'required|integer',
             'padding' => 'required|boolean',
             'show_text' => 'required|boolean',
             'header' => 'string|nullable',
             'body' => 'string|nullable',
-            'text_order' => 'required|integer',
-            'text_span' => 'required|integer',
+            'text_order' => 'integer|nullable',
+            'text_span' => 'integer|nullable',
+            'text_style' => 'string|nullable',
         ];
     }
 }

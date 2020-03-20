@@ -18,6 +18,7 @@ import EditingButton from '@/Components/EditingButton.vue'
 import Feedback from '@/Components/Feedback.vue'
 import PageTree from '@/Components/PageTree.vue'
 import Processing from '@/Components/Processing.vue'
+import SavingIndicator from '@/Components/SavingIndicator.vue'
 
 import ContentElementsEditor from '@/Components/ContentElementsEditor.vue'
 Vue.component('content-elements-editor', ContentElementsEditor);
@@ -32,5 +33,6 @@ const app = new Vue({
         'feedback': Feedback,
         'page-tree': PageTree,
         'processing': Processing,
+        'saving-indicator': SavingIndicator,
     }
 });

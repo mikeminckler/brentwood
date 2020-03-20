@@ -4,12 +4,15 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\PhotoValidation;
+
+use Intervention\Image\Facades\Image;
+use App\FileUpload;
+use App\PhotoBlock;
 
 class Photo extends Model
 {

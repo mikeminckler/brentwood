@@ -31,8 +31,8 @@
                     </div>
                 </div>
 
-                <div class="w-12 h-12" v-if="file.small">
-                    <img :src="'/' + file.small" class="w-full h-full object-cover" />
+                <div class="w-12 h-12" v-if="file.large">
+                    <img :src="'/' + file.large" class="w-full h-full object-cover" />
                 </div>
 
             </div>
@@ -117,14 +117,14 @@
                     reader.readAsDataURL(file);
 
                     reader.onload = e => {
-                        let small = e.target.result;
+                        let large = e.target.result;
 
                         let uploadingIndex = index + filesCount;
                         let newFile = {
                             id: '0.' + index,
                             name: file.name,
                             size: file.size,
-                            small: '',
+                            large: '',
                             type: this.type,
                             progress: 0,
                         };
@@ -159,7 +159,7 @@
                             this.$http.post('/file-uploads/create', formData, formOptions).then( response => {
                                 this.processSuccess(response);
                                 this.$set(this.files, uploadingIndex, response.data.file_upload);
-                                this.files[uploadingIndex].small = small;
+                                this.files[uploadingIndex].large = large;
                                 this.updateParent();
                             }, error => {
                                 this.processErrors(error.response);

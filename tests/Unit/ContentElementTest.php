@@ -7,6 +7,7 @@ use Tests\TestCase;
 use App\ContentElement;
 use App\TextBlock;
 use App\Page;
+use App\Version;
 use Illuminate\Support\Arr;
 
 class ContentElementTest extends TestCase
@@ -39,6 +40,13 @@ class ContentElementTest extends TestCase
     }
 
     /** @test **/
+    public function a_content_element_belongs_to_a_version()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $this->assertInstanceOf(Version::class, $content_element->version);
+    }
+
+    /** @test **/
     public function a_content_element_belongs_to_a_page()
     {
         $content_element = factory(ContentElement::class)->states('text-block')->create();
@@ -59,12 +67,35 @@ class ContentElementTest extends TestCase
         $this->assertEquals('text-block', $content_element->type);
     }
 
-    /*
-    public function a_content_element_has_an_html_attribute()
+    /** @test **/
+    public function a_new_content_element_is_created_if_the_one_updated_has_been_published()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
-        $html = view('content-elements.'.$content_element->type, ['content' => $content_element->content])->render();
-        $this->assertEquals($html, $content_element->html);
+        $page = factory(Page::class)->states('published')->create();
+        $content_element = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->published_version_id,
+        ]);
+
+        $content = $content_element->content;
+
+        $this->assertNotEquals($page->getDraftVersion()->id, $page->publishedVersion->id);
+
+        $this->assertNotNull($content_element->published_at);
+
+        $input = factory(ContentElement::class)->states('text-block')->raw([
+            'page_id' => $page->id,
+        ]);
+        $input['type'] = 'text-block';
+        $input['content'] = factory(TextBlock::class)->raw();
+        $input['content']['id'] = $content->id;
+
+        $saved_content_element = (new ContentElement)->saveContentElement($content_element->id, $input);
+
+        $this->assertNotEquals($content_element->id, $saved_content_element->id);
+        $this->assertNotEquals($content->id, $saved_content_element->content->id);
+
+        $page->refresh();
+        $this->assertEquals($page->getDraftVersion()->id, $saved_content_element->version_id);
     }
-    */
+
 }

@@ -15,12 +15,10 @@ class PhotoBlock extends Model
 
     protected $with = ['photos'];
 
-    public function saveContent($input) 
+    public function saveContent($id = null, $input) 
     {
-        $update = false;
-        if (Arr::get($input, 'id') >= 1) {
-            $photo_block = PhotoBlock::findOrFail(Arr::get($input, 'id'));
-            $update = true;
+        if ($id >= 1) {
+            $photo_block = PhotoBlock::findOrFail($id);
         } else {
             $photo_block = new PhotoBlock;
         }

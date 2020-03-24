@@ -67,6 +67,18 @@ class PagePolicy
     }
 
     /**
+     * Determine whether the user can publish the page.
+     *
+     * @param  \App\User  $user
+     * @param  \App\Page  $page
+     * @return mixed
+     */
+    public function publish(User $user, Page $page)
+    {
+        return $user->hasRole('publisher');
+    }
+
+    /**
      * Determine whether the user can delete the page.
      *
      * @param  \App\User  $user

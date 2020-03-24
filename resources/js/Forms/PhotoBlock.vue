@@ -108,11 +108,11 @@
 
                     <div class="flex">
                         <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="photo.sort_order > 1 && photos.length > 1" @click="decreaseOrder(photo)"><i class="fas fa-arrow-alt-circle-left"></i></div>
+                            <div class="cursor-pointer mx-1" v-if="photo.sort_order > 1 && photos.length > 1" @click="sortUp(photo)"><i class="fas fa-arrow-alt-circle-left"></i></div>
                         </transition>
 
                         <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="photo.sort_order < photos.length && photos.length > 1" @click="increaseOrder(photo)"><i class="fas fa-arrow-alt-circle-right"></i></div>
+                            <div class="cursor-pointer mx-1" v-if="photo.sort_order < photos.length && photos.length > 1" @click="sortDown(photo)"><i class="fas fa-arrow-alt-circle-right"></i></div>
                         </transition>
                     </div>
 
@@ -296,9 +296,7 @@
                 }
             },
 
-            increaseOrder: function(photo) {
-
-                photo.sort_order++;
+            sortDown: function(photo) {
 
                 let currentIndex = this.$lodash.findIndex(this.sortedPhotos, p => {
                     return photo.id === p.id;
@@ -307,13 +305,13 @@
                 let nextPhoto = this.sortedPhotos[currentIndex + 1];
 
                 if (nextPhoto) {
-                    nextPhoto.sort_order = photo.sort_order - 1;
+                    nextPhoto.sort_order = photo.sort_order;
                 }
+
+                photo.sort_order++;
             },
 
-            decreaseOrder: function(photo) {
-
-                photo.sort_order--;
+            sortUp: function(photo) {
 
                 let currentIndex = this.$lodash.findIndex(this.sortedPhotos, p => {
                     return photo.id === p.id;
@@ -322,8 +320,10 @@
                 let prevPhoto = this.sortedPhotos[currentIndex - 1];
 
                 if (prevPhoto) {
-                    prevPhoto.sort_order = photo.sort_order + 1;
+                    prevPhoto.sort_order = photo.sort_order;
                 }
+
+                photo.sort_order--;
             },
 
             setLayout: function() {

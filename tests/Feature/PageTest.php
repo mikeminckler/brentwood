@@ -10,6 +10,10 @@ use App\Page;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
+use App\ContentElement;
+use App\User;
+use App\TextBlock;
+
 class PageTest extends TestCase
 {
 
@@ -193,5 +197,96 @@ class PageTest extends TestCase
         $this->assertEquals($home_page_slug, $home_page->slug);
         $this->assertEquals($home_page_parent_page_id, $home_page->parent_page_id);
         
+    }
+
+    /** @test **/
+    public function a_page_can_be_published()
+    {
+        $page = factory(Page::class)->create();
+
+        $content_element = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->getDraftVersion()->id,
+        ]);
+
+        $this->assertNull($page->published_at);
+
+        $this->json('POST', route('pages.publish', ['id' => $page->id]))
+            ->assertStatus(401);
+
+        $this->signIn( factory(User::class)->create());
+
+        $this->json('POST', route('pages.publish', ['id' => $page->id]))
+            ->assertStatus(403);
+
+        $this->signInAdmin();
+
+        $this->json('POST', route('pages.publish', ['id' => $page->id]))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Page Published',
+             ]);
+
+        $page->refresh();
+        $content_element->refresh();
+
+        $this->assertNotNull($page->published_version_id);
+        $this->assertEquals($page->published_version_id, $content_element->version_id);
+    }
+
+    /** @test **/
+    public function a_published_page_can_be_updated()
+    {
+        $page = factory(Page::class)->states('published')->create();
+
+        $content_element = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->published_version_id,
+        ]);
+
+        $this->signInAdmin();
+
+        $input = $content_element->toArray();
+        $input['content'] = factory(TextBlock::class)->raw();
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful();
+
+        $new_content_element = ContentElement::all()->last();
+
+        $this->assertNotEquals($content_element->id, $new_content_element->id);
+        $this->assertEquals($page->getDraftVersion()->id, $new_content_element->version_id);
+
+        $this->assertEquals(Arr::get($input, 'header'), $new_content_element->header);
+        $this->assertEquals(Arr::get($input, 'body'), $new_content_element->body);
+        $this->assertEquals($page->getDraftVersion()->id, $new_content_element->version_id);
+
+        $this->json('POST', route('pages.publish', ['id' => $page->id]))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Page Published',
+             ]);
+
+        $page->refresh();
+        $content_element->refresh();
+
+        $this->assertNotNull($page->published_version_id);
+        $this->assertEquals($page->published_version_id, $new_content_element->version_id);
+
+    }
+
+
+    /** @test **/
+    public function a_page_returns_a_404_if_it_has_not_been_published()
+    {
+        $page = factory(Page::class)->states('unpublished')->create();
+
+        $this->get( $page->full_slug )
+            ->assertStatus(404);
+        
+        $page->publish();
+
+        $this->get( $page->full_slug )
+            ->assertSuccessful();
     }
 }

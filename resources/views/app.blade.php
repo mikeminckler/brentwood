@@ -47,7 +47,7 @@
 
                             <nav class="flex-1 flex items-center px-8">
                                 @foreach ($menu as $menu_page)
-                                    @if (!$menu_page->unlisted)
+                                    @if (!$menu_page->unlisted && $menu_page->published_version_id)
                                         <a href="{{ $menu_page->full_slug }}" class="font-oswald text-lg ml-8 first:ml-0">{{ $menu_page->name }}</a>
                                     @endif
                                 @endforeach 

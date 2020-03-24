@@ -28,6 +28,7 @@ class PagesSeeder extends Seeder
             $page->parent_page_id = $parent ? $parent->id : 0;
             $page->sort_order = $count;
             $page->save();
+            $page->publish();
             $count++;
         }
     }

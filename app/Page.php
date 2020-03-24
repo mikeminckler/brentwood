@@ -11,15 +11,13 @@ use App\ContentElement;
 class Page extends Model
 {
     protected $with = ['pages', 'contentElements'];
-    protected $appends = ['full_slug'];
+    protected $appends = ['full_slug', 'can_be_published'];
 
     public function savePage($id = null, $input) 
     {
-        $update = false;
         $home_page = false;
         if ($id) {
             $page = Page::findOrFail($id);
-            $update = true;
             if ($page->slug === '/') {
                 $home_page = true;
             }
@@ -129,7 +127,7 @@ class Page extends Model
 
     public function getPublishedAtAttribute() 
     {
-        return $this->publishedVersion->published_at;   
+        return optional($this->publishedVersion)->published_at;   
     }
 
     public function publish() 
@@ -154,5 +152,35 @@ class Page extends Model
                 'page_id' => $this->id,
             ]);
         }
+    }
+
+    public function getDraftVersionIdAttribute() 
+    {
+        return $this->getDraftVersion()->id; 
+    }
+
+    public function getEditableContentElements() 
+    {
+        $content_elements = $this->contentElements()
+            ->where(function($query) {
+                 $query->where('version_id', $this->draft_version_id)
+                       ->orWhere('version_id', $this->published_version_id);
+            })
+            ->get();
+
+        return $content_elements;
+    }
+
+    public function getCanBePublishedAttribute() 
+    {
+        if (!$this->published_version_id && $this->contentElements->count()) {
+            return true;
+        }
+
+        if ($this->contentElements()->where('version_id', $this->draft_version_id)->count()) {
+            return true;
+        }
+
+        return false;
     }
 }

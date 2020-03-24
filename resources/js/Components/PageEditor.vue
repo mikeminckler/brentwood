@@ -3,18 +3,27 @@
     <div class="w-full z-20 flex items-center border-t border-b bg-gray-200 p-2" v-if="editing">
 
         <div class="flex-1 flex items-center">
-            <div class=""><input type="text" v-model="page.name" @enter="savePage" @change="savePage()" /></div>
+            <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
             <div class="">
                 <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> 
             </div>
         </div>
 
-        <div class="">
-            <div class="button mx-2" @click="createSubPage">
-                <div class="pr-2"><i class="fas fa-file-medical"></i></div>
-                <div>Create Sub Page</div>
-            </div>
+        <div class="button mx-2" @click="createSubPage()">
+            <div class="pr-2"><i class="fas fa-file-medical"></i></div>
+            <div>Create Sub Page</div>
         </div>
+
+        <transition name="saving">
+            <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white px-4 py-1 font-bold cursor-pointer" 
+                @click="publishPage()"
+                 v-if="hasDraft || page.can_be_published"
+            >
+                <div class="pr-2"><i class="fas fa-sign-out-alt"></i></div>
+                <div>Publish</div>
+            </div>
+        </transition>
+
     </div>
 
 </template>
@@ -43,6 +52,11 @@
             },
             editing() {
                 return this.$store.state.editing;
+            },
+            hasDraft() {
+                return this.$lodash.filter(this.page.content_elements, content_element => {
+                    return content_element.version_id !== this.page.published_version_id;
+                }).length ? true : false;
             },
         },
 
@@ -98,6 +112,17 @@
                 });
 
             }, 1000),
+
+            publishPage: function() {
+
+                this.$http.post('/pages/' + this.page.id + '/publish').then( response => {
+                    location.reload();
+                    //this.processSuccess(response);
+                }, error => {
+                    this.processErrors(error.response);
+                });
+
+            },
         },
 
     }

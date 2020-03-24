@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 use App\Page;
-
+use App\Version;
 use App\TextBlock;
 
 class ContentElement extends Model
@@ -19,10 +19,16 @@ class ContentElement extends Model
 
     public function saveContentElement($id = null, $input) 
     {
-        $update = false;
+        $new_version = true;
         if ($id) {
             $content_element = ContentElement::findOrFail($id);
-            $update = true;
+            if (!$content_element->published_at) {
+                $new_version = false;
+            } else {
+                //$previous_id = $content_element->id;
+                $content_element = new ContentElement;
+                //$content_element->previous_id = $previous_id;
+            }
         } else {
             $content_element = new ContentElement;
         }
@@ -35,7 +41,7 @@ class ContentElement extends Model
 
         $content_class = 'App\\'.Str::studly(Arr::get($input, 'type'));
 
-        $content = (new $content_class)->saveContent(Arr::get($input, 'content'));
+        $content = (new $content_class)->saveContent($new_version ? null : Arr::get($input, 'content.id'), Arr::get($input, 'content'));
 
         $content_element->content_id = $content->id;
         $content_element->content_type = get_class($content);
@@ -61,15 +67,18 @@ class ContentElement extends Model
         return $this->morphTo();   
     }
 
+    public function version() 
+    {
+        return $this->belongsTo(Version::class);   
+    }
+
     public function getTypeAttribute() 
     {
         return Str::kebab(class_basename($this->content));
     }
 
-    /*
-    public function getHtmlAttribute() 
+    public function getPublishedAtAttribute() 
     {
-        return view('content-elements.'.$this->type, ['content' => $this->content])->render();
+        return $this->version->published_at;
     }
-     */
 }

@@ -14,12 +14,10 @@ class TextBlock extends Model
 
     use ContentElementTrait;
 
-    public function saveContent($input) 
+    public function saveContent($id = null, $input) 
     {
-        $update = false;
-        if (Arr::get($input, 'id') >= 1) {
-            $text_block = TextBlock::findOrFail(Arr::get($input, 'id'));
-            $update = true;
+        if ($id >= 1) {
+            $text_block = TextBlock::findOrFail($id);
         } else {
             $text_block = new TextBlock;
         }

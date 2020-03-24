@@ -1,6 +1,6 @@
 <template>
 
-    <div class="px-2 py-1 border-l-2 border-gray-300" :class="page.unlisted ? 'bg-gray-200' : ''">
+    <div class="px-2 py-1 border-l-2 border-gray-300" :class="[page.unlisted ? 'bg-gray-200' : '', !page.published_version_id ? 'text-gray-500 italic' : '']">
         <div class="flex">
             <div class="cursor-pointer w-3 mr-2 flex items-center justify-center caret text-lg leading-none" 
                  :class="{ 'rotate90' : expanded }"
@@ -10,6 +10,7 @@
             </div>
             <div class="cursor-pointer flex-1" :class="[page.pages ? ( page.pages.length ? '' : 'pl-3' ) : 'pl-3', page.unlisted ? 'text-gray-500' : '']" @click="goToPage(page)">{{ page.name }}</div>
             <div class="" v-if="page.unlisted" class="text-gray-400 pl-2"><i class="fas fa-eye-slash"></i></div>
+            <div class="" v-if="!page.published_version_id || page.can_be_published" class="text-gray-600 pl-2"><i class="fas fa-file-alt"></i></div>
         </div>
         <transition-group name="page-list">
             <page-list :page="p" :key="p.id" v-if="expanded" v-for="p in page.pages"></page-list>

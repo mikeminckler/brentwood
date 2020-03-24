@@ -25,8 +25,12 @@
             toggleEditing: function() {
 
                 this.$http.post('/editing-toggle').then( response => {
-                    this.$store.dispatch('setEditing', response.data.editing);
-                    this.processSuccess(response);
+                    if (!response.data.editing) {
+                        location.reload();
+                    } else {
+                        this.$store.dispatch('setEditing', response.data.editing);
+                        this.processSuccess(response);
+                    }
                 }, error => {
                     this.processErrors(error.response);
                 });

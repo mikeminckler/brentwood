@@ -1,17 +1,28 @@
 <template>
 
-    <div class="relative">
+    <div class="relative" :class="contentElement.unlisted ? 'bg-gray-200 opacity-75' : ''">
 
         <div class="absolute text-xl" style="right: -40px">
-            <div class="content-element-icons" @click="contentElement.sort_order > 1 ? contentElement.sort_order-- : ''"><i class="fas fa-arrow-alt-circle-up"></i></div>
-            <div class="content-element-icons" @click="contentElement.sort_order++"><i class="fas fa-arrow-alt-circle-down"></i></div>
+            <div class="content-element-icons" @click="$emit('sortUp')"><i class="fas fa-arrow-alt-circle-up"></i></div>
+            <div class="content-element-icons" @click="$emit('sortDown')"><i class="fas fa-arrow-alt-circle-down"></i></div>
+            <div class="content-element-icons" @click="contentElement.unlisted = false" v-if="contentElement.unlisted"><i class="fas fa-eye"></i></div>
+            <div class="content-element-icons" @click="contentElement.unlisted = true" v-if="!contentElement.unlisted"><i class="fas fa-eye-slash"></i></div>
         </div>
+
+        <div class="border bg-white p-2">ID:{{ contentElement.id }} : v{{ contentElement.version_id }} PREV:{{ contentElement.previous_id }}</div>
 
         <div class="absolute z-4">
             <transition name="fade">
-                <div class="flex bg-gray-100 text-green-500 px-2 py-1" v-if="$store.state.saving.find( save => save === contentElement.id)" key="saving">
+                <div class="absolute flex bg-gray-100 text-green-500 px-2 py-1" v-if="$store.state.saving.find( save => save === contentElement.id)" key="saving">
                     <div class="spin"><i class="fas fa-sync-alt"></i></div>
                     <div class="ml-2">Saving</div>
+                </div>
+            </transition>
+
+            <transition name="fade">
+                <div class="flex bg-gray-300 px-2 py-1" v-if="contentElement.unlisted" key="unlisted">
+                    <div class=""><i class="fas fa-eye-slash"></i></div>
+                    <div class="ml-2">Hidden</div>
                 </div>
             </transition>
         </div>
@@ -46,6 +57,9 @@
             return {
                 contentElement: {},
                 loaded: false,
+                saveContent: _.debounce( function() {
+                    this.queueSave();
+                }, 1000),
             }
         },
 
@@ -72,10 +86,6 @@
         methods: {
             // refer to the mixin for saving of the content element
 
-            saveContent: _.debounce( function() {
-                this.queueSave();
-            }, 1000),
-
             queueSave: function() {
                 if (this.$store.state.saving.find(save => save === this.contentElement.Id)) {
                     setTimeout(this.queueSave(), 500);
@@ -83,6 +93,7 @@
                     this.saveContentElement();
                 }
             },
+
         },
 
     }

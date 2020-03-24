@@ -10,6 +10,7 @@ use App\ContentElement;
 use App\TextBlock;
 use App\Version;
 use App\Menu;
+use Illuminate\Support\Collection;
 
 class PageTest extends TestCase
 {
@@ -200,5 +201,71 @@ class PageTest extends TestCase
     {
         $page = factory(Page::class)->states('unlisted')->create();
         $this->assertEquals(1, $page->unlisted);
+    }
+
+    /** @test **/
+    public function a_page_can_get_its_editable_content_elements()
+    {
+        $page = factory(Page::class)->states('published')->create();
+
+        $published_content_element = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->published_version_id,
+        ]);
+
+        $unpublished_content_element = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->draft_version_id,
+        ]);
+
+        $this->assertNotNull($page->getEditableContentElements());
+        $this->assertInstanceOf(Collection::class, $page->getEditableContentElements());
+        $this->assertTrue( $page->getEditableContentElements()->contains('id', $published_content_element->id));
+        $this->assertTrue( $page->getEditableContentElements()->contains('id', $unpublished_content_element->id));
+
+        $page->publish();
+        $page->refresh();
+
+        $unpublished_content_element2 = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->draft_version_id,
+        ]);
+
+    }
+
+    /** @test **/
+    public function a_page_has_a_draft_version_id_attribute()
+    {
+        $page = factory(Page::class)->create();   
+        $this->assertNotNull($page->draft_version_id);
+        $this->assertEquals($page->getDraftVersion()->id, $page->draft_version_id);
+    }
+
+    /** @test **/
+    public function a_page_has_a_can_be_published_attribute()
+    {
+        $page = factory(Page::class)->create();
+
+        $this->assertFalse($page->can_be_published);
+
+        $content_element = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->draft_version_id,
+        ]);
+
+        $page->refresh();
+        $this->assertTrue($page->can_be_published);
+        $page->publish();
+        $page->refresh();
+        $this->assertFalse($page->can_be_published);
+
+        $content_element = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->draft_version_id,
+        ]);
+        
+        $page->refresh();
+        $this->assertTrue($page->can_be_published);
+
     }
 }

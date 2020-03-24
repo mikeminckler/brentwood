@@ -4,9 +4,11 @@
 
         <transition-group name="content-elements" tag="div" class="relative">
             <form-content-element 
-                v-for="(contentElement, index) in sortedContentElments"
+                v-for="(contentElement, index) in sortedContentElements"
                 :key="contentElement.type + '-' + contentElement.id"
                 :value="contentElement"
+                @sortUp="sortUp(contentElement)"
+                @sortDown="sortDown(contentElement)"
             >
             </form-content-element>
         </transition-group>
@@ -46,12 +48,45 @@
             contentElements() {
                 return this.$store.state.page.content_elements;
             },
-            sortedContentElments() {
+            sortedContentElements() {
                 return this.$lodash.orderBy(this.contentElements, ['sort_order', 'id'], ['asc', 'asc']);
             },
         },
 
         methods: {
+
+            sortUp: function(contentElement) {
+
+                if (contentElement.sort_order > 1) {
+                    let currentIndex = this.$lodash.findIndex(this.sortedContentElements, ce => {
+                        return contentElement.id === ce.id;
+                    });
+
+                    let nextElement = this.sortedContentElements[currentIndex - 1];
+
+                    if (nextElement) {
+                        this.sortedContentElements[currentIndex - 1].sort_order = contentElement.sort_order;
+                    }
+
+                    contentElement.sort_order--;
+                }
+            },
+
+            sortDown: function(contentElement) {
+
+                let currentIndex = this.$lodash.findIndex(this.sortedContentElements, ce => {
+                    return contentElement.id === ce.id;
+                });
+
+                let nextElement = this.sortedContentElements[currentIndex + 1];
+
+                if (nextElement) {
+                    this.sortedContentElements[currentIndex + 1].sort_order = contentElement.sort_order;
+                }
+
+                contentElement.sort_order++;
+            },
+
 
             newContentElement: function() {
                 return {

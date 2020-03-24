@@ -17,7 +17,7 @@ class TextBlockTest extends TestCase
     {
         $input = factory(TextBlock::class)->raw();
 
-        $text_block = (new TextBlock)->saveContent($input);
+        $text_block = (new TextBlock)->saveContent(null, $input);
 
         $this->assertInstanceOf(TextBlock::class, $text_block);
         $this->assertEquals(Arr::get($input, 'header'), $text_block->header);

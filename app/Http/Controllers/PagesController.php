@@ -20,6 +20,12 @@ class PagesController extends Controller
         if (!$page) {
             return abort(404);
         }
+
+        // if the page hasn't been published and we are not logged in dont show
+        if (!$page->published_at && !auth()->check()) {
+            return abort(404);
+        }
+
         return view('page', compact('page'));
     }
 
@@ -48,7 +54,7 @@ class PagesController extends Controller
              */
             if (!auth()->user()->can('update', Page::findOrFail($id))) {
                 if (request()->expectsJson()) {
-                    return response()->json(['error', 'You do not have permission to update that page'], 403);
+                    return response()->json(['error' => 'You do not have permission to update that page'], 403);
                 }
                 return redirect('/')->with(['error' => 'You do not have permission to update that page']);
             }
@@ -59,5 +65,28 @@ class PagesController extends Controller
             'success' => 'Page Saved',
             'page' => $page,
         ]);
+    }
+
+    public function publish($id) 
+    {
+
+        if (!auth()->check()) {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'You do not have permission to publish that page'], 403);
+            }
+            return redirect('/')->with(['error' => 'You do not have permission to publish that page']);
+        }
+
+        $page = Page::findOrFail($id);
+
+        if (!auth()->user()->can('publish', $page)) {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'You do not have permission to publish that page'], 403);
+            }
+            return redirect('/')->with(['error' => 'You do not have permission to publish that page']);
+        }
+
+        $page->publish();
+        return response()->json(['success' => 'Page Published']);
     }
 }

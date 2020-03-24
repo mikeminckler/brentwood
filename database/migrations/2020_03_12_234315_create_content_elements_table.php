@@ -20,6 +20,7 @@ class CreateContentElementsTable extends Migration
             $table->integer('sort_order');
             $table->boolean('unlisted');
             $table->unsignedBigInteger('version_id');
+            $table->unsignedBigInteger('previous_id')->nullable();
             $table->timestamps();
         });
     }

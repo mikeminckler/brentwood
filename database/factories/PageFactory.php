@@ -33,6 +33,12 @@ $factory->state(Page::class, 'published', function ($faker) {
     ];
 });
 
+$factory->state(Page::class, 'unpublished', function ($faker) {
+    return [
+        'published_version_id' => null,
+    ];
+});
+
 $factory->state(Page::class, 'unlisted', function ($faker) {
     return [
         'unlisted' => 1,

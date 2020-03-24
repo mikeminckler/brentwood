@@ -204,8 +204,9 @@ class PageTest extends TestCase
     }
 
     /** @test **/
-    public function a_page_can_get_its_editable_content_elements()
+    public function a_page_can_get_its_content_elements()
     {
+        // this checks for the proper grouping of content elements by UUID
         $page = factory(Page::class)->states('published')->create();
 
         $published_content_element = factory(ContentElement::class)->states('text-block')->create([
@@ -218,19 +219,8 @@ class PageTest extends TestCase
             'version_id' => $page->draft_version_id,
         ]);
 
-        $this->assertNotNull($page->getEditableContentElements());
-        $this->assertInstanceOf(Collection::class, $page->getEditableContentElements());
-        $this->assertTrue( $page->getEditableContentElements()->contains('id', $published_content_element->id));
-        $this->assertTrue( $page->getEditableContentElements()->contains('id', $unpublished_content_element->id));
-
-        $page->publish();
-        $page->refresh();
-
-        $unpublished_content_element2 = factory(ContentElement::class)->states('text-block')->create([
-            'page_id' => $page->id,
-            'version_id' => $page->draft_version_id,
-        ]);
-
+        $this->assertNotNull($page->content_elements);
+        $this->assertInstanceOf(Collection::class, $page->content_elements);
     }
 
     /** @test **/
@@ -267,5 +257,35 @@ class PageTest extends TestCase
         $page->refresh();
         $this->assertTrue($page->can_be_published);
 
+    }
+
+    /** @test **/
+    public function a_page_can_get_its_published_content_elements()
+    {
+        $page = factory(Page::class)->create();
+
+        $content_element = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->draft_version_id,
+        ]);
+
+        $page->publish();
+        $page->refresh();
+
+        $this->assertTrue($page->published_content_elements->contains('id', $content_element->id));
+
+        $unlisted_content_element = factory(ContentElement::class)->states('unlisted', 'text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->published_version_id,
+        ]);
+
+        $unpublished_content_element = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->draft_version_id,
+        ]);
+
+        $page->refresh();
+        $this->assertFalse($page->published_content_elements->contains('id', $unlisted_content_element->id));
+        $this->assertFalse($page->published_content_elements->contains('id', $unpublished_content_element->id));
     }
 }

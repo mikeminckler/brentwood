@@ -23,7 +23,7 @@
 
         <div class="relative flex-1 flex flex-col">
 
-            <div class="sticky top-0 z-3">
+            <div class="sticky top-0 z-4">
 
                 <page-editor 
                     :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
@@ -34,7 +34,7 @@
                     
                     <div class="flex w-full relative max-w-6xl">
 
-                        <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-3"></div>
+                        <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-5"></div>
 
                         <div class="md:flex-1">
                             <div class="p-8 flex items-center justify-center">

@@ -92,8 +92,8 @@ class PhotoBlockTest extends TestCase
         }));
 
         $photo = $photo_block->photos->first();
-        $this->assertInstanceOf(PhotoBlock::class, $photo->photoBlock);
-        $this->assertEquals($photo_block->id, $photo->photoBlock->id);
+        $this->assertInstanceOf(PhotoBlock::class, $photo->content);
+        $this->assertEquals($photo_block->id, $photo->content->id);
 
         //Storage::assertExists('photos/'.$file->hashName());
         $this->assertInstanceOf(Photo::class, $photo);
@@ -106,8 +106,8 @@ class PhotoBlockTest extends TestCase
     /** @test **/
     public function updating_a_photo_block()
     {
-        $photo = factory(Photo::class)->create();
-        $photo_block = $photo->photoBlock;
+        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo_block = $photo->content;
         $content_element = $photo_block->contentElement;
         $page = $content_element->page;
 
@@ -122,7 +122,7 @@ class PhotoBlockTest extends TestCase
         ]);
         $input['type'] = 'photo-block';
         $input['content'] = factory(PhotoBlock::class)->raw();
-        $input['content']['photos'] = [factory(Photo::class)->create()];
+        $input['content']['photos'] = [factory(Photo::class)->states('photo-block')->create(['content_id' => $photo_block->id])];
 
         $this->signInAdmin();
 

@@ -34,6 +34,7 @@ class ContentElementTest extends TestCase
         $this->assertEquals($page->id, $content_element->page->id);
         $this->assertEquals(1, $content_element->sort_order);
         $this->assertEquals(0, $content_element->unlisted);
+        $this->assertNotNull($content_element->content_id);
         $this->assertEquals(Arr::get($text_block, 'header'), $content_element->content->header);
         $this->assertEquals(Arr::get($text_block, 'body'), $content_element->content->body);
 
@@ -98,4 +99,26 @@ class ContentElementTest extends TestCase
         $this->assertEquals($page->getDraftVersion()->id, $saved_content_element->version_id);
     }
 
+
+    /** @test **/
+    public function a_content_element_can_get_its_previous_version()
+    {
+        $page = factory(Page::class)->states('published')->create();
+        $content_element1 = factory(ContentElement::class)->states('text-block')->create([
+            'page_id' => $page->id,
+            'version_id' => $page->published_version_id,
+        ]);
+
+        $this->assertNotNull($content_element1->published_at);
+
+        $content_element2 = factory(ContentElement::class)->states('text-block')->create([
+            'uuid' => $content_element1->uuid,
+            'page_id' => $page->id,
+            'version_id' => $page->draft_version_id,
+        ]);
+
+        $this->assertInstanceOf(ContentElement::class, $content_element2->getPreviousVersion());
+        $this->assertEquals($content_element1->id, $content_element2->getPreviousVersion()->id);
+        $this->assertEquals($content_element1->uuid, $content_element2->uuid);
+    }
 }

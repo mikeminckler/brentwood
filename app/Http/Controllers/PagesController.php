@@ -6,9 +6,17 @@ use Illuminate\Http\Request;
 
 use App\Page;
 use App\Http\Requests\PageValidation;
+use App\Http\Controllers\SoftDeletesControllerTrait;
 
 class PagesController extends Controller
 {
+    use SoftDeletesControllerTrait;
+
+    protected function getModel()
+    {
+        return new Page;
+    }
+
     /**
      * Find the page associated with the requested URL path
      * This is the main function to render all content pages
@@ -88,5 +96,33 @@ class PagesController extends Controller
 
         $page->publish();
         return response()->json(['success' => 'Page Published']);
+    }
+
+    public function remove($id) 
+    {
+        $page = Page::findOrFail($id);
+
+        if (!auth()->check()) {
+            return abort(401);
+        }
+
+        if ($page->slug === '/') {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'The home page cannot be deleted'], 403);
+            }
+            return redirect('/')->with(['error' => 'The home page cannot be deleted']);
+        }
+
+        if (!auth()->user()->can('delete', $page)) {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'You do not have permission to remove that page'], 403);
+            }
+            return redirect('/')->with(['error' => 'You do not have permission to remove that page']);
+        }
+
+        $page->delete();
+
+        return response()->json(['success' => 'Page Removed']);
+        
     }
 }

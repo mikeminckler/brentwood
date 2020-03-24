@@ -13,11 +13,18 @@ use Illuminate\Support\Str;
 use App\ContentElement;
 use App\User;
 use App\TextBlock;
+use Tests\Feature\SoftDeletesTestTrait;
 
 class PageTest extends TestCase
 {
 
     use WithFaker;
+    use SoftDeletesTestTrait;
+
+    protected function getModel()
+    {
+        return factory(Page::class)->create();
+    }
 
     /** @test **/
     public function a_page_can_be_created()
@@ -288,5 +295,19 @@ class PageTest extends TestCase
 
         $this->get( $page->full_slug )
             ->assertSuccessful();
+    }
+
+    /** @test **/
+    public function the_home_page_cannot_be_deleted()
+    {
+        $home_page = Page::findOrFail(1);
+
+        $this->signInAdmin();
+
+        $this->json('POST', route('pages.remove', ['id' => $home_page->id]))
+             ->assertStatus(403)
+             ->assertJsonFragment([
+                'error' => 'The home page cannot be deleted',
+             ]);
     }
 }

@@ -2,7 +2,7 @@
 
     <div class="w-full z-20 flex items-center border-t border-b bg-gray-200 p-2" v-if="editing">
 
-        <div class="flex-1 flex items-center">
+        <div class="flex items-center">
             <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
             <div class="">
                 <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> 
@@ -23,6 +23,13 @@
                 <div>Publish</div>
             </div>
         </transition>
+
+        <div class="flex-1"></div>
+
+        <div class="flex px-4 mx-2 items-center cursor-pointer hover:bg-primary hover:text-white" @click="removePage()" v-if="page.id !== 1">
+            <div class="pr-2 text-xl"><i class="fas fa-times"></i></div>
+            <div>Delete Page</div>
+        </div>
 
     </div>
 
@@ -122,6 +129,21 @@
                     this.processErrors(error.response);
                 });
 
+            },
+
+            removePage: function() {
+                var answer = confirm('Are you sure you want to delete this page?');
+                if (answer == true) {
+
+                    this.$http.post('/pages/' + this.page.id + '/remove').then( response => {
+                        window.location.href = '/';
+                        this.processSuccess(response);
+                    }, error => {
+                        this.processErrors(error.response);
+                    });
+
+                }
+                
             },
         },
 

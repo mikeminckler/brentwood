@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -13,24 +14,26 @@ use App\TextBlock;
 
 class ContentElement extends Model
 {
+    use SoftDeletes;
 
     protected $with = ['content'];
-    protected $appends = ['type'];
+    protected $appends = ['type', 'published_at'];
 
     public function saveContentElement($id = null, $input) 
     {
         $new_version = true;
         if ($id) {
             $content_element = ContentElement::findOrFail($id);
+            $uuid = $content_element->uuid;
             if (!$content_element->published_at) {
                 $new_version = false;
             } else {
-                //$previous_id = $content_element->id;
                 $content_element = new ContentElement;
-                //$content_element->previous_id = $previous_id;
+                $content_element->uuid = $uuid;
             }
         } else {
             $content_element = new ContentElement;
+            $content_element->uuid = Str::uuid();
         }
 
         $page = Page::findOrFail(Arr::get($input, 'page_id'));
@@ -80,5 +83,15 @@ class ContentElement extends Model
     public function getPublishedAtAttribute() 
     {
         return $this->version->published_at;
+    }
+
+    public function getPreviousVersion() 
+    {
+        return ContentElement::where('uuid', $this->uuid)
+            ->where('version_id', '<', $this->version_id)
+            ->get()
+            ->sortByDesc(function($content_element) {
+                return $content_element->version_id;
+            })->first();
     }
 }

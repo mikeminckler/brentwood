@@ -8,10 +8,12 @@ use App\PhotoBlock;
 use App\Photo;
 use Illuminate\Support\Arr;
 use App\ContentElementTrait;
+use App\PhotosTrait;
 
 class PhotoBlock extends Model
 {
     use ContentElementTrait;
+    use PhotosTrait;
 
     protected $with = ['photos'];
 
@@ -41,18 +43,4 @@ class PhotoBlock extends Model
         return $photo_block;
     }
 
-    public function photos() 
-    {
-        return $this->hasMany(Photo::class);   
-    }
-
-    public function savePhotos($input) 
-    {
-        if (Arr::get($input, 'photos')) {
-            foreach (Arr::get($input, 'photos') as $photo_data) {
-                $photo_data['photo_block_id'] = $this->id;
-                $photo = (new Photo)->savePhoto(Arr::get($photo_data, 'id'), $photo_data);
-            }
-        }
-    }
 }

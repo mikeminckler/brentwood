@@ -5,16 +5,19 @@
         <transition-group name="content-elements" tag="div" class="relative">
             <form-content-element 
                 v-for="(contentElement, index) in sortedContentElements"
-                :key="contentElement.type + '-' + contentElement.id"
+                :key="contentElement.uuid"
                 :value="contentElement"
                 @sortUp="sortUp(contentElement)"
                 @sortDown="sortDown(contentElement)"
+                @remove="removeContentElement(contentElement)"
+                @update="updateContentElement(contentElement, $event)"
             >
             </form-content-element>
         </transition-group>
 
         <div class="flex w-full bg-gray-200 p-2 relative z-2 shadow mt-4 items-center">
             <div class="font-semibold">Create New</div>
+
             <div class="button mx-2" @click="addTextBlock">
                 <div class="pr-2"><i class="fas fa-align-justify"></i></div>
                 <div>Text</div>
@@ -24,6 +27,12 @@
                 <div class="pr-2"><i class="fas fa-file-image"></i></div>
                 <div>Photos</div>
             </div>
+
+            <div class="button mx-2" @click="addQuote">
+                <div class="pr-2"><i class="fas fa-quote-left"></i></div>
+                <div>Testimonial</div>
+            </div>
+
         </div>
 
     </div>
@@ -87,12 +96,18 @@
                 contentElement.sort_order++;
             },
 
+            removeContentElement: function(contentElement) {
+                let index = this.$lodash.findIndex( this.contentElements, ce => {
+                    return ce.id === contentElement.id;
+                });
+                this.contentElements.splice( index, 1);
+            },
 
             newContentElement: function() {
                 return {
-                    id: '0.' + this.$store.state.page.content_elements.length,
+                    id: '0.' + this.contentElements.length,
                     page_id: this.$store.state.page.id,
-                    sort_order: this.$store.state.page.content_elements.length + 1,
+                    sort_order: this.contentElements.length ? this.$lodash.last(this.sortedContentElements).sort_order + 1 : 1,
                     unlisted: false,
                 };
             },
@@ -136,6 +151,23 @@
                 };
 
                 this.saveNewContentElement(contentElement);
+            },
+
+            addQuote: function() {
+
+                let contentElement = this.newContentElement();
+
+                contentElement.type = 'quote';
+                contentElement.content = {
+                    id: 0,
+                    photos: [],
+                    body: '<p></p>',
+                    author_name: '',
+                    author_details: '',
+                };
+
+                this.saveNewContentElement(contentElement);
+
             },
         },
 

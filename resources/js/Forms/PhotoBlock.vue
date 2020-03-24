@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-8 relative z-2">
+    <div class="relative z-2">
 
         <div class="absolute flex flex-col justify-center items-center" style="left: -50px;" v-if="photos.length">
 
@@ -38,7 +38,7 @@
                 :class="['col-span-' + content.text_span, textPosition.row, textPosition.column, content.text_style ? 'photo-block-text-' + content.text_style : '']"
             >
 
-                <div class="text-block flex flex-col justify-center h-full" :class="'columns-' + content.text_span">
+                <div class="text-block flex flex-col justify-center h-full">
                     <div class="h2">
                         <input type="text" v-model="content.header" placeholder="Header" />
                     </div>
@@ -57,22 +57,10 @@
                     </div>
 
                     <div class="flex">
-                        <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="content.text_order > 1" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
-                        </transition>
-
-                        <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
-                        </transition>
-                    </div>
-
-                    <div class="flex">
-                        <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>
-                        </transition>
-                        <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="content.text_span > 1" @click="content.text_span--"><i class="fas fa-minus-circle"></i></div>
-                        </transition>
+                        <div class="cursor-pointer mx-1" v-if="content.text_order > 1" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
+                        <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
+                        <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>
+                        <div class="cursor-pointer mx-1" v-if="content.text_span > 1" @click="content.text_span--"><i class="fas fa-minus-circle"></i></div>
                     </div>
 
                 </div>
@@ -87,6 +75,8 @@
                     paddingBottom: Math.floor(content.height / photo.span) + '%',
                 }"
             >
+
+                <div v-if="index === (sortedPhotos.length - 1)" class="h-1 bg-gray-200 opacity-50 w-full absolute bottom-0 z-5"></div>
 
                 <div class="photo">
                     <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'" />
@@ -104,25 +94,17 @@
                     </div>
                 </div>
 
-                <div class="absolute bottom-0 flex text-white text-xl justify-between w-full">
+                <div class="absolute bottom-0 flex text-white text-xl justify-between w-full mb-2">
 
                     <div class="flex">
-                        <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="photo.sort_order > 1 && photos.length > 1" @click="sortUp(photo)"><i class="fas fa-arrow-alt-circle-left"></i></div>
-                        </transition>
-
-                        <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="photo.sort_order < photos.length && photos.length > 1" @click="sortDown(photo)"><i class="fas fa-arrow-alt-circle-right"></i></div>
-                        </transition>
+                        <div class="cursor-pointer mx-1" v-if="photo.sort_order > 1 && photos.length > 1" @click="sortUp(photo)"><i class="fas fa-arrow-alt-circle-left"></i></div>
+                        <div class="cursor-pointer mx-1" v-if="photo.sort_order < photos.length && photos.length > 1" @click="sortDown(photo)"><i class="fas fa-arrow-alt-circle-right"></i></div>
+                        <div class="cursor-pointer mx-1" v-if="photo.span < content.columns && content.columns > 1" @click="photo.span++"><i class="fas fa-plus-circle"></i></div>
+                        <div class="cursor-pointer mx-1" v-if="photo.span > 1 && content.columns > 1" @click="photo.span--"><i class="fas fa-minus-circle"></i></div>
                     </div>
 
-                    <div class="flex">
-                        <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="photo.span < content.columns && content.columns > 1" @click="photo.span++"><i class="fas fa-plus-circle"></i></div>
-                        </transition>
-                        <transition name="slide-icon">
-                            <div class="cursor-pointer mx-1" v-if="photo.span > 1 && content.columns > 1" @click="photo.span--"><i class="fas fa-minus-circle"></i></div>
-                        </transition>
+                    <div class="absolute right-0 bottom-0">
+                        <div class="mx-1 remove-icon" @click="removePhoto(photo, index)"><i class="fas fa-times"></i></div>
                     </div>
 
                 </div>
@@ -139,7 +121,7 @@
             type="image"
         ></file-uploads>
 
-        <div class="flex bg-gray-100 p-2 shadow mt-2">
+        <div class="flex bg-gray-100 p-2 shadow mt-4">
 
             <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
                 <div class="">Upload Files</div>
@@ -162,6 +144,7 @@
 
 <script>
 
+    import Feedback from '@/Mixins/Feedback';
     import Editor from '@/Components/Editor.vue';
     import FileUploads from '@/Components/FileUploads';
 
@@ -170,6 +153,8 @@
         props: [
             'content',
         ],
+
+        mixins: [Feedback],
 
         components: {
             'editor': Editor,
@@ -473,32 +458,23 @@
 
             removePhoto: function(photo, index) {
 
-                if (photo.id  >= 1) {
+                var answer = confirm('Are you sure you want to delete this photo?');
+                if (answer == true) {
 
-                    var answer = confirm('Are you sure you want to delete this photo?');
-                    if (answer == true) {
+                    this.$http.post('/photos/' + photo.id + '/remove').then( response => {
 
-                        this.$http.post('/photos/' + photo.id + '/destroy').then( response => {
+                        this.processSuccess(response);
 
-                            this.processSuccess(response);
+                        let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
+                        this.uploads.splice(uploadIndex, 1);
+                        this.photos.splice(index, 1);
 
-                            let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
-                            this.uploads.splice(uploadIndex, 1);
-                            this.photos.splice(index, 1);
-
-                        }, function (error) {
-                            this.processErrors(error.response);
-                        });
-
-                    }
-
-                } else {
-
-                    let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
-                    this.uploads.splice(uploadIndex, 1);
-                    this.photos.splice(index, 1);
+                    }, function (error) {
+                        this.processErrors(error.response);
+                    });
 
                 }
+
             },
             
         },

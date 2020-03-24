@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Oswald:300|Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Oswald:300|Roboto:300|400|700&display=swap');
 
 @tailwind base;
 
@@ -58,8 +58,22 @@ p:last-child {
     @apply cursor-pointer px-2 py-1 mb-2 flex items-center justify-center;
 }
 
+.remove-icon {
+    @apply text-xl text-red-600 border border-transparent rounded cursor-pointer h-6 w-6 flex items-center justify-center;
+}
+
+.remove-icon:hover {
+    @apply bg-white border-gray-300;
+}
+
 input, .editor {
     @apply w-full bg-transparent border border-transparent;
+}
+
+.inline-form {
+    & input {
+        @apply w-auto;
+    }
 }
 
 input:hover, input:focus, .editor:hover, .editor:focus {

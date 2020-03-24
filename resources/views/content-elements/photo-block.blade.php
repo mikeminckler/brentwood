@@ -28,11 +28,7 @@
             key="photo-{{ $photo->id }}"
             style="padding-bottom: {{ floor($content->height / $photo->span) }}%"
         >
-
-            <div class="photo">
-                <img src="{{ $photo->large }}" style="object-position: {{ $photo->offsetX }}% {{ $photo->offsetY}}%;" />
-            </div>
-
+            @include ('content-elements.photo', ['photo' => $photo])
         </div>
     @endforeach
 

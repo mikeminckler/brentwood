@@ -27,7 +27,14 @@ export default {
                         //this.$inertia.visit(response.data.redirect);
                     }
 
-                    this.$store.dispatch('addFeedback', {'type': 'error', 'message': 'You dont have access to that item'});
+                    let error_message;
+                    if (response.data.error) {
+                        error_message = response.data.error;
+                    } else {
+                        error_message = 'You dont have access to that item';
+                    }
+
+                    this.$store.dispatch('addFeedback', {'type': 'error', 'message': error_message});
                 } else if (response.status == '422') {
 
                     if (this.$lodash.has(response.data, 'error')) {

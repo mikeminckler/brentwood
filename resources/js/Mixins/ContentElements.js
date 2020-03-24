@@ -22,7 +22,7 @@ export default {
                         this.$store.dispatch('addContentElement', response.data.content_element);
                         this.$store.dispatch('completeSaving', savingId);
                     } else {
-                        this.$lodash.merge(contentElement, response.data.content_element);
+                        this.updateContentElement(contentElement, response.data.content_element);
                     }
 
                     this.processSuccess(response);
@@ -34,6 +34,10 @@ export default {
                 this.$store.dispatch('completeSaving', savingId);
             }
 
+        },
+
+        updateContentElement: function(oldContentElement, newContentElement) {
+            this.$lodash.merge(oldContentElement, newContentElement);
         },
 
     },

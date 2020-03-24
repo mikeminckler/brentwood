@@ -3,6 +3,8 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -10,8 +12,10 @@ use App\ContentElement;
 
 class Page extends Model
 {
-    protected $with = ['pages', 'contentElements'];
-    protected $appends = ['full_slug', 'can_be_published'];
+    use SoftDeletes;
+
+    protected $with = ['pages'];
+    protected $appends = ['full_slug', 'can_be_published', 'content_elements'];
 
     public function savePage($id = null, $input) 
     {
@@ -159,16 +163,38 @@ class Page extends Model
         return $this->getDraftVersion()->id; 
     }
 
-    public function getEditableContentElements() 
+    public function getContentElementsAttribute() 
     {
-        $content_elements = $this->contentElements()
-            ->where(function($query) {
-                 $query->where('version_id', $this->draft_version_id)
-                       ->orWhere('version_id', $this->published_version_id);
-            })
-            ->get();
+        return $this->contentElements()
+                     ->get()
+                     ->groupBy('uuid')
+                     ->map(function($uuid) {
+                        return $uuid->sortByDesc( function( $content_element) {
+                            return $content_element->version_id;
+                        })->first();
+                     })
+                     ->sortBy(function($content_element) {
+                        return $content_element->sort_order;
+                     })->values();
+    }
 
-        return $content_elements;
+    public function getPublishedContentElementsAttribute() 
+    {
+        return $this->contentElements()
+                     ->get()
+                     ->groupBy('uuid')
+                     ->map(function($uuid) {
+                        return $uuid->filter( function($content_element) {
+                            return $content_element->published_at && !$content_element->unlisted ? true : false;
+                        })
+                        ->sortByDesc( function( $content_element) {
+                            return $content_element->version_id;
+                        })->first();
+                     })
+                     ->filter()
+                     ->sortBy(function($content_element) {
+                        return $content_element->sort_order;
+                     })->values();
     }
 
     public function getCanBePublishedAttribute() 
@@ -177,10 +203,8 @@ class Page extends Model
             return true;
         }
 
-        if ($this->contentElements()->where('version_id', $this->draft_version_id)->count()) {
-            return true;
-        }
-
-        return false;
+        return $this->content_elements->filter(function($content_element) {
+                return $content_element->published_at ? false : true;
+            })->count() ? true : false;
     }
 }

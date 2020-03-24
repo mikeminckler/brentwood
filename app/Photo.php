@@ -22,7 +22,7 @@ class Photo extends Model
     protected $appends = ['small', 'medium', 'large'];
 
 
-    public function savePhoto($id = null, $input)
+    public function savePhoto($id = null, $input, $content)
     {
         if (!$input) {
             return null;
@@ -42,8 +42,11 @@ class Photo extends Model
             $photo = new Photo;
         }
 
-        $photo_block = PhotoBlock::findOrFail(Arr::get($input, 'photo_block_id'));
-        $photo->photo_block_id = $photo_block->id;
+        //$content_class = Arr::get($input, 'content_type');
+        //$content = $content_class::findOrFail(Arr::get($input, 'content_id'));
+
+        $photo->content_id = $content->id;
+        $photo->content_type = get_class($content);
 
         $file_upload = FileUpload::findOrFail(Arr::get($input, 'file_upload.id'));
 
@@ -69,9 +72,9 @@ class Photo extends Model
         return $photo;
     }
 
-    public function photoBlock() 
+    public function content() 
     {
-        return $this->belongsTo(PhotoBlock::class);   
+        return $this->morphTo();
     }
 
     public function fileUpload()
@@ -114,10 +117,10 @@ class Photo extends Model
                 if (Storage::disk('public')->exists($value)) {
                     return $value;
                 } else {
-                    return $this->createImage(200, 'small');
+                    return $this->createImage(400, 'small');
                 }
             } else {
-                return $this->createImage(200, 'small');
+                return $this->createImage(400, 'small');
             }
         });
     }
@@ -138,10 +141,10 @@ class Photo extends Model
                 if (Storage::disk('public')->exists($value)) {
                     return $value;
                 } else {
-                    return $this->createImage(600, 'medium');
+                    return $this->createImage(900, 'medium');
                 }
             } else {
-                return $this->createImage(600, 'medium');
+                return $this->createImage(900, 'medium');
             }
         });
     }
@@ -162,10 +165,10 @@ class Photo extends Model
                 if (Storage::disk('public')->exists($value)) {
                     return $value;
                 } else {
-                    return $this->createImage(1200, 'large');
+                    return $this->createImage(1152, 'large');
                 }
             } else {
-                return $this->createImage(1200, 'large');
+                return $this->createImage(1152, 'large');
             }
         });
     }

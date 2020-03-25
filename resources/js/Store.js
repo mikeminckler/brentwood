@@ -20,6 +20,7 @@ const store = new Vuex.Store({
             sort_order: 0,
             content_elements: [],
         },
+        youtubeReady: false,
     },
 
     mutations: {
@@ -38,6 +39,10 @@ const store = new Vuex.Store({
 
         setPage(state, page) {
             state.page = page;
+        },
+
+        setYoutubeReady(state) {
+            state.youtubeReady = true;
         },
 
         addContentElement(state, contentElement) {
@@ -85,6 +90,10 @@ const store = new Vuex.Store({
 
         setPage({ commit, state }, page) {
             commit('setPage', page);
+        },
+
+        setYoutubeReady({ commit, state }) {
+            commit('setYoutubeReady');
         },
 
         addContentElement({ commit, state }, contentElement) {

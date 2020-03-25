@@ -34,7 +34,13 @@ class PagesController extends Controller
             return abort(404);
         }
 
-        return view('page', compact('page'));
+        //if (session()->get('editing')) {
+            return view('page', compact('page'));
+        //} else {
+        //    return cache()->tags([cache_name($page)])->rememberForever(cache_name($page).'-view', function() use($page) {
+        //        return view('page', compact('page'))->render();
+        //    });
+        //}
     }
 
     /**

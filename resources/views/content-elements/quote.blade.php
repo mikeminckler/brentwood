@@ -4,7 +4,7 @@
 
         <div class="p-4 absolute z-2 font-light text-gray-400 leading-none" style="font-size: 150px">&ldquo;</div>
         
-        <div class="px-16 py-8">
+        <div class="px-16 py-8 text-gray-800">
             <div class="relative z-3 italic leading-relaxed my-4">{!! $content->body !!}</div>
 
             <div class="h-1 w-16 bg-primary mb-4"></div>
@@ -22,9 +22,8 @@
     @if ($content->photos->count())
         <div class="flex-1 flex bg-gray-100 relative">
 
-            <div class="photo">
-                @include ('content-elements.photo', ['photo' => $content->photos->first()])
-            </div>
+            <div class="h-1 bg-gray-200 opacity-50 w-full absolute bottom-0 z-5"></div>
+            @include ('content-elements.photo', ['photo' => $content->photos->first()])
 
         </div>
     @endif

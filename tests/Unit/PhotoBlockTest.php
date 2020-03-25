@@ -27,4 +27,12 @@ class PhotoBlockTest extends TestCase
         $photo_block = $photo->content;
         $this->assertInstanceOf(ContentElement::class, $photo_block->contentElement);
     }
+
+    /** @test **/
+    public function a_photo_block_has_a_uuid_attribute()
+    {
+        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo_block = $photo->content;
+        $this->assertEquals($photo_block->contentElement->uuid, $photo_block->uuid);
+    }
 }

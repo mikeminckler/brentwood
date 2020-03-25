@@ -48,6 +48,7 @@ class PhotoTest extends TestCase
         $this->assertEquals(Arr::get($input, 'span'), $photo->span);
         $this->assertEquals(Arr::get($input, 'offsetX'), $photo->offsetX);
         $this->assertEquals(Arr::get($input, 'offsetY'), $photo->offsetY);
+        $this->assertEquals(Arr::get($input, 'fill'), $photo->fill);
 
     }
 

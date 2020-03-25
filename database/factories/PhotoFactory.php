@@ -17,6 +17,7 @@ $factory->define(Photo::class, function (Faker $faker) {
         'span' => 1,
         'offsetX' => 50,
         'offsetY' => 50,
+        'fill' => true,
     ];
 });
 

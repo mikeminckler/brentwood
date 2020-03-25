@@ -11,6 +11,7 @@
                 @sortDown="sortDown(contentElement)"
                 @remove="removeContentElement(contentElement)"
                 @update="updateContentElement(contentElement, $event)"
+                :first="isFirst(contentElement)"
             >
             </form-content-element>
         </transition-group>
@@ -31,6 +32,11 @@
             <div class="button mx-2" @click="addQuote">
                 <div class="pr-2"><i class="fas fa-quote-left"></i></div>
                 <div>Testimonial</div>
+            </div>
+
+            <div class="button mx-2 items-center" @click="addYoutubeVideo">
+                <div class="pr-2 text-lg leading-none"><i class="fab fa-youtube"></i></div>
+                <div>YouTube Video</div>
             </div>
 
         </div>
@@ -63,6 +69,14 @@
         },
 
         methods: {
+
+            isFirst: function(contentElement) {
+
+                return this.$lodash.filter(this.contentElements, ce => {
+                    return contentElement.type === ce.type;
+                })[0].id === contentElement.id;
+
+            },
 
             sortUp: function(contentElement) {
 
@@ -164,6 +178,20 @@
                     body: '<p></p>',
                     author_name: '',
                     author_details: '',
+                };
+
+                this.saveNewContentElement(contentElement);
+
+            },
+
+            addYoutubeVideo: function() {
+
+                let contentElement = this.newContentElement();
+
+                contentElement.type = 'youtube-video';
+                contentElement.content = {
+                    id: 0,
+                    video_id: '',
                 };
 
                 this.saveNewContentElement(contentElement);

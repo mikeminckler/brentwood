@@ -94,4 +94,9 @@ class ContentElement extends Model
                 return $content_element->version_id;
             })->first();
     }
+
+    public function isType($type) 
+    {
+        return $this->type === $type;   
+    }
 }

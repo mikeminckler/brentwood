@@ -56,7 +56,7 @@
                         <div class="w-6 h-6 bg-blue-200" @click="content.text_style = 'blue'"></div>
                     </div>
 
-                    <div class="flex">
+                    <div class="photo-icons flex ml-4">
                         <div class="cursor-pointer mx-1" v-if="content.text_order > 1" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
                         <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
                         <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>
@@ -78,36 +78,19 @@
 
                 <div v-if="index === (sortedPhotos.length - 1)" class="h-1 bg-gray-200 opacity-50 w-full absolute bottom-0 z-5"></div>
 
-                <div class="photo">
+                <div class="photo" :class="photo.fill ? 'fill' : 'fit'" v-if="photo">
                     <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'" />
                 </div>
 
-                <div class="absolute right-0 transform -rotate-90 origin-bottom-right w-32">
-                    <div class="flex items-center px-2 py-1" style="background-color: rgba(255,255,255,0.5)">
-                        <input type="range" v-model="photo.offsetY" min="0" max="100" />
-                    </div>
-                </div>
-
-                <div class="absolute right-0 w-32">
-                    <div class="flex items-center px-2 py-1" style="background-color: rgba(255,255,255,0.5)">
-                        <input type="range" v-model="photo.offsetX" min="0" max="100" />
-                    </div>
-                </div>
-
-                <div class="absolute bottom-0 flex text-white text-xl justify-between w-full mb-2">
-
-                    <div class="flex">
-                        <div class="cursor-pointer mx-1" v-if="photo.sort_order > 1 && photos.length > 1" @click="sortUp(photo)"><i class="fas fa-arrow-alt-circle-left"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="photo.sort_order < photos.length && photos.length > 1" @click="sortDown(photo)"><i class="fas fa-arrow-alt-circle-right"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="photo.span < content.columns && content.columns > 1" @click="photo.span++"><i class="fas fa-plus-circle"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="photo.span > 1 && content.columns > 1" @click="photo.span--"><i class="fas fa-minus-circle"></i></div>
-                    </div>
-
-                    <div class="absolute right-0 bottom-0">
-                        <div class="mx-1 remove-icon" @click="removePhoto(photo, index)"><i class="fas fa-times"></i></div>
-                    </div>
-
-                </div>
+                <photo-controls :photo="photo"
+                    :span="true"
+                    :sort="true"
+                    :content="content"
+                    :photos="photos"
+                    @sortUp="sortUp(photo)"
+                    @sortDown="sortDown(photo)"
+                    @remove="removePhoto(photo, index)"
+                ></photo-controls>
 
             </div>
 
@@ -121,7 +104,7 @@
             type="image"
         ></file-uploads>
 
-        <div class="flex bg-gray-100 p-2 shadow mt-4">
+        <div class="flex bg-gray-200 p-2 shadow mt-4">
 
             <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
                 <div class="">Upload Files</div>
@@ -147,39 +130,33 @@
     import Feedback from '@/Mixins/Feedback';
     import Editor from '@/Components/Editor.vue';
     import FileUploads from '@/Components/FileUploads';
+    import Photos from '@/Mixins/Photos';
+    import PhotoControls from '@/Components/PhotoControls';
 
     export default {
 
-        props: [
-            'content',
-        ],
+        props: [ 'content', 'uuid' ],
 
-        mixins: [Feedback],
+        mixins: [Feedback, Photos],
 
         components: {
             'editor': Editor,
             'file-uploads': FileUploads,
+            'photo-controls': PhotoControls,
         },
 
         data() {
             return {
-                uploads: [],
-                heights: [ 25, 33, 50, 66, 75, 100 ],
+                heights: [ 25, 33, 40, 50, 66, 75, 100 ],
             }
         },
 
         computed: {
-            photos() {
-                return this.content.photos;
-            },
             sortedPhotos() {
                 return this.$lodash.orderBy(this.photos, ['sort_order', 'id'], ['asc', 'asc']);
             },
             photosCount() {
                 return this.photos.length;
-            },
-            fileUploadName() {
-                return 'photos-' + this.content.id;
             },
             totalCells() {
                 return this.$lodash.sumBy(this.content.photos, 'span') + this.content.text_span;
@@ -208,10 +185,6 @@
 
         watch: {
 
-            uploads() {
-                this.updatePhotos();
-            },
-
             photosCount() {
                 this.setLayout();
             },
@@ -229,37 +202,6 @@
 
         methods: {
 
-            updatePhotos: function() {
-                this.$lodash.forEach(this.uploads, (upload, index) => {
-                    this.addUpload(upload);
-                });
-            },
-
-            addUpload: function(upload) {
-
-                if (upload.id >= 1) {
-
-                    if (!this.$lodash.find(this.photos, function(u) {
-                        return u.file_upload.id == upload.id;
-                    })) {
-
-                        let newPhoto = {
-                            id: '0.' + this.photos.length,
-                            name: '',
-                            description: '',
-                            alt: '',
-                            sort_order: this.photos.length + 1,
-                            span: 1,
-                            offsetX: 50,
-                            offsetY: 50,
-                            large: upload.large,
-                            file_upload: upload,
-                        }
-
-                        this.photos.push(newPhoto);
-                    }
-                }
-            },
 
             increaseHeight: function() {
                 let index = this.$lodash.findIndex(this.heights, height => {
@@ -456,27 +398,6 @@
 
             },
 
-            removePhoto: function(photo, index) {
-
-                var answer = confirm('Are you sure you want to delete this photo?');
-                if (answer == true) {
-
-                    this.$http.post('/photos/' + photo.id + '/remove').then( response => {
-
-                        this.processSuccess(response);
-
-                        let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
-                        this.uploads.splice(uploadIndex, 1);
-                        this.photos.splice(index, 1);
-
-                    }, function (error) {
-                        this.processErrors(error.response);
-                    });
-
-                }
-
-            },
-            
         },
 
     }

@@ -12,7 +12,7 @@
             key="text"
         >
 
-            <div class="text-block flex flex-col justify-center h-full columns-{{ $content->text_span }}">
+            <div class="text-block flex flex-col justify-center h-full">
                 @if ($content->header)
                     <h2>{{ $content->header }}</h2>
                 @endif
@@ -23,11 +23,14 @@
 
     @endif
 
-    @foreach ($content->photos as $photo)
+    @foreach ($content->photos as $index => $photo)
         <div class="relative overflow-hidden col-span-{{ $photo->span }}"
             key="photo-{{ $photo->id }}"
             style="padding-bottom: {{ floor($content->height / $photo->span) }}%"
         >
+            @if ($index === $content->photos->count() - 1)
+                <div class="h-1 bg-gray-200 opacity-50 w-full absolute bottom-0 z-5"></div>
+            @endif
             @include ('content-elements.photo', ['photo' => $photo])
         </div>
     @endforeach

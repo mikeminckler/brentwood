@@ -6,7 +6,7 @@
 
     <div v-if="!$store.state.editing">
         @foreach ($page->published_content_elements as $content_element)
-            @include ('content-elements.'.$content_element->type, ['content' => $content_element->content])
+            @include ('content-elements.'.$content_element->type, ['content' => $content_element->content, 'first' => $page->published_content_elements->filter->isType($content_element->type)->first()->id == $content_element->id])
         @endforeach
     </div>
 

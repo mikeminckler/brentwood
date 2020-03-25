@@ -24,6 +24,7 @@ class CreatePhotosTable extends Migration
             $table->integer('span');
             $table->integer('offsetX');
             $table->integer('offsetY');
+            $table->boolean('fill');
 
             $table->string('small')->nullable();
             $table->string('medium')->nullable();

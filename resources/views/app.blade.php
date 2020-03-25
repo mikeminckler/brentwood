@@ -73,7 +73,7 @@
             </div>
 
 
-            <div class="items-center flex-1 flex flex-col relative" style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 50%, rgba(247,218,199,1));"> 
+            <div class="items-center flex-1 flex flex-col relative" style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 75%, rgba(247,218,199,1));"> 
 
                 <div class="flex flex-1 flex-col w-full max-w-6xl relative">
 

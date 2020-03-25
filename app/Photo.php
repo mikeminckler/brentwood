@@ -42,9 +42,6 @@ class Photo extends Model
             $photo = new Photo;
         }
 
-        //$content_class = Arr::get($input, 'content_type');
-        //$content = $content_class::findOrFail(Arr::get($input, 'content_id'));
-
         $photo->content_id = $content->id;
         $photo->content_type = get_class($content);
 
@@ -64,10 +61,13 @@ class Photo extends Model
         $photo->span = Arr::get($input, 'span');
         $photo->offsetX = Arr::get($input, 'offsetX');
         $photo->offsetY = Arr::get($input, 'offsetY');
+        $photo->fill = Arr::get($input, 'fill');
 
         $photo->save();
 
         $photo->fileUpload()->save($file_upload);
+
+        cache()->tags([cache_name($photo)])->flush();
 
         return $photo;
     }

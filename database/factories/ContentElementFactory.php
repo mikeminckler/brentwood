@@ -11,6 +11,7 @@ use App\TextBlock;
 use App\Quote;
 use App\Photo;
 use Illuminate\Support\Str;
+use App\YoutubeVideo;
 
 $factory->define(ContentElement::class, function (Faker $faker) {
     return [
@@ -51,5 +52,13 @@ $factory->state(ContentElement::class, 'quote', function ($faker) {
     return [
         'content_id' => $quote->id,
         'content_type' => get_class($quote),
+    ];
+});
+
+$factory->state(ContentElement::class, 'youtube-video', function ($faker) {
+    $youtube_video = factory(YoutubeVideo::class)->create();
+    return [
+        'content_id' => $youtube_video->id,
+        'content_type' => get_class($youtube_video),
     ];
 });

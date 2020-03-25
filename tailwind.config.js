@@ -9,6 +9,7 @@ module.exports = {
       },
       colors: {
         'primary': '#c8272c',
+        'translucent': 'rgba(55,55,55,0.5)'
       },
       flex: {
         '2': '2 2 0%',

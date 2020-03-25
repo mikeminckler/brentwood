@@ -23,6 +23,9 @@ import SavingIndicator from '@/Components/SavingIndicator.vue'
 import ContentElementsEditor from '@/Components/ContentElementsEditor.vue'
 Vue.component('content-elements-editor', ContentElementsEditor);
 
+import YoutubePlayer from '@/Components/YoutubePlayer.vue'
+Vue.component('youtube-player', YoutubePlayer);
+
 const app = new Vue({
     el: "#app",
     store,
@@ -34,5 +37,17 @@ const app = new Vue({
         'page-tree': PageTree,
         'processing': Processing,
         'saving-indicator': SavingIndicator,
+    },
+
+    mounted() {
+
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        window.onYouTubeIframeAPIReady = function() {
+            app.$store.dispatch('setYoutubeReady');
+        }
     }
 });

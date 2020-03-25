@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative mt-8" :class="!contentElement.published_at ? '' : (contentElement.unlisted ? 'bg-gray-200 opacity-75' : '')">
+    <div class="relative mt-8" :class="!contentElement.published_at ? '' : (contentElement.unlisted ? 'bg-gray-200 opacity-75' : '')" style="min-height: 150px;">
 
         <div class="absolute z-3 flex">
             <transition name="fade">
@@ -32,9 +32,10 @@
             <div class="remove-icon" @click="removeContentElement()"><i class="fas fa-times"></i></div>
         </div>
 
-
         <component :is="contentElement.type" 
             :content="contentElement.content"
+            :uuid="contentElement.uuid"
+            :first="first"
         ></component>
 
     </div>
@@ -47,18 +48,20 @@
     import TextBlock from '@/Forms/TextBlock.vue';
     import PhotoBlock from '@/Forms/PhotoBlock.vue';
     import Quote from '@/Forms/Quote.vue';
+    import YoutubeVideo from '@/Forms/YoutubeVideo.vue';
     import ContentElements from '@/Mixins/ContentElements';
 
     export default {
 
         mixins: [Feedback, ContentElements],
 
-        props: ['value'],
+        props: ['value', 'first'],
 
         components: {
             'text-block': TextBlock,
             'photo-block': PhotoBlock,
             'quote': Quote,
+            'youtube-video': YoutubeVideo,
         },
 
         data() {

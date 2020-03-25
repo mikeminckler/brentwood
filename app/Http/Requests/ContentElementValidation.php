@@ -49,12 +49,16 @@ class ContentElementValidation extends FormRequest
             'page_id' => 'required|exists:pages,id',
             'sort_order' => 'required|integer',
             'unlisted' => 'required|boolean',
-        ])->merge(
-            collect((new $content_class)->rules())->mapWithKeys(function ($rule, $field) {
-                return ['content.'.$field => $rule];
-            })
-        )->all();
+        ]);
+            
+        if ($this->route('id')) {
+            $rules = $rules->merge(
+                collect((new $content_class)->rules())->mapWithKeys(function ($rule, $field) {
+                    return ['content.'.$field => $rule];
+                })
+            );
+        }
 
-        return $rules;
+        return $rules->all();
     }
 }

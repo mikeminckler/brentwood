@@ -10,6 +10,11 @@ use Illuminate\Support\Arr;
 use App\ContentElement;
 use App\User;
 use App\TextBlock;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
+use App\FileUpload;
+use App\Photo;
 
 class TextBlockTest extends TestCase
 {
@@ -45,20 +50,15 @@ class TextBlockTest extends TestCase
                 'content.body',
              ]);
 
-        $content = (new TextBlock);
-        $content->header = Arr::get($input, 'content.header');
-        $content->body = Arr::get($input, 'content.body');
-
         $this->json('POST', route('content-elements.store'), $input)
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
-                //'html' => view('content-elements.text-block', ['content' => $content])->render(),
              ]);
 
         $text_block = TextBlock::all()->last();
-        $this->assertEquals($content->header, $text_block->header);
-        $this->assertEquals($content->body, $text_block->body);
+        $this->assertEquals(Arr::get($input, 'content.header'), $text_block->header);
+        $this->assertEquals(Arr::get($input, 'content.body'), $text_block->body);
     }
 
     /** @test **/
@@ -114,5 +114,45 @@ class TextBlockTest extends TestCase
         $text_block->refresh();
         $this->assertEquals($content->header, $text_block->header);
         $this->assertEquals($content->body, $text_block->body);
+    }
+
+    /** @test **/
+    public function a_text_block_can_save_a_photo()
+    {
+        
+        Storage::fake();
+        $file_name = Str::random().'.jpg';
+        $file = UploadedFile::fake()->image($file_name);
+        $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
+
+        $photo_input = factory(Photo::class)->raw();
+        $photo_input['file_upload'] = $file_upload;
+
+        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input['type'] = 'text-block';
+        $input['content'] = factory(TextBlock::class)->raw();
+        $input['content']['photos'] = [$photo_input];
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.store'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $content_element = ContentElement::all()->last();
+
+        $text_block = $content_element->content;
+
+        $this->assertEquals(1, $text_block->photos->count());
+
+        $photo = $text_block->photos->first();
+        $this->assertInstanceOf(Photo::class, $photo);
+        $this->assertEquals(Arr::get($photo_input, 'name'), $photo->name);
+        $this->assertEquals(Arr::get($photo_input, 'description'), $photo->description);
+        $this->assertEquals(Arr::get($photo_input, 'alt'), $photo->alt);
+        $this->assertEquals($photo->fileUpload->id, $file_upload->id);
     }
 }

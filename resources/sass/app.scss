@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Oswald:300|Roboto:300|400|700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Oswald:300|Roboto:300,400,700&display=swap');
 
 @tailwind base;
 
@@ -17,7 +17,7 @@ a {
 }
 
 h1, h2, h3, .h1, .h2, .h3 {
-    @apply font-oswald p-0 m-0;
+    @apply font-oswald p-0 m-0 font-light;
 }
 
 h1, .h1 {
@@ -33,7 +33,7 @@ h3, .h3 {
 }
 
 p {
-    @apply p-0 m-0 py-4;
+    @apply p-0 m-0 py-4 leading-relaxed;
 }
 
 .columns-2 {
@@ -50,8 +50,24 @@ p:last-child {
     @apply absolute w-full h-full overflow-hidden;
 
     > img {
-        @apply w-full h-full object-cover;
+        @apply w-full h-full;
     }
+}
+
+.photo.fill {
+    > img {
+        @apply object-cover;
+    }
+}
+
+.photo.fit {
+    > img {
+        @apply object-contain;
+    }
+}
+
+.photo-icons {
+    @apply absolute bottom-0 z-3 w-full text-lg bg-translucent;
 }
 
 .content-element-icons {
@@ -82,6 +98,14 @@ input:hover, input:focus, .editor:hover, .editor:focus {
 
 input::placeholder, .placeholder, input::placeholder:hover, .placeholder:hover {
     @apply opacity-100 italic;
+}
+
+input[type=range]::-moz-range-track, input[type=range]::-webkit-slider-runnable-track {
+    background: rgba(255,255,255,0.75);
+}
+
+input[type=range]:hover {
+    @apply border-transparent;
 }
 
 .photo-block-text-blue, .photo-block-text-gray {

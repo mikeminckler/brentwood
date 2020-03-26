@@ -4,7 +4,7 @@
 
         <div class="flex-1 relative flex flex-col">
 
-            <div class="absolute w-full pb-100p">
+            <div class="absolute w-full h-full">
                 <photo-controls :photo="photo" 
                     :fill="true" 
                     :content="content"

@@ -19,7 +19,7 @@
                 return this.$store.state.youtubeReady;
             },
             hostname() {
-                return window.location.hostname;
+                return window.location.protocol + '//' + window.location.hostname;
             }
         },
 

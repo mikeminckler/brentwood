@@ -126,7 +126,7 @@ input[type=range]:hover {
 }
 
 button, .button {
-    @apply flex bg-primary text-white font-bold px-4 py-1 cursor-pointer;
+    @apply inline-flex bg-primary text-white font-bold px-4 py-1 cursor-pointer;
 }
 
 .button-icon {

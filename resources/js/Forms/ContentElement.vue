@@ -1,30 +1,11 @@
 <template>
 
-    <div class="relative mt-8" :class="!contentElement.published_at ? '' : (contentElement.unlisted ? 'bg-gray-200 opacity-75' : '')" style="min-height: 150px;">
+    <div class="relative mt-8" 
+         :class="contentElement.unlisted ? 'bg-gray-200 opacity-75' : ''" 
+        v-if="contentElement.id >= 1"
+    >
 
-        <div class="absolute z-3 flex">
-            <transition name="fade">
-                <div class="absolute flex bg-gray-100 text-green-500 px-2 py-1" v-if="$store.state.saving.find( save => save === contentElement.id)" key="saving">
-                    <div class="spin"><i class="fas fa-sync-alt"></i></div>
-                    <div class="ml-2">Saving</div>
-                </div>
-            </transition>
-
-            <div class="flex bg-gray-300 px-2 py-1" v-if="contentElement.unlisted">
-                <div class=""><i class="fas fa-eye-slash"></i></div>
-                <div class="ml-2">Hidden</div>
-            </div>
-        </div>
-
-        <transition name="draft">
-            <div class="relative bg-yellow-100 flex items-center z-2 justify-center" v-if="!contentElement.published_at">
-                <div class="text-xl mr-2 relative"><i class="fas fa-pen-square"></i></div>
-                <div class="font-bold relative">DRAFT</div>
-                <div class="remove-icon mx-2" @click="removeDraft()"><i class="fas fa-times"></i></div>
-            </div>
-        </transition>
-
-        <div class="absolute text-xl flex flex-col items-center" style="right: -40px">
+        <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
             <div class="content-element-icons" @click="$emit('sortUp')"><i class="fas fa-arrow-alt-circle-up"></i></div>
             <div class="content-element-icons" @click="$emit('sortDown')"><i class="fas fa-arrow-alt-circle-down"></i></div>
             <div class="content-element-icons" @click="contentElement.unlisted = false" v-if="contentElement.unlisted"><i class="fas fa-eye"></i></div>
@@ -32,11 +13,42 @@
             <div class="remove-icon" @click="removeContentElement()"><i class="fas fa-times"></i></div>
         </div>
 
-        <component :is="contentElement.type" 
-            :content="contentElement.content"
-            :uuid="contentElement.uuid"
-            :first="first"
-        ></component>
+        <div class="relative flex">
+            <transition name="saving-icon">
+                <div class="flex bg-gray-100 absolute text-green-500 px-2 py-1 z-3" 
+                    v-if="$store.state.saving.find( save => save === contentElement.id)" 
+                    key="saving"
+                >
+                    <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                </div>
+            </transition>
+
+            <transition name="draft">
+                <div class="relative flex items-center z-2" v-if="!contentElement.published_at">
+                    <div class="flex items-center bg-yellow-100 pl-2">
+                        <div class="text-xl mr-2 relative"><i class="fas fa-pen-square"></i></div>
+                        <div class="font-bold relative">DRAFT</div>
+                        <div class="remove-icon mx-2" @click="removeDraft()"><i class="fas fa-times"></i></div>
+                    </div>
+                </div>
+            </transition>
+
+            <div class="flex bg-gray-300 px-2 py-1" v-if="contentElement.unlisted">
+                <div class=""><i class="fas fa-eye-slash"></i></div>
+                <div class="ml-2">Hidden</div>
+            </div>
+
+        </div>
+
+        <div class="" style="min-height: 150px">
+            <component :is="contentElement.type" 
+                :content="contentElement.content"
+                :uuid="contentElement.uuid"
+                :first="first"
+            ></component>
+        </div>
+
+        <add-content-element :sort-order="contentElement.sort_order"></add-content-element>
 
     </div>
 
@@ -50,6 +62,7 @@
     import Quote from '@/Forms/Quote.vue';
     import YoutubeVideo from '@/Forms/YoutubeVideo.vue';
     import ContentElements from '@/Mixins/ContentElements';
+    import AddContentElement from '@/Components/AddContentElement.vue';
 
     export default {
 
@@ -58,6 +71,7 @@
         props: ['value', 'first'],
 
         components: {
+            'add-content-element': AddContentElement,
             'text-block': TextBlock,
             'photo-block': PhotoBlock,
             'quote': Quote,
@@ -68,9 +82,11 @@
             return {
                 contentElement: {},
                 loaded: false,
+                changed: false,
+                preventWatcher: false,
                 saveContent: _.debounce( function() {
                     this.queueSave();
-                }, 1000),
+                }, 500),
             }
         },
 
@@ -79,13 +95,23 @@
                 this.contentElement = this.value;
             },
             contentElement: {
-                handler: function(content) {
+                handler: _.throttle( function(content) {
+                    // this gets tripped when the content is first loaded
+                    // so we ignore the first watcher hit
+
                     if (this.loaded) {
-                        this.saveContent();
+
+                        if (!this.preventWatcher) {
+                            this.changed = true;
+                            this.saveContent();
+                        } else {
+                            this.preventWatcher = false;
+                        }
+
                     } else {
                         this.loaded = true;
                     }
-                },
+                }, 500),
                 deep: true
             },
         },
@@ -98,7 +124,7 @@
             // refer to the mixin for saving of the content element
 
             queueSave: function() {
-                if (this.$store.state.saving.find(save => save === this.contentElement.Id)) {
+                if (this.isSaving) {
                     setTimeout(this.queueSave(), 500);
                 } else {
                     this.saveContentElement();
@@ -126,6 +152,7 @@
                 if (answer == true) {
 
                     this.$http.post('/content-elements/' + this.contentElement.id + '/remove').then( response => {
+                        this.preventWatcher = true;
                         if (response.data.content_element) {
                             this.$emit('update', response.data.content_element);
                         } else {
@@ -164,5 +191,25 @@
 .draft-leave-active {
     animation: draft var(--transition-time) reverse;
 }
+
+@keyframes saving-icon {
+    0% {
+        opacity: 0;
+        max-width: 0;
+    }
+    100%   {
+        opacity: 1;
+        max-width: 32px;
+    }
+}
+
+.saving-icon-enter-active {
+    animation: saving-icon var(--transition-time) ease-out;
+}
+
+.saving-icon-leave-active {
+    animation: saving-icon var(--transition-time) reverse;
+}
+
 
 </style>

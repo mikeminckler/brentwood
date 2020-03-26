@@ -51,6 +51,7 @@ class ContentElementValidation extends FormRequest
             'unlisted' => 'required|boolean',
         ]);
             
+        /*
         if ($this->route('id')) {
             $rules = $rules->merge(
                 collect((new $content_class)->rules())->mapWithKeys(function ($rule, $field) {
@@ -58,6 +59,7 @@ class ContentElementValidation extends FormRequest
                 })
             );
         }
+         */
 
         return $rules->all();
     }

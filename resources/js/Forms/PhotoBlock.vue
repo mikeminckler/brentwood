@@ -31,7 +31,7 @@
 
         </div>
 
-        <transition-group name="photo-editor" tag="div" class="relative grid" :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'row-gap-2' : 'gap-2' ) : '']">
+        <transition-group name="photo-editor" tag="div" class="relative grid" :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'row-gap-2' : 'gap-2' ) : '']" style="min-height: 100px">
 
             <div v-if="content.show_text" key="text" 
                 class="relative" 
@@ -56,7 +56,7 @@
                         <div class="w-6 h-6 bg-blue-200" @click="content.text_style = 'blue'"></div>
                     </div>
 
-                    <div class="photo-icons flex ml-4">
+                    <div class="flex ml-4">
                         <div class="cursor-pointer mx-1" v-if="content.text_order > 1" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
                         <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
                         <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>

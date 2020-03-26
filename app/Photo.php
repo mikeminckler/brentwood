@@ -39,7 +39,26 @@ class Photo extends Model
             $photo = Photo::findOrFail($id);
             $update = true;
         } else {
-            $photo = new Photo;
+
+            // we need to check for the same filename 
+            // in the content element as we can save
+            // the content element while the image is still processing
+
+            if ($content->photos()->count()) {
+                
+                $existing_photo = $content->photos()->get()->filter( function($photo) use ($input) {
+                    return $photo->fileUpload->id === Arr::get($input, 'file_upload.id');
+                })->first();
+
+                if ($existing_photo) {
+                    $photo = $existing_photo;
+                } else {
+                    $photo = new Photo;
+                }
+
+            } else {
+                $photo = new Photo;
+            }
         }
 
         $photo->content_id = $content->id;

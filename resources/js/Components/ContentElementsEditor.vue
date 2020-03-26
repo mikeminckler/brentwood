@@ -16,30 +16,11 @@
             </form-content-element>
         </transition-group>
 
-        <div class="flex w-full bg-gray-200 p-2 relative z-2 shadow mt-4 items-center">
-            <div class="font-semibold">Create New</div>
-
-            <div class="button mx-2" @click="addTextBlock">
-                <div class="pr-2"><i class="fas fa-align-justify"></i></div>
-                <div>Text</div>
-            </div>
-
-            <div class="button mx-2" @click="addPhotoBlock">
-                <div class="pr-2"><i class="fas fa-file-image"></i></div>
-                <div>Photos</div>
-            </div>
-
-            <div class="button mx-2" @click="addQuote">
-                <div class="pr-2"><i class="fas fa-quote-left"></i></div>
-                <div>Testimonial</div>
-            </div>
-
-            <div class="button mx-2 items-center" @click="addYoutubeVideo">
-                <div class="pr-2 text-lg leading-none"><i class="fab fa-youtube"></i></div>
-                <div>YouTube Video</div>
-            </div>
-
-        </div>
+        <add-content-element 
+            v-if="!contentElements.length"
+            :expanded="true" 
+            :sort-order="contentElements.length"
+        ></add-content-element>
 
     </div>
 
@@ -50,6 +31,7 @@
     import ContentElement from '@/Forms/ContentElement.vue';
     import ContentElements from '@/Mixins/ContentElements';
     import Feedback from '@/Mixins/Feedback';
+    import AddContentElement from '@/Components/AddContentElement.vue';
 
     export default {
 
@@ -57,6 +39,7 @@
 
         components: {
             'form-content-element': ContentElement,
+            'add-content-element': AddContentElement,
         },
 
         computed: {
@@ -68,7 +51,30 @@
             },
         },
 
+        mounted() {
+
+            const listener = data => {
+                this.addContentElement(data);
+            };
+            this.$eventer.$on('add-content-element', listener);
+
+            this.$once('hook:destroyed', () => {
+                this.$eventer.$off('add-content-element', listener);
+            });
+        },
+
         methods: {
+
+            addContentElement: function(data) {
+
+                this.$lodash.each(this.contentElements, ce => {
+                    if (ce.sort_order >= data.sortOrder) {
+                        ce.sort_order++;
+                    }
+                });
+
+                this[data.type](data.sortOrder);
+            },
 
             isFirst: function(contentElement) {
 
@@ -117,11 +123,11 @@
                 this.contentElements.splice( index, 1);
             },
 
-            newContentElement: function() {
+            newContentElement: function(sortOrder) {
                 return {
                     id: '0.' + this.contentElements.length,
                     page_id: this.$store.state.page.id,
-                    sort_order: this.contentElements.length ? this.$lodash.last(this.sortedContentElements).sort_order + 1 : 1,
+                    sort_order: sortOrder,
                     unlisted: false,
                 };
             },
@@ -130,9 +136,11 @@
                 this.saveContentElement(contentElement, true);
             },
 
-            addTextBlock: function() {
+            // Content Types
 
-                let contentElement = this.newContentElement();
+            addTextBlock: function(sortOrder) {
+
+                let contentElement = this.newContentElement(sortOrder);
 
                 contentElement.type = 'text-block';
                 contentElement.content = {
@@ -145,9 +153,9 @@
 
             },
 
-            addPhotoBlock: function() {
+            addPhotoBlock: function(sortOrder) {
                 
-                let contentElement = this.newContentElement();
+                let contentElement = this.newContentElement(sortOrder);
 
                 contentElement.type = 'photo-block';
                 contentElement.content = {
@@ -167,9 +175,9 @@
                 this.saveNewContentElement(contentElement);
             },
 
-            addQuote: function() {
+            addQuote: function(sortOrder) {
 
-                let contentElement = this.newContentElement();
+                let contentElement = this.newContentElement(sortOrder);
 
                 contentElement.type = 'quote';
                 contentElement.content = {
@@ -184,9 +192,9 @@
 
             },
 
-            addYoutubeVideo: function() {
+            addYoutubeVideo: function(sortOrder) {
 
-                let contentElement = this.newContentElement();
+                let contentElement = this.newContentElement(sortOrder);
 
                 contentElement.type = 'youtube-video';
                 contentElement.content = {

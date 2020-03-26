@@ -9,10 +9,11 @@
         </transition>
 
         <editor-menu-bar :editor="editor" :show-menu="showMenu" v-slot="{ commands, isActive, focused, getMarkAttrs }">
-            <div>
+            <div class="relative">
                 <transition name="editor-menu-bar">
 
                     <div v-show="showMenu">
+
                         <div class="rounded-t text-sm flex p-1 items-center text-gray-700" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
                             <div class="menubar__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold" ><i class="fas fa-bold"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.italic() }" @click="commands.italic" ><i class="fas fa-italic"></i></div>
@@ -38,18 +39,32 @@
 
         <div class="relative editor" :class="showBg ? 'bg-gray-100 border px-4 py-2' : ''">
 
-            <editor-menu-bubble class="absolute z-10 h-full w-full bg-gray-100 top-0 left-0 rounded" :editor="editor" @hide="hideLinkMenu" v-slot="{ commands, isActive, getMarkAttrs, menu }">
+            <editor-menu-bubble
+                :editor="editor" 
+                @hide="hideLinkMenu" 
+                v-slot="{ commands, isActive, getMarkAttrs, menu }"
+            >
 
                 <transition name="fade">
-                    <div class="w-full flex items-center text-sm" v-show="linkMenuIsActive">
-                        <div class="relative flex flex-1 items-center">
-                            <input class="" type="text" v-model="linkUrl" placeholder="https://" ref="linkInput" @keyup.esc="hideLinkMenu" @keyup.enter="setLinkUrl(commands.link, linkUrl)" />
-                            <transition name="fade">
-                                <div v-if="linkUrl" class="icon text-lg text-gray-500 absolute right-0" @click="setLinkUrl(commands.link, null)"><i class="fas fa-times-circle"></i></div>
-                            </transition>
+                    <div class="absolute w-full h-full flex items-center justify-center z-10" 
+                        v-show="linkMenuIsActive"
+                        style="background-color: rgba(255,255,255,0.5)"
+                    >
+                        <div class="relative bg-gray-200 m-4 p-4 shadow w-full">
+                            <div class="text-lg hover:text-gray-800 absolute top-0 right-0 -mt-2 -mr-2" @click="hideLinkMenu()"><i class="fas fa-times-circle"></i></div>
+
+                            <div class="flex items-center form relative">
+                                <input class="" type="text" v-model="linkUrl" placeholder="https://www.brentwood.bc.ca/" ref="linkInput" @keyup.esc="hideLinkMenu" @keyup.enter="setLinkUrl(commands.link, linkUrl)" />
+                                <div v-if="linkUrl" class="mr-2 text-lg hover:text-gray-800 absolute right-0" @click="setLinkUrl(commands.link, null)"><i class="fas fa-times-circle"></i></div>
+                            </div>
+
+                            <checkbox-input class="mt-2" v-model="linkButton" label="Is A Button"></checkbox-input> 
+                            <checkbox-input class="mt-2" v-model="linkNewWindow" label="Open In New Window"></checkbox-input> 
+                            <checkbox-input class="mt-2" v-model="linkTopRight" label="Place In Top Right"></checkbox-input> 
+
+                            <div class="mt-2 button" @click="setLinkUrl(commands.link, linkUrl)">Apply Link</div>
                         </div>
-                        <div class="whitespace-no-wrap bg-primary-500 text-white font-semibold py-1 px-2 rounded-r cursor-pointer" @click="setLinkUrl(commands.link, linkUrl)">Apply Link</div>
-                        <div class="icon text-lg hover:text-gray-800" @click="hideLinkMenu"><i class="fas fa-times-circle"></i></div>
+
                     </div>
                 </transition>
 
@@ -82,11 +97,14 @@
           Bold,
           Code,
           Italic,
-          Link,
+          //Link,
           Strike,
           Underline,
           History,
     } from 'tiptap-extensions'
+
+    import CustomLink from '@/CustomLink';
+    import CheckboxInput from '@/Components/CheckboxInput.vue';
 
     export default {
 
@@ -94,6 +112,7 @@
             EditorContent,
             EditorMenuBar,
             EditorMenuBubble,
+            'checkbox-input': CheckboxInput,
         },
 
         props: ['value', 'placeholder', 'label', 'focus', 'showBg'],
@@ -111,7 +130,7 @@
                         new OrderedList(),
                         new TodoItem(),
                         new TodoList(),
-                        new Link(),
+                        new CustomLink(),
                         new Bold(),
                         new Code(),
                         new Italic(),
@@ -127,6 +146,9 @@
                 //json: 'JSON',
                 html: 'HTML',
                 linkUrl: null,
+                linkButton: false,
+                linkNewWindow: false,
+                linkTopRight: false,
                 linkMenuIsActive: false,
                 showMenu: false,
             }
@@ -139,6 +161,19 @@
             },
             focused() {
                 return this.editor.focused;
+            },
+            linkClasses() {
+
+                let classes = '';
+
+                if (this.linkButton) {
+                    classes += 'button ';
+                }
+                if (this.linkTopRight) {
+                    classes += 'absolute top-0 right-0 ';
+                }
+
+                return classes;
             }
         },
 
@@ -181,12 +216,19 @@
             },
 
             hideLinkMenu() {
-                this.linkUrl = null
-                this.linkMenuIsActive = false
+                this.linkUrl = null;
+                this.linkButton = false;
+                this.linkNewWindow = false;
+                this.linkTopRight = false;
+                this.linkMenuIsActive = false;
             },
 
             setLinkUrl(command, url) {
-            command({ href: url })
+                command({ 
+                    href: url, 
+                    target: this.linkNewWindow ? '__blank' : null, 
+                    class: this.linkClasses,
+                })
                 this.hideLinkMenu()
             },
         },

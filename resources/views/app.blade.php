@@ -23,7 +23,7 @@
 
         <div class="relative flex-1 flex flex-col">
 
-            <div class="sticky top-0 z-4">
+            <div class="sticky top-0 z-4" :class="$store.state.editing ? 'px-12' : ''">
 
                 <page-editor 
                     :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
@@ -73,7 +73,9 @@
             </div>
 
 
-            <div class="items-center flex-1 flex flex-col relative" style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 75%, rgba(247,218,199,1));"> 
+            <div class="items-center flex-1 flex flex-col relative" 
+                :class="$store.state.editing ? 'px-12' : ''"
+                style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 75%, rgba(247,218,199,1));"> 
 
                 <div class="flex flex-1 flex-col w-full max-w-6xl relative">
 
@@ -87,23 +89,23 @@
 
             </div>
 
-            <div id="footer" class="relative flex justify-center" style="min-height: 500px">
+            <div id="footer" class="relative flex justify-center" style="min-height: 500px" :class="$store.state.editing ? 'px-12' : ''">
                 <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba(247,218,199,1), rgba(245,205,175,0));" ></div>
                 <div class="absolute w-full h-full overflow-hidden">
-                    <img src="/images/footer_fg.png" class="w-full h-full object-cover z-5 absolute" />
+                    <img src="/images/footer_fg.png" class="w-full h-full object-cover z-2 absolute" />
                     <img src="/images/footer_bg.jpg" class="w-full h-full object-cover" />
                 </div>
-                <div class="flex items-center relative z-1 py-8 w-full max-w-6xl">
+                <div class="flex items-center relative py-8 w-full max-w-6xl">
 
-                    <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-2"></div>
+                    <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-1"></div>
 
-                    <div class="hidden md:flex flex-1 justify-center">
+                    <div class="hidden md:flex flex-1 justify-center relative z-2">
                         <div class="p-8">
                             <img src="images/logo.svg" class="h-12" />
                         </div>
                     </div>
             
-                    <div class="flex-2">
+                    <div class="flex-2 relative z-2">
                         <div class="py-8 px-25p">
                             <a href="tel:2507435521">250.743.5521</a><br/>
                             <a href="mailto:info@brentwood.ca">info@brentwood.ca</a>

@@ -1,6 +1,9 @@
 <template>
 
-    <div class="py-2 relative flex justify-center text-green-500" :class="saving ? 'bg-gray-200' : 'bg-green-100'" style="transition: background-color var(--transition-time)">
+    <div class="py-2 relative flex justify-center text-green-500 border" 
+        :class="saving ? 'bg-gray-200 border-gray-200' : 'bg-green-100 border-green-300'" 
+        style="transition: background-color var(--transition-time); min-width: 175px;"
+    >
 
         <transition name="saving">
             <div class="flex" v-if="!saving" key="saved">

@@ -23,7 +23,7 @@
 
     @endif
 
-    @foreach ($content->photos as $index => $photo)
+    @foreach ($content->photos->sortBy('sort_order') as $index => $photo)
         <div class="relative overflow-hidden col-span-{{ $photo->span }}"
             key="photo-{{ $photo->id }}"
             style="padding-bottom: {{ floor($content->height / $photo->span) }}%"

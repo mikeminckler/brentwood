@@ -62,10 +62,10 @@ class PhotoBlockTest extends TestCase
              ->assertJsonValidationErrors([
                 'page_id',
                 //'content.photos',
-                'content.columns',
-                'content.height',
-                'content.padding',
-                'content.show_text',
+                //'content.columns',
+                //'content.height',
+                //'content.padding',
+                //'content.show_text',
              ]);
 
         //$this->withoutExceptionHandling();

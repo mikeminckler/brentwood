@@ -8,9 +8,24 @@ use App\TextBlock;
 use Illuminate\Support\Arr;
 
 use App\ContentElement;
+use Tests\Unit\PageLinkTestTrait;
 
 class TextBlockTest extends TestCase
 {
+
+    use PageLinkTestTrait;
+
+    protected function getModel()
+    {
+        return factory(TextBlock::class)->create();
+    }
+
+    protected function getLinkFields()
+    {
+        return [
+            'body',
+        ];
+    }
 
     /** @test **/
     public function a_text_block_can_be_created()

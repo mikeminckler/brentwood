@@ -20,6 +20,7 @@ class PhotoTest extends TestCase
     /** @test **/
     public function a_photo_has_a_file_upload()
     {
+        cache()->flush();
         $photo = factory(Photo::class)->states('photo-block')->create();
         $this->assertInstanceOf(FileUpload::class, $photo->fileUpload);
     }

@@ -10,7 +10,9 @@
         @endforeach
     </div>
 
-    <content-elements-editor v-if="$store.state.editing"></content-elements-editor>
+    @if (session()->get('editing'))
+        <content-elements-editor v-if="$store.state.editing"></content-elements-editor>
+    @endif
 
 </div>
 

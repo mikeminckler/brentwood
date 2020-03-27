@@ -6,7 +6,7 @@
             <form-content-element 
                 v-for="(contentElement, index) in sortedContentElements"
                 :key="contentElement.uuid"
-                :value="contentElement"
+                :content-element="contentElement"
                 @sortUp="sortUp(contentElement)"
                 @sortDown="sortDown(contentElement)"
                 @remove="removeContentElement(contentElement)"

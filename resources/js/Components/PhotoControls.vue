@@ -31,7 +31,7 @@
             <div class="mx-1 remove-icon" @click="$emit('remove')"><i class="fas fa-times"></i></div>
         </div>
 
-        <div class="px-2">
+        <div class="px-2 mb-1">
             <input type="text" placeholder="caption" v-model="photo.description" />
         </div>
 

@@ -59,7 +59,7 @@ class QuoteTest extends TestCase
                 'page_id',
                 //'content.author_name',
                 //'content.author_details',
-                'content.body',
+                //'content.body',
              ]);
 
         $this->withoutExceptionHandling();
@@ -113,7 +113,7 @@ class QuoteTest extends TestCase
                 'page_id',
                 //'content.author_name',
                 //'content.author_details',
-                'content.body',
+                //'content.body',
              ]);
 
         $input = $content_element->toArray();

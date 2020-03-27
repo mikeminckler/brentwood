@@ -85,7 +85,7 @@ class YoutubeVideoTest extends TestCase
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'page_id',
-                'content.video_id',
+                //'content.video_id',
              ]);
 
         $input = $content_element->toArray();

@@ -68,7 +68,7 @@
 
         mixins: [Feedback, ContentElements],
 
-        props: ['value', 'first'],
+        props: ['contentElement', 'first'],
 
         components: {
             'add-content-element': AddContentElement,
@@ -80,8 +80,6 @@
 
         data() {
             return {
-                contentElement: {},
-                loaded: false,
                 changed: false,
                 preventWatcher: false,
                 saveContent: _.debounce( function() {
@@ -91,33 +89,24 @@
         },
 
         watch: {
-            value() {
-                this.contentElement = this.value;
-            },
             contentElement: {
                 handler: _.throttle( function(content) {
                     // this gets tripped when the content is first loaded
                     // so we ignore the first watcher hit
 
-                    if (this.loaded) {
-
-                        if (!this.preventWatcher) {
-                            this.changed = true;
-                            this.saveContent();
-                        } else {
-                            this.preventWatcher = false;
-                        }
-
+                    if (!this.preventWatcher) {
+                        this.changed = true;
+                        this.saveContent();
                     } else {
-                        this.loaded = true;
+                        this.preventWatcher = false;
                     }
+
                 }, 500),
                 deep: true
             },
         },
 
         mounted() {
-            this.contentElement = this.value;
         },
 
         methods: {

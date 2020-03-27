@@ -293,6 +293,7 @@ class PageTest extends TestCase
         
         $page->publish();
 
+        $this->withoutExceptionHandling();
         $this->get( $page->full_slug )
             ->assertSuccessful();
     }

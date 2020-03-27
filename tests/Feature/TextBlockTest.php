@@ -47,7 +47,7 @@ class TextBlockTest extends TestCase
              ->assertJsonValidationErrors([
                 'page_id',
                 //'content.header',
-                'content.body',
+                //'content.body',
              ]);
 
         $this->json('POST', route('content-elements.store'), $input)
@@ -90,7 +90,7 @@ class TextBlockTest extends TestCase
              ->assertJsonValidationErrors([
                 'page_id',
                 //'content.header',
-                'content.body',
+                //'content.body',
              ]);
 
         $input = $content_element->toArray();

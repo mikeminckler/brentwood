@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use App\ContentElement;
 use App\ContentElementTrait;
 use App\PhotosTrait;
+use App\Page;
 
 class TextBlock extends Model
 {
@@ -35,4 +36,27 @@ class TextBlock extends Model
         return $text_block;
     }
 
+    public function getBodyAttribute($value) 
+    {
+        if (!session()->has('editing')) {
+
+            $replace = [];
+
+            preg_match_all('/href="(\d+)"/', $value, $match);
+
+            $find = collect($match[0])->map(function($string) {
+                return '/'.$string.'/';
+            })->all();
+
+            foreach ($match[1] as $page_id) {
+                $page = Page::find($page_id);
+                if ($page instanceof Page) {
+                    $replace[] = 'href="/'.$page->full_slug.'"';
+                }
+            }
+
+            return preg_replace($find, $replace, $value);   
+        }
+        return $value;
+    }
 }

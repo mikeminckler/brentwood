@@ -76,11 +76,13 @@ class Page extends Model
         }
 
         if ($this->parent_page_id > 0) {
-            $parent_page = Page::findOrFail($this->parent_page_id);
+            $parent_page = Page::find($this->parent_page_id);
             
-            while ($parent_page->id != 1) {
-                $slug = Str::kebab($parent_page->name).'/'.$slug;
-                $parent_page = Page::find($parent_page->parent_page_id);
+            if ($parent_page instanceof Page) {
+                while ($parent_page->id > 1) {
+                    $slug = Str::kebab($parent_page->name).'/'.$slug;
+                    $parent_page = Page::find($parent_page->parent_page_id);
+                }
             }
         }
 
@@ -185,13 +187,16 @@ class Page extends Model
                      ->groupBy('uuid')
                      ->map(function($uuid) {
                         return $uuid->filter( function($content_element) {
-                            return $content_element->published_at && !$content_element->unlisted ? true : false;
+                            return $content_element->published_at ? true : false;
                         })
                         ->sortByDesc( function( $content_element) {
                             return $content_element->version_id;
                         })->first();
                      })
                      ->filter()
+                     ->filter( function($content_element) {
+                        return $content_element->unlisted ? false : true;
+                     })
                      ->sortBy(function($content_element) {
                         return $content_element->sort_order;
                      })->values();

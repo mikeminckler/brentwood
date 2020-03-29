@@ -30,7 +30,7 @@ class Quote extends Model
 
         $quote->save();
 
-        $quote->savePhotos($input);
+        $quote->saveSinglePhoto($input);
 
         cache()->tags([cache_name($quote)])->flush();
         return $quote;

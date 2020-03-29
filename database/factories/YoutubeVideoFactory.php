@@ -9,6 +9,7 @@ use App\ContentElement;
 $factory->define(YoutubeVideo::class, function (Faker $faker) {
     return [
         'video_id' => '1tW0Zj3YoJ4',
+        'title' => $faker->sentence,
     ];
 });
 

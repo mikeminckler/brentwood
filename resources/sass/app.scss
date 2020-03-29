@@ -45,6 +45,10 @@ p {
 p:last-child {
 }
 
+iframe {
+    @apply absolute w-full h-full;
+}
+
 .photo {
 
     @apply absolute w-full h-full overflow-hidden;
@@ -126,7 +130,7 @@ input[type=range]:hover {
 }
 
 button, .button {
-    @apply inline-flex bg-primary text-white font-bold px-4 py-1 cursor-pointer;
+    @apply inline-flex bg-primary text-white font-bold px-4 py-1 cursor-pointer whitespace-no-wrap;
 }
 
 .button-icon {

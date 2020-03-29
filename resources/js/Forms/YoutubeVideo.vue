@@ -4,20 +4,43 @@
         <div class="flex relative">
 
             <div class="flex-1 relative"></div>
-            <div class="flex-2 flex justify-center items-center relative">
-                <youtube-player :video-id="content.video_id" :uuid="uuid"></youtube-player>
+            <div class="relative flex-2 flex justify-center items-center relative">
+                <youtube-player
+                    :video-id="content.video_id" 
+                    :photo="photo" 
+                    :uuid="uuid"
+                    :title="content.title"
+                    :remove="true"
+                    @remove="removePhoto(photo, 0)"
+                ></youtube-player>
             </div>
 
         </div>
 
-        <div class="flex relative bg-gray-200 p-2 shadow mt-4 z-2">
+        <div class="flex justify-end relative bg-gray-200 p-2 shadow mt-4 z-2">
 
-            <div class="flex-1 relative"></div>
+            <div class="form pl-2">
+                <input type="text" v-model="videoId" placeholder="YouTube Video ID" />
+            </div>
 
-            <div class="flex-2 flex relative">
-                <div class="form pl-2">
-                    <input type="text" v-model="videoId" placeholder="YouTube Video ID" />
+            <div class="flex items-center px-2" v-if="!photo && videoId">
+                <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
+                    <div class="">Upload Banner Image</div>
                 </div>
+            </div>
+
+            <div>
+                <file-uploads
+                    :name="fileUploadName"
+                    v-model="uploads"
+                    multiple="false"
+                    :items="photos"
+                    type="image"
+                ></file-uploads>
+            </div>
+
+            <div class="form pl-2" v-if="photo">
+                <input type="text" v-model="content.title" placeholder="Title" />
             </div>
 
         </div>
@@ -29,11 +52,17 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback';
+    import FileUploads from '@/Components/FileUploads';
+    import Photos from '@/Mixins/Photos';
 
     export default {
 
         props: ['content', 'uuid'],
-        mixins: [Feedback],
+        mixins: [Feedback, Photos],
+
+        components: {
+            'file-uploads': FileUploads,
+        },
 
         data() {
             return {
@@ -67,10 +96,5 @@
                 this.videoId = this.content.video_id;
             }
         },
-
-        methods: {
-
-        },
-
     }
 </script>

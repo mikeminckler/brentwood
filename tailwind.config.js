@@ -9,6 +9,7 @@ module.exports = {
       },
       colors: {
         'primary': '#c8272c',
+        'primaryHover': '#cf2328',
         'translucent': 'rgba(55,55,55,0.5)'
       },
       flex: {
@@ -33,6 +34,7 @@ module.exports = {
         '66p': '66%',
         '75p': '75%',
         '100p': '100%',
+        'video': '56.25%',
       },
       margin: {
         '33p': '33%',

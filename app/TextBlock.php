@@ -30,7 +30,7 @@ class TextBlock extends Model
         $text_block->body = Arr::get($input, 'body');
         $text_block->save();
 
-        $text_block->savePhotos($input);
+        $text_block->saveSinglePhoto($input);
 
         cache()->tags([cache_name($text_block)])->flush();
         return $text_block;

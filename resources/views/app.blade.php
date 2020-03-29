@@ -30,72 +30,70 @@
                     :current-page='@json($page ?? '')'
                 ></page-editor>
 
-                <div id="header" class="flex justify-center relative bg-gray-100">
+                <div id="header" class="flex justify-center relative bg-gray-100 shadow">
                     
                     <div class="flex flex-col w-full relative max-w-6xl">
 
                         <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-5"></div>
 
-                        <div class="relative flex">
+                        <div class="relative flex items-center">
 
-                            <div class="md:flex-1">
-                                <div class="px-8 pt-8 flex items-center justify-center">
+                            <div class="md:flex-1 flex items-center justify-center">
+                                <div class="px-8 py-4">
                                     <a href="/"><img src="images/logo.svg" class="h-12 hidden md:block" /></a>
                                     <a href="/"><img src="images/icon.svg" class="h-12 block md:hidden" /></a>
                                 </div>
                             </div>
 
-                            <div class="flex-2 flex">
+                            <div class="flex-2 h-full">
 
-                                <div class="flex-1 flex items-center justify-between px-8">
-                                    @foreach ($menu as $menu_page)
-                                        @if (!$menu_page->unlisted && $menu_page->published_version_id)
-                                            <a href="{{ $menu_page->full_slug }}" 
-                                                class="font-oswald inline-flex text-lg ml-8 first:ml-0 {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline bg-gray-200' : '' }}"
-                                            >{{ $menu_page->name }}</a>
-                                            @php 
-                                                if ( Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ) {
-                                                    $sub_menu = $menu_page->pages;
-                                                }
-                                            @endphp
-                                        @endif
-                                    @endforeach 
+                                <div class="flex h-full">
+                                    <div class="flex-1 flex items-center -mb-1 h-full">
+                                        @foreach ($menu as $menu_page)
+                                            @if (!$menu_page->unlisted && $menu_page->published_version_id)
+                                                <a href="{{ $menu_page->full_slug }}" 
+                                                    class="font-oswald flex items-center text-lg px-4 h-full
+                                                    {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline shadow bg-white' : '' }}"
+                                                >{{ $menu_page->name }}</a>
+                                                @php 
+                                                    if ( Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ) {
+                                                        $sub_menu = $menu_page->pages;
+                                                    }
+                                                @endphp
+                                            @endif
+                                        @endforeach 
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-end">
+
+                                        <a href="/apply-now" class="button ml-4 whitespace-no-wrap">Apply Now</a>
+
+                                        @auth
+                                            @if (auth()->user()->hasRole('editor'))
+                                                <editing-button class="ml-4"></editing-button>
+                                            @endif
+                                        @endauth
+
+                                    </div>
                                 </div>
-                                
-                                <div class="flex items-center justify-end">
 
-                                    <a href="/apply-now" class="button ml-4 whitespace-no-wrap">Apply Now</a>
+                                @if (isset($sub_menu))
+                                    <div class="shadow">
 
-                                    @auth
-                                        @if (auth()->user()->hasRole('editor'))
-                                            <editing-button class="ml-4"></editing-button>
-                                        @endif
-                                    @endauth
+                                        <div class="flex items-center px-8 bg-white relative z-2">
+                                            @foreach ($sub_menu as $menu_page)
+                                                @if (!$menu_page->unlisted && $menu_page->published_version_id)
+                                                    <a href="{{ $menu_page->full_slug }}" class="py-2 font-oswald ml-8 first:ml-0">{{ $menu_page->name }}</a>
+                                                @endif
+                                            @endforeach 
+                                        </div>
 
-                                </div>
+                                    </div>
+                                @endif
 
                             </div>
 
                         </div>
-
-                        @if (isset($sub_menu))
-                            <div class="flex">
-
-                                <div class="flex-1"></div>
-                                <div class="flex-2">
-
-                                    <div class="border-t-2 border-primary w-full flex items-center justify-between px-8">
-                                        @foreach ($sub_menu as $menu_page)
-                                            @if (!$menu_page->unlisted && $menu_page->published_version_id)
-                                                <a href="{{ $menu_page->full_slug }}" class="font-oswald text-lg ml-8 first:ml-0">{{ $menu_page->name }}</a>
-                                            @endif
-                                        @endforeach 
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        @endif
 
                     </div>
 

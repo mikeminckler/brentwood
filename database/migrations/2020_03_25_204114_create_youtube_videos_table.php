@@ -16,6 +16,7 @@ class CreateYoutubeVideosTable extends Migration
         Schema::create('youtube_videos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('video_id')->nullable();
+            $table->string('title')->nullable();
             $table->timestamps();
         });
     }

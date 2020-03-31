@@ -1,4 +1,4 @@
-<div class="w-full flex py-8">
+<div class="w-full md:flex">
     <div class="flex-1 relative">
 
         @if ($content->photos->count())

@@ -1,4 +1,4 @@
-<div class="relative mt-8 z-2 grid grid-cols-{{ $content->columns }} {{ $content->padding ? ($content->columns === 3 ? 'row-gap-2' : 'gap-2') : '' }}">
+<div class="relative z-2 grid grid-cols-{{ $content->columns }} {{ $content->padding ? ($content->columns === 3 ? 'row-gap-2' : 'gap-2') : '' }}">
 
     @if ($content->show_text)
 

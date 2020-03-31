@@ -83,7 +83,8 @@
                 changed: false,
                 preventWatcher: false,
                 saveContent: _.debounce( function() {
-                    this.queueSave();
+                    // refer to the mixin for saving of the content element
+                    this.saveContentElement();
                 }, 500),
             }
         },
@@ -94,7 +95,7 @@
                     // this gets tripped when the content is first loaded
                     // so we ignore the first watcher hit
 
-                    if (!this.preventWatcher) {
+                    if (!this.preventWatcher && !this.isSaving) {
                         this.changed = true;
                         this.saveContent();
                     } else {
@@ -110,15 +111,6 @@
         },
 
         methods: {
-            // refer to the mixin for saving of the content element
-
-            queueSave: function() {
-                if (this.isSaving) {
-                    setTimeout(this.queueSave(), 500);
-                } else {
-                    this.saveContentElement();
-                }
-            },
 
             removeContentElement: function() {
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 use App\ContentElement;
@@ -12,6 +13,8 @@ use Illuminate\Support\Arr;
 
 class ContentElementTest extends TestCase
 {
+    use WithFaker;
+
     /** @test **/
     public function a_content_element_can_be_created()
     {
@@ -21,8 +24,8 @@ class ContentElementTest extends TestCase
         $input = [
             'id' => 0,
             'type' => 'text-block',
-            'page_id' => $page->id,
             'content' => $text_block,
+            'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
         ];
@@ -31,9 +34,9 @@ class ContentElementTest extends TestCase
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
 
-        $this->assertEquals($page->id, $content_element->page->id);
-        $this->assertEquals(1, $content_element->sort_order);
-        $this->assertEquals(0, $content_element->unlisted);
+        $this->assertEquals($page->id, $content_element->pages->first()->id);
+        $this->assertEquals(1, $content_element->pages->first()->pivot->sort_order);
+        $this->assertEquals(0, $content_element->pages->first()->pivot->unlisted);
         $this->assertNotNull($content_element->content_id);
         $this->assertEquals(Arr::get($text_block, 'header'), $content_element->content->header);
         $this->assertEquals(Arr::get($text_block, 'body'), $content_element->content->body);
@@ -48,10 +51,10 @@ class ContentElementTest extends TestCase
     }
 
     /** @test **/
-    public function a_content_element_belongs_to_a_page()
+    public function a_content_element_belongs_to_many_page()
     {
         $content_element = factory(ContentElement::class)->states('text-block')->create();
-        $this->assertInstanceOf(Page::class, $content_element->page);
+        $this->assertInstanceOf(Page::class, $content_element->pages->first());
     }
 
     /** @test **/
@@ -73,9 +76,10 @@ class ContentElementTest extends TestCase
     {
         $page = factory(Page::class)->states('published')->create();
         $content_element = factory(ContentElement::class)->states('text-block')->create([
-            'page_id' => $page->id,
             'version_id' => $page->published_version_id,
         ]);
+
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
 
         $content = $content_element->content;
 
@@ -85,6 +89,8 @@ class ContentElementTest extends TestCase
 
         $input = factory(ContentElement::class)->states('text-block')->raw([
             'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
         ]);
         $input['type'] = 'text-block';
         $input['content'] = factory(TextBlock::class)->raw();

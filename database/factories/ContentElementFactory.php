@@ -16,11 +16,19 @@ use App\YoutubeVideo;
 $factory->define(ContentElement::class, function (Faker $faker) {
     return [
         'uuid' => Str::uuid(),
-        'page_id' => factory(Page::class)->create()->id,
-        'sort_order' => $faker->randomNumber(1),
         'version_id' => factory(Version::class)->create()->id,
-        'unlisted' => false,
+        //'page_id' => factory(Page::class)->create()->id,
+        //'sort_order' => $faker->randomNumber(1),
+        //'unlisted' => false,
     ];
+});
+
+$factory->afterCreating(ContentElement::class, function($content_element, $faker) {
+    $page = factory(Page::class)->create();
+    $content_element->pages()->attach($page, [
+        'sort_order' => $faker->randomNumber(1),
+        'unlisted' => false,
+    ]);
 });
 
 $factory->state(ContentElement::class, 'unlisted', function ($faker) {

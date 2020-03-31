@@ -2,7 +2,7 @@
 
     <div class="relative">
 
-        <transition-group name="content-elements" tag="div" class="relative">
+        <transition-group name="content-elements" tag="div" class="relative mt-8 first:mt-0">
             <form-content-element 
                 v-for="(contentElement, index) in sortedContentElements"
                 :key="contentElement.uuid"

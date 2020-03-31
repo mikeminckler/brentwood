@@ -34,12 +34,12 @@
                     
                     <div class="flex flex-col w-full relative max-w-6xl">
 
-                        <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-5"></div>
+                        <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-3"></div>
 
                         <div class="relative flex items-center">
 
                             <div class="md:flex-1 flex items-center justify-center">
-                                <div class="px-8 py-4">
+                                <div class="px-2 py-1 md:px-8 md:py-4 w-12 ml-1 md:ml-0 md:w-auto flex justify-center">
                                     <a href="/"><img src="images/logo.svg" class="h-12 hidden md:block" /></a>
                                     <a href="/"><img src="images/icon.svg" class="h-12 block md:hidden" /></a>
                                 </div>
@@ -48,11 +48,12 @@
                             <div class="flex-2 h-full">
 
                                 <div class="flex h-full">
-                                    <div class="flex-1 flex items-center -mb-1 h-full">
+
+                                    <div class="flex-1 flex items-center -mb-1 h-full z-1">
                                         @foreach ($menu as $menu_page)
                                             @if (!$menu_page->unlisted && $menu_page->published_version_id)
                                                 <a href="{{ $menu_page->full_slug }}" 
-                                                    class="font-oswald flex items-center text-lg px-4 h-full
+                                                    class="font-oswald flex items-center md:text-lg px-4 h-full
                                                     {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline shadow bg-white' : '' }}"
                                                 >{{ $menu_page->name }}</a>
                                                 @php 
@@ -78,12 +79,12 @@
                                 </div>
 
                                 @if (isset($sub_menu))
-                                    <div class="shadow">
+                                    <div class="shadow overflow-visible h-0">
 
-                                        <div class="flex items-center px-8 bg-white relative z-2">
+                                        <div class="flex items-center px-8 bg-white relative z-2 text-sm md:text-base">
                                             @foreach ($sub_menu as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
-                                                    <a href="{{ $menu_page->full_slug }}" class="py-2 font-oswald ml-8 first:ml-0">{{ $menu_page->name }}</a>
+                                                    <a href="{{ $menu_page->full_slug }}" class="py-1 font-oswald ml-8 first:ml-0">{{ $menu_page->name }}</a>
                                                 @endif
                                             @endforeach 
                                         </div>
@@ -107,9 +108,9 @@
 
                 <div class="flex flex-1 flex-col w-full max-w-6xl relative">
 
-                    <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-2"></div>
+                    <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-2"></div>
 
-                    <div id="content" class="flex-1 flex flex-col relative">
+                    <div id="content" class="flex-1 flex flex-col relative {{ isset($sub_menu) ? 'mt-8' : '' }}">
                         @yield ('content')
                     </div>
 
@@ -125,7 +126,7 @@
                 </div>
                 <div class="flex items-center relative py-8 w-full max-w-6xl">
 
-                    <div class="border-r-4 border-primary absolute top-0 h-full ml-33p z-1"></div>
+                    <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-1"></div>
 
                     <div class="hidden md:flex flex-1 justify-center relative z-2">
                         <div class="p-8">

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative z-2 flex mt-4 items-center w-full justify-center">
+    <div class="relative z-2 flex items-center w-full justify-center">
         <div class="cursor-pointer hover:bg-white relative text-primary text-2xl leading-none z-2 p-2" @click="show = !show">
             <i class="fas fa-plus-square"></i>
         </div>

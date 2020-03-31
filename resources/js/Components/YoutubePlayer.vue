@@ -8,7 +8,7 @@
                     >
                     <div class="flex absolute bottom-0 mb-8 w-full items-center justify-center" v-if="title">
                         <div class="font-oswald h-12 flex items-center leading-none px-4 border-l-2 border-primary text-2xl text-gray-700 bg-white">
-                            {{ title.toUpperCase() }}
+                            {{ title }}
                         </div>
                         <div class="p-2 bg-primary">
                             <img class="h-8" src="/images/icon_white.svg" />
@@ -47,7 +47,8 @@
                 return this.$store.state.youtubeReady;
             },
             hostname() {
-                return window.location.protocol + '//' + window.location.hostname;
+                //return window.location.protocol + '//' + window.location.hostname;
+                return window.location.hostname;
             },
             canPlay() {
                 return this.$lodash.isFunction(this.player.playVideo);

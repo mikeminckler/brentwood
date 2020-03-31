@@ -38,12 +38,7 @@ class ContentElement extends Model
 
         $page = Page::findOrFail(Arr::get($input, 'page_id'));
 
-        $content_element->page_id = $page->id;
-        $content_element->sort_order = Arr::get($input, 'sort_order');
-        $content_element->unlisted = Arr::get($input, 'unlisted');
-
         $content_class = 'App\\'.Str::studly(Arr::get($input, 'type'));
-
         $content = (new $content_class)->saveContent($new_version ? null : Arr::get($input, 'content.id'), Arr::get($input, 'content'));
 
         $content_element->content_id = $content->id;
@@ -54,15 +49,20 @@ class ContentElement extends Model
 
         $content_element->save();
 
+        $content_element->pages()->attach($page, [
+            'sort_order' => Arr::get($input, 'sort_order'),
+            'unlisted' => Arr::get($input, 'unlisted'),
+        ]);
+
         // refresh the content element so that it updates its content
         $content_element->refresh();
         cache()->tags([cache_name($content_element)])->flush();
         return $content_element;
     }
 
-    public function page() 
+    public function pages() 
     {
-        return $this->belongsTo(Page::class);   
+        return $this->belongsToMany(Page::class)->withPivot('sort_order', 'unlisted');
     }
 
     public function content() 

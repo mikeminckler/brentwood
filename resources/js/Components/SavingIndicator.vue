@@ -49,7 +49,7 @@
         methods: {
             setSaving: _.debounce( function() {
                 this.saving = this.isSaving;
-            }, 1000),
+            }, 500),
         },
 
     }

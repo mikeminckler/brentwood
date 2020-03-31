@@ -16,10 +16,10 @@ class CreateContentElementsTable extends Migration
         Schema::create('content_elements', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->uuid('uuid');
-            $table->unsignedBigInteger('page_id');
+            //$table->unsignedBigInteger('page_id');
+            //$table->integer('sort_order');
+            //$table->boolean('unlisted');
             $table->morphs('content');
-            $table->integer('sort_order');
-            $table->boolean('unlisted');
             $table->unsignedBigInteger('version_id');
             $table->softDeletes();
             $table->timestamps();

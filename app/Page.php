@@ -107,7 +107,7 @@ class Page extends Model
 
     public function contentElements() 
     {
-        return $this->hasMany(ContentElement::class);
+        return $this->belongsToMany(ContentElement::class)->withPivot('sort_order', 'unlisted');
     }
 
     public function saveContentElements($input) 

@@ -1,4 +1,4 @@
-<div class="w-full flex py-8 relative">
+<div class="w-full md:flex relative">
     <div class="flex-1 relative">
     </div>
 

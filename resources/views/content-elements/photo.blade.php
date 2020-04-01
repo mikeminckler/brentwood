@@ -13,7 +13,7 @@
     <img 
         srcset="{{ $photo->small }} 400w, {{ $photo->medium }} 900w, {{ $photo->large }} 1152w"
         src="{{ $photo->large }}"
-        type="image/{{ $photo->fileUpload->extension }}"
+        type="image/{{ optional($photo->fileUpload)->extension }}"
         alt="{{ $photo->alt }}"
         style="object-position: {{ $photo->offsetX }}% {{ $photo->offsetY}}%;"
     >

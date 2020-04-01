@@ -12,6 +12,8 @@ use App\Page;
 
 class ContentElementTest extends TestCase
 {
+    use WithFaker;
+
     protected function getModel()
     {
         return factory(ContentElement::class)->states('text-block')->create();
@@ -22,14 +24,19 @@ class ContentElementTest extends TestCase
     {
         $page = factory(Page::class)->states('published')->create();
         $published_content_element = factory(ContentElement::class)->states('text-block')->create([
-            'page_id' => $page->id,
             'version_id' => $page->published_version_id,
         ]);
+
+        $published_content_element->pages()->detach();
+        $published_content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
 
         $content_element = factory(ContentElement::class)->states('text-block')->create([
             'uuid' => $published_content_element->uuid,
             'version_id' => $page->draft_version_id,
         ]);
+
+        $content_element->pages()->detach();
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
 
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]))
             ->assertStatus(401);
@@ -86,7 +93,6 @@ class ContentElementTest extends TestCase
     {
         $page = factory(Page::class)->states('published')->create();
         $published_content_element = factory(ContentElement::class)->states('text-block')->create([
-            'page_id' => $page->id,
             'version_id' => $page->published_version_id,
         ]);
 
@@ -94,6 +100,9 @@ class ContentElementTest extends TestCase
             'uuid' => $published_content_element->uuid,
             'version_id' => $page->draft_version_id,
         ]);
+
+        $content_element->pages()->detach();
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
 
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['remove_all' => true])
             ->assertStatus(401);

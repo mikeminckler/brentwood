@@ -27,6 +27,7 @@ class YoutubeVideo extends Model
 
         $youtube_video->video_id = Arr::get($input, 'video_id');
         $youtube_video->title = Arr::get($input, 'title');
+        $youtube_video->full_width = Arr::get($input, 'full_width');
 
         $youtube_video->save();
 

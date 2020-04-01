@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative z-2 flex items-center w-full justify-center">
+    <div class="relative z-2 flex items-center w-full justify-center mt-4">
         <div class="cursor-pointer hover:bg-white relative text-primary text-2xl leading-none z-2 p-2" @click="show = !show">
             <i class="fas fa-plus-square"></i>
         </div>
@@ -27,6 +27,11 @@
                     <div class="relative z-2 button mx-2 items-center" @click="add('addYoutubeVideo')">
                         <div class="pr-2 text-lg leading-none"><i class="fab fa-youtube"></i></div>
                         <div class="whitespace-no-wrap">YouTube Video</div>
+                    </div>
+
+                    <div class="relative z-2 button mx-2 items-center" @click="add('addEmbedCode')">
+                        <div class="pr-2 text-lg leading-none"><i class="fas fa-code"></i></div>
+                        <div class="whitespace-no-wrap">HTML</div>
                     </div>
                 </div>
             </div>

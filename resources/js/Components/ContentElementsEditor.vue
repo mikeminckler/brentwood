@@ -47,7 +47,7 @@
                 return this.$store.state.page.content_elements;
             },
             sortedContentElements() {
-                return this.$lodash.orderBy(this.contentElements, ['sort_order', 'id'], ['asc', 'asc']);
+                return this.$lodash.orderBy(this.contentElements, ['pivot.sort_order', 'id'], ['asc', 'asc']);
             },
         },
 
@@ -68,8 +68,8 @@
             addContentElement: function(data) {
 
                 this.$lodash.each(this.contentElements, ce => {
-                    if (ce.sort_order >= data.sortOrder) {
-                        ce.sort_order++;
+                    if (ce.pivot.sort_order >= data.sortOrder) {
+                        ce.pivot.sort_order++;
                     }
                 });
 
@@ -86,7 +86,7 @@
 
             sortUp: function(contentElement) {
 
-                if (contentElement.sort_order > 1) {
+                if (contentElement.pivot.sort_order > 1) {
                     let currentIndex = this.$lodash.findIndex(this.sortedContentElements, ce => {
                         return contentElement.id === ce.id;
                     });
@@ -94,10 +94,10 @@
                     let nextElement = this.sortedContentElements[currentIndex - 1];
 
                     if (nextElement) {
-                        this.sortedContentElements[currentIndex - 1].sort_order = contentElement.sort_order;
+                        this.sortedContentElements[currentIndex - 1].pivot.sort_order = contentElement.pivot.sort_order;
                     }
 
-                    contentElement.sort_order--;
+                    contentElement.pivot.sort_order--;
                 }
             },
 
@@ -110,10 +110,10 @@
                 let nextElement = this.sortedContentElements[currentIndex + 1];
 
                 if (nextElement) {
-                    this.sortedContentElements[currentIndex + 1].sort_order = contentElement.sort_order;
+                    this.sortedContentElements[currentIndex + 1].pivot.sort_order = contentElement.pivot.sort_order;
                 }
 
-                contentElement.sort_order++;
+                contentElement.pivot.sort_order++;
             },
 
             removeContentElement: function(contentElement) {
@@ -126,9 +126,11 @@
             newContentElement: function(sortOrder) {
                 return {
                     id: '0.' + this.contentElements.length,
-                    page_id: this.$store.state.page.id,
-                    sort_order: sortOrder,
-                    unlisted: false,
+                    pivot: {
+                        page_id: this.$store.state.page.id,
+                        sort_order: sortOrder,
+                        unlisted: 0,
+                    }
                 };
             },
 
@@ -163,8 +165,8 @@
                     photos: [],
                     columns: 1,
                     height: 33,
-                    padding: false,
-                    show_text: false,
+                    padding: 0,
+                    show_text: 0,
                     header: '',
                     body: '',
                     text_order: 1,
@@ -200,6 +202,21 @@
                 contentElement.content = {
                     id: 0,
                     video_id: '',
+                    full_width: sortOrder === 1 ? true : false,
+                };
+
+                this.saveNewContentElement(contentElement);
+
+            },
+
+            addEmbedCode: function(sortOrder) {
+
+                let contentElement = this.newContentElement(sortOrder);
+
+                contentElement.type = 'embed-code';
+                contentElement.content = {
+                    id: 0,
+                    code: '',
                 };
 
                 this.saveNewContentElement(contentElement);

@@ -1,15 +1,15 @@
 <template>
 
     <div class="relative mt-8" 
-         :class="contentElement.unlisted ? 'bg-gray-200 opacity-75' : ''" 
+         :class="contentElement.pivot.unlisted ? 'bg-gray-200 opacity-75' : ''" 
         v-if="contentElement.id >= 1"
     >
 
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
             <div class="content-element-icons" @click="$emit('sortUp')"><i class="fas fa-arrow-alt-circle-up"></i></div>
             <div class="content-element-icons" @click="$emit('sortDown')"><i class="fas fa-arrow-alt-circle-down"></i></div>
-            <div class="content-element-icons" @click="contentElement.unlisted = false" v-if="contentElement.unlisted"><i class="fas fa-eye"></i></div>
-            <div class="content-element-icons" @click="contentElement.unlisted = true" v-if="!contentElement.unlisted"><i class="fas fa-eye-slash"></i></div>
+            <div class="content-element-icons" @click="contentElement.pivot.unlisted = 0" v-if="contentElement.pivot.unlisted"><i class="fas fa-eye"></i></div>
+            <div class="content-element-icons" @click="contentElement.pivot.unlisted = 1" v-if="!contentElement.pivot.unlisted"><i class="fas fa-eye-slash"></i></div>
             <div class="remove-icon" @click="removeContentElement()"><i class="fas fa-times"></i></div>
         </div>
 
@@ -33,7 +33,7 @@
                 </div>
             </transition>
 
-            <div class="flex bg-gray-300 px-2 py-1" v-if="contentElement.unlisted">
+            <div class="flex bg-gray-300 px-2 py-1" v-if="contentElement.pivot.unlisted">
                 <div class=""><i class="fas fa-eye-slash"></i></div>
                 <div class="ml-2">Hidden</div>
             </div>
@@ -48,7 +48,7 @@
             ></component>
         </div>
 
-        <add-content-element :sort-order="contentElement.sort_order"></add-content-element>
+        <add-content-element :sort-order="contentElement.pivot.sort_order"></add-content-element>
 
     </div>
 
@@ -61,6 +61,8 @@
     import PhotoBlock from '@/Forms/PhotoBlock.vue';
     import Quote from '@/Forms/Quote.vue';
     import YoutubeVideo from '@/Forms/YoutubeVideo.vue';
+    import EmbedCode from '@/Forms/EmbedCode.vue';
+
     import ContentElements from '@/Mixins/ContentElements';
     import AddContentElement from '@/Components/AddContentElement.vue';
 
@@ -76,6 +78,7 @@
             'photo-block': PhotoBlock,
             'quote': Quote,
             'youtube-video': YoutubeVideo,
+            'embed-code': EmbedCode,
         },
 
         data() {
@@ -91,7 +94,7 @@
 
         watch: {
             contentElement: {
-                handler: _.throttle( function(content) {
+                handler: _.debounce( function(oldValue, newValue) {
                     // this gets tripped when the content is first loaded
                     // so we ignore the first watcher hit
 
@@ -102,7 +105,7 @@
                         this.preventWatcher = false;
                     }
 
-                }, 500),
+                }, 100),
                 deep: true
             },
         },

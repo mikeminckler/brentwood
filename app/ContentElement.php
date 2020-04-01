@@ -36,7 +36,7 @@ class ContentElement extends Model
             $content_element->uuid = Str::uuid();
         }
 
-        $page = Page::findOrFail(Arr::get($input, 'page_id'));
+        $page = Page::findOrFail(Arr::get($input, 'pivot.page_id'));
 
         $content_class = 'App\\'.Str::studly(Arr::get($input, 'type'));
         $content = (new $content_class)->saveContent($new_version ? null : Arr::get($input, 'content.id'), Arr::get($input, 'content'));
@@ -49,10 +49,17 @@ class ContentElement extends Model
 
         $content_element->save();
 
-        $content_element->pages()->attach($page, [
-            'sort_order' => Arr::get($input, 'sort_order'),
-            'unlisted' => Arr::get($input, 'unlisted'),
-        ]);
+        if (!$content_element->pages()->get()->contains('id', $page->id)) {
+            $content_element->pages()->attach($page->id, [
+                'sort_order' => Arr::get($input, 'pivot.sort_order'),
+                'unlisted' => Arr::get($input, 'pivot.unlisted'),
+            ]);
+        } else {
+            $content_element->pages()->updateExistingPivot($page->id, [
+                'sort_order' => Arr::get($input, 'pivot.sort_order'),
+                'unlisted' => Arr::get($input, 'pivot.unlisted'),
+            ]);
+        }
 
         // refresh the content element so that it updates its content
         $content_element->refresh();

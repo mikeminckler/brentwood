@@ -1,8 +1,8 @@
 <div class="w-full md:flex">
-    <div class="flex-1 relative">
+    <div class="flex-1 relative {{ $content->photos->count() ? 'w-1/2 pb-50p float-right md:w-auto md:pb-0 md:float-none' : '' }}">
 
         @if ($content->photos->count())
-            <div class="absolute w-full pb-100p">
+            <div class="absolute w-full h-full">
                 @include ('content-elements.photo', ['photo' => $content->photos->first()])
             </div>
         @endif

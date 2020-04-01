@@ -4,9 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-use App\Quote;
-
-class QuoteValidation extends FormRequest
+class EmbedCodeValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,9 +24,7 @@ class QuoteValidation extends FormRequest
     public function rules()
     {
         return [
-            'body' => 'required',
-            'author_name' => 'max:255',
-            'author_details' => 'max:255',
+            //
         ];
     }
 }

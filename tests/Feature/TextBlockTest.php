@@ -15,6 +15,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use App\FileUpload;
 use App\Photo;
+use App\Page;
 
 class TextBlockTest extends TestCase
 {
@@ -25,6 +26,12 @@ class TextBlockTest extends TestCase
         $input = factory(ContentElement::class)->states('text-block')->raw();
         $input['type'] = 'text-block';
         $input['content'] = factory(TextBlock::class)->raw();
+        $page = factory(Page::class)->create();
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
 
         $this->json('POST', route('content-elements.store'), [])
             ->assertStatus(401);
@@ -45,15 +52,21 @@ class TextBlockTest extends TestCase
         $this->json('POST', route('content-elements.store'), ['type' => 'text-block'])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'page_id',
+                'pivot.page_id',
+                'pivot.sort_order',
+                'pivot.unlisted',
                 //'content.header',
                 //'content.body',
              ]);
 
+        $this->withoutExceptionHandling();
         $this->json('POST', route('content-elements.store'), $input)
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
+                'page_id' => $page->id,
+                'sort_order' => 1,
+                'unlisted' => 0,
              ]);
 
         $text_block = TextBlock::all()->last();
@@ -88,7 +101,9 @@ class TextBlockTest extends TestCase
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'text-block'])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'page_id',
+                'pivot.page_id',
+                'pivot.sort_order',
+                'pivot.unlisted',
                 //'content.header',
                 //'content.body',
              ]);
@@ -97,6 +112,12 @@ class TextBlockTest extends TestCase
         $text_block_input = factory(TextBlock::class)->raw();
         $input['content']['header'] = Arr::get($text_block_input, 'header');
         $input['content']['body'] = Arr::get($text_block_input, 'body');
+        $page = factory(Page::class)->create();
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
 
         $content = (new TextBlock);
         $content->header = Arr::get($input, 'content.header');
@@ -132,6 +153,12 @@ class TextBlockTest extends TestCase
         $input['type'] = 'text-block';
         $input['content'] = factory(TextBlock::class)->raw();
         $input['content']['photos'] = [$photo_input];
+        $page = factory(Page::class)->create();
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
 
         $this->signInAdmin();
 
@@ -154,5 +181,48 @@ class TextBlockTest extends TestCase
         $this->assertEquals(Arr::get($photo_input, 'description'), $photo->description);
         $this->assertEquals(Arr::get($photo_input, 'alt'), $photo->alt);
         $this->assertEquals($photo->fileUpload->id, $file_upload->id);
+    }
+
+    /** @test **/
+    public function a_text_block_content_element_can_be_created_after_another_text_block()
+    {
+        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input['type'] = 'text-block';
+        $input['content'] = factory(TextBlock::class)->raw();
+        $page = factory(Page::class)->create();
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.store'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+                'page_id' => $page->id,
+                'sort_order' => 1,
+                'unlisted' => 0,
+             ]);
+
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 2,
+            'unlisted' => true,
+        ];
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.store'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+                'page_id' => $page->id,
+                'sort_order' => 2,
+                'unlisted' => 1,
+             ]);
+
     }
 }

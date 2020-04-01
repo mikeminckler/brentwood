@@ -209,12 +209,13 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_be_published()
     {
-        $page = factory(Page::class)->create();
-
         $content_element = factory(ContentElement::class)->states('text-block')->create([
-            'page_id' => $page->id,
-            'version_id' => $page->getDraftVersion()->id,
         ]);
+        $page = $content_element->pages->first();
+
+        $content_element->version_id = $page->getDraftVersion()->id;
+        $content_element->save();
+        $content_element->refresh();
 
         $this->assertNull($page->published_at);
 
@@ -247,9 +248,13 @@ class PageTest extends TestCase
         $page = factory(Page::class)->states('published')->create();
 
         $content_element = factory(ContentElement::class)->states('text-block')->create([
-            'page_id' => $page->id,
             'version_id' => $page->published_version_id,
         ]);
+        $content_element['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+        ];
 
         $this->signInAdmin();
 

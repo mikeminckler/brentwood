@@ -25,9 +25,11 @@ class ContentElementTest extends TestCase
             'id' => 0,
             'type' => 'text-block',
             'content' => $text_block,
-            'page_id' => $page->id,
-            'sort_order' => 1,
-            'unlisted' => false,
+            'pivot' => [
+                'page_id' => $page->id,
+                'sort_order' => 1,
+                'unlisted' => false,
+            ],
         ];
 
         $content_element = (new ContentElement)->saveContentElement(null, $input);
@@ -87,14 +89,15 @@ class ContentElementTest extends TestCase
 
         $this->assertNotNull($content_element->published_at);
 
-        $input = factory(ContentElement::class)->states('text-block')->raw([
-            'page_id' => $page->id,
-            'sort_order' => $this->faker->randomNumber(1),
-            'unlisted' => false,
-        ]);
+        $input = factory(ContentElement::class)->states('text-block')->raw();
         $input['type'] = 'text-block';
         $input['content'] = factory(TextBlock::class)->raw();
         $input['content']['id'] = $content->id;
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+        ];
 
         $saved_content_element = (new ContentElement)->saveContentElement($content_element->id, $input);
 
@@ -111,17 +114,21 @@ class ContentElementTest extends TestCase
     {
         $page = factory(Page::class)->states('published')->create();
         $content_element1 = factory(ContentElement::class)->states('text-block')->create([
-            'page_id' => $page->id,
             'version_id' => $page->published_version_id,
         ]);
+
+        $content_element1->pages()->detach();
+        $content_element1->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
 
         $this->assertNotNull($content_element1->published_at);
 
         $content_element2 = factory(ContentElement::class)->states('text-block')->create([
             'uuid' => $content_element1->uuid,
-            'page_id' => $page->id,
             'version_id' => $page->draft_version_id,
         ]);
+
+        $content_element2->pages()->detach();
+        $content_element2->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
 
         $this->assertInstanceOf(ContentElement::class, $content_element2->getPreviousVersion());
         $this->assertEquals($content_element1->id, $content_element2->getPreviousVersion()->id);

@@ -24,7 +24,7 @@ class YoutubeVideoValidation extends FormRequest
     public function rules()
     {
         return [
-            'video_id' => 'required',
+            //'video_id' => 'string',
         ];
     }
 }

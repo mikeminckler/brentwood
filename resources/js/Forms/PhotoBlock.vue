@@ -33,6 +33,12 @@
 
         <transition-group name="photo-editor" tag="div" class="relative grid" :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'row-gap-2' : 'gap-2' ) : '']" style="min-height: 100px">
 
+            <div class="flex items-center justify-center bg-gray-200" key="no-photos" v-if="photosCount === 0">
+                <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
+                    <div class="">Upload Files</div>
+                </div>
+            </div>
+
             <div v-if="content.show_text" key="text" 
                 class="relative" 
                 :class="['col-span-' + content.text_span, textPosition.row, textPosition.column, content.text_style ? 'photo-block-text-' + content.text_style : '']"
@@ -83,8 +89,8 @@
                 </div>
 
                 <photo-controls :photo="photo"
-                    :span="true"
-                    :sort="true"
+                    :span="1"
+                    :sort="1"
                     :content="content"
                     :photos="photos"
                     @sortUp="sortUp(photo)"
@@ -104,7 +110,7 @@
             type="image"
         ></file-uploads>
 
-        <div class="flex bg-gray-200 p-2 shadow mt-4">
+        <div class="flex bg-gray-200 p-2 shadow mt-4" v-if="photosCount > 0">
 
             <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
                 <div class="">Upload Files</div>
@@ -195,9 +201,7 @@
         },
 
         mounted() {
-            if (this.content.id < 1) {
-                this.$eventer.$emit('add-files', this.fileUploadName);
-            }
+            //this.$eventer.$emit('add-files', this.fileUploadName);
         },
 
         methods: {
@@ -268,21 +272,21 @@
                     if (this.photos.length === 1) {
                         this.content.columns = 1;
                         this.content.height = 33;
-                        this.content.padding = false;
+                        this.content.padding = 0;
                     }
 
                     if (this.photos.length === 2) {
 
                         this.content.columns = 2;
                         this.content.height = 50;
-                        this.content.padding = false;
+                        this.content.padding = 0;
 
                     }
 
                     if (this.photos.length === 3) {
                         this.content.columns = 3;
                         this.content.height = 50;
-                        this.content.padding = false;
+                        this.content.padding = 0;
                     }
                 }
 
@@ -293,8 +297,8 @@
                 if (this.photos.length === 1) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = false;
-                    this.content.show_text = true;
+                    this.content.padding = 0;
+                    this.content.show_text = 1;
                     this.content.text_order = 1;
                     this.content.text_span = 1;
                     this.sortedPhotos[0].span = 2;
@@ -307,8 +311,8 @@
                 if (this.photos.length === 1) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = false;
-                    this.content.show_text = true;
+                    this.content.padding = 0;
+                    this.content.show_text = 1;
                     this.content.text_order = 3;
                     this.content.text_span = 2;
                     this.sortedPhotos[0].span = 2;
@@ -321,8 +325,8 @@
                 if (this.photos.length === 1) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = false;
-                    this.content.show_text = true;
+                    this.content.padding = 0;
+                    this.content.show_text = 1;
                     this.content.text_order = 2;
                     this.content.text_span = 2;
                     this.sortedPhotos[0].span = 1;
@@ -335,8 +339,8 @@
                 if (this.photos.length === 2) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = true;
-                    this.content.show_text = true;
+                    this.content.padding = 1;
+                    this.content.show_text = 1;
                     this.content.text_order = 3;
                     this.content.text_span = 1;
                     this.sortedPhotos[0].sort_order = 1;
@@ -352,8 +356,8 @@
                 if (this.photos.length === 2) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = true;
-                    this.content.show_text = true;
+                    this.content.padding = 1;
+                    this.content.show_text = 1;
                     this.content.text_order = 1;
                     this.content.text_span = 1;
                     this.sortedPhotos[0].sort_order = 1;
@@ -369,8 +373,8 @@
                 if (this.photos.length === 2) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = true;
-                    this.content.show_text = true;
+                    this.content.padding = 1;
+                    this.content.show_text = 1;
                     this.content.text_order = 2;
                     this.content.text_span = 1;
                     this.sortedPhotos[0].sort_order = 1;
@@ -386,8 +390,8 @@
                 if (this.photos.length === 2) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = true;
-                    this.content.show_text = true;
+                    this.content.padding = 1;
+                    this.content.show_text = 1;
                     this.content.text_order = 2;
                     this.content.text_span = 2;
                     this.sortedPhotos[0].sort_order = 1;

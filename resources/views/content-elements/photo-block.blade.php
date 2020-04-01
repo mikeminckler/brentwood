@@ -1,4 +1,4 @@
-<div class="relative z-2 grid grid-cols-{{ $content->columns }} {{ $content->padding ? ($content->columns === 3 ? 'row-gap-2' : 'gap-2') : '' }}">
+<div class="relative z-2 md:grid md:grid-cols-{{ $content->columns }} {{ $content->padding ? ($content->columns === 3 ? 'row-gap-2' : 'gap-2') : '' }}">
 
     @if ($content->show_text)
 
@@ -24,9 +24,8 @@
     @endif
 
     @foreach ($content->photos->sortBy('sort_order') as $index => $photo)
-        <div class="relative overflow-hidden col-span-{{ $photo->span }}"
+        <div class="w-full md:w-auto relative overflow-hidden col-span-{{ $photo->span }} pb-50p md:pb-{{ floor($content->height / $photo->span) }}p"
             key="photo-{{ $photo->id }}"
-            style="padding-bottom: {{ floor($content->height / $photo->span) }}%"
         >
             @if ($index === $content->photos->count() - 1)
                 <div class="h-1 bg-gray-200 opacity-50 w-full absolute bottom-0 z-5"></div>

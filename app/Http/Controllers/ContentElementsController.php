@@ -7,6 +7,7 @@ use App\Http\Requests\ContentElementValidation;
 
 use App\ContentElement;
 use Illuminate\Support\Str;
+use App\Page;
 
 class ContentElementsController extends Controller
 {
@@ -31,6 +32,10 @@ class ContentElementsController extends Controller
         }
 
         $content_element = (new ContentElement)->saveContentElement($id, requestInput());
+
+        $page = Page::findOrFail(requestInput('pivot.page_id'));
+        $content_element = $page->contentElements()->where('content_element_id', $content_element->id)->first();
+
         return response()->json([
             'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Saved',
             'content_element' => $content_element,

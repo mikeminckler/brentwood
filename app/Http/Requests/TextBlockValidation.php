@@ -24,8 +24,8 @@ class TextBlockValidation extends FormRequest
     public function rules()
     {
         return [
-            //'header' => 'required',
-            'body' => 'required',
+            'header' => 'max:255',
+            //'body' => '',
         ];
     }
 }

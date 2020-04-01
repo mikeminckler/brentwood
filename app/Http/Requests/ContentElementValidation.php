@@ -46,20 +46,16 @@ class ContentElementValidation extends FormRequest
         $content_class = '\App\\Http\\Requests\\'.Str::studly(requestInput('type')).'Validation';
 
         $rules = collect([
-            'page_id' => 'required|exists:pages,id',
-            'sort_order' => 'required|integer',
-            'unlisted' => 'required|boolean',
+            'pivot.page_id' => 'required|exists:pages,id',
+            'pivot.sort_order' => 'required|integer',
+            'pivot.unlisted' => 'required|boolean',
         ]);
             
-        /*
-        if ($this->route('id')) {
-            $rules = $rules->merge(
-                collect((new $content_class)->rules())->mapWithKeys(function ($rule, $field) {
-                    return ['content.'.$field => $rule];
-                })
-            );
-        }
-         */
+        $rules = $rules->merge(
+            collect((new $content_class)->rules())->mapWithKeys(function ($rule, $field) {
+                return ['content.'.$field => $rule];
+            })
+        );
 
         return $rules->all();
     }

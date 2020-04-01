@@ -12,6 +12,7 @@ use App\Quote;
 use App\Photo;
 use Illuminate\Support\Str;
 use App\YoutubeVideo;
+use App\EmbedCode;
 
 $factory->define(ContentElement::class, function (Faker $faker) {
     return [
@@ -25,6 +26,9 @@ $factory->define(ContentElement::class, function (Faker $faker) {
 
 $factory->afterCreating(ContentElement::class, function($content_element, $faker) {
     $page = factory(Page::class)->create();
+    //$content_element->version_id = $page->getDraftVersion()->id;
+    //$content_element->save();
+    //$content_element->refresh();
     $content_element->pages()->attach($page, [
         'sort_order' => $faker->randomNumber(1),
         'unlisted' => false,
@@ -33,8 +37,15 @@ $factory->afterCreating(ContentElement::class, function($content_element, $faker
 
 $factory->state(ContentElement::class, 'unlisted', function ($faker) {
     return [
-        'unlisted' => true,
     ];
+});
+
+$factory->afterCreatingState(ContentElement::class, 'unlisted', function($content_element, $faker) {
+    $page = $content_element->pages->first();
+    $content_element->pages()->updateExistingPivot($page, [
+        'sort_order' => $faker->randomNumber(1),
+        'unlisted' => true,
+    ]);
 });
 
 $factory->state(ContentElement::class, 'text-block', function ($faker) {
@@ -68,5 +79,13 @@ $factory->state(ContentElement::class, 'youtube-video', function ($faker) {
     return [
         'content_id' => $youtube_video->id,
         'content_type' => get_class($youtube_video),
+    ];
+});
+
+$factory->state(ContentElement::class, 'embed-code', function ($faker) {
+    $embed_code = factory(EmbedCode::class)->create();
+    return [
+        'content_id' => $embed_code->id,
+        'content_type' => get_class($embed_code),
     ];
 });

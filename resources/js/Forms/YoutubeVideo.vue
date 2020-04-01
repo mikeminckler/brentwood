@@ -3,13 +3,14 @@
     <div class="relative">
         <div class="flex relative">
 
-            <div class="flex-1 relative"></div>
-            <div class="relative flex-2 flex justify-center items-center relative">
+            <div class="flex-1 relative" v-if="!content.full_width"></div>
+            <div class="relative flex-2 flex justify-center items-center relative z-2">
                 <youtube-player
                     :video-id="content.video_id" 
                     :photo="photo" 
                     :uuid="uuid"
                     :title="content.title"
+                    :full-width="content.full_width"
                     :remove="true"
                     @remove="removePhoto(photo, 0)"
                 ></youtube-player>
@@ -17,11 +18,13 @@
 
         </div>
 
-        <div class="flex justify-end relative bg-gray-200 p-2 shadow mt-4 z-2">
+        <div class="flex items-center justify-end relative bg-gray-200 p-2 shadow mt-4 z-2">
 
             <div class="form pl-2">
                 <input type="text" v-model="videoId" placeholder="YouTube Video ID" />
             </div>
+
+                <checkbox-input v-model="content.full_width" label="Full Width"></checkbox-input> 
 
             <div class="flex items-center px-2" v-if="!photo && videoId">
                 <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
@@ -53,6 +56,7 @@
 
     import Feedback from '@/Mixins/Feedback';
     import FileUploads from '@/Components/FileUploads';
+    import CheckboxInput from '@/Components/CheckboxInput';
     import Photos from '@/Mixins/Photos';
 
     export default {
@@ -62,6 +66,7 @@
 
         components: {
             'file-uploads': FileUploads,
+            'checkbox-input': CheckboxInput,
         },
 
         data() {

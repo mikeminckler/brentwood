@@ -37,9 +37,7 @@ class PhotoBlockTest extends TestCase
 
         $page = factory(Page::class)->create();
 
-        $input = factory(ContentElement::class)->states('photo-block')->raw([
-            'page_id' => $page->id,
-        ]);
+        $input = factory(ContentElement::class)->states('photo-block')->raw();
         $input['type'] = 'photo-block';
 
         $input['content'] = [
@@ -55,12 +53,20 @@ class PhotoBlockTest extends TestCase
             'text_style' => 'blue',
         ];
 
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
+
         $this->signInAdmin();
 
         $this->json('POST', route('content-elements.store'), ['type' => 'photo-block'])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'page_id',
+                'pivot.page_id',
+                'pivot.sort_order',
+                'pivot.unlisted',
                 //'content.photos',
                 //'content.columns',
                 //'content.height',
@@ -109,20 +115,22 @@ class PhotoBlockTest extends TestCase
         $photo = factory(Photo::class)->states('photo-block')->create();
         $photo_block = $photo->content;
         $content_element = $photo_block->contentElement;
-        $page = $content_element->page;
+        $page = $content_element->pages->first();
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
         $this->assertInstanceOf(PhotoBlock::class, $photo_block);
         $this->assertInstanceOf(Photo::class, $photo);
         $this->assertInstanceOf(Page::class, $page);
 
-        $input = factory(ContentElement::class)->raw([
-            'page_id' => $page->id,
-            'sort_order' => $this->faker->numberBetween(1,100),
-        ]);
+        $input = factory(ContentElement::class)->raw();
         $input['type'] = 'photo-block';
         $input['content'] = factory(PhotoBlock::class)->raw();
         $input['content']['photos'] = [factory(Photo::class)->states('photo-block')->create(['content_id' => $photo_block->id])];
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
 
         $this->signInAdmin();
 
@@ -135,9 +143,10 @@ class PhotoBlockTest extends TestCase
         $content_element->refresh();
         $photo_block->refresh();
 
-        $this->assertEquals($page->id, $content_element->page->id);
-        $this->assertEquals( Arr::get($input, 'sort_order'), $content_element->sort_order);
-        $this->assertEquals( Arr::get($input, 'unlisted'), $content_element->unlisted);
+        $content_element_page = $content_element->pages->first();
+        $this->assertEquals($page->id, $content_element_page->id);
+        $this->assertEquals( Arr::get($input, 'pivot.sort_order'), $content_element_page->pivot->sort_order);
+        $this->assertEquals( Arr::get($input, 'pivot.unlisted'), $content_element_page->pivot->unlisted);
 
         $this->assertEquals(Arr::get($input, 'content.columns'), $photo_block->columns);
         $this->assertEquals(Arr::get($input, 'content.height'), $photo_block->height);
@@ -165,9 +174,7 @@ class PhotoBlockTest extends TestCase
 
         $page = factory(Page::class)->create();
 
-        $input = factory(ContentElement::class)->states('photo-block')->raw([
-            'page_id' => $page->id,
-        ]);
+        $input = factory(ContentElement::class)->states('photo-block')->raw();
         $input['type'] = 'photo-block';
 
         $input['content'] = [
@@ -184,8 +191,15 @@ class PhotoBlockTest extends TestCase
             'text_style' => '',
         ];
 
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
+
         $this->signInAdmin();
 
+        $this->withoutExceptionHandling();
         $this->json('POST', route('content-elements.store'), $input)
              ->assertSuccessful()
              ->assertJsonFragment([

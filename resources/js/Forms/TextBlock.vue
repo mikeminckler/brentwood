@@ -6,7 +6,7 @@
 
             <div class="absolute w-full h-full">
                 <photo-controls :photo="photo" 
-                    :fill="true" 
+                    :fill="1" 
                     :content="content"
                     :photos="photos"
                     @remove="removePhoto(photo, 0)"

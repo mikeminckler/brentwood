@@ -15,6 +15,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use App\FileUpload;
 use App\Photo;
+use App\Page;
 
 class YoutubeVideoTest extends TestCase
 {
@@ -26,6 +27,12 @@ class YoutubeVideoTest extends TestCase
         $input = factory(ContentElement::class)->states('youtube-video')->raw();
         $input['type'] = 'youtube-video';
         $input['content'] = factory(YoutubeVideo::class)->raw();
+        $page = factory(Page::class)->create();
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
 
         $this->json('POST', route('content-elements.store'), [])
             ->assertStatus(401);
@@ -46,7 +53,9 @@ class YoutubeVideoTest extends TestCase
         $this->json('POST', route('content-elements.store'), ['type' => 'youtube-video'])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'page_id',
+                'pivot.page_id',
+                'pivot.sort_order',
+                'pivot.unlisted',
                 //'content.video_id',
              ]);
 
@@ -60,6 +69,7 @@ class YoutubeVideoTest extends TestCase
         $youtube_video = YoutubeVideo::all()->last();
         $this->assertEquals(Arr::get($input, 'content.video_id'), $youtube_video->video_id);
         $this->assertEquals(Arr::get($input, 'content.title'), $youtube_video->title);
+        $this->assertEquals(Arr::get($input, 'content.full_width'), $youtube_video->full_width);
 
     }
 
@@ -90,7 +100,9 @@ class YoutubeVideoTest extends TestCase
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'youtube-video'])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'page_id',
+                'pivot.page_id',
+                'pivot.sort_order',
+                'pivot.unlisted',
                 //'content.video_id',
              ]);
 
@@ -98,6 +110,12 @@ class YoutubeVideoTest extends TestCase
         $youtube_video_input = factory(YoutubeVideo::class)->raw();
         $input['content']['video_id'] = Arr::get($youtube_video_input, 'video_id');
         $input['content']['title'] = Arr::get($youtube_video_input, 'title');
+        $page = factory(Page::class)->create();
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
              ->assertSuccessful()
@@ -133,6 +151,12 @@ class YoutubeVideoTest extends TestCase
         $input['content']['video_id'] = Arr::get($youtube_video_input, 'video_id');
         $input['content']['title'] = Arr::get($youtube_video_input, 'title');
         $input['content']['photos'] = [$photo_input];
+        $page = factory(Page::class)->create();
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
 
         $this->withoutExceptionHandling();
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
@@ -176,6 +200,12 @@ class YoutubeVideoTest extends TestCase
         $youtube_video_input = factory(YoutubeVideo::class)->raw();
         $input['content']['video_id'] = Arr::get($youtube_video_input, 'video_id');
         $input['content']['photos'] = [$photo_input];
+        $page = factory(Page::class)->create();
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+        ];
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
              ->assertSuccessful()

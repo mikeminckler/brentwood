@@ -46,9 +46,12 @@ export default {
         updateContentElement: function(oldContentElement, newContentElement) {
             if (!this.changed) {
                 this.preventWatcher = true;
-                this.$lodash.merge(oldContentElement, newContentElement);
+                this.$lodash.mergeWith(oldContentElement, newContentElement, this.compareValues);
             } else {
             }
+        },
+
+        compareValues: function(oldValue, newValue, field) {
         },
 
     },

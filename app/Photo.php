@@ -22,7 +22,7 @@ class Photo extends Model
     protected $appends = ['small', 'medium', 'large'];
 
 
-    public function savePhoto($id = null, $input, $content)
+    public function savePhoto($id = null, $input, $content = null)
     {
         if (!$input) {
             return null;
@@ -34,10 +34,11 @@ class Photo extends Model
             return null;
         }
 
-        $update = false;
         if ($id >= 1) {
             $photo = Photo::findOrFail($id);
-            $update = true;
+            if (!$content) {
+                $content = $photo->content;
+            }
         } else {
 
             // we need to check for the same filename 
@@ -84,10 +85,17 @@ class Photo extends Model
 
         $photo->save();
 
+        if ($photo->fileUpload) {
+            if ($photo->fileUpload->id !== $file_upload->id) {
+                $photo->fileUpload()->delete();
+            }
+        }
+
         $photo->fileUpload()->save($file_upload);
 
         cache()->tags([cache_name($photo)])->flush();
 
+        $photo->refresh();
         return $photo;
     }
 

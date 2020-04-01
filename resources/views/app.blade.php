@@ -8,8 +8,8 @@
     <script src="{{ mix('/js/app.js') }}" defer></script>
     <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
     <script src="https://kit.fontawesome.com/da9050191e.js" crossorigin="anonymous"></script>
-
 </head>
+
 <body class="antialiased relative h-full flex flex-col" style="min-height: 100vh">
 
     <div id="app" class="relative flex-1 flex">
@@ -21,16 +21,16 @@
             </div>
         </div>
 
-        <div class="relative flex-1 flex flex-col">
+        <div id="main" class="relative flex-1 flex flex-col">
 
-            <div class="sticky top-0 z-4" :class="$store.state.editing ? 'px-12' : ''">
+            <div id="header" class="sticky top-0 z-4" :class="$store.state.editing ? 'px-12' : ''">
 
                 <page-editor 
                     :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
                     :current-page='@json($page ?? '')'
                 ></page-editor>
 
-                <div id="header" class="flex justify-center relative bg-gray-100 shadow">
+                <div class="flex justify-center relative bg-gray-100 shadow">
                     
                     <div class="flex flex-col w-full relative max-w-6xl">
 
@@ -38,8 +38,8 @@
 
                         <div class="relative flex items-center">
 
-                            <div class="md:flex-1 flex items-center justify-center">
-                                <div class="px-2 py-1 md:px-8 md:py-4 w-12 ml-1 md:ml-0 md:w-auto flex justify-center">
+                            <div class="relative md:flex-1 flex items-center justify-center">
+                                <div class="px-2 py-1 md:px-8 md:py-4 w-12 ml-1 md:ml-0 md:w-auto flex justify-center relative">
                                     <a href="/"><img src="images/logo.svg" class="h-12 hidden md:block" /></a>
                                     <a href="/"><img src="images/icon.svg" class="h-12 block md:hidden" /></a>
                                 </div>

@@ -1,6 +1,6 @@
-<div class="flex justify-center relative z-2">
+<div class="md:flex justify-center relative z-2">
 
-    <div class="relative flex-1 bg-gray-200" style="max-width: 50%;">
+    <div class="relative flex-1 bg-gray-200 md:w-1/2">
 
         <div class="p-4 absolute z-2 font-light text-gray-400 leading-none" style="font-size: 150px">&ldquo;</div>
         
@@ -20,7 +20,7 @@
     </div>
 
     @if ($content->photos->count())
-        <div class="flex-1 flex bg-gray-100 relative">
+        <div class="flex-1 flex bg-gray-100 relative w-full md:w-auto pb-75p md:pb-0">
 
             <div class="h-1 bg-gray-200 opacity-50 w-full absolute bottom-0 z-5"></div>
             @include ('content-elements.photo', ['photo' => $content->photos->first()])

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative w-full pb-video overflow-hidden" v-show="videoId">
+    <div class="relative w-full overflow-hidden" :class="fullWidth ? 'pb-33p' : 'pb-video'" v-show="videoId">
         <transition name="fade">
             <div class="photo z-3" :class="photo.fill ? 'fill' : 'fit'" v-if="photo && !hideBanner">
                 <div class="absolute z-3 w-full h-full flex items-center justify-center text-6xl text-primary hover:text-primaryHover cursor-pointer border-b-2 border-transparent hover:border-primary"
@@ -34,7 +34,7 @@
 <script>
     export default {
 
-        props: ['videoId', 'uuid', 'photo', 'remove', 'title'],
+        props: ['videoId', 'uuid', 'photo', 'remove', 'title', 'fullWidth'],
         data() {
             return {
                 player: {},

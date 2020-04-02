@@ -105,7 +105,7 @@
         <file-uploads
             :name="fileUploadName"
             v-model="uploads"
-            :multiple="true"
+            :multiple="multiplePhotos"
             :items="photos"
             type="image"
         ></file-uploads>
@@ -154,6 +154,7 @@
         data() {
             return {
                 heights: [ 25, 33, 40, 50, 66, 75, 100 ],
+                multiplePhotos: true,
             }
         },
 

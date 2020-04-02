@@ -44,7 +44,7 @@ module.exports = {
   variants: {
     backgroundColor: ['responsive', 'odd', 'hover', 'focus'],
     margin: ['responsive', 'first', 'last'],
-    borderRadius: ['responsive', 'first', 'last'],
+    padding: ['responsive', 'first', 'last'],
   },
   plugins: []
 }

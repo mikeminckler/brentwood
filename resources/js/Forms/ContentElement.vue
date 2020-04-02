@@ -10,6 +10,7 @@
             <div class="content-element-icons" @click="$emit('sortDown')"><i class="fas fa-arrow-alt-circle-down"></i></div>
             <div class="content-element-icons" @click="contentElement.pivot.unlisted = 0" v-if="contentElement.pivot.unlisted"><i class="fas fa-eye"></i></div>
             <div class="content-element-icons" @click="contentElement.pivot.unlisted = 1" v-if="!contentElement.pivot.unlisted"><i class="fas fa-eye-slash"></i></div>
+            <div class="content-element-icons"><i class="fas fa-exchange-alt"></i></div>
             <div class="remove-icon" @click="removeContentElement()"><i class="fas fa-times"></i></div>
         </div>
 
@@ -87,25 +88,23 @@
                 preventWatcher: false,
                 saveContent: _.debounce( function() {
                     // refer to the mixin for saving of the content element
-                    this.saveContentElement();
+                    if (!this.preventWatcher && !this.isSaving) {
+                        this.saveContentElement();
+                    } else {
+                        this.preventWatcher = false;
+                    }
                 }, 500),
             }
         },
 
         watch: {
             contentElement: {
-                handler: _.debounce( function(oldValue, newValue) {
+                handler: function(oldValue, newValue) {
                     // this gets tripped when the content is first loaded
                     // so we ignore the first watcher hit
-
-                    if (!this.preventWatcher && !this.isSaving) {
-                        this.changed = true;
-                        this.saveContent();
-                    } else {
-                        this.preventWatcher = false;
-                    }
-
-                }, 50),
+                    this.changed = true;
+                    this.saveContent();
+                },
                 deep: true
             },
         },

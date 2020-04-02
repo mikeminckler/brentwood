@@ -1,11 +1,13 @@
 <template>
 
     <div v-if="editing"
-        class="bg-gray-100 border-r border-gray-300 pt-2 px-2"
+        class="bg-gray-100 border-r border-gray-300 pt-2 px-2 overflow-y-scroll"
+        :style="maxHeight ? 'max-height: ' + maxHeight : ''"
     >
         <page-list :page="homePage" 
             :key="homePage.id" 
             :emit-event="emitEvent"
+            :show-changes="showChanges"
             :show-content-elements="showContentElements"
             :expanded="expanded"
             @selected="$emit('selected', $event)"
@@ -22,7 +24,7 @@
 
     export default {
 
-        props: ['emitEvent', 'showContentElements', 'expanded'],
+        props: ['emitEvent', 'showContentElements', 'expanded', 'showChanges', 'maxHeight'],
         mixins: [Feedback],
 
         data() {

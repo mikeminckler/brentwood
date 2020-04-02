@@ -18,7 +18,7 @@
             <div class="relative" v-if="$store.state.editing">
                 <div class="sticky top-0">
                     <saving-indicator></saving-indicator>
-                    <page-tree :expanded="true"></page-tree>
+                    <page-tree :expanded="true" :show-changes="true" max-height="100vh"></page-tree>
                 </div>
             </div>
         @endif
@@ -126,7 +126,7 @@
                     <img src="/images/footer_fg.png" class="w-full h-full object-cover z-2 absolute" />
                     <img src="/images/footer_bg.jpg" class="w-full h-full object-cover" />
                 </div>
-                <div class="flex items-center relative py-8 w-full max-w-6xl">
+                <div class="flex relative py-8 w-full max-w-6xl">
 
                     <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-1"></div>
 

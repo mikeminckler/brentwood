@@ -8,6 +8,10 @@
     --transition-time: 200ms;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
     @apply text-gray-600 font-roboto bg-gray-100;
 }
@@ -36,13 +40,17 @@ p {
     @apply p-0 m-0 py-4 leading-relaxed;
 }
 
+p:first-child, p:last-child {
+}
+
+p:empty {
+    @apply p-0;
+}
+
 .columns-2 {
     & p {
         column-count: 2;
     }
-}
-
-p:last-child {
 }
 
 iframe {
@@ -171,7 +179,7 @@ button, .button {
 /* CONTENT */
 
 .text-block {
-    @apply p-8 max-w-xl;
+    @apply p-8 w-full max-w-xl;
 }
 
 .photo-block-text-blue {
@@ -189,7 +197,7 @@ button, .button {
 }
 
 .menubar__button {
-    @apply w-6 h-6 m-1 cursor-pointer flex items-center justify-center rounded border shadow-inner bg-gray-200;
+    @apply w-6 h-6 mx-1 cursor-pointer flex items-center justify-center rounded border shadow-inner bg-gray-200;
 }
 
 .menubar__button:hover {

@@ -9,13 +9,15 @@
 
     </div>
 
-    <div class="flex-2">
+    <div class="flex-2 flex justify-center">
 
         <div class="text-block relative">
             @if ($content->header)
-                <h2>{{ $content->header }}</h2>
+                <h{{ $first ? '1' : '2'}}>{{ $content->header }}</h{{ $first ? '1': '2' }}>
             @endif
-            {!! $content->body !!}
+            <div class="body">
+                {!! $content->body !!}
+            </div>
 
             @if ($first)
                 <div class="h-1 w-16 bg-gray-400 my-4"></div>

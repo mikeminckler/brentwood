@@ -24,7 +24,7 @@
                     <file-uploads
                         :name="fileUploadName"
                         v-model="uploads"
-                        :multiple="false"
+                        :multiple="multiplePhotos"
                         :items="photos"
                         type="image"
                     ></file-uploads>
@@ -75,6 +75,7 @@
 
         data() {
             return {
+                multiplePhotos: false,
             }
         },
 

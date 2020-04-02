@@ -30,6 +30,10 @@ export default {
 
                     if (add) {
                         this.$store.dispatch('addContentElement', response.data.content_element);
+                        this.$nextTick(() => {
+                            let newContent = document.getElementById('c-' + response.data.content_element.uuid);
+                            newContent.scrollIntoView();
+                        });
                     } else {
                         this.updateContentElement(contentElement, response.data.content_element);
                     }

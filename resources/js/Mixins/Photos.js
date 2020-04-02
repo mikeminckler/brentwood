@@ -28,7 +28,13 @@ export default {
     methods: {
         
         updatePhotos: function() {
-            this.$lodash.forEach(this.uploads, (upload, index) => {
+           let uploads;
+            if (this.multiplePhotos) {
+                uploads = this.uploads;
+            } else {
+                uploads = [this.uploads];
+            }
+            this.$lodash.forEach(uploads, (upload, index) => {
                 this.addUpload(upload);
             });
         },

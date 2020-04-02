@@ -36,7 +36,7 @@
                 <file-uploads
                     :name="fileUploadName"
                     v-model="uploads"
-                    multiple="false"
+                    :multiple="multiplePhotos"
                     :items="photos"
                     type="image"
                 ></file-uploads>
@@ -72,6 +72,7 @@
         data() {
             return {
                 videoId: '',
+                multiplePhotos: false,
                 setVideoId: _.debounce( function() {
                     this.content.video_id = this.videoId;
                 }, 1000),

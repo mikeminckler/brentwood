@@ -12,9 +12,9 @@
             <div class="relative">
                 <transition name="editor-menu-bar">
 
-                    <div v-show="true">
+                    <div v-show="showMenu" class="absolute -mt-2 bg-gray-100 z-2">
 
-                        <div class="rounded-t text-sm flex p-1 items-center text-gray-700" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
+                        <div class="text-sm flex items-center text-gray-700" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
                             <div class="menubar__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold" ><i class="fas fa-bold"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.italic() }" @click="commands.italic" ><i class="fas fa-italic"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.strike() }" @click="commands.strike" ><i class="fas fa-strikethrough"></i></div>
@@ -38,21 +38,20 @@
 
         </editor-menu-bar>
 
-        <div class="relative editor" :class="showBg ? 'bg-gray-100 border px-4 py-2' : ''">
+        <div class="editor" :class="showBg ? 'bg-gray-100 border px-4 py-2' : ''">
 
             <editor-menu-bubble
                 :editor="editor" 
                 @hide="hideLinkMenu" 
                 v-slot="{ commands, isActive, getMarkAttrs, menu }"
-                class="relative"
             >
 
                 <transition name="fade">
-                    <div class="absolute bottom-0 w-full h-full flex items-center justify-center z-10"
+                    <div class="absolute top-0 w-full z-10"
                         v-show="linkMenuIsActive"
                         style="background-color: rgba(255,255,255,0.5);"
                     >
-                        <div class="relative bg-gray-200 m-4 p-4 shadow w-full h-full">
+                        <div class="relative bg-gray-200 p-4 shadow w-full">
                             <div class="text-lg hover:text-gray-800 absolute top-0 right-0 -mt-2 -mr-2" @click="hideLinkMenu()"><i class="fas fa-times-circle"></i></div>
 
                             <div class="flex items-center form relative">
@@ -60,12 +59,16 @@
                                 <div v-if="linkUrl" class="mr-2 text-lg hover:text-gray-800 absolute right-0" @click="setLinkUrl(commands.link, null)"><i class="fas fa-times-circle"></i></div>
                             </div>
 
-                            <div style="max-height: 300px;" class="overflow-scroll">
-                                <page-tree :emit-event="true" @selected="setLinkUrl(commands.link, $event)" :show-content-elements="true" :expanded="false"></page-tree>
-                            </div>
+                            <page-tree max-height="300px;" 
+                                :emit-event="true" 
+                                @selected="setLinkUrl(commands.link, $event)" 
+                                :show-content-elements="true" 
+                                :expanded="false"
+                            ></page-tree>
 
                             <checkbox-input class="mt-2" v-model="linkButton" label="Is A Button"></checkbox-input> 
                             <checkbox-input class="mt-2" v-model="linkNewWindow" label="Open In New Window"></checkbox-input> 
+                            <checkbox-input class="mt-2" v-model="linkFloatRight" label="Float Right"></checkbox-input> 
 
                             <div class="mt-2 button" @click="setLinkUrl(commands.link, linkUrl)">Apply Link</div>
                         </div>
@@ -157,6 +160,7 @@
                 linkUrl: null,
                 linkButton: false,
                 linkNewWindow: false,
+                linkFloatRight: false,
                 linkMenuIsActive: false,
                 showMenu: false,
             }
@@ -176,6 +180,10 @@
 
                 if (this.linkButton) {
                     classes += 'button ';
+                }
+
+                if (this.linkFloatRight) {
+                    classes += 'float-right ';
                 }
 
                 return classes;
@@ -224,6 +232,7 @@
                 this.linkUrl = null;
                 this.linkButton = false;
                 this.linkNewWindow = false;
+                this.linkFloatRight = false;
                 this.linkMenuIsActive = false;
             },
 

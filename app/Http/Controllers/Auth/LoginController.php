@@ -40,6 +40,20 @@ class LoginController extends Controller
     }
 
     /**
+     * The user has been authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        if ($user->hasRole('editor')) {
+            session()->put('editing', true);
+        }
+    }
+
+    /**
      * The user has logged out of the application.
      *
      * @param  \Illuminate\Http\Request  $request

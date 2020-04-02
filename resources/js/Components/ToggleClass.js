@@ -13,19 +13,18 @@ export default class CustomStyle extends Mark {
           default: ''
         }
       },
-      //content: 'text*',
-      //group: 'block',
-      //defining: true,
-      //draggable: false,
+      inline: true,
+      //group: 'inline',
+      draggable: false,
       parseDOM: [
         {
-          //tag: "p",
+          tag: "span",
           getAttrs: dom => ({
             class: dom.getAttribute('class')
           }),
         }
       ],
-      toDOM: mark => ['p', {
+      toDOM: mark => ['span', {
           class: `${mark.attrs.class}`
       }, 0],
     };

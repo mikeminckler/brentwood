@@ -1,8 +1,25 @@
 <template>
 
-    <div class="relative w-full overflow-hidden" :class="fullWidth ? 'pb-33p' : 'pb-video'" v-show="videoId">
+    <div class="relative w-full overflow-hidden" :class="videoPadding" v-show="videoId" style="transition: padding calc(var(--transition-time) * 5)">
+
+
+        <div class="absolute bottom-0 z-4 w-full h-full" v-if="$store.state.editing">
+            <div class="absolute right-0 bottom-0 transform rotate-90 origin-top-right w-32 mb-6" @click.stop>
+                <div class="flex items-center px-2 py-1">
+                    <input type="range" v-model="photo.offsetY" min="0" max="100" />
+                </div>
+            </div>
+
+            <div class="absolute right-0 bottom-0 w-32 mb-6" @click.stop>
+                <div class="flex items-center px-2 py-1">
+                    <input type="range" v-model="photo.offsetX" min="0" max="100" />
+                </div>
+            </div>
+        </div>
+
         <transition name="fade">
-            <div class="photo z-3" :class="photo.fill ? 'fill' : 'fit'" v-if="photo && !hideBanner">
+            <div class="photo z-3 fill" v-if="photo && !hideBanner">
+
                 <div class="absolute z-3 w-full h-full flex items-center justify-center text-6xl text-primary hover:text-primaryHover cursor-pointer border-b-2 border-transparent hover:border-primary"
                      @click="playVideo()"
                     >
@@ -20,6 +37,8 @@
                             <i class="fab fa-youtube"></i>
                         </div>
                     </div>
+
+
                     <div v-if="remove" class="absolute remove-icon right-0 bottom-0" @click.stop="$emit('remove')"><i class="fas fa-times"></i></div>
                 </div>
                 <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'">
@@ -39,6 +58,7 @@
             return {
                 player: {},
                 hideBanner: false,
+                videoPadding: 'pb-video',
             }
         },
 
@@ -61,6 +81,9 @@
             },
             videoId() {
                 this.loadVideo();
+            },
+            fullWidth() {
+                this.setPadding();
             }
         },
 
@@ -74,6 +97,8 @@
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('play-video', listener);
             });
+
+            this.setPadding();
 
             if (this.ready) {
                 this.loadVideo();
@@ -99,12 +124,22 @@
                                 iv_load_policy: 3,
                                 enablejsapi: 1,
                                 autoplay: 0,
-                            }
+                            },
+                            events: {
+                                'onStateChange': this.onPlayerStateChange
+                            },
                         });
 
                     }
                 }
 
+            },
+
+            onPlayerStateChange: function(event) {
+                if (event.data == YT.PlayerState.ENDED) {
+                    this.hideBanner = false;
+                    this.setPadding();
+                }
             },
 
             playVideo: function(uuid) {
@@ -118,10 +153,19 @@
 
                 if (this.canPlay && start) {
                     this.hideBanner = true;
+                    this.videoPadding = 'pb-video';
                     this.player.playVideo();
                 }
 
-            }
+            },
+
+            setPadding: function() {
+                if (this.fullWidth) {
+                    this.videoPadding = 'pb-33p';
+                } else {
+                    this.videoPadding = 'pb-video';
+                }
+            },
         },
 
     }

@@ -42,13 +42,13 @@ class TextBlock extends Model
 
             $replace = [];
 
-            preg_match_all('/href="(\d+)"/', $value, $match);
+            preg_match_all('/\<a.*(href="(\d+))(#c-([^"]+))?.*\>(.*)\<\/a>/', $value, $match);
 
-            $find = collect($match[0])->map(function($string) {
-                return '/'.$string.'/';
+            $find = collect($match[1])->map(function($string) {
+                return '/'.str_replace('/', '\/', $string).'/';
             })->all();
 
-            foreach ($match[1] as $page_id) {
+            foreach ($match[2] as $page_id) {
                 $page = Page::find($page_id);
                 if ($page instanceof Page) {
                     if ($page->full_slug !== '/') {
@@ -57,11 +57,12 @@ class TextBlock extends Model
                         $full_slug = '/';
                     }
 
-                    $replace[] = 'href="'.$full_slug.'"';
+                    $replace[] = 'href="'.$full_slug;
                 }
             }
 
-            return preg_replace($find, $replace, $value);   
+            $processed_text = preg_replace($find, $replace, $value);   
+            return $processed_text;
         }
         return $value;
     }

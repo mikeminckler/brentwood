@@ -3,7 +3,14 @@
     <div v-if="editing"
         class="bg-gray-100 border-r border-gray-300 pt-2 px-2"
     >
-        <page-list :page="homePage" :key="homePage.id"></page-list>
+        <page-list :page="homePage" 
+            :key="homePage.id" 
+            :emit-event="emitEvent"
+            :show-content-elements="showContentElements"
+            :expanded="expanded"
+            @selected="$emit('selected', $event)"
+        ></page-list>
+
     </div>
 
 </template>
@@ -15,12 +22,12 @@
 
     export default {
 
-        props: [],
+        props: ['emitEvent', 'showContentElements', 'expanded'],
         mixins: [Feedback],
 
         data() {
             return {
-                homePage: [],
+                homePage: {},
             }
         },
 
@@ -49,13 +56,13 @@
             * you can see the emitter in Components/ContentEditor
             * you can emit refresh-page-tree from any component and the page tree will listen it
             */
-            const listener = event => {
+            const refreshPageTree = event => {
                 this.loadPageTree();
             };
-            this.$eventer.$on('refresh-page-tree', listener);
+            this.$eventer.$on('refresh-page-tree', refreshPageTree);
 
             this.$once('hook:destroyed', () => {
-                this.$eventer.$off('refresh-page-tree', listener);
+                this.$eventer.$off('refresh-page-tree', refreshPageTree);
             });
 
             if (this.editing) {
@@ -70,6 +77,10 @@
                 }, error => {
                     this.processErrors(error.response);
                 });
+            },
+
+            goToPage: function(page) {
+                window.location.href = page.full_slug;
             }
         },
 

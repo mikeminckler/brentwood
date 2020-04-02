@@ -105,7 +105,7 @@
         <file-uploads
             :name="fileUploadName"
             v-model="uploads"
-            multiple="true"
+            :multiple="true"
             :items="photos"
             type="image"
         ></file-uploads>

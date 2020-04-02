@@ -14,16 +14,18 @@
 
     <div id="app" class="relative flex-1 flex">
 
-        <div class="relative" v-if="$store.state.editing">
-            <div class="sticky top-0">
-                <saving-indicator></saving-indicator>
-                <page-tree></page-tree>
+        @if (session()->get('editing') && !request('preview'))
+            <div class="relative" v-if="$store.state.editing">
+                <div class="sticky top-0">
+                    <saving-indicator></saving-indicator>
+                    <page-tree :expanded="true"></page-tree>
+                </div>
             </div>
-        </div>
+        @endif
 
         <div id="main" class="relative flex-1 flex flex-col">
 
-            <div id="header" class="sticky top-0 z-4" :class="$store.state.editing ? 'px-12' : ''">
+            <div id="header" class="sticky top-0 z-4 {{ session()->get('editing') && !request('preview') ? 'px-12' : '' }}">
 
                 <page-editor 
                     :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"

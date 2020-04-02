@@ -21,7 +21,6 @@ class Photo extends Model
     protected $with = ['fileUpload'];
     protected $appends = ['small', 'medium', 'large'];
 
-
     public function savePhoto($id = null, $input, $content = null)
     {
         if (!$input) {
@@ -88,6 +87,9 @@ class Photo extends Model
         if ($photo->fileUpload) {
             if ($photo->fileUpload->id !== $file_upload->id) {
                 $photo->fileUpload()->delete();
+                $photo->removeSmall();
+                $photo->removeMedium();
+                $photo->removeLarge();
             }
         }
 

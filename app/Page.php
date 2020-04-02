@@ -15,7 +15,7 @@ class Page extends Model
     use SoftDeletes;
 
     protected $with = ['pages'];
-    protected $appends = ['full_slug', 'can_be_published', 'content_elements'];
+    protected $appends = ['full_slug', 'can_be_published', 'content_elements', 'preview_content_elements'];
 
     public function savePage($id = null, $input) 
     {
@@ -194,6 +194,27 @@ class Page extends Model
                         })->first();
                      })
                      ->filter()
+                     ->filter( function($content_element) {
+                        return $content_element->pivot->unlisted ? false : true;
+                     })
+                     ->sortBy(function($content_element) {
+                        return $content_element->pivot->sort_order;
+                     })->values();
+    }
+
+    public function getPreviewContentElementsAttribute() 
+    {
+        if (!session()->get('editing')) {
+            return collect();
+        }
+        return $this->contentElements()
+                     ->get()
+                     ->groupBy('uuid')
+                     ->map(function($uuid) {
+                        return $uuid->sortByDesc( function( $content_element) {
+                            return $content_element->version_id;
+                        })->first();
+                     })
                      ->filter( function($content_element) {
                         return $content_element->pivot->unlisted ? false : true;
                      })

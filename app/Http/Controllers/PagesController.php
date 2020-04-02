@@ -34,13 +34,13 @@ class PagesController extends Controller
             return abort(404);
         }
 
-        //if (session()->get('editing')) {
-            return view('page', compact('page'));
-        //} else {
-        //    return cache()->tags([cache_name($page)])->rememberForever(cache_name($page).'-view', function() use($page) {
-        //        return view('page', compact('page'))->render();
-        //    });
-        //}
+        if (session()->has('editing') && request('preview')) {
+            $content_elements = $page->content_elements;
+        } else {
+            $content_elements = $page->published_content_elements;
+        }
+
+        return view('page', compact('page', 'content_elements'));
     }
 
     /**

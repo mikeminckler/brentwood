@@ -8,22 +8,27 @@
                 <div class=""><i class="fas fa-file-medical"></i></div>
             </div>
 
+            <div class="button mx-2" @click="preview()">
+                <div class=""><i class="fas fa-eye"></i></div>
+            </div>
+
             <div class="flex items-center justify-center flex-1">
                 <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
                 <div class="">
                     <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> 
                 </div>
 
-                <transition name="saving">
-                    <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white px-4 py-1 font-bold cursor-pointer" 
-                        @click="publishPage()"
-                         v-if="hasDraft || page.can_be_published"
-                    >
-                        <div class="pr-2"><i class="fas fa-sign-out-alt"></i></div>
-                        <div>Publish</div>
-                    </div>
-                </transition>
             </div>
+
+            <transition name="saving">
+                <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white px-4 py-1 font-bold cursor-pointer" 
+                    @click="publishPage()"
+                     v-if="hasDraft || page.can_be_published"
+                >
+                    <div class="pr-2"><i class="fas fa-sign-out-alt"></i></div>
+                    <div>Publish</div>
+                </div>
+            </transition>
 
             <div class="flex px-4 mx-2 items-center cursor-pointer hover:bg-primary hover:text-white" @click="removePage()" v-if="page.id !== 1">
                 <div class="pr-2 text-xl"><i class="fas fa-times"></i></div>
@@ -120,6 +125,11 @@
                 });
 
             }, 1000),
+
+            preview: function() {
+                window.open(this.page.full_slug + '?preview=true', this.page.full_slug);
+                window.opener.focus();
+            },
 
             publishPage: function() {
 

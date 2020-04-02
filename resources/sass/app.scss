@@ -71,7 +71,7 @@ iframe {
 }
 
 .photo-icons {
-    @apply absolute bottom-0 z-3 w-full text-lg bg-translucent;
+    @apply absolute bottom-0 z-3 w-full text-lg;
 }
 
 .content-element-icons {
@@ -123,10 +123,13 @@ input[type=range]:hover {
         @apply mb-4;
     }
 
-    & input {
+    & input { 
         @apply border border-gray-300 bg-gray-100 px-4 py-2 w-full;
     }
 
+    & input.remove {
+        @apply pl-4 pr-8;
+    }
 }
 
 button, .button {
@@ -168,7 +171,7 @@ button, .button {
 /* CONTENT */
 
 .text-block {
-    @apply p-8;
+    @apply p-8 max-w-xl;
 }
 
 .photo-block-text-blue {

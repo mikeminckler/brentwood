@@ -5,6 +5,7 @@
         <transition-group name="content-elements" tag="div" class="relative mt-8 first:mt-0">
             <form-content-element 
                 v-for="(contentElement, index) in sortedContentElements"
+                :id="'c-' + contentElement.uuid"
                 :key="contentElement.uuid"
                 :content-element="contentElement"
                 @sortUp="sortUp(contentElement)"

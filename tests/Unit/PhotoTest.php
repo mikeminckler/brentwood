@@ -117,4 +117,39 @@ class PhotoTest extends TestCase
         Storage::disk('public')->assertMissing($large);
     }
 
+
+    /** @test **/
+    public function updating_a_file_upload_clears_the_generated_images()
+    {
+        Storage::fake();
+        $file_name = Str::random().'jpg';
+        $file = UploadedFile::fake()->image($file_name);
+        $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
+
+        $input = factory(Photo::class)->raw();
+        $input['file_upload'] = $file_upload;
+
+        $photo_block = factory(PhotoBlock::class)->create();
+        $photo = (new Photo)->savePhoto(null, $input, $photo_block);
+        $this->assertInstanceOf(Photo::class, $photo);
+
+        $this->assertTrue(Str::contains($photo->small, $file_name));
+        $this->assertTrue(Str::contains($photo->medium, $file_name));
+        $this->assertTrue(Str::contains($photo->large, $file_name));
+
+        $file_name2 = Str::random().'jpg';
+        $file2 = UploadedFile::fake()->image($file_name2);
+        $file_upload2 = (new FileUpload)->saveFile($file2, 'photos', true);
+
+        $input['file_upload'] = $file_upload2;
+
+        $photo = (new Photo)->savePhoto($photo->id, $input, $photo_block);
+
+        $photo->refresh();
+
+        $this->assertEquals($file_upload2->id, $photo->fileUpload->id);
+        $this->assertTrue(Str::contains($photo->small, $file_name2));
+        $this->assertTrue(Str::contains($photo->medium, $file_name2));
+        $this->assertTrue(Str::contains($photo->large, $file_name2));
+    }
 }

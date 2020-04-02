@@ -51,7 +51,13 @@ class TextBlock extends Model
             foreach ($match[1] as $page_id) {
                 $page = Page::find($page_id);
                 if ($page instanceof Page) {
-                    $replace[] = 'href="/'.$page->full_slug.'"';
+                    if ($page->full_slug !== '/') {
+                        $full_slug = '/'.$page->full_slug;
+                    } else {
+                        $full_slug = '/';
+                    }
+
+                    $replace[] = 'href="'.$full_slug.'"';
                 }
             }
 

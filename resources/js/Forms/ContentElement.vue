@@ -105,7 +105,7 @@
                         this.preventWatcher = false;
                     }
 
-                }, 100),
+                }, 50),
                 deep: true
             },
         },

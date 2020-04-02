@@ -300,8 +300,72 @@ class PageTest extends TestCase
             'version_id' => $page->draft_version_id,
         ]);
 
+        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false]);
+
+        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
+        $this->assertTrue($page->contentElements->contains('id', $unpublished_content_element->id));
+        $this->assertTrue($page->contentElements->contains('id', $unlisted_content_element->id));
+
         $page->refresh();
         $this->assertFalse($page->published_content_elements->contains('id', $unlisted_content_element->id));
         $this->assertFalse($page->published_content_elements->contains('id', $unpublished_content_element->id));
+    }
+
+    /** @test **/
+    public function a_page_can_get_its_preview_content_elements()
+    {
+        $this->signInAdmin();
+        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $this->assertEquals(1, $content_element->pages()->count());
+        $page = $content_element->pages->first();
+        $content_element->version_id = $page->getDraftVersion()->id;
+        $content_element->save();
+
+        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
+        $this->assertTrue($page->content_elements->contains('id', $content_element->id));
+        $this->assertEquals($page->getDraftVersion()->id, $content_element->version_id);
+
+        $page->publish();
+        $page->refresh();
+
+        $content_element->refresh();
+        $this->assertNotNull($content_element->published_at);
+        $this->assertTrue($page->preview_content_elements->contains('id', $content_element->id));
+
+        $unlisted_content_element = factory(ContentElement::class)->states('unlisted', 'text-block')->create([
+            'version_id' => $page->published_version_id,
+        ]);
+
+        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true]);
+
+        $unpublished_content_element = factory(ContentElement::class)->states('text-block')->create([
+            'version_id' => $page->draft_version_id,
+        ]);
+
+        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false]);
+
+        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
+        $this->assertTrue($page->contentElements->contains('id', $unpublished_content_element->id));
+        $this->assertTrue($page->contentElements->contains('id', $unlisted_content_element->id));
+
+        $page->refresh();
+        $this->assertFalse($page->preview_content_elements->contains('id', $unlisted_content_element->id));
+        $this->assertTrue($page->preview_content_elements->contains('id', $content_element->id));
+        $this->assertTrue($page->preview_content_elements->contains('id', $unpublished_content_element->id));
+    }
+
+    /** @test **/
+    public function if_session_editing_preview_content_elements_are_appended()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $this->assertEquals(1, $content_element->pages()->count());
+        $page = $content_element->pages->first();
+        $content_element->version_id = $page->getDraftVersion()->id;
+        $content_element->save();
+
+        $this->assertFalse($page->preview_content_elements->contains('id', $content_element->id));
+        $this->signInAdmin();
+        session()->put('editing', true);
+        $this->assertTrue($page->preview_content_elements->contains('id', $content_element->id));
     }
 }

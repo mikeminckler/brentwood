@@ -24,7 +24,7 @@
                     <file-uploads
                         :name="fileUploadName"
                         v-model="uploads"
-                        multiple="false"
+                        :multiple="false"
                         :items="photos"
                         type="image"
                     ></file-uploads>
@@ -34,7 +34,7 @@
 
         </div>
 
-        <div class="flex-2">
+        <div class="flex-2 flex justify-center">
 
             <div class="text-block">
                 <div class="h2">

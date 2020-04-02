@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use Illuminate\Foundation\Testing\WithFaker;
 use App\Page;
 use Illuminate\Support\Str;
+use App\ContentElement;
 
 trait PageLinkTestTrait
 {
@@ -55,6 +56,41 @@ trait PageLinkTestTrait
             $this->assertTrue(Str::contains($content->{$link_field}, 'href="/'.$page2->full_slug.'"'));
             $this->assertFalse(Str::contains($content->{$link_field}, 'href="'.$page3->id.'"'));
             $this->assertTrue(Str::contains($content->{$link_field}, 'href="/'.$page3->full_slug.'"'));
+        }
+    }
+
+    /** @test **/
+    public function if_a_page_is_displayed_in_the_front_end_we_convert_page_id_links_with_content_links()
+    {
+
+        $content = $this->getModel();
+        $content_element = $content->contentElement;
+        $this->assertInstanceOf(ContentElement::class, $content_element);
+        $page = factory(Page::class)->create();
+        $this->assertNotNull($page->full_slug);
+        $page->contentElements()->attach($content_element, ['sort_order' => 1, 'unlisted' => false]);
+
+        foreach ($this->getLinkFields() as $link_field) {
+
+            $body = '<p>'.$this->faker->paragraph.'</p>';
+            $body .= '<p>'.$this->faker->sentence.' <a href="'.$page->id.'#c-'.$content_element->uuid.'" />'.$page->name.'</p>';
+            $body .= '<p>'.$this->faker->paragraph.'</p>';
+
+            $content->{$link_field} = $body;
+            $content->save();
+
+            $content->refresh();
+
+            session()->put('editing', true);
+
+            $this->assertTrue(Str::contains($content->{$link_field}, 'href="'.$page->id.'#c-'.$content_element->uuid.'"'));
+            $this->assertFalse(Str::contains($content->{$link_field}, 'href="/'.$page->full_slug.'#c-'.$content_element->uuid.'"'));
+
+            session()->pull('editing');
+
+            // if not editing, the links should be parsed for the frontend
+            $this->assertFalse(Str::contains($content->{$link_field}, 'href="'.$page->id.'#c-'.$content_element->uuid.'"'));
+            $this->assertTrue(Str::contains($content->{$link_field}, 'href="/'.$page->full_slug.'#c-'.$content_element->uuid.'"'));
         }
     }
 

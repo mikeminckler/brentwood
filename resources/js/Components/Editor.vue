@@ -12,7 +12,7 @@
             <div class="relative">
                 <transition name="editor-menu-bar">
 
-                    <div v-show="showMenu">
+                    <div v-show="true">
 
                         <div class="rounded-t text-sm flex p-1 items-center text-gray-700" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
                             <div class="menubar__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold" ><i class="fas fa-bold"></i></div>
@@ -27,6 +27,7 @@
                             <div class="menubar__button" :class="{ 'is-active': isActive.ordered_list() }" @click="commands.ordered_list" ><i class="fas fa-list-ol"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.blockquote() }" @click="commands.blockquote" ><i class="fas fa-quote-right"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.link() }" @click="toggleLinkMenu(getMarkAttrs('link'))" ><i class="fas fa-link"></i></div>
+                            <div class="menubar__button" v-if="false" :class="{ 'is-active': isActive.toggleClass({ class: 'float-right' }) }" @click="commands.toggleClass({ class: 'float-right' })" ><i class="fas fa-window-restore"></i></div>
                         </div>
 
                     </div>
@@ -43,24 +44,28 @@
                 :editor="editor" 
                 @hide="hideLinkMenu" 
                 v-slot="{ commands, isActive, getMarkAttrs, menu }"
+                class="relative"
             >
 
                 <transition name="fade">
-                    <div class="absolute w-full h-full flex items-center justify-center z-10" 
+                    <div class="absolute bottom-0 w-full h-full flex items-center justify-center z-10"
                         v-show="linkMenuIsActive"
-                        style="background-color: rgba(255,255,255,0.5)"
+                        style="background-color: rgba(255,255,255,0.5);"
                     >
-                        <div class="relative bg-gray-200 m-4 p-4 shadow w-full">
+                        <div class="relative bg-gray-200 m-4 p-4 shadow w-full h-full">
                             <div class="text-lg hover:text-gray-800 absolute top-0 right-0 -mt-2 -mr-2" @click="hideLinkMenu()"><i class="fas fa-times-circle"></i></div>
 
                             <div class="flex items-center form relative">
-                                <input class="" type="text" v-model="linkUrl" placeholder="https://www.brentwood.bc.ca/" ref="linkInput" @keyup.esc="hideLinkMenu" @keyup.enter="setLinkUrl(commands.link, linkUrl)" />
+                                <input class="remove" type="text" v-model="linkUrl" placeholder="https://www.brentwood.bc.ca/" ref="linkInput" @keyup.esc="hideLinkMenu" @keyup.enter="setLinkUrl(commands.link, linkUrl)" />
                                 <div v-if="linkUrl" class="mr-2 text-lg hover:text-gray-800 absolute right-0" @click="setLinkUrl(commands.link, null)"><i class="fas fa-times-circle"></i></div>
+                            </div>
+
+                            <div style="max-height: 300px;" class="overflow-scroll">
+                                <page-tree :emit-event="true" @selected="setLinkUrl(commands.link, $event)" :show-content-elements="true" :expanded="false"></page-tree>
                             </div>
 
                             <checkbox-input class="mt-2" v-model="linkButton" label="Is A Button"></checkbox-input> 
                             <checkbox-input class="mt-2" v-model="linkNewWindow" label="Open In New Window"></checkbox-input> 
-                            <checkbox-input class="mt-2" v-model="linkTopRight" label="Place In Top Right"></checkbox-input> 
 
                             <div class="mt-2 button" @click="setLinkUrl(commands.link, linkUrl)">Apply Link</div>
                         </div>
@@ -103,8 +108,10 @@
           History,
     } from 'tiptap-extensions'
 
-    import CustomLink from '@/CustomLink';
+    import CustomLink from '@/Components/CustomLink';
+    import ToggleClass from '@/Components/ToggleClass';
     import CheckboxInput from '@/Components/CheckboxInput.vue';
+    import PageTree from '@/Components/PageTree.vue';
 
     export default {
 
@@ -113,6 +120,7 @@
             EditorMenuBar,
             EditorMenuBubble,
             'checkbox-input': CheckboxInput,
+            'page-tree': PageTree,
         },
 
         props: ['value', 'placeholder', 'label', 'focus', 'showBg'],
@@ -130,25 +138,25 @@
                         new OrderedList(),
                         new TodoItem(),
                         new TodoList(),
-                        new CustomLink(),
                         new Bold(),
                         new Code(),
                         new Italic(),
                         new Strike(),
                         new Underline(),
                         new History(),
+                        new CustomLink(),
+                        new ToggleClass(),
                     ],
                     onUpdate: _.debounce( ({ getJSON, getHTML }) => {
                         //this.json = getJSON()
                         this.html = getHTML()
-                    }, 100),
+                    }, 50),
                 }),
                 //json: 'JSON',
                 html: 'HTML',
                 linkUrl: null,
                 linkButton: false,
                 linkNewWindow: false,
-                linkTopRight: false,
                 linkMenuIsActive: false,
                 showMenu: false,
             }
@@ -168,9 +176,6 @@
 
                 if (this.linkButton) {
                     classes += 'button ';
-                }
-                if (this.linkTopRight) {
-                    classes += 'absolute top-0 right-0 ';
                 }
 
                 return classes;
@@ -219,7 +224,6 @@
                 this.linkUrl = null;
                 this.linkButton = false;
                 this.linkNewWindow = false;
-                this.linkTopRight = false;
                 this.linkMenuIsActive = false;
             },
 

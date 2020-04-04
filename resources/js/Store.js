@@ -6,6 +6,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
     state: {
         editing: false,
+        showMenu: false,
         feedback: [],
         saving: [],
         processing: {
@@ -20,12 +21,17 @@ const store = new Vuex.Store({
             sort_order: 0,
             content_elements: [],
         },
+        pageTree: {},
         youtubeReady: false,
     },
 
     mutations: {
         setEditing(state, editing) {
             state.editing = editing;
+        },
+
+        toggleMenu(state, showMenu) {
+            state.showMenu = showMenu;
         },
 
         startSaving(state, saving) {
@@ -39,6 +45,10 @@ const store = new Vuex.Store({
 
         setPage(state, page) {
             state.page = page;
+        },
+
+        setPageTree(state, pageTree) {
+            state.pageTree = pageTree;
         },
 
         setYoutubeReady(state) {
@@ -80,6 +90,11 @@ const store = new Vuex.Store({
             commit('setEditing', editing);
         },
 
+        toggleMenu({ commit, state }) {
+            let showMenu = !state.showMenu;
+            commit('toggleMenu', showMenu);
+        },
+
         startSaving({ commit, state }, saving) {
             commit('startSaving', saving);
         },
@@ -90,6 +105,10 @@ const store = new Vuex.Store({
 
         setPage({ commit, state }, page) {
             commit('setPage', page);
+        },
+
+        setPageTree({ commit, state }, pageTree) {
+            commit('setPageTree', pageTree);
         },
 
         setYoutubeReady({ commit, state }) {

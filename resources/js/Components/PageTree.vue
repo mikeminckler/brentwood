@@ -1,11 +1,11 @@
 <template>
 
     <div v-if="editing"
-        class="bg-gray-100 border-r border-gray-300 pt-2 px-2 overflow-y-scroll"
+        class="bg-gray-100 border-r border-gray-300 pt-2 px-2 overflow-y-scroll text-gray-700"
         :style="maxHeight ? 'max-height: ' + maxHeight : ''"
     >
-        <page-list :page="homePage" 
-            :key="homePage.id" 
+        <page-list :page="pageTree" 
+            :key="pageTree.id" 
             :emit-event="emitEvent"
             :show-changes="showChanges"
             :show-content-elements="showContentElements"
@@ -29,7 +29,6 @@
 
         data() {
             return {
-                homePage: {},
             }
         },
 
@@ -40,47 +39,19 @@
         computed: {
             editing() {
                 return this.$store.state.editing;
+            },
+            pageTree() {
+                return this.$store.state.pageTree;
             }
         },
 
         watch: {
-            editing() {
-                if (this.editing) {
-                    this.loadPageTree();
-                }
-            }
         },
 
         mounted() {
-
-            /**
-            * here we setup a listener to refresh the page tree
-            * you can see the emitter in Components/ContentEditor
-            * you can emit refresh-page-tree from any component and the page tree will listen it
-            */
-            const refreshPageTree = event => {
-                this.loadPageTree();
-            };
-            this.$eventer.$on('refresh-page-tree', refreshPageTree);
-
-            this.$once('hook:destroyed', () => {
-                this.$eventer.$off('refresh-page-tree', refreshPageTree);
-            });
-
-            if (this.editing) {
-                this.loadPageTree();
-            }
         },
 
         methods: {
-            loadPageTree: function() {
-                this.$http.get('/pages').then( response => {
-                    this.homePage = response.data.home_page;
-                }, error => {
-                    this.processErrors(error.response);
-                });
-            },
-
             goToPage: function(page) {
                 window.location.href = page.full_slug;
             }

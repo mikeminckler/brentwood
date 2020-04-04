@@ -21,23 +21,41 @@ a {
 }
 
 h1, h2, h3, .h1, .h2, .h3 {
-    @apply font-oswald p-0 m-0 font-light;
+    @apply font-oswald p-0 m-0 font-light leading-tight;
 }
 
 h1, .h1 {
-    @apply text-4xl;
-}
-
-h2, .h2 {
     @apply text-3xl;
 }
 
-h3, .h3 {
+h2, .h2 {
     @apply text-2xl;
 }
 
+h3, .h3 {
+    @apply text-xl;
+}
+
+@media (min-width: 768px) {
+    h1, h2, h3 {
+        @apply leading-normal;
+    }
+
+    h1, .h1 {
+        @apply text-4xl;
+    }
+
+    h2, .h2 {
+        @apply text-3xl;
+    }
+
+    h3, .h3 {
+        @apply text-2xl;
+    }
+}
+
 p {
-    @apply p-0 m-0 py-4 leading-relaxed;
+    @apply p-0 m-0 py-2 leading-relaxed;
 }
 
 p:first-child, p:last-child {
@@ -120,8 +138,14 @@ input[type=range]:hover {
     @apply border-transparent;
 }
 
-.photo-block-text-blue, .photo-block-text-gray {
+.text-style-blue, .text-style-gray {
     & input::placeholder, .placeholder, .placeholder:hover {
+    }
+}
+
+.text-style-blue {
+    & ::selection {
+        @apply bg-blue-700;
     }
 }
 
@@ -179,18 +203,24 @@ button, .button {
 /* CONTENT */
 
 .text-block {
-    @apply p-8 w-full max-w-xl;
+    @apply px-8 py-0 w-full max-w-xl;
 }
 
-.photo-block-text-blue {
+.text-style-blue {
     @apply text-white bg-blue-400;
 }
 
-.photo-block-text-gray {
+.text-style-gray {
     @apply text-white bg-gray-500;
 }
 
 /* EDITOR */
+
+.ProseMirror {
+    & p:first-child {
+        @apply pt-2;
+    }
+}
 
 .ProseMirror:focus {
     @apply outline-none;

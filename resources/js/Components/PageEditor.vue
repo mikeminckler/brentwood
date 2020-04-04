@@ -4,8 +4,12 @@
 
         <div class="w-full max-w-6xl flex items-center bg-gray-200 p-2 shadow">
 
-            <div class="button mx-2" @click="createSubPage()">
+            <div class="button mx-2" @click="createPage()">
                 <div class=""><i class="fas fa-file-medical"></i></div>
+            </div>
+
+            <div class="button mx-2" @click="createSubPage()">
+                <div class=""><i class="fas fa-file-download"></i></div>
             </div>
 
             <div class="button mx-2" @click="preview()">
@@ -105,6 +109,25 @@
                     this.processErrors(error.response);
                 });
             },
+
+            createPage: function() {
+
+                let input = {
+                    name: 'Untitled Page',
+                    parent_page_id: this.page.parent_page_id,
+                    unlisted: true,
+                    sort_order: this.page.sort_order + 1,
+                    content_elements: [],
+                }
+
+                this.$http.post('/pages/create', input).then( response => {
+                    this.processSuccess(response);
+                    window.location = response.data.page.full_slug;
+                }, error => {
+                    this.processErrors(error.response);
+                });
+            },
+
 
             savePage: _.debounce(function() {
 

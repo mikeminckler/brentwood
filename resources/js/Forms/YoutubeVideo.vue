@@ -3,7 +3,7 @@
     <div class="relative">
         <div class="flex relative">
 
-            <div class="flex-1 relative" v-if="!content.full_width"></div>
+            <div class="relative" style="transition: flex calc(var(--transition-time) * 5)" :class="content.full_width ? 'flex-0' : 'flex-1'"></div>
             <div class="relative flex-2 flex justify-center items-center relative z-2">
                 <youtube-player
                     :video-id="content.video_id" 

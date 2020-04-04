@@ -32,31 +32,35 @@
                     :current-page='@json($page ?? '')'
                 ></page-editor>
 
-                <div class="flex justify-center relative bg-gray-100 shadow">
+                <div class="flex justify-center relative bg-gray-100">
                     
-                    <div class="flex flex-col w-full relative max-w-6xl">
+                    <div class="flex flex-col w-full relative max-w-6xl shadow">
 
-                        <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-3"></div>
+                        <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p"></div>
 
-                        <div class="relative flex items-center">
+                        <div class="relative flex">
 
                             <div class="relative md:flex-1 flex items-center justify-center">
-                                <div class="px-2 py-1 md:px-8 md:py-4 w-12 ml-1 md:ml-0 md:w-auto flex justify-center relative">
-                                    <a href="/"><img src="images/logo.svg" class="h-12 hidden md:block" /></a>
-                                    <a href="/"><img src="images/icon.svg" class="h-12 block md:hidden" /></a>
+                                <div class="p-2 ml-1 md:ml-0 flex justify-center relative">
+                                    <a href="/"><img src="images/logo.svg" class="h-8 md:h-12 block" /></a>
                                 </div>
                             </div>
 
-                            <div class="flex-2 h-full">
+                            <nav class="flex-2 relative flex md:block">
 
-                                <div class="flex h-full">
+                                <div class="md:hidden absolute right-0 text-white bg-primary px-2 cursor-pointer mt-3 mr-2" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
 
-                                    <div class="flex-1 flex items-center -mb-1 h-full z-1">
+                                <div class="absolute top-0 mt-12 md:mt-0 right-0 md:right-auto md:relative md:h-auto md:flex shadow z-3 md:pr-4 overflow-hidden"
+                                    :class="$store.state.showMenu ? 'max-h-200 md:max-h-screen' : 'max-h-0 md:max-h-screen'"
+                                    style="transition: max-height var(--transition-time) ease"
+                                >
+
+                                    <div class="flex-1 md:flex relative justify-around">
                                         @foreach ($menu as $menu_page)
                                             @if (!$menu_page->unlisted && $menu_page->published_version_id)
                                                 <a href="{{ $menu_page->full_slug }}" 
-                                                    class="font-oswald flex items-center md:text-lg px-4 h-full
-                                                    {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline shadow bg-white' : '' }}"
+                                                    class="font-oswald flex items-center text-base md:text-lg px-4 py-1 md:py-0 relative hover:bg-white
+                                                    {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline bg-white' : 'bg-gray-100' }}"
                                                 >{{ $menu_page->name }}</a>
                                                 @php 
                                                     if ( Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ) {
@@ -67,9 +71,9 @@
                                         @endforeach 
                                     </div>
                                     
-                                    <div class="flex items-center justify-end">
+                                    <div class="flex">
 
-                                        <a href="/apply-now" class="button ml-4 whitespace-no-wrap">Apply Now</a>
+                                        <a href="/apply-now" class="button md:ml-4 md:my-4 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
 
                                         @auth
                                             @if (auth()->user()->hasRole('editor'))
@@ -81,20 +85,16 @@
                                 </div>
 
                                 @if (isset($sub_menu))
-                                    <div class="shadow overflow-visible h-0">
-
-                                        <div class="flex items-center px-8 bg-white relative z-2 text-sm md:text-base">
-                                            @foreach ($sub_menu as $menu_page)
-                                                @if (!$menu_page->unlisted && $menu_page->published_version_id)
-                                                    <a href="{{ $menu_page->full_slug }}" class="py-1 font-oswald ml-8 first:ml-0">{{ $menu_page->name }}</a>
-                                                @endif
-                                            @endforeach 
-                                        </div>
-
+                                    <div class="hidden md:flex items-center px-8 bg-gray-100 relative text-sm md:text-base">
+                                        @foreach ($sub_menu as $menu_page)
+                                            @if (!$menu_page->unlisted && $menu_page->published_version_id)
+                                                <a href="{{ $menu_page->full_slug }}" class="py-1 font-oswald ml-8 first:ml-0">{{ $menu_page->name }}</a>
+                                            @endif
+                                        @endforeach 
                                     </div>
                                 @endif
 
-                            </div>
+                            </nav>
 
                         </div>
 
@@ -112,7 +112,7 @@
 
                     <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-2"></div>
 
-                    <div id="content" class="flex-1 flex flex-col relative {{ isset($sub_menu) ? 'mt-8' : '' }}">
+                    <div id="content" class="flex-1 flex flex-col relative {{ isset($sub_menu) ? 'mt-0' : '' }}">
                         @yield ('content')
                     </div>
 

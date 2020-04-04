@@ -12,9 +12,9 @@
             <div class="relative">
                 <transition name="editor-menu-bar">
 
-                    <div v-show="showMenu" class="absolute -mt-2 bg-gray-100 z-2">
+                    <div v-show="true" class="mt-2 relative z-2">
 
-                        <div class="text-sm flex items-center text-gray-700" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
+                        <div class="text-sm flex flex-wrap items-center text-gray-700" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
                             <div class="menubar__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold" ><i class="fas fa-bold"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.italic() }" @click="commands.italic" ><i class="fas fa-italic"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.strike() }" @click="commands.strike" ><i class="fas fa-strikethrough"></i></div>
@@ -47,7 +47,7 @@
             >
 
                 <transition name="fade">
-                    <div class="absolute top-0 w-full z-10"
+                    <div class="absolute top-0 w-full z-10 text-gray-700"
                         v-show="linkMenuIsActive"
                         style="background-color: rgba(255,255,255,0.5);"
                     >
@@ -220,6 +220,7 @@
                 if (this.linkMenuIsActive) {
                     this.hideLinkMenu();
                 } else {
+                    this.$eventer.$emit('refresh-page-tree');
                     this.linkUrl = attrs.href
                     this.linkMenuIsActive = true
                     this.$nextTick(() => {

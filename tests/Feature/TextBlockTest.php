@@ -31,6 +31,7 @@ class TextBlockTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->json('POST', route('content-elements.store'), [])
@@ -55,8 +56,7 @@ class TextBlockTest extends TestCase
                 'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
-                //'content.header',
-                //'content.body',
+                'pivot.expandable',
              ]);
 
         $this->withoutExceptionHandling();
@@ -67,11 +67,19 @@ class TextBlockTest extends TestCase
                 'page_id' => $page->id,
                 'sort_order' => 1,
                 'unlisted' => 0,
+                'expandable' => 0,
              ]);
 
+        $page->refresh();
         $text_block = TextBlock::all()->last();
         $this->assertEquals(Arr::get($input, 'content.header'), $text_block->header);
         $this->assertEquals(Arr::get($input, 'content.body'), $text_block->body);
+        $this->assertEquals(Arr::get($input, 'content.style'), $text_block->style);
+        $this->assertTrue($page->content_elements->contains('uuid', $text_block->contentElement->uuid));
+        $pivot = $page->contentElements()->where('content_element_id', $text_block->contentElement->id)->first()->pivot;
+        $this->assertEquals(1, $pivot->sort_order);
+        $this->assertEquals(0, $pivot->unlisted);
+        $this->assertEquals(0, $pivot->expandable);
     }
 
     /** @test **/
@@ -104,6 +112,7 @@ class TextBlockTest extends TestCase
                 'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
+                'pivot.expandable',
                 //'content.header',
                 //'content.body',
              ]);
@@ -112,16 +121,19 @@ class TextBlockTest extends TestCase
         $text_block_input = factory(TextBlock::class)->raw();
         $input['content']['header'] = Arr::get($text_block_input, 'header');
         $input['content']['body'] = Arr::get($text_block_input, 'body');
+        $input['content']['style'] = Arr::get($text_block_input, 'style');
         $page = factory(Page::class)->create();
         $input['pivot'] = [
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $content = (new TextBlock);
         $content->header = Arr::get($input, 'content.header');
         $content->body = Arr::get($input, 'content.body');
+        $content->style = Arr::get($input, 'content.style');
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
              ->assertSuccessful()
@@ -129,12 +141,14 @@ class TextBlockTest extends TestCase
                 'success' => 'Text Block Saved',
                 'header' => $content->header,
                 'body' => $content->body,
+                'style' => $content->style,
              ]);
 
         $content_element->refresh();
         $text_block->refresh();
         $this->assertEquals($content->header, $text_block->header);
         $this->assertEquals($content->body, $text_block->body);
+        $this->assertEquals($content->style, $text_block->style);
     }
 
     /** @test **/
@@ -158,6 +172,7 @@ class TextBlockTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->signInAdmin();
@@ -184,7 +199,7 @@ class TextBlockTest extends TestCase
     }
 
     /** @test **/
-    public function a_text_block_content_element_can_be_created_after_another_text_block()
+    public function a_text_block_content_element_can_be_after_another_text_block()
     {
         $input = factory(ContentElement::class)->states('text-block')->raw();
         $input['type'] = 'text-block';
@@ -194,6 +209,7 @@ class TextBlockTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->signInAdmin();
@@ -206,12 +222,14 @@ class TextBlockTest extends TestCase
                 'page_id' => $page->id,
                 'sort_order' => 1,
                 'unlisted' => 0,
+                'expandable' => 0,
              ]);
 
         $input['pivot'] = [
             'page_id' => $page->id,
             'sort_order' => 2,
             'unlisted' => true,
+            'expandable' => true,
         ];
 
         $this->withoutExceptionHandling();
@@ -222,6 +240,7 @@ class TextBlockTest extends TestCase
                 'page_id' => $page->id,
                 'sort_order' => 2,
                 'unlisted' => 1,
+                'expandable' => 1,
              ]);
 
     }

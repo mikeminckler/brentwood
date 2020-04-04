@@ -53,11 +53,13 @@ class ContentElement extends Model
             $content_element->pages()->attach($page->id, [
                 'sort_order' => Arr::get($input, 'pivot.sort_order'),
                 'unlisted' => Arr::get($input, 'pivot.unlisted'),
+                'expandable' => Arr::get($input, 'pivot.expandable'),
             ]);
         } else {
             $content_element->pages()->updateExistingPivot($page->id, [
                 'sort_order' => Arr::get($input, 'pivot.sort_order'),
                 'unlisted' => Arr::get($input, 'pivot.unlisted'),
+                'expandable' => Arr::get($input, 'pivot.expandable'),
             ]);
         }
 
@@ -69,7 +71,7 @@ class ContentElement extends Model
 
     public function pages() 
     {
-        return $this->belongsToMany(Page::class)->withPivot('sort_order', 'unlisted');
+        return $this->belongsToMany(Page::class)->withPivot('sort_order', 'unlisted', 'expandable');
     }
 
     public function content() 

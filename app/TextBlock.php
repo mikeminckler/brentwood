@@ -28,6 +28,7 @@ class TextBlock extends Model
 
         $text_block->header = Arr::get($input, 'header');
         $text_block->body = Arr::get($input, 'body');
+        $text_block->style = Arr::get($input, 'style');
         $text_block->save();
 
         $text_block->saveSinglePhoto($input);
@@ -38,17 +39,17 @@ class TextBlock extends Model
 
     public function getBodyAttribute($value) 
     {
-        if (!session()->has('editing')) {
+        if (!session()->has('editing') || request('preview')) {
 
             $replace = [];
 
-            preg_match_all('/\<a.*(href="(\d+))(#c-([^"]+))?.*\>(.*)\<\/a>/', $value, $match);
+            preg_match_all('/\<a.*?(href="(\d+)(#c-([^"]+))?").*?\>([^\<]+)\<\/a>/', $value, $match);
 
             $find = collect($match[1])->map(function($string) {
                 return '/'.str_replace('/', '\/', $string).'/';
             })->all();
 
-            foreach ($match[2] as $page_id) {
+            foreach ($match[2] as $index => $page_id) {
                 $page = Page::find($page_id);
                 if ($page instanceof Page) {
                     if ($page->full_slug !== '/') {
@@ -57,7 +58,19 @@ class TextBlock extends Model
                         $full_slug = '/';
                     }
 
-                    $replace[] = 'href="'.$full_slug;
+                    $new_link = '';
+                    if ($match[4][$index]) {
+                        $new_link .= '@click="$eventer.$emit(\'toggle-expander\', \''.$match[4][$index].'\')" ';
+                    }
+                    $new_link .= 'href="'.$full_slug;
+                    if (request('preview')) {
+                        $new_link .= '?preview=true';
+                    }
+                    if ($match[4][$index]) {
+                        $new_link .= '#c-'.$match[4][$index];
+                    }
+                    $new_link.= '"';
+                    $replace[] = $new_link;
                 }
             }
 

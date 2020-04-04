@@ -41,7 +41,7 @@
 
             <div v-if="content.show_text" key="text" 
                 class="relative" 
-                :class="['col-span-' + content.text_span, textPosition.row, textPosition.column, content.text_style ? 'photo-block-text-' + content.text_style : '']"
+                :class="['col-span-' + content.text_span, textPosition.row, textPosition.column, content.text_style ? 'text-style-' + content.text_style : '']"
             >
 
                 <div class="text-block flex flex-col justify-center h-full">

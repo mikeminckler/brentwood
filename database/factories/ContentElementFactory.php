@@ -18,20 +18,15 @@ $factory->define(ContentElement::class, function (Faker $faker) {
     return [
         'uuid' => Str::uuid(),
         'version_id' => factory(Version::class)->create()->id,
-        //'page_id' => factory(Page::class)->create()->id,
-        //'sort_order' => $faker->randomNumber(1),
-        //'unlisted' => false,
     ];
 });
 
 $factory->afterCreating(ContentElement::class, function($content_element, $faker) {
     $page = factory(Page::class)->create();
-    //$content_element->version_id = $page->getDraftVersion()->id;
-    //$content_element->save();
-    //$content_element->refresh();
     $content_element->pages()->attach($page, [
         'sort_order' => $faker->randomNumber(1),
         'unlisted' => false,
+        'expandable' => false,
     ]);
 });
 
@@ -43,10 +38,22 @@ $factory->state(ContentElement::class, 'unlisted', function ($faker) {
 $factory->afterCreatingState(ContentElement::class, 'unlisted', function($content_element, $faker) {
     $page = $content_element->pages->first();
     $content_element->pages()->updateExistingPivot($page, [
-        'sort_order' => $faker->randomNumber(1),
         'unlisted' => true,
     ]);
 });
+
+$factory->state(ContentElement::class, 'expandable', function ($faker) {
+    return [
+    ];
+});
+
+$factory->afterCreatingState(ContentElement::class, 'expandable', function($content_element, $faker) {
+    $page = $content_element->pages->first();
+    $content_element->pages()->updateExistingPivot($page, [
+        'expandable' => true,
+    ]);
+});
+
 
 $factory->state(ContentElement::class, 'text-block', function ($faker) {
     $text_block = factory(TextBlock::class)->create();

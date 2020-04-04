@@ -2,8 +2,7 @@
 
     <div class="relative w-full overflow-hidden" :class="videoPadding" v-show="videoId" style="transition: padding calc(var(--transition-time) * 5)">
 
-
-        <div class="absolute bottom-0 z-4 w-full h-full" v-if="$store.state.editing">
+        <div class="absolute bottom-0 z-4 w-full h-full" v-if="$store.state.editing && photo">
             <div class="absolute right-0 bottom-0 transform rotate-90 origin-top-right w-32 mb-6" @click.stop>
                 <div class="flex items-center px-2 py-1">
                     <input type="range" v-model="photo.offsetY" min="0" max="100" />
@@ -20,18 +19,16 @@
         <transition name="fade">
             <div class="photo z-3 fill" v-if="photo && !hideBanner">
 
-                <div class="absolute z-3 w-full h-full flex items-center justify-center text-6xl text-primary hover:text-primaryHover cursor-pointer border-b-2 border-transparent hover:border-primary"
+                <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-2 border-transparent hover:border-primary"
                      @click="playVideo()"
                     >
-                    <div class="flex absolute bottom-0 mb-8 w-full items-center justify-center" v-if="title">
-                        <div class="font-oswald h-12 flex items-center leading-none px-4 border-l-2 border-primary text-2xl text-gray-700 bg-white">
+                    <div class="flex absolute bottom-0 w-full items-center justify-end" v-if="title">
+                        <div class="font-oswald flex items-center leading-none px-4 text-xl md:text-2xl text-gray-700 py-2" 
+                          style="background-color: rgba(255,255,255,0.8)">
                             {{ title }}
                         </div>
-                        <div class="p-2 bg-primary">
-                            <img class="h-8" src="/images/icon_white.svg" />
-                        </div>
                     </div>
-                    <div class="relative flex items-center justify-center">
+                    <div class="relative flex items-center justify-center text-6xl text-primary">
                         <div class="absolute bg-white w-8 h-6 z-1"></div>
                         <div class="relative z-2">
                             <i class="fab fa-youtube"></i>
@@ -161,7 +158,7 @@
 
             setPadding: function() {
                 if (this.fullWidth) {
-                    this.videoPadding = 'pb-33p';
+                    this.videoPadding = 'pb-video md:pb-33p';
                 } else {
                     this.videoPadding = 'pb-video';
                 }

@@ -29,6 +29,7 @@ class ContentElementTest extends TestCase
                 'page_id' => $page->id,
                 'sort_order' => 1,
                 'unlisted' => false,
+                'expandable' => false,
             ],
         ];
 
@@ -39,6 +40,7 @@ class ContentElementTest extends TestCase
         $this->assertEquals($page->id, $content_element->pages->first()->id);
         $this->assertEquals(1, $content_element->pages->first()->pivot->sort_order);
         $this->assertEquals(0, $content_element->pages->first()->pivot->unlisted);
+        $this->assertEquals(0, $content_element->pages->first()->pivot->expandable);
         $this->assertNotNull($content_element->content_id);
         $this->assertEquals(Arr::get($text_block, 'header'), $content_element->content->header);
         $this->assertEquals(Arr::get($text_block, 'body'), $content_element->content->body);
@@ -81,7 +83,7 @@ class ContentElementTest extends TestCase
             'version_id' => $page->published_version_id,
         ]);
 
-        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
 
         $content = $content_element->content;
 
@@ -97,6 +99,7 @@ class ContentElementTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $saved_content_element = (new ContentElement)->saveContentElement($content_element->id, $input);
@@ -118,7 +121,7 @@ class ContentElementTest extends TestCase
         ]);
 
         $content_element1->pages()->detach();
-        $content_element1->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
+        $content_element1->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
 
         $this->assertNotNull($content_element1->published_at);
 
@@ -128,7 +131,7 @@ class ContentElementTest extends TestCase
         ]);
 
         $content_element2->pages()->detach();
-        $content_element2->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
+        $content_element2->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
 
         $this->assertInstanceOf(ContentElement::class, $content_element2->getPreviousVersion());
         $this->assertEquals($content_element1->id, $content_element2->getPreviousVersion()->id);

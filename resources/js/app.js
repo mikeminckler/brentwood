@@ -13,30 +13,24 @@ Object.defineProperty(Vue.prototype, "$eventer", { value: new Vue() });
 
 import store from './Store';
 
-import PageEditor from '@/Components/PageEditor.vue'
-import EditingButton from '@/Components/EditingButton.vue'
-import Feedback from '@/Components/Feedback.vue'
-import PageTree from '@/Components/PageTree.vue'
-import Processing from '@/Components/Processing.vue'
-import SavingIndicator from '@/Components/SavingIndicator.vue'
-
-import ContentElementsEditor from '@/Components/ContentElementsEditor.vue'
-Vue.component('content-elements-editor', ContentElementsEditor);
-
 import YoutubePlayer from '@/Components/YoutubePlayer.vue'
 Vue.component('youtube-player', YoutubePlayer);
+
+import Expander from '@/Components/Expander.vue'
+Vue.component('expander', Expander);
 
 const app = new Vue({
     el: "#app",
     store,
-    
+
     components: {
-        'page-editor': PageEditor,
-        'editing-button': EditingButton,
-        'feedback': Feedback,
-        'page-tree': PageTree,
-        'processing': Processing,
-        'saving-indicator': SavingIndicator,
+        'content-elements-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/ContentElementsEditor'),
+        'page-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/PageEditor'),
+        'editing-button': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/EditingButton'),
+        'feedback': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/Feedback'),
+        'page-tree': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/PageTree'),
+        'processing': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/Processing'),
+        'saving-indicator': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/SavingIndicator'),
     },
 
     mounted() {
@@ -49,5 +43,44 @@ const app = new Vue({
         window.onYouTubeIframeAPIReady = function() {
             app.$store.dispatch('setYoutubeReady');
         }
+
+        /**
+        * here we setup a listener to refresh the page tree
+        * you can see the emitter in Components/ContentEditor
+        * you can emit refresh-page-tree from any component and the page tree will listen it
+        */
+        const refreshPageTree = event => {
+            this.loadPageTree();
+        };
+        this.$eventer.$on('refresh-page-tree', refreshPageTree);
+
+        this.$once('hook:destroyed', () => {
+            this.$eventer.$off('refresh-page-tree', refreshPageTree);
+        });
+
+    },
+
+    computed: {
+        editing() {
+            return this.$store.state.editing;
+        }
+    },
+
+    watch: {
+        editing() {
+            if (this.editing) {
+                this.loadPageTree();
+            }
+        }
+    },
+
+    methods: {
+        loadPageTree: _.debounce( function() {
+            this.$http.get('/pages').then( response => {
+                this.$store.dispatch('setPageTree', response.data.home_page);
+            }, error => {
+                this.processErrors(error.response);
+            });
+        }, 100),
     }
 });

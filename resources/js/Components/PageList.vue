@@ -1,6 +1,6 @@
 <template>
 
-    <div class="pl-2 border-l-2 border-gray-300" :class="[page.unlisted ? 'bg-gray-200' : '', !page.published_version_id ? 'text-gray-500 italic' : '']">
+    <div class="pl-2" :class="[page.unlisted ? 'bg-gray-200' : '', !page.published_version_id ? 'text-gray-500 italic' : '', activePage ? 'bg-white text-black' : '']">
         <div class="flex hover:bg-white border-b border-gray-300 items-center">
             <div class="cursor-pointer w-3 mr-2 flex items-center justify-center caret text-lg leading-none" 
                 :class="{ 'rotate90' : expand }"
@@ -11,17 +11,28 @@
             <div class="cursor-pointer flex-1" :class="[page.pages ? ( page.pages.length ? '' : 'pl-3' ) : 'pl-3', page.unlisted ? 'text-gray-500' : '']" @click="selectPage()">{{ page.name }}</div>
             <div class="" v-if="page.unlisted" class="text-gray-400 pl-2"><i class="fas fa-eye-slash"></i></div>
             <div class="text-gray-600 pl-2 text-lg" v-if="showChanges && (!page.published_version_id || page.can_be_published)"><i class="fas fa-pen-square"></i></div>
-            <div class="pl-2" v-if="showContentElements" @click="displayContentElements = !displayContentElements"><i class="fas fa-caret-square-down"></i></div>
+            <div class="text-xl px-2" v-if="showContentElements" @click="displayContentElements = !displayContentElements"><i class="fas fa-caret-square-down"></i></div>
         </div>
 
         <div class="pl-3" v-if="displayContentElements">
-            <div class="flex hover:bg-white border-b border-gray-300 cursor-pointer" 
+            <div class="hover:bg-white border-b border-gray-300 cursor-pointer overflow-hidden relative my-1" 
                  v-for="contentElement in page.preview_content_elements"
-                :key="contentElement.uuid"
+                 :key="contentElement.uuid"
+                 style="max-height: 100px;"
                  @click="$emit('selected', page.id + '#c-' + contentElement.uuid)"
             >
-                <div class="truncate">
-                    <strong>{{ contentElement.type }}</strong>: {{ contentElement.content.header }} {{ contentElement.content.body }}
+                <div class="absolute right-0 top-0 z-4 bg-gray-100 text-sm px-1">{{ contentElement.type }}</div>
+                <div class="relative">
+                    <div class="absolute w-full h-full bg-transparent z-3"></div>
+                    <div class="origin-top-left relative z-2"
+                         style="transform: scale(0.25); max-width: 1152px; width: 100vw; max-height: 400px;"
+                        >
+                        <component :is="contentElement.type" 
+                            :content="contentElement.content"
+                            :uuid="contentElement.uuid"
+                             @click.stop
+                        ></component>
+                    </div>
                 </div>
             </div>
         </div>
@@ -46,12 +57,25 @@
 
         components: {
             'page-list': () => import(/* webpackChunkName: "page-list" */ '@/Components/PageList'),
+
+            'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement'),
+            'text-block': () => import(/* webpackChunkName: "text-block" */ '@/Forms/TextBlock'),
+            'photo-block': () => import(/* webpackChunkName: "photo-block" */ '@/Forms/PhotoBlock'),
+            'quote': () => import(/* webpackChunkName: "quote" */ '@/Forms/Quote'),
+            'youtube-video': () => import(/* webpackChunkName: "youtube-video" */ '@/Forms/YoutubeVideo'),
+            'embed-code': () => import(/* webpackChunkName: "embed-code" */ '@/Forms/EmbedCode'),
         },
 
         data() {
             return {
                 expand: false,
                 displayContentElements: false,
+            }
+        },
+
+        computed: {
+            activePage() {
+                return window.location.pathname === '/' + this.page.full_slug;
             }
         },
 

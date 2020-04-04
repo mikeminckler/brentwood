@@ -38,6 +38,10 @@ module.exports = {
       },
       margin: {
         '33p': '33%',
+      },
+      maxHeight: {
+       '0': '0',
+       '200': '200px',
       }
     },
   },

@@ -131,6 +131,7 @@
                         page_id: this.$store.state.page.id,
                         sort_order: sortOrder,
                         unlisted: 0,
+                        expandable: 0,
                     }
                 };
             },
@@ -223,6 +224,7 @@
                 this.saveNewContentElement(contentElement);
 
             },
+
         },
 
     }

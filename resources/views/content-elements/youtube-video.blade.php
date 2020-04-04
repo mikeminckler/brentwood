@@ -9,9 +9,9 @@
             video-id="{{ $content->video_id }}" 
             uuid="{{ $content->contentElement->uuid }}"
             title="{{ $content->title }}"
-            full-width="{{ $content->full_width }}"
+            :full-width="{{ $content->full_width }}"
             @if ($content->banner)
-                :photo="{{ $content->banner }}" 
+            :photo="{{ $content->banner }}" 
             @endif
         ></youtube-player>
     </div>

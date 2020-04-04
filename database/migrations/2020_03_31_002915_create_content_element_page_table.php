@@ -15,11 +15,11 @@ class CreateContentElementPageTable extends Migration
     {
         Schema::create('content_element_page', function (Blueprint $table) {
             $table->bigIncrements('id');
-
             $table->unsignedBigInteger('content_element_id');
             $table->unsignedBigInteger('page_id');
             $table->integer('sort_order');
             $table->boolean('unlisted');
+            $table->boolean('expandable');
             $table->timestamps();
         });
     }

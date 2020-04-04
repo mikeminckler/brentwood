@@ -57,6 +57,7 @@ class PhotoBlockTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->signInAdmin();
@@ -67,6 +68,7 @@ class PhotoBlockTest extends TestCase
                 'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
+                'pivot.expandable',
                 //'content.photos',
                 //'content.columns',
                 //'content.height',
@@ -130,6 +132,7 @@ class PhotoBlockTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->signInAdmin();
@@ -147,6 +150,7 @@ class PhotoBlockTest extends TestCase
         $this->assertEquals($page->id, $content_element_page->id);
         $this->assertEquals( Arr::get($input, 'pivot.sort_order'), $content_element_page->pivot->sort_order);
         $this->assertEquals( Arr::get($input, 'pivot.unlisted'), $content_element_page->pivot->unlisted);
+        $this->assertEquals( Arr::get($input, 'pivot.expandable'), $content_element_page->pivot->expandable);
 
         $this->assertEquals(Arr::get($input, 'content.columns'), $photo_block->columns);
         $this->assertEquals(Arr::get($input, 'content.height'), $photo_block->height);
@@ -195,6 +199,7 @@ class PhotoBlockTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->signInAdmin();

@@ -41,6 +41,7 @@ class QuoteTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->json('POST', route('content-elements.store'), [])
@@ -63,8 +64,9 @@ class QuoteTest extends TestCase
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.page_id',
-                'pivot.unlisted',
                 'pivot.sort_order',
+                'pivot.unlisted',
+                'pivot.expandable',
                 //'content.author_name',
                 //'content.author_details',
                 //'content.body',
@@ -121,6 +123,7 @@ class QuoteTest extends TestCase
                 'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
+                'pivot.expandable',
                 //'content.author_name',
                 //'content.author_details',
                 //'content.body',
@@ -136,6 +139,7 @@ class QuoteTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)

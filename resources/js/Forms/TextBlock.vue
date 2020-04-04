@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex relative">
+    <div class="flex relative z-2" :class="photo && content.style ? 'text-style-' + content.style : ''">
 
         <div class="flex-1 relative flex flex-col">
 
@@ -34,7 +34,7 @@
 
         </div>
 
-        <div class="flex-2 flex justify-center">
+        <div class="flex-2 flex justify-center" :class="!photo && content.style ? 'text-style-' + content.style : ''">
 
             <div class="text-block">
                 <div class="h2">
@@ -46,6 +46,12 @@
                 ></editor>
 
                 <div v-if="first" class="h-1 w-16 bg-gray-400 my-4"></div>
+
+                <div class="flex">
+                    <div class="w-6 h-6 bg-white cursor-pointer" @click="content.style = ''"></div>
+                    <div class="w-6 h-6 bg-gray-200 cursor-pointer" @click="content.style = 'gray'"></div>
+                    <div class="w-6 h-6 bg-blue-200 cursor-pointer" @click="content.style = 'blue'"></div>
+                </div>
             </div>
 
         </div>

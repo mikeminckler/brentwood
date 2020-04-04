@@ -32,6 +32,7 @@ class YoutubeVideoTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->json('POST', route('content-elements.store'), [])
@@ -56,6 +57,7 @@ class YoutubeVideoTest extends TestCase
                 'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
+                'pivot.expandable',
                 //'content.video_id',
              ]);
 
@@ -103,6 +105,7 @@ class YoutubeVideoTest extends TestCase
                 'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
+                'pivot.expandable',
                 //'content.video_id',
              ]);
 
@@ -115,6 +118,7 @@ class YoutubeVideoTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
@@ -156,6 +160,7 @@ class YoutubeVideoTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->withoutExceptionHandling();
@@ -205,6 +210,7 @@ class YoutubeVideoTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)

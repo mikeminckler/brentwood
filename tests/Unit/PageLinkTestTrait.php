@@ -28,9 +28,9 @@ trait PageLinkTestTrait
         foreach ($this->getLinkFields() as $link_field) {
 
             $body = '<p>'.$this->faker->paragraph.'</p>';
-            $body .= '<p>'.$this->faker->sentence.' <a href="'.$page1->id.'" />'.$page1->name.'</a></p>';
-            $body .= '<p>'.$this->faker->sentence.' <a href="'.$page2->id.'" />'.$page2->name.'</a></p>';
-            $body .= '<p>'.$this->faker->sentence.' <a href="'.$page3->id.'" />'.$page3->name.'</a></p>';
+            $body .= '<p>'.$this->faker->sentence.' <a href="'.$page1->id.'" >'.$page1->name.'</a></p>';
+            $body .= '<p>'.$this->faker->sentence.' <a href="'.$page2->id.'" >'.$page2->name.'</a></p>';
+            $body .= '<p>'.$this->faker->sentence.' <a href="'.$page3->id.'" >'.$page3->name.'</a></p>';
             $body .= '<p>'.$this->faker->paragraph.'</p>';
 
             $content->{$link_field} = $body;
@@ -68,12 +68,18 @@ trait PageLinkTestTrait
         $this->assertInstanceOf(ContentElement::class, $content_element);
         $page = factory(Page::class)->create();
         $this->assertNotNull($page->full_slug);
-        $page->contentElements()->attach($content_element, ['sort_order' => 1, 'unlisted' => false]);
+        $page->contentElements()->attach($content_element, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+
+        $content2 = $this->getModel();
+        $content_element2 = $content2->contentElement;
+        $content_element2->pages()->detach();
+        $page->contentElements()->attach($content_element2, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
 
         foreach ($this->getLinkFields() as $link_field) {
 
             $body = '<p>'.$this->faker->paragraph.'</p>';
             $body .= '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element->uuid.'" target="__blank" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
+            $body .= '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element2->uuid.'" target="__blank" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
             $body .= '<p>'.$this->faker->paragraph.'</p>';
 
             $content->{$link_field} = $body;
@@ -86,11 +92,61 @@ trait PageLinkTestTrait
             $this->assertTrue(Str::contains($content->{$link_field}, 'href="'.$page->id.'#c-'.$content_element->uuid.'"'));
             $this->assertFalse(Str::contains($content->{$link_field}, 'href="/'.$page->full_slug.'#c-'.$content_element->uuid.'"'));
 
+            $this->assertTrue(Str::contains($content->{$link_field}, 'href="'.$page->id.'#c-'.$content_element2->uuid.'"'));
+            $this->assertFalse(Str::contains($content->{$link_field}, 'href="/'.$page->full_slug.'#c-'.$content_element2->uuid.'"'));
+
             session()->pull('editing');
 
             // if not editing, the links should be parsed for the frontend
             $this->assertFalse(Str::contains($content->{$link_field}, 'href="'.$page->id.'#c-'.$content_element->uuid.'"'));
             $this->assertTrue(Str::contains($content->{$link_field}, 'href="/'.$page->full_slug.'#c-'.$content_element->uuid.'"'));
+
+            $this->assertFalse(Str::contains($content->{$link_field}, 'href="'.$page->id.'#c-'.$content_element2->uuid.'"'));
+            $this->assertTrue(Str::contains($content->{$link_field}, 'href="/'.$page->full_slug.'#c-'.$content_element2->uuid.'"'));
+        }
+    }
+
+    /** @test **/
+    public function page_links_have_a_click_event_for_vue_to_expand_any_expanders()
+    {
+        $content = $this->getModel();
+        $content_element1 = $content->contentElement;
+        $this->assertInstanceOf(ContentElement::class, $content_element1);
+        $page = factory(Page::class)->create();
+        $this->assertNotNull($page->full_slug);
+        $page->contentElements()->attach($content_element1, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+
+        $content2 = $this->getModel();
+        $content_element2 = $content2->contentElement;
+        $content_element2->pages()->detach();
+        $page->contentElements()->attach($content_element2, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+
+        $page->refresh();
+
+        $this->assertEquals(2, $page->contentElements->count());
+
+        foreach ($this->getLinkFields() as $link_field) {
+
+            $body = '<p>'.$this->faker->paragraph.'</p>';
+            $body .= '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element1->uuid.'" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
+            $body .= '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element2->uuid.'" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
+            $body .= '<p>'.$this->faker->paragraph.'</p>';
+
+            $content->{$link_field} = $body;
+            $content->save();
+
+            $content->refresh();
+
+            session()->put('editing', true);
+
+            $this->assertFalse(Str::contains($content->{$link_field}, '@click="$eventer.$emit(\'toggle-expander\', \''.$content_element1->uuid.'\')"'));
+            $this->assertFalse(Str::contains($content->{$link_field}, '@click="$eventer.$emit(\'toggle-expander\', \''.$content_element2->uuid.'\')"'));
+
+            session()->pull('editing');
+
+            // if not editing, the links should be parsed for the frontend
+            $this->assertTrue(Str::contains($content->{$link_field}, '@click="$eventer.$emit(\'toggle-expander\', \''.$content_element1->uuid.'\')"'));
+            $this->assertTrue(Str::contains($content->{$link_field}, '@click="$eventer.$emit(\'toggle-expander\', \''.$content_element2->uuid.'\')"'));
         }
     }
 

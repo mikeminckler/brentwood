@@ -10,11 +10,13 @@
             <div class="content-element-icons" @click="$emit('sortDown')"><i class="fas fa-arrow-alt-circle-down"></i></div>
             <div class="content-element-icons" @click="contentElement.pivot.unlisted = 0" v-if="contentElement.pivot.unlisted"><i class="fas fa-eye"></i></div>
             <div class="content-element-icons" @click="contentElement.pivot.unlisted = 1" v-if="!contentElement.pivot.unlisted"><i class="fas fa-eye-slash"></i></div>
+            <div class="content-element-icons text-gray-800" @click="contentElement.pivot.expandable = 0" v-if="contentElement.pivot.expandable"><i class="fas fa-angle-double-down"></i></div>
+            <div class="content-element-icons text-gray-400" @click="contentElement.pivot.expandable = 1" v-if="!contentElement.pivot.expandable"><i class="fas fa-angle-double-down"></i></div>
             <div class="content-element-icons"><i class="fas fa-exchange-alt"></i></div>
             <div class="remove-icon" @click="removeContentElement()"><i class="fas fa-times"></i></div>
         </div>
 
-        <div class="relative flex">
+        <div class="relative flex justify-end">
             <transition name="saving-icon">
                 <div class="flex bg-gray-100 absolute text-green-500 px-2 py-1 z-3" 
                     v-if="$store.state.saving.find( save => save === contentElement.id)" 
@@ -39,15 +41,22 @@
                 <div class="ml-2">Hidden</div>
             </div>
 
+            <div class="flex bg-orange-200 px-2 py-1" v-if="contentElement.pivot.expandable">
+                <div class=""><i class="fas fa-angle-double-down"></i></div>
+                <div class="ml-2">Expandable</div>
+            </div>
+
         </div>
 
-        <div class="" style="min-height: 150px">
-            <component :is="contentElement.type" 
-                :content="contentElement.content"
-                :uuid="contentElement.uuid"
-                :first="first"
-            ></component>
-        </div>
+        <expander :expandable="contentElement.pivot.expandable" :uuid="contentElement.uuid">
+            <div class="" style="min-height: 150px">
+                <component :is="contentElement.type" 
+                    :content="contentElement.content"
+                    :uuid="contentElement.uuid"
+                    :first="first"
+                ></component>
+            </div>
+        </expander>
 
         <add-content-element :sort-order="contentElement.pivot.sort_order"></add-content-element>
 
@@ -58,14 +67,7 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback';
-    import TextBlock from '@/Forms/TextBlock.vue';
-    import PhotoBlock from '@/Forms/PhotoBlock.vue';
-    import Quote from '@/Forms/Quote.vue';
-    import YoutubeVideo from '@/Forms/YoutubeVideo.vue';
-    import EmbedCode from '@/Forms/EmbedCode.vue';
-
     import ContentElements from '@/Mixins/ContentElements';
-    import AddContentElement from '@/Components/AddContentElement.vue';
 
     export default {
 
@@ -74,12 +76,12 @@
         props: ['contentElement', 'first'],
 
         components: {
-            'add-content-element': AddContentElement,
-            'text-block': TextBlock,
-            'photo-block': PhotoBlock,
-            'quote': Quote,
-            'youtube-video': YoutubeVideo,
-            'embed-code': EmbedCode,
+            'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement'),
+            'text-block': () => import(/* webpackChunkName: "text-block" */ '@/Forms/TextBlock'),
+            'photo-block': () => import(/* webpackChunkName: "photo-block" */ '@/Forms/PhotoBlock'),
+            'quote': () => import(/* webpackChunkName: "quote" */ '@/Forms/Quote'),
+            'youtube-video': () => import(/* webpackChunkName: "youtube-video" */ '@/Forms/YoutubeVideo'),
+            'embed-code': () => import(/* webpackChunkName: "embed-code" */ '@/Forms/EmbedCode'),
         },
 
         data() {

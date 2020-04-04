@@ -1,10 +1,11 @@
 <template>
   
     <div class="flex">
-        <div class="cursor-pointer mx-2 relative flex items-center justify-center rounded-full bg-white w-5 h-5 border border-gray-500 shadow-inner" 
+        <div class="cursor-pointer mx-4 relative flex items-center justify-center" 
             @click="toggle($event)" 
             :dusk="'checkbox-' + dusk"
         >
+            <div class="absolute text-xl text-primary-600" :class="iconClass" v-if="!checked" key="unchecked"><i class="far fa-circle"></i></div>
             <div class="absolute text-xl text-primary-600" :class="iconClass" v-if="checked" key="checked"><i class="fas fa-check-circle"></i></div>
         </div>
         <div class="cursor-pointer whitespace-no-wrap" @click.stop="toggle($event)">{{ label }} <slot></slot></div>

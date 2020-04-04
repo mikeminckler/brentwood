@@ -134,6 +134,7 @@ class PageTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,
+            'expandable' => false,
         ];
         $input = [
             'content_elements' => [
@@ -215,14 +216,14 @@ class PageTest extends TestCase
         ]);
 
         $published_content_element->pages()->detach();
-        $published_content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => false]);
+        $published_content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
 
         $unpublished_content_element = factory(ContentElement::class)->states('text-block')->create([
             'version_id' => $page->draft_version_id,
         ]);
 
         $unpublished_content_element->pages()->detach();
-        $unpublished_content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => false]);
+        $unpublished_content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
 
         $page->refresh();
         $this->assertNotNull($page->content_elements);
@@ -261,7 +262,7 @@ class PageTest extends TestCase
         ]);
 
         $content_element->pages()->detach();
-        $content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => true]);
+        $content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
         $content_element->version_id = $page->draft_version_id;
         $content_element->save();
         
@@ -294,13 +295,13 @@ class PageTest extends TestCase
             'version_id' => $page->published_version_id,
         ]);
 
-        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true]);
+        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
 
         $unpublished_content_element = factory(ContentElement::class)->states('text-block')->create([
             'version_id' => $page->draft_version_id,
         ]);
 
-        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false]);
+        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false, 'expandable' => false,]);
 
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->contentElements->contains('id', $unpublished_content_element->id));
@@ -315,6 +316,7 @@ class PageTest extends TestCase
     public function a_page_can_get_its_preview_content_elements()
     {
         $this->signInAdmin();
+        session()->put('editing', true);
         $content_element = factory(ContentElement::class)->states('text-block')->create();
         $this->assertEquals(1, $content_element->pages()->count());
         $page = $content_element->pages->first();
@@ -324,25 +326,29 @@ class PageTest extends TestCase
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->content_elements->contains('id', $content_element->id));
         $this->assertEquals($page->getDraftVersion()->id, $content_element->version_id);
+        $this->assertEquals(0, $page->pivot->unlisted);
 
         $page->publish();
         $page->refresh();
-
         $content_element->refresh();
+
         $this->assertNotNull($content_element->published_at);
+        $this->assertEquals(1, $page->contentElements->count());
+        $this->assertTrue(session()->get('editing'));
+        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->preview_content_elements->contains('id', $content_element->id));
 
         $unlisted_content_element = factory(ContentElement::class)->states('unlisted', 'text-block')->create([
             'version_id' => $page->published_version_id,
         ]);
 
-        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true]);
+        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
 
         $unpublished_content_element = factory(ContentElement::class)->states('text-block')->create([
             'version_id' => $page->draft_version_id,
         ]);
 
-        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false]);
+        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false, 'expandable' => false]);
 
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->contentElements->contains('id', $unpublished_content_element->id));

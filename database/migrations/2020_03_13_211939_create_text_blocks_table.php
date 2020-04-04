@@ -17,6 +17,7 @@ class CreateTextBlocksTable extends Migration
             $table->bigIncrements('id');
             $table->string('header')->nullable();
             $table->mediumText('body');
+            $table->string('style')->nullable();
             $table->timestamps();
         });
     }

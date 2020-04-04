@@ -28,7 +28,7 @@ class ContentElementTest extends TestCase
         ]);
 
         $published_content_element->pages()->detach();
-        $published_content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
+        $published_content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
 
         $content_element = factory(ContentElement::class)->states('text-block')->create([
             'uuid' => $published_content_element->uuid,
@@ -36,7 +36,7 @@ class ContentElementTest extends TestCase
         ]);
 
         $content_element->pages()->detach();
-        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
 
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]))
             ->assertStatus(401);
@@ -102,7 +102,7 @@ class ContentElementTest extends TestCase
         ]);
 
         $content_element->pages()->detach();
-        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false]);
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
 
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['remove_all' => true])
             ->assertStatus(401);

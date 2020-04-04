@@ -11,6 +11,7 @@ $factory->define(TextBlock::class, function (Faker $faker) {
     return [
         'header' => $faker->sentence($faker->numberBetween(1,5)),
         'body' => $faker->paragraph,
+        'style' => 'gray',
     ];
 });
 

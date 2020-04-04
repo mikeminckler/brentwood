@@ -254,6 +254,7 @@ class PageTest extends TestCase
             'page_id' => $page->id,
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
+            'expandable' => false,
         ];
 
         $this->signInAdmin();

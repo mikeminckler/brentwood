@@ -49,6 +49,7 @@ class ContentElementValidation extends FormRequest
             'pivot.page_id' => 'required|exists:pages,id',
             'pivot.sort_order' => 'required|integer',
             'pivot.unlisted' => 'required|boolean',
+            'pivot.expandable' => 'required|boolean',
         ]);
             
         $rules = $rules->merge(

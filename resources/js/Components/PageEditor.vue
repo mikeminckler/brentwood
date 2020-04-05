@@ -4,7 +4,7 @@
 
         <div class="w-full max-w-6xl flex items-center bg-gray-200 p-2 shadow">
 
-            <div class="button mx-2" @click="createPage()">
+            <div class="button mx-2" @click="createPage()" v-if="page.id > 1">
                 <div class=""><i class="fas fa-file-medical"></i></div>
             </div>
 
@@ -88,6 +88,15 @@
             if (this.editingEnabled) {
                 this.$store.dispatch('setEditing', this.editingEnabled);
             }
+
+            const savePageEvent = event => {
+                this.savePage();
+            };
+            this.$eventer.$on('save-page', savePageEvent);
+
+            this.$once('hook:destroyed', () => {
+                this.$eventer.$off('save-page', savePageEvent);
+            });
         },
 
         methods: {
@@ -137,6 +146,9 @@
                     unlisted: this.page.unlisted ? true : false,
                     sort_order: this.page.sort_order,
                     content_elements: this.page.content_elements,
+                    footer_fg_file_upload: this.page.footer_fg_file_upload,
+                    footer_bg_file_upload: this.page.footer_bg_file_upload,
+                    footer_color: this.page.footer_color,
                 };
 
                 this.$http.post('/pages/' + this.page.id, input).then( response => {

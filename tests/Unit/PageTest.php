@@ -11,6 +11,10 @@ use App\TextBlock;
 use App\Version;
 use App\Menu;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
+use App\FileUpload;
+use Illuminate\Support\Str;
 
 class PageTest extends TestCase
 {
@@ -373,5 +377,95 @@ class PageTest extends TestCase
         $this->signInAdmin();
         session()->put('editing', true);
         $this->assertTrue($page->preview_content_elements->contains('id', $content_element->id));
+    }
+
+    /** @test **/
+    public function a_page_has_footer_images_and_a_footer_color_that_can_be_inherited() 
+    {
+        Storage::fake();
+        $fg_file_name = Str::random().'.jpg';
+        $fg_file = UploadedFile::fake()->image($fg_file_name);
+        $fg_file_upload = (new FileUpload)->saveFile($fg_file, 'photos', true);
+        $bg_file_name = Str::random().'.jpg';
+        $bg_file = UploadedFile::fake()->image($bg_file_name);
+        $bg_file_upload = (new FileUpload)->saveFile($bg_file, 'photos', true);
+        $footer_color = $this->faker->hexcolor;
+
+        $home_page = Page::find(1);
+        $home_page->footer_fg_file_upload_id = $fg_file_upload->id;
+        $home_page->footer_bg_file_upload_id = $bg_file_upload->id;
+        $home_page->footer_color = $footer_color;
+        $home_page->save();
+
+        $page = factory(Page::class)->create([
+            'parent_page_id' => $home_page->id,
+        ]);
+
+        $this->assertEquals($fg_file_upload->id, $page->footer_fg->id);
+        $this->assertEquals($bg_file_upload->id, $page->footer_bg->id);
+        $this->assertEquals($footer_color, $page->footer_color);
+
+        $fg_file_name2 = Str::random().'.jpg';
+        $fg_file2 = UploadedFile::fake()->image($fg_file_name2);
+        $fg_file_upload2 = (new FileUpload)->saveFile($fg_file2, 'photos', true);
+        $bg_file_name2 = Str::random().'.jpg';
+        $bg_file2 = UploadedFile::fake()->image($bg_file_name2);
+        $bg_file_upload2 = (new FileUpload)->saveFile($bg_file2, 'photos', true);
+        $footer_color2 = $this->faker->hexcolor;
+        
+        $sub_page = factory(Page::class)->create([
+            'parent_page_id' => $page->id,
+        ]);
+
+        $this->assertEquals($fg_file_upload->id, $sub_page->footer_fg->id);
+        $this->assertEquals($bg_file_upload->id, $sub_page->footer_bg->id);
+        $this->assertEquals($footer_color, $sub_page->footer_color);
+
+        $page->footer_fg_file_upload_id = $fg_file_upload2->id;
+        $page->footer_bg_file_upload_id = $bg_file_upload2->id;
+        $page->footer_color = $footer_color2;
+        $page->save();
+        $page->refresh();
+        $sub_page->refresh();
+
+        $this->assertEquals($fg_file_upload2->id, $sub_page->footer_fg->id);
+        $this->assertEquals($bg_file_upload2->id, $sub_page->footer_bg->id);
+        $this->assertEquals($footer_color2, $sub_page->footer_color);
+    }
+
+    /** @test **/
+    public function a_page_can_have_a_footer_fg()
+    {
+        Storage::fake();
+        $fg_file_name = Str::random().'.jpg';
+        $fg_file = UploadedFile::fake()->image($fg_file_name);
+        $fg_file_upload = (new FileUpload)->saveFile($fg_file, 'photos', true);
+
+        $page = factory(Page::class)->create();
+        $page->footer_fg_file_upload_id = $fg_file_upload->id;
+        $page->save();
+
+        $footer_fg_image = $page->footer_fg_image;
+        $this->assertNotNull($footer_fg_image);
+        $this->assertTrue(strpos($footer_fg_image, $fg_file_upload->filename) > 0);
+        Storage::disk('public')->assertExists($footer_fg_image);
+    }
+
+    /** @test **/
+    public function a_page_can_have_a_footer_bg()
+    {
+        Storage::fake();
+        $bg_file_name = Str::random().'.jpg';
+        $bg_file = UploadedFile::fake()->image($bg_file_name);
+        $bg_file_upload = (new FileUpload)->saveFile($bg_file, 'photos', true);
+
+        $page = factory(Page::class)->create();
+        $page->footer_bg_file_upload_id = $bg_file_upload->id;
+        $page->save();
+
+        $footer_bg_image = $page->footer_bg_image;
+        $this->assertNotNull($footer_bg_image);
+        $this->assertTrue(strpos($footer_bg_image, $bg_file_upload->filename) > 0);
+        Storage::disk('public')->assertExists($footer_bg_image);
     }
 }

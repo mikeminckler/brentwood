@@ -200,6 +200,19 @@ button, .button {
     transform: rotate(90deg);
 }
 
+/* MENU */
+
+.sub-menu {
+    max-height: 0px;
+    transition: max-height var(--transition-time) ease-out;
+}
+
+.show-sub-menu {
+    > .sub-menu {
+        max-height: 32px;
+    }
+}
+
 /* CONTENT */
 
 .text-block {

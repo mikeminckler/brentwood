@@ -14,6 +14,10 @@ use App\ContentElement;
 use App\User;
 use App\TextBlock;
 use Tests\Feature\SoftDeletesTestTrait;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
+use App\FileUpload;
+use App\Photo;
 
 class PageTest extends TestCase
 {
@@ -316,5 +320,52 @@ class PageTest extends TestCase
              ->assertJsonFragment([
                 'error' => 'The home page cannot be deleted',
              ]);
+    }
+
+    /** @test **/
+    public function a_page_can_save_a_footer_image()
+    {
+        Storage::fake();
+        $fg_file_name = Str::random().'.jpg';
+        $fg_file = UploadedFile::fake()->image($fg_file_name);
+        $fg_file_upload = (new FileUpload)->saveFile($fg_file, 'photos', true);
+
+        $bg_file_name = Str::random().'.jpg';
+        $bg_file = UploadedFile::fake()->image($bg_file_name);
+        $bg_file_upload = (new FileUpload)->saveFile($bg_file, 'photos', true);
+
+        $page = factory(Page::class)->create();
+        $input = factory(Page::class)->raw();   
+        $input['footer_fg_file_upload'] = $fg_file_upload;
+        $input['footer_bg_file_upload'] = $bg_file_upload;
+        $input['footer_color'] = $this->faker->hexcolor;
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+        $this->postJson(route('pages.update', ['id' => $page->id]), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Page Saved',
+                'full_slug' => $page->refresh()->full_slug,
+            ]);
+
+        $page->refresh();
+
+        $this->assertEquals( Arr::get($input, 'name'), $page->name);
+        $this->assertEquals( Arr::get($input, 'parent_page_id'), $page->parent_page_id);
+        $this->assertEquals( Arr::get($input, 'sort_order'), $page->sort_order);
+        $this->assertEquals( Arr::get($input, 'footer_color'), $page->footer_color);
+        $this->assertEquals( Arr::get($input, 'footer_fg_file_upload.id'), $page->footer_fg_file_upload_id);
+        $this->assertEquals( Arr::get($input, 'footer_bg_file_upload.id'), $page->footer_bg_file_upload_id);
+
+        $fg_photo = $page->footerFgFileUpload;
+        $bg_photo = $page->footerBgFileUpload;
+
+        $this->assertInstanceOf(FileUpload::class, $fg_photo);
+        $this->assertInstanceOf(FileUpload::class, $bg_photo);
+
+        $this->assertEquals($fg_photo->id, $fg_file_upload->id);
+        $this->assertEquals($bg_photo->id, $bg_file_upload->id);
     }
 }

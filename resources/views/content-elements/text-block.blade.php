@@ -13,7 +13,7 @@
 @endif
 
 <div class="w-full md:flex relative z-2 {{ $content->photos->count() && $content->style ? 'text-style-'.$content->style : '' }}">
-    <div class="flex-1 relative {{ $content->photos->count() ? 'w-1/2 pb-50p float-right m-2 mt-8 md:m-0 md:w-auto md:pb-0 md:float-none' : '' }} {{ $content->header ? 'md:-mt-12' : '' }}">
+    <div class="flex-1 relative {{ $content->photos->count() ? 'w-1/2 pb-50p float-right z-3 m-2 mt-8 md:m-0 md:w-auto md:pb-0 md:float-none' : '' }} {{ $content->header ? 'md:-mt-12' : '' }}">
 
         @if ($content->photos->count())
             <div class="absolute w-full h-full">

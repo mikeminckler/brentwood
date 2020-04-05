@@ -1,4 +1,4 @@
-<picture class="photo {{ $photo->fill ? 'fill' : 'fit' }}">
+<picture class="photo {{ $photo->fill ? 'fill' : 'fit' }} cursor-zoom-in" @click="$eventer.$emit('view-photo', '{{ $photo->large }}')">
     <source
         media="(min-width: 900px)"
         srcset="{{ $photo->large }}.webp"
@@ -18,6 +18,7 @@
         style="object-position: {{ $photo->offsetX }}% {{ $photo->offsetY}}%;"
     >
 </picture>
+
 @if ($photo->description)
     <div class="absolute bottom-0 z-3 text-white px-2 py-1" style="text-shadow: 1px 1px 0px #000000">{{ $photo->description }}</div>
 @endif

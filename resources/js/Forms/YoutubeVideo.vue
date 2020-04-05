@@ -24,7 +24,7 @@
                 <input type="text" v-model="videoId" placeholder="YouTube Video ID" />
             </div>
 
-                <checkbox-input v-model="content.full_width" label="Full Width"></checkbox-input> 
+            <checkbox-input v-model="content.full_width" label="Full Width"></checkbox-input> 
 
             <div class="flex items-center px-2" v-if="!photo && videoId">
                 <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">

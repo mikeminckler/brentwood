@@ -9,13 +9,22 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 use App\ContentElement;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class Page extends Model
 {
     use SoftDeletes;
 
-    protected $with = ['pages'];
-    protected $appends = ['full_slug', 'can_be_published', 'content_elements', 'preview_content_elements'];
+    protected $with = ['pages', 'footerFgFileUpload', 'footerBgFileUpload'];
+    protected $appends = [
+        'full_slug', 
+        'can_be_published', 
+        'content_elements', 
+        'preview_content_elements',
+        'footer_fg_image',
+        'footer_bg_image',
+    ];
 
     public function savePage($id = null, $input) 
     {
@@ -45,6 +54,9 @@ class Page extends Model
 
         $page->sort_order = Arr::get($input, 'sort_order');
         $page->unlisted = Arr::get($input, 'unlisted') == true ? true : false;
+        $page->footer_color = Arr::get($input, 'footer_color');
+        $page->footer_fg_file_upload_id = Arr::get($input, 'footer_fg_file_upload.id');
+        $page->footer_bg_file_upload_id = Arr::get($input, 'footer_bg_file_upload.id');
         $page->save();
 
         $page->saveContentElements($input);
@@ -232,5 +244,100 @@ class Page extends Model
         return $this->content_elements->filter(function($content_element) {
                 return $content_element->published_at ? false : true;
             })->count() ? true : false;
+    }
+
+    public function footerFgFileUpload() 
+    {
+        return $this->belongsTo(FileUpload::class, 'footer_fg_file_upload_id');   
+    }
+
+    public function footerBgFileUpload() 
+    {
+        return $this->belongsTo(FileUpload::class, 'footer_bg_file_upload_id');   
+    }
+
+    public function getFooterFgAttribute() 
+    {
+        if ($this->footerFgFileUpload) {
+            return $this->footerFgFileUpload;
+        } else {
+            if ($this->parent_page_id > 0) {
+                return Page::find($this->parent_page_id)->footer_fg;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public function getFooterBgAttribute() 
+    {
+        if ($this->footerBgFileUpload) {
+            return $this->footerBgFileUpload;
+        } else {
+            if ($this->parent_page_id > 0) {
+                return Page::find($this->parent_page_id)->footer_bg;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public function getFooterColorAttribute($value) 
+    {
+        if ($value) {
+            return $value;
+        } else {
+            if ($this->parent_page_id > 0) {
+                return Page::find($this->parent_page_id)->footer_color;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public function getFooterFgImageAttribute()
+    {
+        return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-footer-fg-image', function () {
+
+            if ($this->footer_fg) {
+                if (Storage::disk('public')->exists('/photos/footers/fg-'.$this->footer_fg->name)) {
+                    return '/photos/footers/fg-'.$this->footer_fg->name;
+                } else {
+                    return $this->createImage($this->footer_fg, 'fg');
+                }
+            }
+
+        });
+    }
+
+    public function getFooterBgImageAttribute()
+    {
+        return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-footer-bg-image', function () {
+
+            if ($this->footer_bg) {
+                if (Storage::disk('public')->exists('/photos/footers/bg-'.$this->footer_bg->name)) {
+                    return '/photos/footers/bg-'.$this->footer_bg->name;
+                } else {
+                    return $this->createImage($this->footer_bg, 'bg');
+                }
+            }
+
+        });
+    }
+
+    public function createImage($file_upload, $prefix)
+    {
+        $file = Storage::get($file_upload->storage_filename);
+        $image = Image::make($file)
+            ->resize(1200, 1200, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+            //})->encode('png');
+
+        $file_name = '/photos/footers/'.$prefix.'-'.$file_upload->name;
+        Storage::disk('public')->put($file_name, $image->stream());
+        //cache()->tags([cache_name($this)])->flush();
+        return $file_name;
     }
 }

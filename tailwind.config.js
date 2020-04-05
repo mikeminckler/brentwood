@@ -41,7 +41,9 @@ module.exports = {
       },
       maxHeight: {
        '0': '0',
-       '200': '200px',
+      },
+      cursor: {
+        'zoom-in': 'zoom-in',
       }
     },
   },

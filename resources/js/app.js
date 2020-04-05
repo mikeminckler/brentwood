@@ -25,12 +25,14 @@ const app = new Vue({
 
     components: {
         'content-elements-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/ContentElementsEditor'),
-        'page-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/PageEditor'),
-        'editing-button': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/EditingButton'),
-        'feedback': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/Feedback'),
-        'page-tree': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/PageTree'),
-        'processing': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/Processing'),
-        'saving-indicator': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/SavingIndicator'),
+        'page-editor': () => import(/* webpackChunkName: "page-editor" */ '@/Components/PageEditor'),
+        'footer-editor': () => import(/* webpackChunkName: "footer-editor" */ '@/Components/FooterEditor'),
+        'editing-button': () => import(/* webpackChunkName: "editing-button" */ '@/Components/EditingButton'),
+        'feedback': () => import(/* webpackChunkName: "feedback" */ '@/Components/Feedback'),
+        'page-tree': () => import(/* webpackChunkName: "page-tree" */ '@/Components/PageTree'),
+        'photo-viewer': () => import(/* webpackChunkName: "photo-viewer" */ '@/Components/PhotoViewer'),
+        'processing': () => import(/* webpackChunkName: "processing" */ '@/Components/Processing'),
+        'saving-indicator': () => import(/* webpackChunkName: "saving-indicator" */ '@/Components/SavingIndicator'),
     },
 
     mounted() {

@@ -27,10 +27,12 @@
 
             <div id="header" class="sticky top-0 z-4 {{ session()->get('editing') && !request('preview') ? 'px-12' : '' }}">
 
-                <page-editor 
-                    :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
-                    :current-page='@json($page ?? '')'
-                ></page-editor>
+                @if (session()->get('editing'))
+                    <page-editor 
+                        :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
+                        :current-page='@json($page ?? '')'
+                    ></page-editor>
+                @endif
 
                 <div class="flex justify-center relative bg-gray-100">
                     
@@ -50,38 +52,72 @@
 
                                 <div class="md:hidden absolute right-0 text-white bg-primary px-2 cursor-pointer mt-3 mr-2" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
 
-                                <div class="absolute top-0 mt-12 md:mt-0 right-0 md:right-auto md:relative md:h-auto md:flex shadow z-3 md:pr-4 overflow-hidden"
-                                    :class="$store.state.showMenu ? 'max-h-200 md:max-h-screen' : 'max-h-0 md:max-h-screen'"
+                                <div class="absolute md:relative w-screen md:w-auto top-0 mt-12 md:mt-0 right-0 md:right-auto md:h-auto md:flex shadow z-3 md:pr-4 overflow-hidden"
+                                    :class="$store.state.showMenu ? 'max-h-screen' : 'max-h-0 md:max-h-screen'"
                                     style="transition: max-height var(--transition-time) ease"
                                 >
 
-                                    <div class="flex-1 md:flex relative justify-around">
-                                        @foreach ($menu as $menu_page)
-                                            @if (!$menu_page->unlisted && $menu_page->published_version_id)
-                                                <a href="{{ $menu_page->full_slug }}" 
-                                                    class="font-oswald flex items-center text-base md:text-lg px-4 py-1 md:py-0 relative hover:bg-white
-                                                    {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline bg-white' : 'bg-gray-100' }}"
-                                                >{{ $menu_page->name }}</a>
-                                                @php 
-                                                    if ( Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ) {
-                                                        $sub_menu = $menu_page->pages;
-                                                    }
-                                                @endphp
-                                            @endif
-                                        @endforeach 
+                                    <div class="w-full flex">
+
+                                        <div class="flex-1 md:flex relative justify-around">
+                                            @foreach ($menu as $menu_page)
+                                                @if (!$menu_page->unlisted && $menu_page->published_version_id)
+
+                                                    <div class="font-oswald text-base md:text-lg relative text-primary hover:bg-white md:flex md:items-center
+                                                        {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'bg-white' : 'bg-gray-100' }}"
+                                                        ref="menu{{ $menu_page->id }}"
+                                                    >
+                                                        <div class="flex items-center">
+                                                            <a href="{{ $menu_page->full_slug }}" class="px-4 py-1 md:py-4 flex-1 
+                                                                {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline' : '' }}">{{ $menu_page->name }}</a>
+                                                            @php 
+                                                                if ( Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ) {
+                                                                    $sub_menu = $menu_page->pages;
+                                                                }
+                                                            @endphp
+
+                                                            @if ($menu_page->pages->count())
+                                                                <div class="block md:hidden text-lg cursor-pointer px-2" @click="$refs.menu{{ $menu_page->id }}.classList.toggle('show-sub-menu')">
+                                                                    <div class="icon"><i class="fas fa-caret-down"></i></div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+
+                                                        @if ($menu_page->pages->count())
+                                                            @foreach ($menu_page->pages as $menu_sub_page)
+                                                                <div class="sub-menu font-oswald text-base bg-gray-300 hover:bg-gray-200 md:hidden">
+                                                                    <a href="{{ $menu_sub_page->full_slug }}" class="px-4 py-1 block">{{ $menu_sub_page->name }}</a>
+                                                                </div>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+
+
+                                                @endif
+                                            @endforeach 
+                                        </div>
+
+                                        <div class="flex-1 bg-gray-200 md:bg-transparent flex items-center justify-center md:items-end flex-col">
+
+                                            <div class="text-sm leading-loose md:hidden">
+                                                <a href="tel:2507435521">250.743.5521</a><br/>
+                                                <a href="mailto:info@brentwood.ca">info@brentwood.ca</a>
+                                            </div>
+
+                                            <div class="flex items-center mt-2 md:mt-0">
+                                                <a href="/apply-now" class="button md:ml-4 md:my-4 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
+                                                @auth
+                                                    @if (auth()->user()->hasRole('editor'))
+                                                        <editing-button class="ml-4"></editing-button>
+                                                    @endif
+                                                @endauth
+                                            </div>
+
+
+                                        </div>
+
                                     </div>
                                     
-                                    <div class="flex">
-
-                                        <a href="/apply-now" class="button md:ml-4 md:my-4 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
-
-                                        @auth
-                                            @if (auth()->user()->hasRole('editor'))
-                                                <editing-button class="ml-4"></editing-button>
-                                            @endif
-                                        @endauth
-
-                                    </div>
                                 </div>
 
                                 @if (isset($sub_menu))
@@ -106,7 +142,7 @@
 
             <div class="items-center flex-1 flex flex-col relative" 
                 :class="$store.state.editing ? 'px-12' : ''"
-                style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 75%, rgba(247,218,199,1));"> 
+                style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 75%, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '247,218,199') : '247,218,199' }},1));"> 
 
                 <div class="flex flex-1 flex-col w-full max-w-6xl relative">
 
@@ -121,28 +157,46 @@
             </div>
 
             <div id="footer" class="relative flex justify-center" style="min-height: 500px" :class="$store.state.editing ? 'px-12' : ''">
-                <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba(247,218,199,1), rgba(245,205,175,0));" ></div>
+
+                @if (session()->get('editing') && !request('preview'))
+                    <footer-editor></footer-editor>
+                @endif
+                <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '247,218,199') : '247,218,199' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '247,218,199') : '247,218,199' }},0));" ></div>
                 <div class="absolute w-full h-full overflow-hidden">
-                    <img src="/images/footer_fg.png" class="w-full h-full object-cover z-2 absolute" />
-                    <img src="/images/footer_bg.jpg" class="w-full h-full object-cover" />
+                    <img src="{{ isset($page) ? ( $page->footer_fg_image ? $page->footer_fg_image : '/images/footer_fg.png' ) : '/images/footer_fg.png' }}" class="w-full h-full object-cover z-2 absolute" />
+                    <img src="{{ isset($page) ? ( $page->footer_bg_image ? $page->footer_bg_image : '/images/footer_bg.jpg' ) : '/images/footer_bg.jpg' }}" class="w-full h-full object-cover" />
                 </div>
-                <div class="flex relative py-8 w-full max-w-6xl">
+                <div class="relative w-full max-w-6xl">
 
                     <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-1"></div>
-
-                    <div class="hidden md:flex flex-1 justify-center relative z-2">
-                        <div class="p-8">
-                            <img src="images/logo.svg" class="h-12" />
+                    
+                    <div class="flex items-center pt-8 md:pt-16">
+                        <div class="hidden md:flex flex-1 justify-center relative z-2">
+                            <div class="p-8">
+                                <img src="images/logo.svg" class="h-12" />
+                            </div>
                         </div>
-                    </div>
-            
-                    <div class="flex-2 relative z-2">
-                        <div class="py-8 px-25p">
-                            <a href="tel:2507435521">250.743.5521</a><br/>
-                            <a href="mailto:info@brentwood.ca">info@brentwood.ca</a>
-
-                            <p class="mt-4">2735 Mount Baker Road<br/>Mill Bay, BC<br/>Canada<br/>VOR 2P1</p>
+                
+                        <div class="flex-2 relative z-2">
+                            <div class="flex flex-col md:flex-row items-center justify-center">
+                                <div class="">
+                                    <a href="tel:2507435521">250.743.5521</a><br/>
+                                    <a href="mailto:info@brentwood.ca">info@brentwood.ca</a>
+                                    <div class="mt-4">2735 Mount Baker Road<br/>Mill Bay, BC, Canada VOR 2P1</div>
+                                    <div class="text-xl flex mt-4">
+                                        <a href="https://www.youtube.com/user/brentwoodcollege" target="__blank" class="pr-4"><i class="fab fa-youtube"></i></a>
+                                        <a href="https://www.facebook.com/brentwoodcollegeschool" target="__blank" class="pr-4"><i class="fab fa-facebook"></i></a>
+                                        <a href="https://www.instagram.com/brentwoodboarding" target="__blank" class="pr-4"><i class="fab fa-instagram"></i></a>
+                                        <a href="https://twitter.com/BrentwoodNews" target="__blank" class="pr-4"><i class="fab fa-twitter"></i></a>
+                                        <a href="https://www.linkedin.com/school/brentwood-college-school" target="__blank" class="pr-4"><i class="fab fa-linkedin"></i></a>
+                                    </div>
+                                </div>
+                                <div class="flex py-8 md:px-8">
+                                    <a href="/contact-us" class="button md:ml-4 md:my-4 whitespace-no-wrap text-sm md:text-base">Contact Us</a>
+                                </div>
+                            </div>
                         </div>
+
                     </div>
 
                 </div>
@@ -157,6 +211,8 @@
             {{ isset($error) ? ':error="'.json_encode($error).'"' : '' }} 
             {{ isset($sucess) ? ':success="'.json_encode($sucess).'"' : '' }} 
         ></feedback>
+
+        <photo-viewer></photo-viewer>
 
     </div>
 

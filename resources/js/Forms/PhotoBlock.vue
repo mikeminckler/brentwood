@@ -40,7 +40,7 @@
             </div>
 
             <div v-if="content.show_text" key="text" 
-                class="relative" 
+                class="relative py-4" 
                 :class="['col-span-' + content.text_span, textPosition.row, textPosition.column, content.text_style ? 'text-style-' + content.text_style : '']"
             >
 

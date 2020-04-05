@@ -1,8 +1,7 @@
 <template>
 
     <transition name="fade">
-        <div v-if="src" class="fixed top-0 left-0 w-screen h-screen z-30 p-8"
-            style="background-color: rgba(255,255,255,0.8)"
+        <div v-if="src" class="fixed top-0 left-0 w-screen h-screen z-30 p-8 bg-wash"
             @click="src = null"
         >
 

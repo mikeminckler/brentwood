@@ -55,7 +55,13 @@ h3, .h3 {
 }
 
 p {
-    @apply p-0 m-0 py-2 leading-relaxed;
+    @apply p-0 m-0 py-2;
+}
+
+@media (min-width: 768px) {
+    p {
+        @apply leading-relaxed;
+    }
 }
 
 p:first-child, p:last-child {
@@ -69,6 +75,38 @@ p:empty {
     & p {
         column-count: 2;
     }
+}
+
+table {
+    @apply w-full m-4 bg-wash;
+}
+
+tr {
+    min-height: 32px;
+}
+
+tr:nth-child(even) {
+}
+
+tr:nth-child(odd) {
+}
+
+tr:last-child {
+    > td {
+        @apply border-b-0;
+    }
+}
+
+td {
+    @apply border-b border-r border-gray-400;
+
+    & p {
+        @apply px-2 py-1;
+    }
+}
+
+td:last-child {
+    @apply border-r-0;
 }
 
 iframe {
@@ -239,8 +277,12 @@ button, .button {
     @apply outline-none;
 }
 
+.menubar__button, .menubar_table_button {
+    @apply mx-1 cursor-pointer flex items-center justify-center rounded border shadow-inner bg-gray-200;
+}
+
 .menubar__button {
-    @apply w-6 h-6 mx-1 cursor-pointer flex items-center justify-center rounded border shadow-inner bg-gray-200;
+    @apply w-6 h-6;
 }
 
 .menubar__button:hover {
@@ -279,6 +321,26 @@ button, .button {
     100%   {
         transform: rotate(360deg);
     }
+}
+
+@keyframes slide-down {
+    0% {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+    100%   {
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
+
+.slide-down-enter-active {
+    animation: slide-down var(--transition-time) ease-out;
+}
+
+.slide-down-leave-active {
+    position: absolute;
+    animation: slide-down var(--transition-time) reverse;
 }
 
 @tailwind utilities;

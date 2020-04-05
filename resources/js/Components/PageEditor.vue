@@ -2,7 +2,7 @@
 
     <div class="w-full z-20 flex items-center justify-center bg-gray-100 p-1" v-if="editing">
 
-        <div class="w-full max-w-6xl flex items-center bg-gray-200 p-2 shadow">
+        <div class="w-full max-w-6xl flex items-center bg-gray-200 p-2 shadow relative">
 
             <div class="button mx-2" @click="createPage()" v-if="page.id > 1">
                 <div class=""><i class="fas fa-file-medical"></i></div>
@@ -24,15 +24,26 @@
 
             </div>
 
-            <transition name="saving">
-                <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white px-4 py-1 font-bold cursor-pointer" 
-                    @click="publishPage()"
-                     v-if="hasDraft || page.can_be_published"
-                >
-                    <div class="pr-2"><i class="fas fa-sign-out-alt"></i></div>
-                    <div>Publish</div>
-                </div>
-            </transition>
+            <div class="relative flex overflow-hidden">
+                <transition name="slide-down">
+                    <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white px-4 py-1 font-bold cursor-pointer w-32 justify-center" 
+                        @click="publishPage()"
+                         v-if="(hasDraft || page.can_be_published) && !$store.state.saving.length"
+                    >
+                        <div class="pr-2"><i class="fas fa-sign-out-alt"></i></div>
+                        <div>Publish</div>
+                    </div>
+                </transition>
+
+                <transition name="slide-down">
+                    <div class="flex mx-2 text-green-600 px-4 py-1 w-32 justify-center" 
+                         v-if="$store.state.saving.length"
+                    >
+                        <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                        <div class="ml-2">Saving</div>
+                    </div>
+                </transition>
+            </div>
 
             <div class="flex px-4 mx-2 items-center cursor-pointer hover:bg-primary hover:text-white" @click="removePage()" v-if="page.id !== 1">
                 <div class="pr-2 text-xl"><i class="fas fa-times"></i></div>
@@ -106,7 +117,7 @@
                 let input = {
                     name: 'Untitled Page',
                     parent_page_id: this.page.id,
-                    unlisted: true,
+                    unlisted: false,
                     sort_order: this.page.pages.length + 1,
                     content_elements: [],
                 }
@@ -124,7 +135,7 @@
                 let input = {
                     name: 'Untitled Page',
                     parent_page_id: this.page.parent_page_id,
-                    unlisted: true,
+                    unlisted: false,
                     sort_order: this.page.sort_order + 1,
                     content_elements: [],
                 }
@@ -151,6 +162,8 @@
                     footer_color: this.page.footer_color,
                 };
 
+                this.$store.dispatch('startSaving', 'page');
+
                 this.$http.post('/pages/' + this.page.id, input).then( response => {
                     //this.$eventer.$emit('refresh-page-tree');
                     window.location = response.data.page.full_slug;
@@ -159,7 +172,7 @@
                     this.processErrors(error.response);
                 });
 
-            }, 1000),
+            }, 750),
 
             preview: function() {
                 window.open(this.page.full_slug + '?preview=true', this.page.full_slug);

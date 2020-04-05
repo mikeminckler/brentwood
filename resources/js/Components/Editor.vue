@@ -28,6 +28,20 @@
                             <div class="menubar__button" :class="{ 'is-active': isActive.blockquote() }" @click="commands.blockquote" ><i class="fas fa-quote-right"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.link() }" @click="toggleLinkMenu(getMarkAttrs('link'))" ><i class="fas fa-link"></i></div>
                             <div class="menubar__button" v-if="false" :class="{ 'is-active': isActive.toggleClass({ class: 'float-right' }) }" @click="commands.toggleClass({ class: 'float-right' })" ><i class="fas fa-window-restore"></i></div>
+
+                            <div class="menubar__button" @click="commands.createTable({rowsCount: 3, colsCount: 3, withHeaderRow: false })" >  <i class="fas fa-table"></i> </div>
+
+                        </div>
+
+                        <div v-if="isActive.table()" class="flex">
+                            <div class="menubar_table_button" @click="commands.deleteTable" ><i class="fas fa-table"></i><i class="fas fa-times"></i></div>
+                            <div class="menubar_table_button" @click="commands.addColumnBefore" > <i class="fas fa-plus"></i><i class="fas fa-columns"></i></div>
+                            <div class="menubar_table_button" @click="commands.addColumnAfter" ><i class="fas fa-plus"></i><i class="fas fa-columns"></i></div>
+                            <div class="menubar_table_button" @click="commands.deleteColumn" > <i class="fas fa-columns"></i><i class="fas fa-times"></i></div>
+                            <div class="menubar_table_button" @click="commands.addRowBefore" ><i class="fas fa-plus"></i><div class="transform -rotate-90"><i class="fas fa-columns"></i></div></div>
+                            <div class="menubar_table_button" @click="commands.addRowAfter" ><div class="transform -rotate-90"><i class="fas fa-columns"></i></div><i class="fas fa-plus"></i></div>
+                            <div class="menubar_table_button" @click="commands.deleteRow" > <div class="transform -rotate-90"><i class="fas fa-columns"></i></div><i class="fas fa-times"></i></div>
+                            <div class="menubar_table_button" @click="commands.toggleCellMerge" ><i class="fas fa-compress-alt"></i></div>
                         </div>
 
                     </div>
@@ -109,6 +123,10 @@
           Strike,
           Underline,
           History,
+          Table,
+          TableHeader,
+          TableCell,
+          TableRow,
     } from 'tiptap-extensions'
 
     import CustomLink from '@/Components/CustomLink';
@@ -149,6 +167,12 @@
                         new History(),
                         new CustomLink(),
                         new ToggleClass(),
+                        new Table({
+							resizable: false,
+						}),
+						new TableHeader(),
+						new TableCell(),
+						new TableRow(),
                     ],
                     onUpdate: _.debounce( ({ getJSON, getHTML }) => {
                         //this.json = getJSON()

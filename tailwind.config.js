@@ -10,7 +10,8 @@ module.exports = {
       colors: {
         'primary': '#c8272c',
         'primaryHover': '#cf2328',
-        'translucent': 'rgba(55,55,55,0.5)'
+        'translucent': 'rgba(55,55,55,0.5)',
+        'wash': 'rgba(255,255,255,0.75)'
       },
       flex: {
         '2': '2 2 0%',

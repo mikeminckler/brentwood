@@ -4,10 +4,11 @@
 
         <div class="
                 relative 
+                py-4
                 col-span-{{ $content->text_span }}
                 row-start-{{ ceil($content->text_order / $content->columns) }} 
                 col-start-{{ $content->text_order % $content->columns === 0 ? $content->columns : $content->text_order % $content->columns }}
-                {{ $content->text_style ? 'photo-block-text-'.$content->text_style : '' }}
+                {{ $content->text_style ? 'text-style-'.$content->text_style : '' }}
             " 
             key="text"
         >

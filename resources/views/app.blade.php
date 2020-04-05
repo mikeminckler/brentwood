@@ -92,7 +92,6 @@
                                                         @endif
                                                     </div>
 
-
                                                 @endif
                                             @endforeach 
                                         </div>
@@ -105,6 +104,9 @@
                                             </div>
 
                                             <div class="flex items-center mt-2 md:mt-0">
+                                        
+                                                <a href="/search" class="text-xl text-gray-500 cursor-pointer"><i class="fas fa-search"></i></a>
+
                                                 <a href="/apply-now" class="button md:ml-4 md:my-4 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
                                                 @auth
                                                     @if (auth()->user()->hasRole('editor'))
@@ -148,7 +150,7 @@
 
                     <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-2"></div>
 
-                    <div id="content" class="flex-1 flex flex-col relative {{ isset($sub_menu) ? 'mt-0' : '' }}">
+                    <div id="content" class="flex-1 flex flex-col relative mt-4">
                         @yield ('content')
                     </div>
 
@@ -156,7 +158,7 @@
 
             </div>
 
-            <div id="footer" class="relative flex justify-center" style="min-height: 500px" :class="$store.state.editing ? 'px-12' : ''">
+            <div id="footer" class="relative flex justify-center" style="min-height: 600px" :class="$store.state.editing ? 'px-12' : ''">
 
                 @if (session()->get('editing') && !request('preview'))
                     <footer-editor></footer-editor>
@@ -164,7 +166,7 @@
                 <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '247,218,199') : '247,218,199' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '247,218,199') : '247,218,199' }},0));" ></div>
                 <div class="absolute w-full h-full overflow-hidden">
                     <img src="{{ isset($page) ? ( $page->footer_fg_image ? $page->footer_fg_image : '/images/footer_fg.png' ) : '/images/footer_fg.png' }}" class="w-full h-full object-cover z-2 absolute" />
-                    <img src="{{ isset($page) ? ( $page->footer_bg_image ? $page->footer_bg_image : '/images/footer_bg.jpg' ) : '/images/footer_bg.jpg' }}" class="w-full h-full object-cover" />
+                    <img src="{{ isset($page) ? ( $page->footer_bg_image ? $page->footer_bg_image : '/images/footer_bg.png' ) : '/images/footer_bg.png' }}" class="w-full h-full object-cover" />
                 </div>
                 <div class="relative w-full max-w-6xl">
 

@@ -1,7 +1,7 @@
 <template>
 
     <div class="relative">
-        <div class="text-lg hover:text-gray-800 absolute top-0 right-0 -mt-2 -mr-2 z-5 bg-gray-100 shadow rounded-full p-1 cursor-pointer flex items-center justify-center" 
+        <div class="text-lg hover:text-gray-800 absolute top-0 right-0 -mt-4 z-5 bg-gray-100 shadow rounded-full p-1 cursor-pointer flex items-center justify-center" 
             @click="expanded = false"
              v-if="expanded && !$store.state.editing"
         ><i class="fas fa-times-circle"></i></div>

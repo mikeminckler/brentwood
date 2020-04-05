@@ -329,7 +329,7 @@ class Page extends Model
     {
         $file = Storage::get($file_upload->storage_filename);
         $image = Image::make($file)
-            ->resize(1200, 1200, function ($constraint) {
+            ->resize(2000, 2000, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
             });

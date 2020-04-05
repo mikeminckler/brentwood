@@ -3,40 +3,40 @@
     <div class="relative w-full overflow-hidden" :class="videoPadding" v-show="videoId" style="transition: padding calc(var(--transition-time) * 5)">
 
         <div class="absolute bottom-0 z-4 w-full h-full" v-if="$store.state.editing && photo">
-            <div class="absolute right-0 bottom-0 transform rotate-90 origin-top-right w-32 mb-6" @click.stop>
+            <div class="absolute right-0 bottom-0 transform rotate-90 origin-top-right w-32 mb-16" @click.stop>
                 <div class="flex items-center px-2 py-1">
                     <input type="range" v-model="photo.offsetY" min="0" max="100" />
                 </div>
             </div>
 
-            <div class="absolute right-0 bottom-0 w-32 mb-6" @click.stop>
+            <div class="absolute right-0 bottom-0 w-32 mb-16" @click.stop>
                 <div class="flex items-center px-2 py-1">
                     <input type="range" v-model="photo.offsetX" min="0" max="100" />
                 </div>
             </div>
+
         </div>
 
         <transition name="fade">
             <div class="photo z-3 fill" v-if="photo && !hideBanner">
 
-                <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-2 border-transparent hover:border-primary"
+                <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-4 border-wash"
                      @click="playVideo()"
                     >
-                    <div class="flex absolute bottom-0 w-full items-center justify-end" v-if="title">
-                        <div class="font-oswald flex items-center leading-none px-4 text-xl md:text-2xl text-gray-700 py-2" 
-                          style="background-color: rgba(255,255,255,0.8)">
+                    <div class="flex absolute bottom-0 w-full items-center leading-none justify-end font-oswald text-xl md:text-2xl text-gray-700">
+                        <div class="flex items-center px-4 py-2 bg-wash" 
+                            v-if="title && !$store.state.editing"
+                          >
                             {{ title }}
                         </div>
                     </div>
                     <div class="relative flex items-center justify-center text-6xl text-primary">
-                        <div class="absolute bg-white w-8 h-6 z-1"></div>
-                        <div class="relative z-2">
+                        <div class="absolute bg-white w-8 h-6 z-2"></div>
+                        <div class="relative z-3">
                             <i class="fab fa-youtube"></i>
                         </div>
                     </div>
 
-
-                    <div v-if="remove" class="absolute remove-icon right-0 bottom-0" @click.stop="$emit('remove')"><i class="fas fa-times"></i></div>
                 </div>
                 <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'">
             </div>
@@ -50,7 +50,7 @@
 <script>
     export default {
 
-        props: ['videoId', 'uuid', 'photo', 'remove', 'title', 'fullWidth'],
+        props: ['videoId', 'uuid', 'photo', 'title', 'fullWidth'],
         data() {
             return {
                 player: {},

@@ -1,22 +1,18 @@
 <template>
 
-    <div class="flex relative z-2" :class="photo && content.style ? 'text-style-' + content.style : ''">
+    <div class="flex relative" :class="photo && content.style ? 'text-style-' + content.style : ''">
 
         <div class="flex-1 relative flex flex-col">
 
-            <div class="absolute w-full h-full">
-                <photo-controls :photo="photo" 
-                    :fill="1" 
-                    :content="content"
-                    :photos="photos"
-                    @remove="removePhoto(photo, 0)"
-                ></photo-controls>
+            <div class="flex z-3 w-full items-center justify-center flex flex-col items-center justify-center h-full">
 
-                <div class="photo" :class="photo.fill ? 'fill' : 'fit'" v-if="photo">
-                    <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'">
+                <stat v-if="showStat || content.stat_number || content.stat_name" :model="content" :photo="photo"></stat>
+
+                <div class="button mb-2" @click="showStat = true" v-if="!showStat && !content.stat_number && !content.stat_name">
+                    <div class="">Add Statistic</div>
                 </div>
 
-                <div class="flex-1 flex flex-col items-center justify-center w-full py-16" v-if="!photo">
+                <div class="" v-if="!photo">
                     <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
                         <div class="">Upload A Photo</div>
                     </div>
@@ -28,17 +24,32 @@
                         :items="photos"
                         type="image"
                     ></file-uploads>
-
                 </div>
+
+            </div>
+
+            <div class="absolute w-full h-full">
+                <photo-controls :photo="photo" 
+                    :fill="1" 
+                    :content="content"
+                    :photos="photos"
+                    @remove="removePhoto(photo, 0)"
+                     class="z-4"
+                ></photo-controls>
+
+                <div class="photo z-2" :class="photo.fill ? 'fill' : 'fit'" v-if="photo">
+                    <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'">
+                </div>
+
             </div>
 
         </div>
 
-        <div class="flex-2 flex justify-center" :class="!photo && content.style ? 'text-style-' + content.style : ''">
+        <div class="flex-2 flex justify-center relative" :class="!photo && content.style ? 'text-style-' + content.style : ''">
 
             <div class="text-block">
-                <div class="h2">
-                    <input type="text" v-model="content.header" placeholder="Header" />
+                <div class="">
+                    <input :class="first ? 'h1' : 'h2'" type="text" v-model="content.header" placeholder="Header" />
                 </div>
 
                 <editor v-model="content.body" 
@@ -67,6 +78,7 @@
     import Photos from '@/Mixins/Photos';
     import Feedback from '@/Mixins/Feedback';
     import PhotoControls from '@/Components/PhotoControls';
+    import Stat from '@/Components/Stat.vue';
 
     export default {
 
@@ -77,11 +89,13 @@
             'editor': Editor,
             'file-uploads': FileUploads,
             'photo-controls': PhotoControls,
+            'stat': Stat,
         },
 
         data() {
             return {
                 multiplePhotos: false,
+                showStat: false,
             }
         },
 

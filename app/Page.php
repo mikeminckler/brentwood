@@ -24,6 +24,7 @@ class Page extends Model
         'preview_content_elements',
         'footer_fg_image',
         'footer_bg_image',
+        'sub_menu',
     ];
 
     public function savePage($id = null, $input) 
@@ -339,5 +340,19 @@ class Page extends Model
         Storage::disk('public')->put($file_name, $image->stream());
         //cache()->tags([cache_name($this)])->flush();
         return $file_name;
+    }
+
+    public function getSubMenuAttribute() 
+    {
+        if ($this->id !== 1) {
+            if ($this->parent_page_id) {
+                return $this->pages;
+            } else {
+                $parent_page = Page::find($this->parent_page_id);
+                if ($parent_page) {
+                    return $parent_page->sub_menu;
+                }
+            }
+        }
     }
 }

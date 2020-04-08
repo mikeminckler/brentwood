@@ -25,7 +25,7 @@ class TextBlockTest extends TestCase
     {
         $input = factory(ContentElement::class)->states('text-block')->raw();
         $input['type'] = 'text-block';
-        $input['content'] = factory(TextBlock::class)->raw();
+        $input['content'] = factory(TextBlock::class)->states('stat')->raw();
         $page = factory(Page::class)->create();
         $input['pivot'] = [
             'page_id' => $page->id,
@@ -75,6 +75,8 @@ class TextBlockTest extends TestCase
         $this->assertEquals(Arr::get($input, 'content.header'), $text_block->header);
         $this->assertEquals(Arr::get($input, 'content.body'), $text_block->body);
         $this->assertEquals(Arr::get($input, 'content.style'), $text_block->style);
+        $this->assertEquals(Arr::get($input, 'content.stat_number'), $text_block->stat_number);
+        $this->assertEquals(Arr::get($input, 'content.stat_name'), $text_block->stat_name);
         $this->assertTrue($page->content_elements->contains('uuid', $text_block->contentElement->uuid));
         $pivot = $page->contentElements()->where('content_element_id', $text_block->contentElement->id)->first()->pivot;
         $this->assertEquals(1, $pivot->sort_order);

@@ -18,7 +18,7 @@
         </transition-group>
 
         <add-content-element 
-            v-if="!contentElements.length"
+            v-if="!contentElements.length && $store.state.page.name !== 'Untitled Page'"
             :expanded="true" 
             :sort-order="contentElements.length"
         ></add-content-element>

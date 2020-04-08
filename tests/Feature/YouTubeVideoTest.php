@@ -26,7 +26,7 @@ class YoutubeVideoTest extends TestCase
 
         $input = factory(ContentElement::class)->states('youtube-video')->raw();
         $input['type'] = 'youtube-video';
-        $input['content'] = factory(YoutubeVideo::class)->raw();
+        $input['content'] = factory(YoutubeVideo::class)->states('text')->raw();
         $page = factory(Page::class)->create();
         $input['pivot'] = [
             'page_id' => $page->id,
@@ -72,6 +72,8 @@ class YoutubeVideoTest extends TestCase
         $this->assertEquals(Arr::get($input, 'content.video_id'), $youtube_video->video_id);
         $this->assertEquals(Arr::get($input, 'content.title'), $youtube_video->title);
         $this->assertEquals(Arr::get($input, 'content.full_width'), $youtube_video->full_width);
+        $this->assertEquals(Arr::get($input, 'content.header'), $youtube_video->header);
+        $this->assertEquals(Arr::get($input, 'content.body'), $youtube_video->body);
 
     }
 

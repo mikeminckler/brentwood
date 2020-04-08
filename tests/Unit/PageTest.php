@@ -468,4 +468,19 @@ class PageTest extends TestCase
         $this->assertTrue(strpos($footer_bg_image, $bg_file_upload->filename) > 0);
         Storage::disk('public')->assertExists($footer_bg_image);
     }
+
+    /** @test **/
+    public function a_page_has_a_sub_menu()
+    {
+        $page = factory(Page::class)->create();
+        $sub_page = factory(Page::class)->create([
+            'parent_page_id' => $page->id,
+        ]);
+
+        $this->assertInstanceOf(Collection::class, $page->sub_menu);
+        $this->assertInstanceOf(Collection::class, $sub_page->sub_menu);
+
+        $this->assertTrue($page->sub_menu->contains('name', $sub_page->name));
+        $this->assertTrue($sub_page->sub_menu->contains('name', $sub_page->name));
+    }
 }

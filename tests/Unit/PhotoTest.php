@@ -33,7 +33,7 @@ class PhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $input = factory(Photo::class)->raw();
+        $input = factory(Photo::class)->states('stat')->raw();
         $input['file_upload'] = $file_upload;
 
         $photo_block = factory(PhotoBlock::class)->create();
@@ -50,6 +50,8 @@ class PhotoTest extends TestCase
         $this->assertEquals(Arr::get($input, 'offsetX'), $photo->offsetX);
         $this->assertEquals(Arr::get($input, 'offsetY'), $photo->offsetY);
         $this->assertEquals(Arr::get($input, 'fill'), $photo->fill);
+        $this->assertEquals(Arr::get($input, 'stat_number'), $photo->stat_number);
+        $this->assertEquals(Arr::get($input, 'stat_name'), $photo->stat_name);
 
     }
 

@@ -45,4 +45,5 @@ class TextBlockTest extends TestCase
         $text_block = factory(TextBlock::class)->create();
         $this->assertInstanceOf(ContentElement::class, $text_block->contentElement);
     }
+
 }

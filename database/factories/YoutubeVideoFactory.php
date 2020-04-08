@@ -21,3 +21,9 @@ $factory->afterCreating(YoutubeVideo::class, function ($youtube_video, $faker) {
     ]);
 });
 
+$factory->state(YoutubeVideo::class, 'text', function ($faker) {
+    return [
+        'header' => $faker->sentence,
+        'body' => $faker->paragraph,
+    ];
+});

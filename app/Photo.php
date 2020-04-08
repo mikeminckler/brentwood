@@ -81,6 +81,8 @@ class Photo extends Model
         $photo->offsetX = Arr::get($input, 'offsetX');
         $photo->offsetY = Arr::get($input, 'offsetY');
         $photo->fill = Arr::get($input, 'fill');
+        $photo->stat_number = Arr::get($input, 'stat_number');
+        $photo->stat_name = Arr::get($input, 'stat_name');
 
         $photo->save();
 

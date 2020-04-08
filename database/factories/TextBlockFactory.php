@@ -21,3 +21,10 @@ $factory->afterCreating(TextBlock::class, function ($text_block, $faker) {
         'content_type' => get_class($text_block),
     ]);
 });
+
+$factory->state(TextBlock::class, 'stat', function ($faker) {
+    return [
+        'stat_number' => $faker->randomNumber(2),
+        'stat_name' => $faker->word,
+    ];
+});

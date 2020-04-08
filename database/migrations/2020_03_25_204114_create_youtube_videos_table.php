@@ -18,6 +18,8 @@ class CreateYoutubeVideosTable extends Migration
             $table->string('video_id')->nullable();
             $table->string('title')->nullable();
             $table->boolean('full_width');
+            $table->string('header')->nullable();
+            $table->mediumText('body')->nullable();
             $table->timestamps();
         });
     }

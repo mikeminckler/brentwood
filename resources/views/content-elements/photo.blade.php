@@ -19,6 +19,10 @@
     >
 </picture>
 
+@if ($photo->stat_number)
+    @include ('content-elements.stat', ['number' => $photo->stat_number, 'name' => $photo->stat_name, 'photo' => true])
+@endif
+
 @if ($photo->description)
-    <div class="absolute bottom-0 z-3 text-white px-2 py-1" style="text-shadow: 1px 1px 0px #000000">{{ $photo->description }}</div>
+    <div class="absolute bottom-0 z-3 text-white px-2 py-1 text-shadow">{{ $photo->description }}</div>
 @endif

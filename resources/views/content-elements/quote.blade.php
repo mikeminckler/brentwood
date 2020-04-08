@@ -2,14 +2,14 @@
 
     <div class="relative flex-1 bg-gray-200 md:w-1/2">
 
-        <div class="p-4 absolute z-2 font-light text-gray-400 leading-none" style="font-size: 150px">&ldquo;</div>
+        <div class="md:p-4 absolute z-2 font-light text-gray-400 leading-none" style="font-size: 150px">&ldquo;</div>
         
-        <div class="px-16 py-8 text-gray-800">
+        <div class="px-8 pt-2 pb-4 md:px-16 md:py-8 text-gray-700">
             <div class="relative z-3 italic leading-relaxed my-4">{!! $content->body !!}</div>
 
             <div class="h-1 w-16 bg-primary mb-4"></div>
 
-            <div class="flex flex-col w-full items-end">
+            <div class="flex flex-col w-full md:items-end">
                 <div class="">
                     {{ $content->author_name }}<br/>
                     {{ $content->author_details }}

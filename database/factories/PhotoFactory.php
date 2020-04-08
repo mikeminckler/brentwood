@@ -50,3 +50,10 @@ $factory->state(Photo::class, 'youtube-video', function ($faker) {
         'content_type' => get_class($youtube_video),
     ];
 });
+
+$factory->state(Photo::class, 'stat', function ($faker) {
+    return [
+        'stat_number' => $faker->randomNumber(2),
+        'stat_name' => $faker->sentence,
+    ];
+});

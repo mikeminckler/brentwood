@@ -54,9 +54,6 @@
         methods: {
             expand: function(uuid) {
 
-                console.log(uuid);
-                console.log(this.uuid);
-
                 if (uuid === this.uuid) {
                     this.expanded = true;
                     let content = document.getElementById('c-' + this.uuid);

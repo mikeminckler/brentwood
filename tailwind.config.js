@@ -7,6 +7,10 @@ module.exports = {
         'roboto': ['Roboto'],
         'oswald': ['Oswald'],
       },
+      fontSize: {
+        '7xl': '5rem',
+        '8xl': '6rem',
+      },
       colors: {
         'primary': '#c8272c',
         'primaryHover': '#cf2328',
@@ -15,6 +19,7 @@ module.exports = {
       },
       flex: {
         '2': '2 2 0%',
+        '3': '3 3 0%',
       },
       zIndex: {
         '1': '1',

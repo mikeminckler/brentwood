@@ -29,6 +29,8 @@ class TextBlock extends Model
         $text_block->header = Arr::get($input, 'header');
         $text_block->body = Arr::get($input, 'body');
         $text_block->style = Arr::get($input, 'style');
+        $text_block->stat_number = Arr::get($input, 'stat_number');
+        $text_block->stat_name = Arr::get($input, 'stat_name');
         $text_block->save();
 
         $text_block->saveSinglePhoto($input);
@@ -79,4 +81,5 @@ class TextBlock extends Model
         }
         return $value;
     }
+
 }

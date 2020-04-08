@@ -13,16 +13,16 @@
         "@babel/plugin-syntax-dynamic-import": "^7.8.3",
         "axios": "^0.19",
         "cross-env": "^7.0",
-        "laravel-mix": "^5.0.1",
-        "lodash": "^4.17.13",
-        "resolve-url-loader": "^3.1.0",
-        "sass": "^1.15.2",
-        "sass-loader": "^8.0.0",
-        "tailwindcss": "^1.2.0",
-        "tiptap": "^1.26.6",
-        "tiptap-extensions": "^1.28.6",
+        "laravel-mix": "^5.0",
+        "lodash": "^4.17",
+        "resolve-url-loader": "^3.1",
+        "sass": "^1.26",
+        "sass-loader": "^8.0",
+        "tailwindcss": "^1.2",
+        "tiptap": "^1.26",
+        "tiptap-extensions": "^1.28",
         "vue": "^2.6.11",
         "vue-template-compiler": "^2.6.11",
-        "vuex": "^3.1.2"
+        "vuex": "^3.1"
     }
 }

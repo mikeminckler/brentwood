@@ -5,7 +5,11 @@
 <div class="flex flex-col flex-1">
 
     @if (!session()->get('editing') || (session()->get('editing') && request('preview')))
-        @foreach ($content_elements as $content_element)
+        @foreach ($content_elements as $index => $content_element)
+
+            @if ($index === 0 && $content_element->type === 'text-block')
+                @include ('sub-menu')
+            @endif 
 
             @if ($content_element->pivot->expandable)
                 <expander uuid="{{ $content_element->uuid }}" {{ request('preview') ? ':preview="true"' : '' }}>
@@ -22,6 +26,10 @@
             @if ($content_element->pivot->expandable)
                 </expander>
             @endif
+
+            @if ($index === 0 && $content_element->type !== 'text-block')
+                @include ('sub-menu')
+            @endif 
 
         @endforeach
     @endif

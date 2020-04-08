@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Oswald:300|Roboto:300,400,700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Oswald:300,400|Roboto:300,400,700&display=swap');
 
 @tailwind base;
 
@@ -14,6 +14,10 @@ html {
 
 body {
     @apply text-gray-600 font-roboto bg-gray-100;
+}
+
+.contents {
+    display: contents;
 }
 
 a {
@@ -264,6 +268,48 @@ button, .button {
 .text-style-gray {
     @apply text-white bg-gray-500;
 }
+
+
+.stat-number {
+    @apply font-oswald font-normal text-7xl leading-none;
+
+    > .stat-symbol:first-child {
+        @apply -ml-8;
+    }
+
+    > .stat-symbol:last-child {
+        @apply -mr-8;
+    }
+}
+
+.text-shadow {
+    text-shadow: 1px 1px 0px #000000; 
+}
+
+.drop-shadow {
+    box-shadow: 1px 1px 0px #000000;
+}
+
+.stat-symbol {
+    @apply text-3xl;
+}
+
+.stat-name {
+    @apply font-oswald text-xl;
+}
+
+@media (min-width: 768px) {
+    .stat-number {
+        @apply text-8xl;
+    }
+    .stat-name {
+        @apply text-2xl;
+    }
+    .stat-symbol {
+        @apply text-5xl;
+    }
+}
+
 
 /* EDITOR */
 

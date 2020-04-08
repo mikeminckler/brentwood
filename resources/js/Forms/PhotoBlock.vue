@@ -45,8 +45,8 @@
             >
 
                 <div class="text-block flex flex-col justify-center h-full">
-                    <div class="h2">
-                        <input type="text" v-model="content.header" placeholder="Header" />
+                    <div class="">
+                        <input class="h2" type="text" v-model="content.header" placeholder="Header" />
                     </div>
 
                     <editor v-model="content.body" 
@@ -96,6 +96,7 @@
                     @sortUp="sortUp(photo)"
                     @sortDown="sortDown(photo)"
                     @remove="removePhoto(photo, index)"
+                    :stat="true"
                 ></photo-controls>
 
             </div>
@@ -340,7 +341,7 @@
                 if (this.photos.length === 2) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = 1;
+                    this.content.padding = 0;
                     this.content.show_text = 1;
                     this.content.text_order = 3;
                     this.content.text_span = 1;
@@ -357,7 +358,7 @@
                 if (this.photos.length === 2) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = 1;
+                    this.content.padding = 0;
                     this.content.show_text = 1;
                     this.content.text_order = 1;
                     this.content.text_span = 1;
@@ -374,7 +375,7 @@
                 if (this.photos.length === 2) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = 1;
+                    this.content.padding = 0;
                     this.content.show_text = 1;
                     this.content.text_order = 2;
                     this.content.text_span = 1;
@@ -391,7 +392,7 @@
                 if (this.photos.length === 2) {
                     this.content.columns = 3;
                     this.content.height = 100;
-                    this.content.padding = 1;
+                    this.content.padding = 0;
                     this.content.show_text = 1;
                     this.content.text_order = 2;
                     this.content.text_span = 2;

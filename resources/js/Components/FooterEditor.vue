@@ -1,6 +1,6 @@
 <template>
 
-    <div class="shadow max-w-6xl absolute z-3 bg-gray-100" v-if="page ? ( page.id > 1 ? true : false ) : false">
+    <div class="shadow mt-8 max-w-6xl absolute z-3 bg-gray-100" v-if="page ? ( page.id > 1 ? true : false ) : false">
         
         <transition name="slide-down">
             <div class="absolute flex justify-center items-center w-full h-full bg-wash z-3" v-if="saving">

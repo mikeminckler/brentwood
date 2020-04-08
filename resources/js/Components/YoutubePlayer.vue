@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative w-full overflow-hidden" :class="videoPadding" v-show="videoId" style="transition: padding calc(var(--transition-time) * 5)">
+    <div class="relative w-full overflow-hidden z-4" :class="videoPadding" v-show="videoId" style="transition: padding calc(var(--transition-time) * 5)">
 
         <div class="absolute bottom-0 z-4 w-full h-full" v-if="$store.state.editing && photo">
             <div class="absolute right-0 bottom-0 transform rotate-90 origin-top-right w-32 mb-16" @click.stop>
@@ -21,10 +21,10 @@
             <div class="photo z-3 fill" v-if="photo && !hideBanner">
 
                 <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-4 border-wash"
-                     @click="playVideo()"
+                     @click="$eventer.$emit('play-video', uuid)"
                     >
-                    <div class="flex absolute bottom-0 w-full items-center leading-none justify-end font-oswald text-xl md:text-2xl text-gray-700">
-                        <div class="flex items-center px-4 py-2 bg-wash" 
+                    <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700">
+                        <div class="flex items-center px-4 py-2 bg-wash font-thin mb-4" 
                             v-if="title && !$store.state.editing"
                           >
                             {{ title }}
@@ -42,7 +42,7 @@
             </div>
         </transition>
 
-        <div :id="'player-' + this.uuid"></div>
+        <div :id="'player-' + uuid"></div>
     </div>
 
 </template>
@@ -56,6 +56,19 @@
                 player: {},
                 hideBanner: false,
                 videoPadding: 'pb-video',
+                setPlayerState: _.debounce( function(state) {
+
+                    if (state == YT.PlayerState.PLAYING || state == YT.PlayerState.BUFFERING) {
+                        this.hideBanner = true;
+                        this.videoPadding = 'pb-video';
+                    }
+
+                    if (state == YT.PlayerState.ENDED || state == YT.PlayerState.PAUSED) {
+                        this.hideBanner = false;
+                        this.setPadding();
+                    }
+
+                }, 500),
             }
         },
 
@@ -133,26 +146,30 @@
             },
 
             onPlayerStateChange: function(event) {
-                if (event.data == YT.PlayerState.ENDED) {
-                    this.hideBanner = false;
-                    this.setPadding();
-                }
+                this.setPlayerState(event.data);
             },
 
             playVideo: function(uuid) {
 
-                let start = true;
-                if (uuid) {
                     if (this.uuid !== uuid) {
-                        start = false;
-                    }
-                }
 
-                if (this.canPlay && start) {
-                    this.hideBanner = true;
-                    this.videoPadding = 'pb-video';
-                    this.player.playVideo();
-                }
+                        if (this.$lodash.isFunction(this.player.getPlayerState)) {
+                            if (this.player.getPlayerState() === 1) {
+                                this.player.pauseVideo();
+                            }
+                        }
+
+                    } else {
+
+                        if (this.canPlay) {
+                            //this.hideBanner = true;
+                            //this.videoPadding = 'pb-video';
+                            this.player.playVideo();
+
+                            let content = document.getElementById('c-' + this.uuid);
+                            content.scrollIntoView();
+                        }
+                    }
 
             },
 

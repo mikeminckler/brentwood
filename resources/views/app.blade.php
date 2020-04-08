@@ -25,7 +25,7 @@
 
         <div id="main" class="relative flex-1 flex flex-col">
 
-            <div id="header" class="sticky top-0 z-4 {{ session()->get('editing') && !request('preview') ? 'px-12' : '' }}">
+            <div id="header" class="sticky top-0 z-10 {{ session()->get('editing') && !request('preview') ? 'px-12' : '' }}">
 
                 @if (session()->get('editing'))
                     <page-editor 
@@ -52,30 +52,24 @@
 
                                 <div class="md:hidden absolute right-0 text-white bg-primary px-2 cursor-pointer mt-3 mr-2" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
 
-                                <div class="absolute md:relative w-screen md:w-auto top-0 mt-12 md:mt-0 right-0 md:right-auto md:h-auto md:flex shadow z-3 md:pr-4 overflow-hidden"
+                                <div class="absolute md:relative w-screen md:w-auto top-0 mt-12 md:mt-0 right-0 md:right-auto md:h-auto md:flex shadow z-5 md:pr-4 overflow-hidden"
                                     :class="$store.state.showMenu ? 'max-h-screen' : 'max-h-0 md:max-h-screen'"
                                     style="transition: max-height var(--transition-time) ease"
                                 >
 
-                                    <div class="w-full flex">
+                                    <div class="w-full flex bg-gray-100">
 
                                         <div class="flex-1 md:flex relative justify-around">
                                             @foreach ($menu as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
 
-                                                    <div class="font-oswald text-base md:text-lg relative text-primary hover:bg-white md:flex md:items-center
+                                                    <div class="font-oswald font-light text-base md:text-lg relative text-primary hover:bg-white md:flex md:items-center
                                                         {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'bg-white' : 'bg-gray-100' }}"
                                                         ref="menu{{ $menu_page->id }}"
                                                     >
                                                         <div class="flex items-center">
                                                             <a href="{{ $menu_page->full_slug }}" class="px-4 py-1 md:py-4 flex-1 
                                                                 {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline' : '' }}">{{ $menu_page->name }}</a>
-                                                            @php 
-                                                                if ( Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ) {
-                                                                    $sub_menu = $menu_page->pages;
-                                                                }
-                                                            @endphp
-
                                                             @if ($menu_page->pages->count())
                                                                 <div class="block md:hidden text-lg cursor-pointer px-2" @click="$refs.menu{{ $menu_page->id }}.classList.toggle('show-sub-menu')">
                                                                     <div class="icon"><i class="fas fa-caret-down"></i></div>
@@ -85,11 +79,12 @@
 
                                                         @if ($menu_page->pages->count())
                                                             @foreach ($menu_page->pages as $menu_sub_page)
-                                                                <div class="sub-menu font-oswald text-base bg-gray-300 hover:bg-gray-200 md:hidden">
+                                                                <div class="sub-menu overflow-hidden font-oswald text-base bg-gray-300 hover:bg-gray-200 md:hidden">
                                                                     <a href="{{ $menu_sub_page->full_slug }}" class="px-4 py-1 block">{{ $menu_sub_page->name }}</a>
                                                                 </div>
                                                             @endforeach
                                                         @endif
+
                                                     </div>
 
                                                 @endif
@@ -115,22 +110,11 @@
                                                 @endauth
                                             </div>
 
-
                                         </div>
 
                                     </div>
                                     
                                 </div>
-
-                                @if (isset($sub_menu))
-                                    <div class="hidden md:flex items-center px-8 bg-gray-100 relative text-sm md:text-base">
-                                        @foreach ($sub_menu as $menu_page)
-                                            @if (!$menu_page->unlisted && $menu_page->published_version_id)
-                                                <a href="{{ $menu_page->full_slug }}" class="py-1 font-oswald ml-8 first:ml-0">{{ $menu_page->name }}</a>
-                                            @endif
-                                        @endforeach 
-                                    </div>
-                                @endif
 
                             </nav>
 

@@ -13,6 +13,7 @@ use App\Http\Requests\PhotoValidation;
 use Intervention\Image\Facades\Image;
 use App\FileUpload;
 use App\PhotoBlock;
+use App\PageLink;
 
 class Photo extends Model
 {
@@ -83,6 +84,7 @@ class Photo extends Model
         $photo->fill = Arr::get($input, 'fill');
         $photo->stat_number = Arr::get($input, 'stat_number');
         $photo->stat_name = Arr::get($input, 'stat_name');
+        $photo->link = Arr::get($input, 'link');
 
         $photo->save();
 
@@ -211,5 +213,10 @@ class Photo extends Model
                 Storage::disk('public')->delete($this->large);
             }
         }
+    }
+
+    public function getLinkAttribute($value) 
+    {
+        return PageLink::convertLink($value);
     }
 }

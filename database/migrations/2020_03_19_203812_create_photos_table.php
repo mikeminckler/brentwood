@@ -27,6 +27,7 @@ class CreatePhotosTable extends Migration
             $table->boolean('fill');
             $table->string('stat_number')->nullable();
             $table->string('stat_name')->nullable();
+            $table->string('link')->nullable();
 
             $table->string('small')->nullable();
             $table->string('medium')->nullable();

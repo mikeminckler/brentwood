@@ -1,8 +1,8 @@
 <template>
 
-    <div class="flex relative" :class="photo && content.style ? 'text-style-' + content.style : ''">
+    <div class="flex relative" :class="content.full_width ? 'bg-white z-3' : ( photo && content.style ? 'text-style-' + content.style : '' )">
 
-        <div class="flex-1 relative flex flex-col">
+        <div class="flex-1 relative flex flex-col" v-if="!content.full_width">
 
             <div class="flex z-3 w-full items-center justify-center flex flex-col items-center justify-center h-full">
 
@@ -47,12 +47,13 @@
 
         <div class="flex-2 flex justify-center relative" :class="!photo && content.style ? 'text-style-' + content.style : ''">
 
-            <div class="text-block">
+            <div :class="content.full_width ? 'px-12 py-8' : 'text-block'">
                 <div class="">
                     <input :class="first ? 'h1' : 'h2'" type="text" v-model="content.header" placeholder="Header" />
                 </div>
 
                 <editor v-model="content.body" 
+                        :class="content.full_width ? 'columns-2' : ''"
                     placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
                 ></editor>
 
@@ -62,6 +63,7 @@
                     <div class="w-6 h-6 bg-white cursor-pointer" @click="content.style = ''"></div>
                     <div class="w-6 h-6 bg-gray-200 cursor-pointer" @click="content.style = 'gray'"></div>
                     <div class="w-6 h-6 bg-blue-200 cursor-pointer" @click="content.style = 'blue'"></div>
+                    <checkbox-input v-model="content.full_width" label="Full Width"></checkbox-input> 
                 </div>
             </div>
 
@@ -79,6 +81,7 @@
     import Feedback from '@/Mixins/Feedback';
     import PhotoControls from '@/Components/PhotoControls';
     import Stat from '@/Components/Stat.vue';
+    import CheckboxInput from '@/Components/CheckboxInput';
 
     export default {
 
@@ -90,6 +93,7 @@
             'file-uploads': FileUploads,
             'photo-controls': PhotoControls,
             'stat': Stat,
+            'checkbox-input': CheckboxInput,
         },
 
         data() {

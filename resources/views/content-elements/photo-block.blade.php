@@ -3,7 +3,7 @@
     @if ($content->show_text)
 
         <div class="
-                relative 
+                relative flex justify-center
                 py-4
                 col-span-{{ $content->text_span }}
                 row-start-{{ ceil($content->text_order / $content->columns) }} 

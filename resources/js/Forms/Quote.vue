@@ -8,7 +8,7 @@
 
                 <div class="p-4 absolute z-2 font-light text-gray-400 leading-none" style="font-size: 150px">&ldquo;</div>
                 
-                <div class="px-16 py-8 text-gray-800">
+                <div class="px-16 py-8 text-gray-600">
                     <editor v-model="content.body" 
                             placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
                             class="mt-4 relative z-3 italic leading-relaxed"

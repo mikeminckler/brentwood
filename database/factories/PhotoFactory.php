@@ -8,6 +8,7 @@ use App\FileUpload;
 use App\PhotoBlock;
 use App\Quote;
 use App\YoutubeVideo;
+use App\Page;
 
 $factory->define(Photo::class, function (Faker $faker) {
     return [
@@ -55,5 +56,11 @@ $factory->state(Photo::class, 'stat', function ($faker) {
     return [
         'stat_number' => $faker->randomNumber(2),
         'stat_name' => $faker->sentence,
+    ];
+});
+
+$factory->state(Photo::class, 'link', function ($faker) {
+    return [
+        'link' => factory(Page::class)->create()->id,
     ];
 });

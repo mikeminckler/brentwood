@@ -14,9 +14,13 @@ use App\PhotoBlock;
 use App\FileUpload;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use Tests\Unit\PageLinkTestTrait;
+use App\TextBlock;
+use App\Page;
 
 class PhotoTest extends TestCase
 {
+
     /** @test **/
     public function a_photo_has_a_file_upload()
     {
@@ -33,7 +37,7 @@ class PhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $input = factory(Photo::class)->states('stat')->raw();
+        $input = factory(Photo::class)->states('stat', 'link')->raw();
         $input['file_upload'] = $file_upload;
 
         $photo_block = factory(PhotoBlock::class)->create();
@@ -52,6 +56,7 @@ class PhotoTest extends TestCase
         $this->assertEquals(Arr::get($input, 'fill'), $photo->fill);
         $this->assertEquals(Arr::get($input, 'stat_number'), $photo->stat_number);
         $this->assertEquals(Arr::get($input, 'stat_name'), $photo->stat_name);
+        $this->assertEquals(Arr::get($input, 'link'), $photo->link);
 
     }
 
@@ -153,5 +158,24 @@ class PhotoTest extends TestCase
         $this->assertTrue(Str::contains($photo->small, $file_name2));
         $this->assertTrue(Str::contains($photo->medium, $file_name2));
         $this->assertTrue(Str::contains($photo->large, $file_name2));
+    }
+
+    /** @test **/
+    public function a_photo_link_is_converted_to_a_slug()
+    {
+        $text_block = factory(TextBlock::class)->create();
+        $content_element = $text_block->contentElement;
+        $page = $content_element->pages()->first();
+
+        $link = $page->id.'#c-'.$content_element->uuid;
+
+        $this->assertInstanceOf(Page::class, $page);
+        $photo = factory(Photo::class)->states('photo-block')->create([
+            'link' => $link,
+        ]);
+
+        $this->assertNotNull($photo->link);
+
+        $this->assertEquals('/'.$page->full_slug.'#c-'.$content_element->uuid, $photo->link);
     }
 }

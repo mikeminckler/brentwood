@@ -18,6 +18,7 @@ class CreateTextBlocksTable extends Migration
             $table->string('header')->nullable();
             $table->mediumText('body');
             $table->string('style')->nullable();
+            $table->boolean('full_width');
             $table->string('stat_number')->nullable();
             $table->string('stat_name')->nullable();
             $table->timestamps();

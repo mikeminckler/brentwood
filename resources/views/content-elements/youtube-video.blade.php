@@ -5,7 +5,7 @@
     @endif
 
     <div class="{{ !$content->full_width && !$content->header && !$content->body ? 'flex-3' : 'flex-2'}} flex justify-center items-center relative z-2">
-        <div class="{{ !$content->full_width  && ($content->header && $content->body) ? 'md:absolute w-full pb-4 md:pb-video' : 'relative w-full' }}">
+        <div class="{{ !$content->full_width  && ($content->header && $content->body) ? 'md:absolute w-full pb-4 md:pb-0' : 'relative w-full' }}">
             <youtube-player 
                 video-id="{{ $content->video_id }}" 
                 uuid="{{ $content->contentElement->uuid }}"

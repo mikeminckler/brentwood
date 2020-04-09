@@ -75,6 +75,7 @@ class TextBlockTest extends TestCase
         $this->assertEquals(Arr::get($input, 'content.header'), $text_block->header);
         $this->assertEquals(Arr::get($input, 'content.body'), $text_block->body);
         $this->assertEquals(Arr::get($input, 'content.style'), $text_block->style);
+        $this->assertEquals(Arr::get($input, 'content.full_width'), $text_block->full_width);
         $this->assertEquals(Arr::get($input, 'content.stat_number'), $text_block->stat_number);
         $this->assertEquals(Arr::get($input, 'content.stat_name'), $text_block->stat_name);
         $this->assertTrue($page->content_elements->contains('uuid', $text_block->contentElement->uuid));

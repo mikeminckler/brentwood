@@ -27,11 +27,9 @@ trait PageLinkTestTrait
 
         foreach ($this->getLinkFields() as $link_field) {
 
-            $body = '<p>'.$this->faker->paragraph.'</p>';
-            $body .= '<p>'.$this->faker->sentence.' <a href="'.$page1->id.'" >'.$page1->name.'</a></p>';
+            $body = '<p>'.$this->faker->sentence.' <a href="'.$page1->id.'" >'.$page1->name.'</a></p>';
             $body .= '<p>'.$this->faker->sentence.' <a href="'.$page2->id.'" >'.$page2->name.'</a></p>';
             $body .= '<p>'.$this->faker->sentence.' <a href="'.$page3->id.'" >'.$page3->name.'</a></p>';
-            $body .= '<p>'.$this->faker->paragraph.'</p>';
 
             $content->{$link_field} = $body;
             $content->save();
@@ -77,10 +75,8 @@ trait PageLinkTestTrait
 
         foreach ($this->getLinkFields() as $link_field) {
 
-            $body = '<p>'.$this->faker->paragraph.'</p>';
-            $body .= '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element->uuid.'" target="__blank" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
+            $body = '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element->uuid.'" target="__blank" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
             $body .= '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element2->uuid.'" target="__blank" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
-            $body .= '<p>'.$this->faker->paragraph.'</p>';
 
             $content->{$link_field} = $body;
             $content->save();
@@ -127,10 +123,8 @@ trait PageLinkTestTrait
 
         foreach ($this->getLinkFields() as $link_field) {
 
-            $body = '<p>'.$this->faker->paragraph.'</p>';
-            $body .= '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element1->uuid.'" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
+            $body = '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element1->uuid.'" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
             $body .= '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element2->uuid.'" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
-            $body .= '<p>'.$this->faker->paragraph.'</p>';
 
             $content->{$link_field} = $body;
             $content->save();

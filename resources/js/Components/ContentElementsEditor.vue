@@ -151,6 +151,7 @@
                     id: 0,
                     header: '',
                     body: '<p></p>',
+                    full_width: false,
                 };
 
                 this.saveNewContentElement(contentElement);

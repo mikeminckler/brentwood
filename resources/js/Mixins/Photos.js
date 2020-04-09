@@ -57,6 +57,9 @@ export default {
                         offsetX: 50,
                         offsetY: 50,
                         fill: true,
+                        stat_number: null,
+                        stat_name: null,
+                        link: null,
                         large: upload.large,
                         file_upload: upload,
                     }

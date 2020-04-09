@@ -75,9 +75,12 @@ p:empty {
     @apply p-0;
 }
 
-.columns-2 {
-    & p {
+
+@media (min-width: 768px) {
+    .columns-2 {
+        @apply w-full;
         column-count: 2;
+        column-gap: 3rem;
     }
 }
 
@@ -271,7 +274,7 @@ button, .button {
 
 
 .stat-number {
-    @apply font-oswald font-normal text-7xl leading-none;
+    @apply font-oswald font-normal text-6xl leading-none whitespace-no-wrap;
 
     > .stat-symbol:first-child {
         @apply -ml-8;
@@ -280,6 +283,10 @@ button, .button {
     > .stat-symbol:last-child {
         @apply -mr-8;
     }
+}
+
+.stat-numbers {
+    @apply text-8xl;
 }
 
 .text-shadow {
@@ -300,7 +307,7 @@ button, .button {
 
 @media (min-width: 768px) {
     .stat-number {
-        @apply text-8xl;
+        @apply text-6xl;
     }
     .stat-name {
         @apply text-2xl;

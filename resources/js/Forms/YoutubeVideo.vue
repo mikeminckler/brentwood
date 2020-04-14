@@ -1,11 +1,31 @@
 <template>
 
     <div class="relative">
-        <div class="flex relative">
+        <div class="relative" :class="content.full_width ? '' : 'flex'">
 
-            <div class="relative" style="transition: flex calc(var(--transition-time) * 5)" :class="content.full_width ? 'flex-0' : 'flex-1'">
+            <div class="relative flex-2 flex justify-center items-center relative">
 
-                <div class="text-block" v-show="!content.full_width">
+                <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700 z-5 mb-1">
+                    <div class="flex items-center py-2 justify-center mb-4" 
+                         style="background-color: rgba(255,255,255,0.8)"
+                         v-if="$store.state.editing && !content.full_width && !content.header"
+                    >
+                        <input class="overflow-visible p-2 -my-2 text-center font-thin" type="text" v-model="content.title" placeholder="Title" />
+                    </div>
+                </div>
+
+                <div v-if="photo" class="z-5 absolute remove-icon right-0 bottom-0 mb-12" @click.stop="removePhoto(photo, 0)"><i class="fas fa-times"></i></div>
+
+                <youtube-player :photo="photo" :content="content" :uuid="uuid"></youtube-player>
+            </div>
+
+            <div class="relative" 
+                style="transition: flex calc(var(--transition-time) * 5)" 
+                :class="content.full_width ? 'flex justify-center z-4 -mt-32' : 'flex-1'"
+                v-show="addText || content.header || content.body || !content.full_width"
+            >
+
+                <div class="text-block" :class="content.full_width ? 'bg-white max-w-2xl py-8' : ''">
 
                     <div class="">
                         <input :class="first ? 'h1' : 'h2'" type="text" v-model="content.header" placeholder="Header" />
@@ -20,27 +40,6 @@
                 </div>
 
             </div>
-            <div class="relative flex-2 flex justify-center items-center relative">
-
-                <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700 z-5 mb-1">
-                    <div class="flex items-center py-2 justify-center mb-4" 
-                         style="background-color: rgba(255,255,255,0.8)"
-                         v-if="$store.state.editing"
-                    >
-                        <input class="overflow-visible p-2 -my-2 text-center font-thin" type="text" v-model="content.title" placeholder="Title" />
-                    </div>
-                </div>
-
-                <div v-if="photo" class="z-5 absolute remove-icon right-0 bottom-0 mb-12" @click.stop="removePhoto(photo, 0)"><i class="fas fa-times"></i></div>
-
-                <youtube-player
-                    :video-id="content.video_id" 
-                    :photo="photo" 
-                    :uuid="uuid"
-                    :title="content.title"
-                    :full-width="content.full_width"
-                ></youtube-player>
-            </div>
 
         </div>
 
@@ -51,6 +50,8 @@
             </div>
 
             <checkbox-input v-model="content.full_width" label="Full Width"></checkbox-input> 
+
+            <div class="button ml-4" @click="addText = !addText">Add Text</div>
 
             <div class="flex items-center px-2" v-if="!photo && videoId">
                 <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
@@ -97,6 +98,7 @@
             return {
                 videoId: '',
                 multiplePhotos: false,
+                addText: false,
                 setVideoId: _.debounce( function() {
                     this.content.video_id = this.videoId;
                 }, 1000),

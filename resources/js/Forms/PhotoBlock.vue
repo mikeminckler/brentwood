@@ -39,40 +39,6 @@
                 </div>
             </div>
 
-            <div v-if="content.show_text" key="text" 
-                class="relative py-4" 
-                :class="['col-span-' + content.text_span, textPosition.row, textPosition.column, content.text_style ? 'text-style-' + content.text_style : '']"
-            >
-
-                <div class="text-block flex flex-col justify-center h-full">
-                    <div class="">
-                        <input class="h2" type="text" v-model="content.header" placeholder="Header" />
-                    </div>
-
-                    <editor v-model="content.body" 
-                            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                    ></editor>
-                </div>
-
-                <div class="absolute bottom-0 flex text-xl items-end">
-
-                    <div class="">
-                        <div class="w-6 h-6 bg-white" @click="content.text_style = ''"></div>
-                        <div class="w-6 h-6 bg-gray-200" @click="content.text_style = 'gray'"></div>
-                        <div class="w-6 h-6 bg-blue-200" @click="content.text_style = 'blue'"></div>
-                    </div>
-
-                    <div class="flex ml-4">
-                        <div class="cursor-pointer mx-1" v-if="content.text_order > 1" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="content.text_span > 1" @click="content.text_span--"><i class="fas fa-minus-circle"></i></div>
-                    </div>
-
-                </div>
-
-            </div>
-
             <div class="relative overflow-hidden" 
                 :class="'col-span-' + photo.span"
                 v-for="(photo, index) in sortedPhotos"
@@ -98,6 +64,41 @@
                     @remove="removePhoto(photo, index)"
                     :stat="true"
                 ></photo-controls>
+
+            </div>
+
+            <div v-if="content.show_text" key="text" 
+                class="relative py-4" 
+                :class="['col-span-' + content.text_span, textPosition.row, textPosition.column, content.text_style ? 'text-style-' + content.text_style : '']"
+            >
+
+                <div class="text-block flex flex-col justify-center h-full">
+                    <div class="">
+                        <input class="h2" type="text" v-model="content.header" placeholder="Header" />
+                    </div>
+
+                    <editor v-model="content.body" 
+                            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                    ></editor>
+                </div>
+
+                <div class="absolute bottom-0 flex text-xl items-end">
+
+                    <div class="">
+                        <div class="w-6 h-6 bg-transparent cursor-pointer" @click="content.text_style = ''"><i class="fas fa-ban"></i></div>
+                        <div class="w-6 h-6 bg-white" @click="content.text_style = 'white'"></div>
+                        <div class="w-6 h-6 bg-gray-200" @click="content.text_style = 'gray'"></div>
+                        <div class="w-6 h-6 bg-blue-200" @click="content.text_style = 'blue'"></div>
+                    </div>
+
+                    <div class="flex ml-4">
+                        <div class="cursor-pointer mx-1" v-if="content.text_order > 1" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
+                        <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
+                        <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>
+                        <div class="cursor-pointer mx-1" v-if="content.text_span > 1" @click="content.text_span--"><i class="fas fa-minus-circle"></i></div>
+                    </div>
+
+                </div>
 
             </div>
 

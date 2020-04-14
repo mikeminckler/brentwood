@@ -19,14 +19,19 @@
                         <div class="whitespace-no-wrap">Photos</div>
                     </div>
 
+                    <div class="relative z-2 button mx-2 items-center" @click="add('addYoutubeVideo')">
+                        <div class="pr-2 text-lg leading-none"><i class="fab fa-youtube"></i></div>
+                        <div class="whitespace-no-wrap">YouTube Video</div>
+                    </div>
+
                     <div class="relative z-2 button mx-2" @click="add('addQuote')">
                         <div class="pr-2"><i class="fas fa-quote-left"></i></div>
                         <div class="whitespace-no-wrap">Testimonial</div>
                     </div>
 
-                    <div class="relative z-2 button mx-2 items-center" @click="add('addYoutubeVideo')">
-                        <div class="pr-2 text-lg leading-none"><i class="fab fa-youtube"></i></div>
-                        <div class="whitespace-no-wrap">YouTube Video</div>
+                    <div class="relative z-2 button mx-2" @click="add('addFeaturedPhoto')">
+                        <div class="pr-2"><i class="fas fa-align-justify"></i></div>
+                        <div class="whitespace-no-wrap">Featured Photo</div>
                     </div>
 
                     <div class="relative z-2 button mx-2 items-center" @click="add('addEmbedCode')">

@@ -20,4 +20,3 @@ $factory->afterCreating(Quote::class, function ($quote, $faker) {
         'content_type' => get_class($quote),
     ]);
 });
-

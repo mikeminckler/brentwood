@@ -59,7 +59,7 @@
 
                                     <div class="w-full flex bg-gray-100">
 
-                                        <div class="flex-1 md:flex relative justify-around">
+                                        <div class="flex-1 md:flex relative justify-around w-full px-4">
                                             @foreach ($menu as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
 
@@ -68,7 +68,7 @@
                                                         ref="menu{{ $menu_page->id }}"
                                                     >
                                                         <div class="flex items-center">
-                                                            <a href="{{ $menu_page->full_slug }}" class="px-4 py-1 md:py-4 flex-1 
+                                                            <a href="{{ $menu_page->full_slug }}" class="px-2 md:px-4 py-1 md:py-4 flex-1 
                                                                 {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline' : '' }}">{{ $menu_page->name }}</a>
                                                             @if ($menu_page->pages->count())
                                                                 <div class="block md:hidden text-lg cursor-pointer px-2" @click="$refs.menu{{ $menu_page->id }}.classList.toggle('show-sub-menu')">
@@ -91,23 +91,24 @@
                                             @endforeach 
                                         </div>
 
-                                        <div class="flex-1 bg-gray-200 md:bg-transparent flex items-center justify-center md:items-end flex-col">
+                                        <div class="bg-gray-200 md:bg-transparent flex items-center justify-center md:items-end flex-col px-2">
 
-                                            <div class="text-sm leading-loose md:hidden">
-                                                <a href="tel:2507435521">250.743.5521</a><br/>
-                                                <a href="mailto:info@brentwood.ca">info@brentwood.ca</a>
-                                            </div>
 
-                                            <div class="flex items-center mt-2 md:mt-0">
+                                            <div class="flex items-center mb-2 md:mb-0">
                                         
-                                                <a href="/search" class="text-xl text-gray-500 cursor-pointer"><i class="fas fa-search"></i></a>
+                                                <a href="/apply-now" class="button md:mr-4 md:my-4 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
+                                                <a href="/search" class="hidden md:block text-xl text-gray-500 cursor-pointer"><i class="fas fa-search"></i></a>
 
-                                                <a href="/apply-now" class="button md:ml-4 md:my-4 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
                                                 @auth
                                                     @if (auth()->user()->hasRole('editor'))
                                                         <editing-button class="ml-4"></editing-button>
                                                     @endif
                                                 @endauth
+                                            </div>
+
+                                            <div class="text-sm leading-loose md:hidden text-center">
+                                                <a href="tel:2507435521">250.743.5521</a><br/>
+                                                <a href="mailto:info@brentwood.ca">info@brentwood.ca</a>
                                             </div>
 
                                         </div>
@@ -134,7 +135,7 @@
 
                     <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-2"></div>
 
-                    <div id="content" class="flex-1 flex flex-col relative mt-4">
+                    <div id="content" class="flex-1 flex flex-col relative">
                         @yield ('content')
                     </div>
 

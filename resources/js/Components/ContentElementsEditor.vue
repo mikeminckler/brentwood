@@ -226,6 +226,21 @@
 
             },
 
+            addFeaturedPhoto: function(sortOrder) {
+
+                let contentElement = this.newContentElement(sortOrder);
+
+                contentElement.type = 'featured-photo';
+                contentElement.content = {
+                    id: 0,
+                    body: '<p></p>',
+                    header: '',
+                };
+
+                this.saveNewContentElement(contentElement);
+
+            },
+
         },
 
     }

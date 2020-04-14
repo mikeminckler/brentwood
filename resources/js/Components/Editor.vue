@@ -27,6 +27,7 @@
                             <div class="menubar__button" :class="{ 'is-active': isActive.ordered_list() }" @click="commands.ordered_list" ><i class="fas fa-list-ol"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.blockquote() }" @click="commands.blockquote" ><i class="fas fa-quote-right"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.link() }" @click="toggleLinkMenu(getMarkAttrs('link'))" ><i class="fas fa-link"></i></div>
+                            <div class="menubar__button" @click="showImagePrompt(commands.image)" ><i class="fas fa-image"></i></div>
                             <div class="menubar__button" v-if="false" :class="{ 'is-active': isActive.toggleClass({ class: 'float-right' }) }" @click="commands.toggleClass({ class: 'float-right' })" ><i class="fas fa-window-restore"></i></div>
 
                             <div class="menubar__button" @click="commands.createTable({rowsCount: 3, colsCount: 3, withHeaderRow: false })" >  <i class="fas fa-table"></i> </div>
@@ -127,6 +128,7 @@
           TableHeader,
           TableCell,
           TableRow,
+          Image,
     } from 'tiptap-extensions'
 
     import CustomLink from '@/Components/CustomLink';
@@ -173,6 +175,7 @@
 						new TableHeader(),
 						new TableCell(),
 						new TableRow(),
+                        new Image(),
                     ],
                     onUpdate: _.debounce( ({ getJSON, getHTML }) => {
                         //this.json = getJSON()
@@ -269,6 +272,15 @@
                 })
                 this.hideLinkMenu()
             },
+
+            showImagePrompt(command) {
+                const src = prompt('Enter the url of your image here')
+                if (src !== null) {
+                    command({ src })
+                }
+            },
+
+
         },
 
         beforeDestroy() {

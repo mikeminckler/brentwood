@@ -1,48 +1,70 @@
 <template>
 
-    <div class="relative w-full overflow-hidden z-4" :class="videoPadding" v-show="videoId" style="transition: padding calc(var(--transition-time) * 5)">
+    <div class="relative w-full overflow-hidden">
+        <div class="relative w-full overflow-hidden z-4" :class="videoPadding" v-show="content.video_id" style="transition: padding calc(var(--transition-time) * 5)">
 
-        <div class="absolute bottom-0 z-4 w-full h-full" v-if="$store.state.editing && photo">
-            <div class="absolute right-0 bottom-0 transform rotate-90 origin-top-right w-32 mb-16" @click.stop>
-                <div class="flex items-center px-2 py-1">
-                    <input type="range" v-model="photo.offsetY" min="0" max="100" />
+            <div class="absolute bottom-0 z-4 w-full h-full" v-if="$store.state.editing && banner">
+                <div class="absolute right-0 bottom-0 transform rotate-90 origin-top-right w-32 mb-16" @click.stop>
+                    <div class="flex items-center px-2 py-1">
+                        <input type="range" v-model="banner.offsetY" min="0" max="100" />
+                    </div>
                 </div>
+
+                <div class="absolute right-0 bottom-0 w-32 mb-16" @click.stop>
+                    <div class="flex items-center px-2 py-1">
+                        <input type="range" v-model="banner.offsetX" min="0" max="100" />
+                    </div>
+                </div>
+
             </div>
 
-            <div class="absolute right-0 bottom-0 w-32 mb-16" @click.stop>
-                <div class="flex items-center px-2 py-1">
-                    <input type="range" v-model="photo.offsetX" min="0" max="100" />
+            <transition name="fade">
+                <div class="photo z-3 fill" v-if="banner && !hideBanner">
+
+                    <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-4 border-wash"
+                         @click="$eventer.$emit('play-video', uuid)"
+                        >
+                        <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700">
+                            <div class="flex items-center px-4 py-2 bg-wash font-thin mb-4" 
+                                v-if="content.title && !$store.state.editing"
+                              >
+                                {{ content.title }}
+                            </div>
+                        </div>
+                        <div class="relative flex items-center justify-center text-6xl text-primary">
+                            <div class="absolute bg-white w-8 h-6 z-2"></div>
+                            <div class="relative z-3">
+                                <i class="fab fa-youtube"></i>
+                            </div>
+                        </div>
+
+                    </div>
+                    <img :src="banner.large" :style="'object-position: ' + banner.offsetX + '% ' + banner.offsetY + '%;'">
                 </div>
+            </transition>
+
+            <div :id="'player-' + uuid"></div>
+        </div>
+
+        <div class="relative flex justify-center z-4" 
+             :class="hideBanner ? 'mt-0' : 'md:-mt-32'" 
+             style="transition: margin var(--transition-time) ease-out"
+            v-if="content.full_width && content.body && !$store.state.editing">
+
+            <div class="md:bg-white px-8 md:px-16 md:py-8 text-gray-600 w-full max-w-2xl md:shadow-lg">
+
+                <h1>{{ content.header }}</h1>
+
+                <div class="body">
+                    <span v-html="content.body"></span>
+                </div>
+
+                <div class="h-1 w-16 bg-gray-400 my-4"></div>
+
             </div>
 
         </div>
 
-        <transition name="fade">
-            <div class="photo z-3 fill" v-if="photo && !hideBanner">
-
-                <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-4 border-wash"
-                     @click="$eventer.$emit('play-video', uuid)"
-                    >
-                    <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700">
-                        <div class="flex items-center px-4 py-2 bg-wash font-thin mb-4" 
-                            v-if="title && !$store.state.editing"
-                          >
-                            {{ title }}
-                        </div>
-                    </div>
-                    <div class="relative flex items-center justify-center text-6xl text-primary">
-                        <div class="absolute bg-white w-8 h-6 z-2"></div>
-                        <div class="relative z-3">
-                            <i class="fab fa-youtube"></i>
-                        </div>
-                    </div>
-
-                </div>
-                <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'">
-            </div>
-        </transition>
-
-        <div :id="'player-' + uuid"></div>
     </div>
 
 </template>
@@ -50,7 +72,7 @@
 <script>
     export default {
 
-        props: ['videoId', 'uuid', 'photo', 'title', 'fullWidth'],
+        props: ['content', 'uuid', 'photo'],
         data() {
             return {
                 player: {},
@@ -83,16 +105,19 @@
             canPlay() {
                 return this.$lodash.isFunction(this.player.playVideo);
             },
+            banner() {
+                return this.photo ? this.photo : this.content.photos[0];
+            }
         },
 
         watch: {
             ready() {
                 this.loadVideo();
             },
-            videoId() {
+            'content.video_id': function (newVal, oldVal) {
                 this.loadVideo();
             },
-            fullWidth() {
+            'content.full_width': function(newVal, oldVal) {
                 this.setPadding();
             }
         },
@@ -118,14 +143,14 @@
         methods: {
             loadVideo: function() {
 
-                if (this.videoId) {
+                if (this.content.video_id) {
 
                     if (this.$lodash.isFunction(this.player.loadVideoById)) {
-                        this.player.loadVideoById(this.videoId);
+                        this.player.loadVideoById(this.content.video_id);
                     } else {
 
                         this.player = new YT.Player('player-' + this.uuid, {
-                            videoId: this.videoId,
+                            videoId: this.content.video_id,
                             playerVars: {
                                 //origin: this.hostname,
                                 host: this.hostname,
@@ -167,15 +192,22 @@
                             this.player.playVideo();
 
                             let content = document.getElementById('c-' + this.uuid);
-                            content.scrollIntoView();
+                            let elementRect = content.getBoundingClientRect();
+                            let middle = content.offsetTop - (elementRect.height / 3);
+                            window.scrollTo(0, middle);
+
                         }
                     }
 
             },
 
             setPadding: function() {
-                if (this.fullWidth) {
-                    this.videoPadding = 'pb-video md:pb-33p';
+                if (this.content.full_width) {
+                    if (this.content.body) {
+                        this.videoPadding = 'pb-video md:pb-50p';
+                    } else {
+                        this.videoPadding = 'pb-video md:pb-33p';
+                    }
                 } else {
                     this.videoPadding = 'pb-video';
                 }

@@ -17,6 +17,7 @@ use Illuminate\Support\Arr;
 use Tests\Unit\PageLinkTestTrait;
 use App\TextBlock;
 use App\Page;
+use App\PageLink;
 
 class PhotoTest extends TestCase
 {
@@ -56,7 +57,7 @@ class PhotoTest extends TestCase
         $this->assertEquals(Arr::get($input, 'fill'), $photo->fill);
         $this->assertEquals(Arr::get($input, 'stat_number'), $photo->stat_number);
         $this->assertEquals(Arr::get($input, 'stat_name'), $photo->stat_name);
-        $this->assertEquals(Arr::get($input, 'link'), $photo->link);
+        $this->assertEquals(PageLink::convertLink(Arr::get($input, 'link')), $photo->link);
 
     }
 

@@ -13,7 +13,7 @@ use App\Photo;
 use Illuminate\Support\Str;
 use App\YoutubeVideo;
 use App\EmbedCode;
-use App\FeaturedPhoto;
+use App\BannerPhoto;
 
 $factory->define(ContentElement::class, function (Faker $faker) {
     return [
@@ -98,10 +98,10 @@ $factory->state(ContentElement::class, 'embed-code', function ($faker) {
     ];
 });
 
-$factory->state(ContentElement::class, 'featured-photo', function ($faker) {
-    $featured_photo = factory(FeaturedPhoto::class)->create();
+$factory->state(ContentElement::class, 'banner-photo', function ($faker) {
+    $banner_photo = factory(BannerPhoto::class)->create();
     return [
-        'content_id' => $featured_photo->id,
-        'content_type' => get_class($featured_photo),
+        'content_id' => $banner_photo->id,
+        'content_type' => get_class($banner_photo),
     ];
 });

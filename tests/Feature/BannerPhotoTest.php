@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Quote;
+use App\BannerPhoto;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
@@ -16,13 +16,12 @@ use App\FileUpload;
 use App\User;
 use App\Page;
 use App\ContentElement;
-use App\FeaturedPhoto;
 
-class FeaturedPhotoTest extends TestCase
+class BannerPhotoTest extends TestCase
 {
 
     /** @test **/
-    public function a_featured_photo_content_element_can_be_created()
+    public function a_banner_photo_content_element_can_be_created()
     {
 
         Storage::fake();
@@ -33,9 +32,9 @@ class FeaturedPhotoTest extends TestCase
         $photo_input = factory(Photo::class)->raw();
         $photo_input['file_upload'] = $file_upload;
 
-        $input = factory(ContentElement::class)->states('featured-photo')->raw();
-        $input['type'] = 'featured-photo';
-        $input['content'] = factory(FeaturedPhoto::class)->raw();
+        $input = factory(ContentElement::class)->states('banner-photo')->raw();
+        $input['type'] = 'banner-photo';
+        $input['content'] = factory(BannerPhoto::class)->raw();
         $input['content']['photos'] = [$photo_input];
         $page = factory(Page::class)->create();
         $input['pivot'] = [
@@ -61,7 +60,7 @@ class FeaturedPhotoTest extends TestCase
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'featured-photo'])
+        $this->json('POST', route('content-elements.store'), ['type' => 'banner-photo'])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.page_id',
@@ -74,19 +73,18 @@ class FeaturedPhotoTest extends TestCase
         $this->json('POST', route('content-elements.store'), $input)
              ->assertSuccessful()
              ->assertJsonFragment([
-                'success' => 'Featured Photo Saved',
+                'success' => 'Banner Photo Saved',
              ]);
 
-        $featured_photo = FeaturedPhoto::all()->last();
-        $this->assertEquals(Arr::get($input, 'content.body'), $featured_photo->body);
-        $this->assertEquals(Arr::get($input, 'content.header'), $featured_photo->header);
+        $banner_photo = BannerPhoto::all()->last();
+        $this->assertEquals(Arr::get($input, 'content.body'), $banner_photo->body);
+        $this->assertEquals(Arr::get($input, 'content.header'), $banner_photo->header);
 
-        $photo = $featured_photo->photos->first();
+        $photo = $banner_photo->photos->first();
         $this->assertInstanceOf(Photo::class, $photo);
         $this->assertEquals(Arr::get($photo_input, 'name'), $photo->name);
         $this->assertEquals(Arr::get($photo_input, 'description'), $photo->description);
         $this->assertEquals(Arr::get($photo_input, 'alt'), $photo->alt);
         $this->assertEquals($photo->fileUpload->id, $file_upload->id);
     }
-
 }

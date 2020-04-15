@@ -71,7 +71,7 @@
                                                         ref="menu{{ $menu_page->id }}"
                                                     >
                                                         <div class="flex items-center">
-                                                            <a href="{{ $menu_page->full_slug }}" class="px-2 md:px-4 py-1 md:py-4 flex-1 
+                                                            <a href="{{ $menu_page->full_slug }}" class="whitespace-no-wrap px-2 md:px-4 py-1 md:py-4 flex-1 
                                                                 {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline' : '' }}">{{ $menu_page->name }}</a>
                                                             @if ($menu_page->pages->count())
                                                                 <div class="block md:hidden text-lg cursor-pointer px-2" @click="$refs.menu{{ $menu_page->id }}.classList.toggle('show-sub-menu')">

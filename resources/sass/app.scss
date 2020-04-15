@@ -147,6 +147,16 @@ iframe {
     @apply absolute w-full h-full;
 }
 
+.hover-wash {
+    background: radial-gradient(circle, rgba(25,25,25,0), rgba(54,128,187,0) 75%, rgba(54,128,187,0.2));
+    background-size: 100% 100%;
+    background-position: 50% 50%;
+    transition: background-size 0.5s;
+}
+.hover-wash:hover {
+    background-size: 120% 120%;
+}
+
 .photo {
 
     @apply absolute w-full h-full overflow-hidden;

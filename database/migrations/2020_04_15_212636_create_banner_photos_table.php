@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFeaturedPhotosTable extends Migration
+class CreateBannerPhotosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateFeaturedPhotosTable extends Migration
      */
     public function up()
     {
-        Schema::create('featured_photos', function (Blueprint $table) {
+        Schema::create('banner_photos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('header')->nullable();
             $table->mediumText('body');
@@ -28,6 +28,6 @@ class CreateFeaturedPhotosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('featured_photos');
+        Schema::dropIfExists('banner_photos');
     }
 }

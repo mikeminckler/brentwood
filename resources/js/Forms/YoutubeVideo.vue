@@ -21,7 +21,7 @@
 
             <div class="relative" 
                 style="transition: flex calc(var(--transition-time) * 5)" 
-                :class="content.full_width ? 'flex justify-center z-4 -mt-32' : 'flex-1'"
+                :class="content.full_width ? 'flex justify-center z-4 -mt-16' : 'flex-1'"
                 v-show="addText || content.header || content.body || !content.full_width"
             >
 

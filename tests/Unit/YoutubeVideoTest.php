@@ -6,9 +6,25 @@ use Tests\TestCase;
 
 use App\Photo;
 use App\YoutubeVideo;
+use Tests\Unit\PageLinkTestTrait;
 
 class YoutubeVideoTest extends TestCase
 {
+
+    use PageLinkTestTrait;
+
+    protected function getModel()
+    {
+        return factory(YoutubeVideo::class)->create();
+    }
+
+    protected function getLinkFields()
+    {
+        return [
+            'body',
+        ];
+    }
+
 
     /** @test **/
     public function a_youtube_video_has_a_banner_image()

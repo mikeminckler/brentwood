@@ -2,21 +2,20 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\FeaturedPhoto;
+use App\BannerPhoto;
 use Faker\Generator as Faker;
 use App\ContentElement;
 
-$factory->define(FeaturedPhoto::class, function (Faker $faker) {
+$factory->define(BannerPhoto::class, function (Faker $faker) {
     return [
         'body' => $faker->paragraph,
         'header' => $faker->sentence,
     ];
 });
 
-$factory->afterCreating(FeaturedPhoto::class, function ($featured_photo, $faker) {
+$factory->afterCreating(BannerPhoto::class, function ($banner_photo, $faker) {
     $content_element = factory(ContentElement::class)->create([
-        'content_id' => $featured_photo->id,
-        'content_type' => get_class($featured_photo),
+        'content_id' => $banner_photo->id,
+        'content_type' => get_class($banner_photo),
     ]);
 });
-

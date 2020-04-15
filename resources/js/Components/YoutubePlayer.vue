@@ -19,9 +19,9 @@
             </div>
 
             <transition name="fade">
-                <div class="photo z-3 fill transform hover:scale-105 transition-transform duration-500" v-if="banner && !hideBanner">
+                <div class="photo z-3 fill" v-if="banner && !hideBanner">
 
-                    <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-4 border-wash"
+                    <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-4 border-wash hover-wash"
                          @click="$eventer.$emit('play-video', uuid)"
                         >
                         <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700">
@@ -51,17 +51,7 @@
              style="transition: margin var(--transition-time) ease-out"
             v-if="content.full_width && content.body && !$store.state.editing">
 
-            <div class="md:bg-white px-8 md:px-16 md:py-4 text-gray-600 w-full max-w-2xl md:shadow-lg">
-
-                <h1>{{ content.header }}</h1>
-
-                <div class="body">
-                    <span v-html="content.body"></span>
-                </div>
-
-                <div class="h-1 w-16 bg-gray-400 my-4"></div>
-
-            </div>
+            <slot></slot>
 
         </div>
 
@@ -90,7 +80,7 @@
                         this.setPadding();
                     }
 
-                }, 500),
+                }, 100),
             }
         },
 

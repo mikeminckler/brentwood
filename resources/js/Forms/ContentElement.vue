@@ -82,7 +82,7 @@
             'quote': () => import(/* webpackChunkName: "quote" */ '@/Forms/Quote'),
             'youtube-video': () => import(/* webpackChunkName: "youtube-video" */ '@/Forms/YoutubeVideo'),
             'embed-code': () => import(/* webpackChunkName: "embed-code" */ '@/Forms/EmbedCode'),
-            'featured-photo': () => import(/* webpackChunkName: "featured-photo" */ '@/Forms/FeaturedPhoto'),
+            'banner-photo': () => import(/* webpackChunkName: "banner-photo" */ '@/Forms/BannerPhoto'),
         },
 
         data() {

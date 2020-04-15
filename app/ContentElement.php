@@ -16,7 +16,7 @@ class ContentElement extends Model
 {
     use SoftDeletes;
 
-    protected $with = ['content'];
+    protected $with = ['content', 'version'];
     protected $appends = ['type', 'published_at'];
 
     public function saveContentElement($id = null, $input) 
@@ -65,7 +65,7 @@ class ContentElement extends Model
 
         // refresh the content element so that it updates its content
         $content_element->refresh();
-        cache()->tags([cache_name($content_element)])->flush();
+        cache()->tags([cache_name($content_element), cache_name($page)])->flush();
         return $content_element;
     }
 

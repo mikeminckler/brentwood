@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative">
+    <div class="relative transition-all duration-500 background-transparent p-0" :class="expanded ? 'md:bg-white md:p-8 shadow-lg' : ''">
         <div class="text-lg hover:text-gray-800 absolute top-0 right-0 -mt-4 z-5 bg-gray-100 shadow rounded-full p-1 cursor-pointer flex items-center justify-center" 
             @click="expanded = false"
              v-if="expanded && !$store.state.editing"
@@ -57,7 +57,9 @@
                 if (uuid === this.uuid) {
                     this.expanded = true;
                     let content = document.getElementById('c-' + this.uuid);
-                    content.scrollIntoView();
+                    let elementRect = content.getBoundingClientRect();
+                    let middle = content.offsetTop - (elementRect.height / 3);
+                    window.scrollTo(0, middle);
                 } else {
                     this.expanded = false;
                 }
@@ -86,7 +88,7 @@
 }
 
 .expander-leave-active {
-    animation: expander var(--transition-time) reverse;
+    animation: expander calc(var(--transition-time) * 2) reverse;
 }
 
 </style>

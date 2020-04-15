@@ -8,6 +8,7 @@ use App\YoutubeVideo;
 use Illuminate\Support\Arr;
 use App\PhotosTrait;
 use App\ContentElementTrait;
+use App\PageLink;
 
 class YoutubeVideo extends Model
 {
@@ -42,5 +43,10 @@ class YoutubeVideo extends Model
     public function getBannerAttribute() 
     {
         return $this->photos->first();
+    }
+
+    public function getBodyAttribute($value) 
+    {
+        return PageLink::convertLinkText($value);
     }
 }

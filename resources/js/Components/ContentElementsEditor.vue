@@ -226,11 +226,11 @@
 
             },
 
-            addFeaturedPhoto: function(sortOrder) {
+            addBannerPhoto: function(sortOrder) {
 
                 let contentElement = this.newContentElement(sortOrder);
 
-                contentElement.type = 'featured-photo';
+                contentElement.type = 'banner-photo';
                 contentElement.content = {
                     id: 0,
                     body: '<p></p>',

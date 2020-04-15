@@ -29,9 +29,9 @@
                         <div class="whitespace-no-wrap">Testimonial</div>
                     </div>
 
-                    <div class="relative z-2 button mx-2" @click="add('addFeaturedPhoto')">
+                    <div class="relative z-2 button mx-2" @click="add('addBannerPhoto')">
                         <div class="pr-2"><i class="fas fa-align-justify"></i></div>
-                        <div class="whitespace-no-wrap">Featured Photo</div>
+                        <div class="whitespace-no-wrap">Banner Photo</div>
                     </div>
 
                     <div class="relative z-2 button mx-2 items-center" @click="add('addEmbedCode')">

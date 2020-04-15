@@ -197,6 +197,7 @@ class PageTest extends TestCase
             'sort_order' => $this->faker->numberBetween(10,100),
         ];
 
+        $this->withoutExceptionHandling();
         $this->postJson(route('pages.update', ['id' => $home_page->id]), $input)
             ->assertSuccessful()
             ->assertJsonFragment([

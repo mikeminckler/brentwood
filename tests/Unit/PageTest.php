@@ -478,9 +478,6 @@ class PageTest extends TestCase
         ]);
 
         $this->assertInstanceOf(Collection::class, $page->sub_menu);
-        $this->assertInstanceOf(Collection::class, $sub_page->sub_menu);
-
         $this->assertTrue($page->sub_menu->contains('name', $sub_page->name));
-        $this->assertTrue($sub_page->sub_menu->contains('name', $sub_page->name));
     }
 }

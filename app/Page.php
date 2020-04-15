@@ -180,17 +180,19 @@ class Page extends Model
 
     public function getContentElementsAttribute() 
     {
-        return $this->contentElements()
-                     ->get()
-                     ->groupBy('uuid')
-                     ->map(function($uuid) {
-                        return $uuid->sortByDesc( function( $content_element) {
-                            return $content_element->version_id;
-                        })->first();
-                     })
-                     ->sortBy(function($content_element) {
-                        return $content_element->sort_order;
-                     })->values();
+        //return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-content-elements', function() {
+            return $this->contentElements()
+                         ->get()
+                         ->groupBy('uuid')
+                         ->map(function($uuid) {
+                            return $uuid->sortByDesc( function( $content_element) {
+                                return $content_element->version_id;
+                            })->first();
+                         })
+                         ->sortBy(function($content_element) {
+                            return $content_element->sort_order;
+                         })->values();
+        //});
     }
 
     public function getPublishedContentElementsAttribute() 
@@ -328,6 +330,9 @@ class Page extends Model
 
     public function createImage($file_upload, $prefix)
     {
+        if (!Storage::exists($file_upload->storage_filename)) {
+            return null;
+        }
         $file = Storage::get($file_upload->storage_filename);
         $image = Image::make($file)
             ->resize(2000, 2000, function ($constraint) {
@@ -345,14 +350,7 @@ class Page extends Model
     public function getSubMenuAttribute() 
     {
         if ($this->id !== 1) {
-            if ($this->parent_page_id) {
-                return $this->pages;
-            } else {
-                $parent_page = Page::find($this->parent_page_id);
-                if ($parent_page) {
-                    return $parent_page->sub_menu;
-                }
-            }
+            return $this->pages;
         }
     }
 }

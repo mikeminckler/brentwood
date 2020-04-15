@@ -31,8 +31,12 @@ export default {
                     if (add) {
                         this.$store.dispatch('addContentElement', response.data.content_element);
                         this.$nextTick(() => {
+
                             let newContent = document.getElementById('c-' + response.data.content_element.uuid);
-                            newContent.scrollIntoView();
+                            let elementRect = newContent.getBoundingClientRect();
+                            let middle = newContent.offsetTop - (elementRect.height / 3);
+                            window.scrollTo(0, middle);
+
                         });
                     } else {
                         this.updateContentElement(contentElement, response.data.content_element);

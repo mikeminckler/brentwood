@@ -25,7 +25,7 @@
                 v-show="addText || content.header || content.body || !content.full_width"
             >
 
-                <div class="text-block" :class="content.full_width ? 'bg-white max-w-2xl py-8' : ''">
+                <div class="text-block" :class="content.full_width ? 'bg-white max-w-2xl py-8 px-16' : ''">
 
                     <div class="">
                         <input :class="first ? 'h1' : 'h2'" type="text" v-model="content.header" placeholder="Header" />

@@ -23,9 +23,11 @@
                             <div class="menubar__button" :class="{ 'is-active': isActive.heading({ level: 1 }) }" @click="commands.heading({ level: 1 })" > H1 </div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.heading({ level: 2 }) }" @click="commands.heading({ level: 2 })" > H2 </div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.heading({ level: 3 }) }" @click="commands.heading({ level: 3 })" > H3 </div>
+
+                            <div class="menubar__button" :class="{ 'is-active': isActive.align({ textAlign: 'center' }) }" @click="commands.align({ textAlign: 'center' })" > <i class="fas fa-align-center"></i></div>
+
                             <div class="menubar__button" :class="{ 'is-active': isActive.bullet_list() }" @click="commands.bullet_list" ><i class="fas fa-list-ul"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.ordered_list() }" @click="commands.ordered_list" ><i class="fas fa-list-ol"></i></div>
-                            <div class="menubar__button" :class="{ 'is-active': isActive.blockquote() }" @click="commands.blockquote" ><i class="fas fa-quote-right"></i></div>
                             <div class="menubar__button" :class="{ 'is-active': isActive.link() }" @click="toggleLinkMenu(getMarkAttrs('link'))" ><i class="fas fa-link"></i></div>
                             <div class="menubar__button" @click="showImagePrompt(commands.image)" ><i class="fas fa-image"></i></div>
                             <div class="menubar__button" v-if="false" :class="{ 'is-active': isActive.toggleClass({ class: 'float-right' }) }" @click="commands.toggleClass({ class: 'float-right' })" ><i class="fas fa-window-restore"></i></div>
@@ -131,8 +133,10 @@
           Image,
     } from 'tiptap-extensions'
 
-    import CustomLink from '@/Components/CustomLink';
-    import ToggleClass from '@/Components/ToggleClass';
+    import CustomLink from '@/Components/EditorClasses/CustomLink';
+    import ToggleClass from '@/Components/EditorClasses/ToggleClass';
+    import Align from '@/Components/EditorClasses/Align';
+
     import CheckboxInput from '@/Components/CheckboxInput.vue';
     import PageTree from '@/Components/PageTree.vue';
 
@@ -168,7 +172,7 @@
                         new Underline(),
                         new History(),
                         new CustomLink(),
-                        new ToggleClass(),
+                        //new ToggleClass(),
                         new Table({
 							resizable: false,
 						}),
@@ -176,6 +180,7 @@
 						new TableCell(),
 						new TableRow(),
                         new Image(),
+                        new Align(),
                     ],
                     onUpdate: _.debounce( ({ getJSON, getHTML }) => {
                         //this.json = getJSON()

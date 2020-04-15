@@ -77,14 +77,14 @@ p:empty {
 
 p {
     img {
-        @apply w-full py-4;
+        @apply w-2/3 py-4 text-center mx-auto block;
     }
 }
 
 @media (min-width: 768px) {
     p {
-        img {
-            @apply w-full px-16 py-4;
+        img:first-child {
+            @apply pt-0;
         }
     }
 }
@@ -94,6 +94,20 @@ p {
         @apply w-full;
         column-count: 2;
         column-gap: 3rem;
+    }
+}
+
+ul {
+    @apply list-disc ml-4 my-2;
+}
+
+ol {
+    @apply list-decimal;
+}
+
+li {
+    & p {
+        @apply py-0;
     }
 }
 
@@ -282,11 +296,13 @@ button, .button {
 }
 
 .text-style-blue {
-    @apply text-white bg-blue-400;
+    @apply text-white;
+    background-color: #a1bad1;
 }
 
 .text-style-gray {
-    @apply text-white bg-gray-500;
+    @apply text-white;
+    background-color: #607384;
 }
 
 
@@ -339,7 +355,6 @@ button, .button {
 
 .ProseMirror {
     & p:first-child {
-        @apply pt-2;
     }
 }
 

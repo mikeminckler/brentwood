@@ -16,17 +16,19 @@ class PageLink
 
             preg_match('/(^\d+)/', $value, $match);
 
-            $page = Page::find($match[0]);
+            if (count($match)) {
+                $page = Page::find($match[0]);
 
-            if ($page instanceof Page) {
-                if ($page->full_slug !== '/') {
-                    $full_slug = '/'.$page->full_slug;
-                } else {
-                    $full_slug = '/';
+                if ($page instanceof Page) {
+                    if ($page->full_slug !== '/') {
+                        $full_slug = '/'.$page->full_slug;
+                    } else {
+                        $full_slug = '/';
+                    }
                 }
-            }
 
-            return preg_replace('/'.$match[0].'/', $full_slug, $value);
+                return preg_replace('/'.$match[0].'/', $full_slug, $value);
+            }
 
         }
         return $value;

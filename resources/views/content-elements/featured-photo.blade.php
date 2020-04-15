@@ -9,9 +9,9 @@
             </div>
         @endif
 
-        <div class="relative flex md:-mt-32 justify-center z-4">
+        <div class="relative flex md:-mt-16 justify-center z-4">
 
-            <div class="md:bg-white px-16 py-8 text-gray-600 w-full max-w-2xl md:shadow-lg">
+            <div class="md:bg-white px-8 md:px-16 py-8 text-gray-600 w-full max-w-2xl md:shadow-lg">
                 @if ($content->header)
                     <h{{ $index === 1 ? '1' : '2'}}>{{ $content->header }}</h{{ $index === 1 ? '1': '2' }}>
                 @endif

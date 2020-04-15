@@ -19,7 +19,7 @@
             </div>
 
             <transition name="fade">
-                <div class="photo z-3 fill" v-if="banner && !hideBanner">
+                <div class="photo z-3 fill transform hover:scale-105 transition-transform duration-500" v-if="banner && !hideBanner">
 
                     <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-4 border-wash"
                          @click="$eventer.$emit('play-video', uuid)"
@@ -47,11 +47,11 @@
         </div>
 
         <div class="relative flex justify-center z-4" 
-             :class="hideBanner ? 'mt-0' : 'md:-mt-32'" 
+             :class="hideBanner ? 'mt-0' : 'md:-mt-16'" 
              style="transition: margin var(--transition-time) ease-out"
             v-if="content.full_width && content.body && !$store.state.editing">
 
-            <div class="md:bg-white px-8 md:px-16 md:py-8 text-gray-600 w-full max-w-2xl md:shadow-lg">
+            <div class="md:bg-white px-8 md:px-16 md:py-4 text-gray-600 w-full max-w-2xl md:shadow-lg">
 
                 <h1>{{ content.header }}</h1>
 
@@ -204,7 +204,7 @@
             setPadding: function() {
                 if (this.content.full_width) {
                     if (this.content.body) {
-                        this.videoPadding = 'pb-video md:pb-50p';
+                        this.videoPadding = 'pb-video md:pb-40p';
                     } else {
                         this.videoPadding = 'pb-video md:pb-33p';
                     }

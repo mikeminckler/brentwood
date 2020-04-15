@@ -7,7 +7,7 @@
 
         <div class="flex-2 justify-center {{ $content->photos->count() ? 'md:flex' : 'flex' }} {{ !$content->photos->count() && $content->style ? 'text-style-'.$content->style : '' }}">
 
-            <div class="{{ $content->full_width ? 'px-12 pt-4 w-full' : 'text-block' }} relative {{ $content->style ? 'pt-8' : '' }}">
+            <div class="{{ $content->full_width ? 'px-8 md:px-12 pt-4 w-full' : 'text-block' }} relative {{ $content->style ? 'pt-8' : '' }}">
                 <h{{ $first ? '1' : '2'}}>{{ $content->header }}</h{{ $first ? '1': '2' }}>
             </div>
 
@@ -19,13 +19,13 @@
     @if (!$content->full_width)
         <div class="flex-1 relative {{ $content->photos->count() || ($content->stat_number && $content->stat_name) ? 'w-1/2 pb-50p float-right z-3 m-2 mt-8 md:m-0 md:w-auto md:pb-0 md:float-none' : '' }} {{ $content->header ? ( $content->style ? 'md:-mt-20' : 'md:-mt-12' ) : '' }}">
 
-            @if ($content->stat_number && $content->stat_name)
-                @include ('content-elements.stat', ['number' => $content->stat_number, 'name' => $content->stat_name, 'photo' => $content->photos->count() ? true : false ])
+            @if ($content->stat_number && $content->stat_name && !$content->photos->count())
+                @include ('content-elements.stat', ['number' => $content->stat_number, 'name' => $content->stat_name, 'photo' => null, 'link' => null ])
             @endif
 
             @if ($content->photos->count())
                 <div class="absolute w-full h-full z-1">
-                    @include ('content-elements.photo', ['photo' => $content->photos->first()])
+                    @include ('content-elements.photo', ['photo' => $content->photos->first(), 'stat_number' => $content->stat_number, 'stat_name' => $content->stat_name])
                 </div>
             @endif
 
@@ -34,7 +34,7 @@
 
     <div class="flex-2 justify-center {{ $content->photos->count() || ($content->stat_number && $content->stat_name) ? 'md:flex' : 'flex' }} {{ !$content->photos->count() && $content->style ? 'text-style-'.$content->style : '' }}">
 
-        <div class="{{ $content->full_width ? 'pb-8 px-12 columns-2' : 'text-block' }} relative {{ $content->style ? 'pb-8' : '' }}">
+        <div class="{{ $content->full_width ? 'pb-8 px-8 md:px-12 columns-2' : 'text-block' }} relative {{ $content->style ? 'pb-8' : '' }}">
             <div class="body">
                 {!! $content->body !!}
             </div>

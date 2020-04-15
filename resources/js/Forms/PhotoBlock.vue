@@ -155,7 +155,7 @@
 
         data() {
             return {
-                heights: [ 25, 33, 40, 50, 66, 75, 100 ],
+                heights: [ 25, 33, 40, 50, 66, 75, 100, 150, 200 ],
                 multiplePhotos: true,
             }
         },

@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="relative flex -mt-32 justify-center">
+        <div class="relative flex -mt-16 justify-center">
 
             <div class="bg-white px-16 py-8 text-gray-600 w-full max-w-2xl shadow-lg z-4">
 

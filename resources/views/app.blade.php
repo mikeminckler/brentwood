@@ -43,14 +43,17 @@
                         <div class="relative flex">
 
                             <div class="relative md:flex-1 flex items-center justify-center">
-                                <div class="p-2 ml-1 md:ml-0 flex justify-center relative">
+                                <div class="p-2 ml-4 md:ml-0 flex justify-center relative">
                                     <a href="/"><img src="images/logo.svg" class="h-8 md:h-12 block" /></a>
                                 </div>
                             </div>
 
                             <nav class="flex-2 relative flex md:block">
 
-                                <div class="md:hidden absolute right-0 text-white bg-primary px-2 cursor-pointer mt-3 mr-2" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
+                                <div class="flex w-full items-center justify-end mr-4">
+                                    <a href="/apply-now" class="button md:hidden mr-4 whitespace-no-wrap text-sm">Apply Now</a>
+                                    <div class="md:hidden text-white bg-primary px-2 text-lg cursor-pointer" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
+                                </div>
 
                                 <div class="absolute md:relative w-screen md:w-auto top-0 mt-12 md:mt-0 right-0 md:right-auto md:h-auto md:flex shadow z-5 md:pr-4 overflow-hidden"
                                     :class="$store.state.showMenu ? 'max-h-screen' : 'max-h-0 md:max-h-screen'"
@@ -96,7 +99,7 @@
 
                                             <div class="flex items-center mb-2 md:mb-0">
                                         
-                                                <a href="/apply-now" class="button md:mr-4 md:my-4 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
+                                                <a href="/apply-now" class="button hidden md:block mr-4 my-4 whitespace-no-wrap text-base">Apply Now</a>
                                                 <a href="/search" class="hidden md:block text-xl text-gray-500 cursor-pointer"><i class="fas fa-search"></i></a>
 
                                                 @auth
@@ -129,7 +132,7 @@
 
             <div class="items-center flex-1 flex flex-col relative" 
                 :class="$store.state.editing ? 'px-12' : ''"
-                style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 75%, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '247,218,199') : '247,218,199' }},1));"> 
+                style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 75%, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1));"> 
 
                 <div class="flex flex-1 flex-col w-full max-w-6xl relative">
 
@@ -148,7 +151,7 @@
                 @if (session()->get('editing') && !request('preview'))
                     <footer-editor></footer-editor>
                 @endif
-                <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '247,218,199') : '247,218,199' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '247,218,199') : '247,218,199' }},0));" ></div>
+                <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
                 <div class="absolute w-full h-full overflow-hidden">
                     <img src="{{ isset($page) ? ( $page->footer_fg_image ? $page->footer_fg_image : '/images/footer_fg.png' ) : '/images/footer_fg.png' }}" class="w-full h-full object-cover z-2 absolute" />
                     <img src="{{ isset($page) ? ( $page->footer_bg_image ? $page->footer_bg_image : '/images/footer_bg.png' ) : '/images/footer_bg.png' }}" class="w-full h-full object-cover" />

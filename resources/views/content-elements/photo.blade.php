@@ -1,8 +1,15 @@
 @if ($photo->link)
-    <a href="{{ $photo->link }}">
+    <a class="absolute w-full h-full transform hover:scale-105 transition-transform duration-500" href="{{ $photo->link }}">
 @endif
 
-<picture class="photo {{ $photo->fill ? 'fill' : 'fit' }} cursor-zoom-in" @click="$eventer.$emit('view-photo', '{{ $photo->large }}')">
+<picture class="photo {{ $photo->fill ? 'fill' : 'fit' }} {{ $photo->link ? 'cursor-pointer' : 'cursor-zoom-in' }}" 
+
+@if (!$photo->link)
+    @click="$eventer.$emit('view-photo', '{{ $photo->large }}')"
+@endif
+
+>
+
     <source
         media="(min-width: 900px)"
         srcset="{{ $photo->large }}.webp"
@@ -23,8 +30,8 @@
     >
 </picture>
 
-@if ($photo->stat_number)
-    @include ('content-elements.stat', ['number' => $photo->stat_number, 'name' => $photo->stat_name, 'photo' => true])
+@if ($photo->stat_number || isset($stat_number))
+    @include ('content-elements.stat', ['number' => isset($stat_number) ? $stat_number : $photo->stat_number, 'name' => isset($stat_name) ? $stat_name : $photo->stat_name, 'photo' => $photo, 'link' => $photo->link])
 @endif
 
 @if ($photo->description)

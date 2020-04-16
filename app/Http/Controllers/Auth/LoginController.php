@@ -7,6 +7,9 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 
+use Socialite;
+use App\User;
+
 class LoginController extends Controller
 {
     /*
@@ -62,5 +65,18 @@ class LoginController extends Controller
     protected function loggedOut(Request $request)
     {
         return redirect()->route('login')->with('success', 'Logged Out');
+    }
+
+    public function redirectToProvider()
+    {
+        return Socialite::driver('google')->with(['hd' => 'brentwood.ca'])->redirect();
+    }
+
+    public function handleProviderCallback()
+    {
+        $user = User::createOrUpdateFromGoogle(Socialite::driver('google')->user());
+        $user->setGroupsFromGoogle();
+        auth()->login($user);
+        return redirect('/');
     }
 }

@@ -7,8 +7,15 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;      
 
+use App\User;
 use App\Role;
 use App\FileUpload;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Two\User as SocialiteUser;
+use Google_Client;
+use Google_Service_Directory;
 
 class User extends Authenticatable
 {
@@ -105,5 +112,61 @@ class User extends Authenticatable
     public function fileUploads()
     {
         return $this->morphMany(FileUpload::class, 'fileable');
+    }
+
+    public static function createOrUpdateFromGoogle(SocialiteUser $data) 
+    {
+        $validator = Validator::make([
+            'id' => $data->getId(),
+            'name' => $data->getName(),
+            'email' => $data->getEmail(),
+            'avatar' => $data->getAvatar(),
+        ], [
+            'id' => 'required',
+            'email' => 'required|email',
+            'name' => 'required:max:255',
+        ])->validate();
+
+        $user = User::where('email', $data->getEmail())->first();
+
+        if (!$user instanceof User) {
+            $user = new User;
+            $user->password = Str::random(40);
+        }
+
+        $user->oauth_id = $data->getId();
+        $user->email = $data->getEmail();
+        $user->name = $data->getName();
+        $user->avatar = $data->getAvatar();
+        $user->save();
+
+        return $user;
+
+    }
+
+    public function setGroupsFromGoogle() 
+    {
+        
+        $client = new Google_Client();
+        $client->setScopes(Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY);
+        $client->setAuthConfig(base_path('service.json'));
+        $client->setSubject('brent.lee@brentwood.ca');
+
+        $service = new Google_Service_Directory($client);
+        $groups = collect($service->groups->listGroups(['domain' => 'brentwood.ca', 'userKey' => $this->email])->groups)->pluck('name', 'id');
+
+        foreach ($groups as $id => $name) {
+            $role = Role::where('name', $name)->first();
+
+            if (!$role instanceof Role) {
+                $role = new Role;
+                $role->name = $name;
+                $role->oauth_id = $id;
+                $role->save();
+            }
+            $this->addRole($role);
+        }
+
+        return $this;
     }
 }

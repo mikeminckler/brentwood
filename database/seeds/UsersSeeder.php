@@ -13,24 +13,26 @@ class UsersSeeder extends Seeder
      */
     public function run()
     {
+
         $mike = new User;
+        $mike->oauth_id = 'Mike Minckler';
         $mike->name = 'Mike Minckler';
         $mike->email = 'mike.minckler@brentwood.ca';
-        //$mike->password = bcrypt(Str::random(8));
-        $mike->password = bcrypt('q');
+        $mike->password = bcrypt(Str::random(8));
         $mike->email_verified_at = now();
         $mike->save();
 
         $mike->addRole('admin');
 
         $brent = new User;
-        $brent->name = 'Brent lee';
-        $brent->email = 'brent.lee@brentwood.bc.ca';
-        //$brent->password = bcrypt(Str::random(8));
-        $brent->password = bcrypt('q');
+        $brent->oauth_id = 'Brent Lee';
+        $brent->name = 'Brent Lee';
+        $brent->email = 'brent.lee@brentwood.ca';
+        $brent->password = bcrypt(Str::random(8));
         $brent->email_verified_at = now();
         $brent->save();
 
         $brent->addRole('admin');
+
     }
 }

@@ -8,8 +8,25 @@ use App\PhotoBlock;
 use App\Photo;
 use App\ContentElement;
 
+use App\PageLinkTestTrait;
+
 class PhotoBlockTest extends TestCase
 {
+
+    use PageLinkTestTrait;
+
+    protected function getModel()
+    {
+        return factory(PhotoBlock::class)->create();
+    }
+
+    protected function getLinkFields()
+    {
+        return [
+            'body',
+        ];
+    }
+
     /** @test **/
     public function a_photo_block_has_many_photos()
     {

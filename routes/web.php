@@ -13,6 +13,9 @@
 
 Auth::routes();
 
+Route::get('login/google', 'Auth\LoginController@redirectToProvider');
+Route::get('login/google/authorized', 'Auth\LoginController@handleProviderCallback');
+
 Route::get('/pages', 'PagesController@index')->name('pages.index');
 
 Route::group(['middleware' => ['auth']], function () {

@@ -9,6 +9,7 @@ use App\Photo;
 use Illuminate\Support\Arr;
 use App\ContentElementTrait;
 use App\PhotosTrait;
+use App\PageLink;
 
 class PhotoBlock extends Model
 {
@@ -41,6 +42,11 @@ class PhotoBlock extends Model
 
         cache()->tags([cache_name($photo_block)])->flush();
         return $photo_block;
+    }
+
+    public function getBodyAttribute($value) 
+    {
+        return PageLink::convertLinkText($value);
     }
 
 }

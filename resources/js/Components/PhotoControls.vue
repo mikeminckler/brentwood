@@ -52,9 +52,9 @@
                 <div class="cursor-pointer mx-1" v-if="photo.span < content.columns && content.columns > 1 && span" @click="photo.span++"><i class="fas fa-plus-circle"></i></div>
                 <div class="cursor-pointer mx-1" v-if="photo.span > 1 && content.columns > 1 && span" @click="photo.span--"><i class="fas fa-minus-circle"></i></div>
             </div>
-            <div class="mx-2 cursor-pointer" v-if="photo.file_upload.id >= 1" @click="showStat = !showStat"><i class="fas fa-align-justify"></i></div>
-            <div class="mx-2 cursor-pointer" v-if="photo.file_upload.id >= 1" @click="$eventer.$emit('add-files', fileUploadName)"><i class="fas fa-edit"></i></div>
-            <div class="mx-2 cursor-pointer" v-if="photo.file_upload.id >= 1" @click="showLinkMenu = !showLinkMenu"><i class="fas fa-link"></i></div>
+            <div class="mx-2 cursor-pointer" v-if="photo.id >= 1" @click="showStat = !showStat"><i class="fas fa-align-justify"></i></div>
+            <div class="mx-2 cursor-pointer" v-if="photo.id >= 1" @click="$eventer.$emit('add-files', fileUploadName)"><i class="fas fa-edit"></i></div>
+            <div class="mx-2 cursor-pointer" v-if="photo.id >= 1" @click="showLinkMenu = !showLinkMenu"><i class="fas fa-link"></i></div>
             <div class="mx-2 remove-icon" @click="$emit('remove')"><i class="fas fa-times"></i></div>
         </div>
 

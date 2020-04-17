@@ -34,14 +34,6 @@ class PagesController extends Controller
             return abort(404);
         }
 
-        if (!auth()->check()) {
-            return abort(403);
-        }
-
-        if (!auth()->user()->hasRole('admin')) {
-            return abort(403);
-        }
-
         if (session()->has('editing') && request('preview')) {
             $content_elements = $page->content_elements;
         } else {

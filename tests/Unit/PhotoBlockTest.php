@@ -8,7 +8,7 @@ use App\PhotoBlock;
 use App\Photo;
 use App\ContentElement;
 
-use App\PageLinkTestTrait;
+use Tests\Unit\PageLinkTestTrait;
 
 class PhotoBlockTest extends TestCase
 {

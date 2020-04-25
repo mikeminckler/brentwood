@@ -11,12 +11,14 @@ use Illuminate\Support\Str;
 use App\ContentElement;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use App\PageAccess;
 
 class Page extends Model
 {
     use SoftDeletes;
 
     protected $with = ['pages', 'footerFgFileUpload', 'footerBgFileUpload'];
+
     protected $appends = [
         'full_slug', 
         'can_be_published', 
@@ -330,6 +332,7 @@ class Page extends Model
 
     public function createImage($file_upload, $prefix)
     {
+        //\Log::info('CREATE '.$prefix.'-'.$file_upload->storage_filename);
         if (!Storage::exists($file_upload->storage_filename)) {
             return null;
         }
@@ -343,7 +346,7 @@ class Page extends Model
 
         $file_name = '/photos/footers/'.$prefix.'-'.$file_upload->name;
         Storage::disk('public')->put($file_name, $image->stream());
-        //cache()->tags([cache_name($this)])->flush();
+        cache()->tags([cache_name($this)])->flush();
         return $file_name;
     }
 
@@ -352,5 +355,22 @@ class Page extends Model
         if ($this->id !== 1) {
             return $this->pages;
         }
+    }
+
+    public function createPageAccess($object)
+    {
+        $page_access = (new PageAccess)->savePageAccess($this, $object);
+        return $this;
+    }
+
+    public function removePageAccess($object)
+    {
+        $page_access = (new PageAccess)->removePageAccess($this, $object);
+        return $this;
+    }
+
+    public function pageAccesses()
+    {
+        return $this->hasMany(PageAccess::class);
     }
 }

@@ -16,10 +16,13 @@ use Illuminate\Support\Str;
 use Laravel\Socialite\Two\User as SocialiteUser;
 use Google_Client;
 use Google_Service_Directory;
+use App\PageAccess;
+use App\SearchTrait;
 
 class User extends Authenticatable
 {
     use Notifiable;
+    use SearchTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -47,6 +50,46 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected $appends = ['search_label'];
+
+    public function getSearchLabelAttribute()
+    {
+        return $this->name;
+    }
+
+    public function getSearchFieldsAttribute()
+    {
+        return [
+            'name',
+        ];
+    }
+
+    public function saveUser($id = null, $input)
+    {
+        if ($id) {
+            $user = User::findOrFail($id);
+        } else {
+            $user = new User;
+        }
+
+        $user->name = Arr::get($input, 'name');
+        $user->email = strtolower(Arr::get($input, 'email'));
+        $user->save();
+
+        if (auth()->user()->hasRole('admin')) {
+            $user->roles()->detach();
+            if (Arr::get($input, 'roles')) {
+                foreach (Arr::get($input, 'roles') as $role_data) {
+                    $user->addRole( Role::findOrFail(Arr::get($role_data, 'id')));
+                }
+            }
+        }
+
+        cache()->tags([cache_name($user)])->flush();
+
+        return $user;
+    }
 
 
     public function roles()
@@ -150,7 +193,7 @@ class User extends Authenticatable
         $client = new Google_Client();
         $client->setScopes(Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY);
         $client->setAuthConfig(base_path('service.json'));
-        $client->setSubject('brent.lee@brentwood.ca');
+        $client->setSubject('sa_developer@brentwood.ca');
 
         $service = new Google_Service_Directory($client);
         $groups = collect($service->groups->listGroups(['domain' => 'brentwood.ca', 'userKey' => $this->email])->groups)->pluck('name', 'id');
@@ -168,5 +211,48 @@ class User extends Authenticatable
         }
 
         return $this;
+    }
+
+    public function pageAccesses()
+    {
+        return $this->morphMany(PageAccess::class, 'accessable');
+    }
+
+    public function createPageAccess($page)
+    {
+        $page_access = (new PageAccess)->savePageAccess($page, $this);
+        return $this;
+    }
+
+    public function removePageAccess($page)
+    {
+        $page_access = (new PageAccess)->removePageAccess($page, $this);
+        return $this;
+    }
+
+    public function canEditPage(Page $page)
+    {
+        if ($this->hasRole('admin')) {
+            return true;
+        }
+
+        return cache()->tags([cache_name($this), cache_name($page)])->rememberForever(cache_name($this).'-can-access-'.$page->id, function () use ($page) {
+            $page_accesses = $this->pageAccesses;
+
+            $this->roles->each(function ($role) use ($page_accesses) {
+                $role->pageAccesses()->get()->each(function ($pa) use ($page_accesses) {
+                    $page_accesses->push($pa);
+                });
+            });
+
+            $page_accesses = $page_accesses->unique(function ($pa) {
+                return $pa->page->id;
+            });
+
+            if ($page_accesses->contains('page_id', $page->id)) {
+                return true;
+            }
+            return false;
+        });
     }
 }

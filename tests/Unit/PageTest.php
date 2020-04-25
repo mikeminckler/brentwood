@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use App\FileUpload;
 use Illuminate\Support\Str;
+use App\Role;
+use App\User;
 
 class PageTest extends TestCase
 {
@@ -247,8 +249,6 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_has_a_can_be_published_attribute()
     {
-
-
         $content_element = factory(ContentElement::class)->states('text-block')->create();
         $page = $content_element->pages->first();
         $content_element->version_id = $page->draft_version_id;
@@ -479,5 +479,38 @@ class PageTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $page->sub_menu);
         $this->assertTrue($page->sub_menu->contains('name', $sub_page->name));
+    }
+
+    /** @test **/
+    public function a_page_has_many_page_accesses()
+    {
+        $page = factory(Page::class)->create();
+        $role = factory(Role::class)->create();
+
+        $page->createPageAccess($role);
+
+        $this->assertInstanceOf(Collection::class, $page->pageAccesses()->get());
+    }
+
+    /** @test **/
+    public function a_page_can_grant_access_to_a_role()
+    {
+        $page = factory(Page::class)->create();
+        $role = factory(Role::class)->create();
+
+        $page->createPageAccess($role);
+
+        $this->assertTrue($role->canEditPage($page));
+    }
+
+    /** @test **/
+    public function a_page_can_grant_access_to_a_user()
+    {
+        $page = factory(Page::class)->create();
+        $user = factory(User::class)->create();
+
+        $page->createPageAccess($user);
+
+        $this->assertTrue($user->canEditPage($page));
     }
 }

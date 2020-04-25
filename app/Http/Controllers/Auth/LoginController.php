@@ -77,6 +77,9 @@ class LoginController extends Controller
         $user = User::createOrUpdateFromGoogle(Socialite::driver('google')->user());
         $user->setGroupsFromGoogle();
         auth()->login($user);
+        if ($user->hasRole('editor')) {
+            session()->put('editing', true);
+        }
         return redirect('/');
     }
 }

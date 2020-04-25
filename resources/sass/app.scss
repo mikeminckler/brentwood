@@ -20,8 +20,8 @@ body {
     display: contents;
 }
 
-a {
-    @apply text-primary;
+a, .link {
+    @apply text-primary cursor-pointer;
 }
 
 h1, h2, h3, .h1, .h2, .h3 {
@@ -239,6 +239,10 @@ input[type=range]:hover {
 
     & input { 
         @apply border border-gray-300 bg-gray-100 px-4 py-2 w-full;
+    }
+
+    & input.icon { 
+        @apply pl-8;
     }
 
     & input.remove {

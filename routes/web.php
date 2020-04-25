@@ -20,6 +20,21 @@ Route::get('/pages', 'PagesController@index')->name('pages.index');
 
 Route::group(['middleware' => ['auth']], function () {
 
+    Route::get('/users', 'UsersController@index')->name('users.index');
+    Route::get('/users/load', 'UsersController@load')->name('users.load');
+    Route::post('/users/{id}', 'UsersController@store')->name('users.update')->where('id', '\d+');
+    Route::post('/users/search', 'UsersController@search')->name('users.search');
+
+    Route::get('/roles', 'RolesController@index')->name('roles.index');
+    Route::post('/roles/create', 'RolesController@store')->name('roles.store');
+    Route::post('/roles/{id}', 'RolesController@store')->name('roles.update')->where('id', '\d+');
+    Route::post('/roles/search', 'RolesController@search')->name('roles.search');
+
+    Route::get('/page-accesses', 'PageAccessesController@index')->name('page-accesses.index');
+    Route::get('/page-accesses/page/{id}', 'PageAccessesController@page')->name('page-accesses.page')->where('id', '\d+');
+    Route::post('/page-accesses/create', 'PageAccessesController@store')->name('page-accesses.store');
+    Route::post('/page-accesses/{id}/destroy', 'PageAccessesController@destroy')->name('page-accesses.destroy')->where('id', '\d+');
+
     Route::post('/editing-toggle', 'SessionsController@editingToggle')->name('editing-toggle');
 
     Route::post('/pages/create', 'PagesController@store')->name('pages.store');

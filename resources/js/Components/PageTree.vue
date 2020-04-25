@@ -1,7 +1,7 @@
 <template>
 
     <div v-if="editing"
-        class="bg-gray-100 border-r border-gray-300 pt-2 px-2 overflow-y-scroll text-gray-700"
+        class="bg-gray-100 border-r border-gray-300 pt-2 overflow-y-scroll text-gray-700"
         :style="maxHeight ? 'max-height: ' + maxHeight : ''"
     >
         <page-list :page="pageTree" 

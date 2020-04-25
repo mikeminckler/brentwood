@@ -33,6 +33,9 @@ const app = new Vue({
         'photo-viewer': () => import(/* webpackChunkName: "photo-viewer" */ '@/Components/PhotoViewer'),
         'processing': () => import(/* webpackChunkName: "processing" */ '@/Components/Processing'),
         'saving-indicator': () => import(/* webpackChunkName: "saving-indicator" */ '@/Components/SavingIndicator'),
+        'user-management': () => import(/* webpackChunkName: "user-management" */ '@/Components/UserManagement'),
+        'page-access': () => import(/* webpackChunkName: "page-access" */ '@/Components/PageAccess'),
+        'role-management': () => import(/* webpackChunkName: "role-management" */ '@/Components/RoleManagement'),
     },
 
     mounted() {
@@ -81,7 +84,7 @@ const app = new Vue({
             this.$http.get('/pages').then( response => {
                 this.$store.dispatch('setPageTree', response.data.home_page);
             }, error => {
-                this.processErrors(error.response);
+                //console.log(error.response);
             });
         }, 100),
     }

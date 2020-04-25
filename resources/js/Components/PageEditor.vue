@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full z-20 flex items-center justify-center bg-gray-100 p-1" v-if="editing">
+    <div class="w-full z-20 flex items-center justify-center bg-gray-100 p-1" v-if="editing && page">
 
         <div class="w-full max-w-6xl flex items-center bg-gray-200 p-2 shadow relative">
 

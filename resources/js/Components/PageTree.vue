@@ -1,7 +1,7 @@
 <template>
 
     <div v-if="editing"
-        class="bg-gray-100 border-r border-gray-300 pt-2 overflow-y-scroll text-gray-700"
+        class="bg-gray-100 border-r border-gray-300 pt-2 overflow-y-scroll text-gray-700 pb-4"
         :style="maxHeight ? 'max-height: ' + maxHeight : ''"
     >
         <page-list :page="pageTree" 
@@ -11,6 +11,7 @@
             :show-content-elements="showContentElements"
             :expanded="expanded"
             @selected="$emit('selected', $event)"
+            :sort="sort"
         ></page-list>
 
     </div>

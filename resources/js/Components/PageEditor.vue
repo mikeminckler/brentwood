@@ -28,7 +28,7 @@
                 <transition name="slide-down">
                     <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white px-4 py-1 font-bold cursor-pointer w-32 justify-center" 
                         @click="publishPage()"
-                         v-if="(hasDraft && page.can_be_published) && !$store.state.saving.length"
+                         v-if="(hasDraft && page.editable) && !$store.state.saving.length"
                     >
                         <div class="pr-2"><i class="fas fa-sign-out-alt"></i></div>
                         <div>Publish</div>

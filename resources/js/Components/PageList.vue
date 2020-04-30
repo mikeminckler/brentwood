@@ -1,6 +1,6 @@
 <template>
 
-    <div class="pl-2" 
+    <div class="pl-2 relative w-full overflow-visible" 
         :id="'page' + page.id" 
         :data-page-id="page.id"
         :draggable="page.id > 1 ? 'true' : 'false'"
@@ -13,18 +13,32 @@
             !page.published_version_id ? 'text-gray-500 italic' : '', 
          ]"
     >
-        <div class="flex hover:bg-white border-b border-gray-300 items-center" :class="activePage ? 'bg-yellow-100 text-black' : ''">
+
+        <div
+            v-if="page.id > 1 && sort && $store.state.dragging"
+            class="absolute w-3/4 overflow-visible z-2"
+            :class="[$store.state.dragging ? 'h-8' : 'h-0']"
+            @drop.stop='onDrop($event)'
+            @dragover.stop.prevent
+            @dragenter.stop.prevent="hover = true"
+            @dragleave.stop.prevent="hover = false"
+        >
+            <div class="relative overflow-visible h-0" v-if="hover" style="bottom: -13px;"><i class="fas fa-caret-right"></i></div>
+        </div>
+
+        <div class="flex hover:bg-white border-b border-gray-300 items-center relative z-1" :class="activePage ? 'bg-yellow-100 text-black' : ''">
             <div class="cursor-pointer w-3 mr-2 flex items-center justify-center caret text-lg leading-none" 
                 :class="{ 'rotate90' : expand }"
                 @click="expand = !expand" v-if="page.pages ? ( page.pages.length ? true : false ) : false"
             >
                 <i class="fas fa-caret-right"></i>
             </div>
-        <div class="cursor-pointer flex-1 pr-4" :class="[page.pages ? ( page.pages.length ? '' : 'pl-3' ) : 'pl-3', page.unlisted ? 'text-gray-500' : '']" @click="selectPage()">{{ page.name }} {{ page.sort_order }}</div>
+            <div class="cursor-pointer flex-1 pr-4 whitespace-no-wrap" :class="[page.pages ? ( page.pages.length ? '' : 'pl-3' ) : 'pl-3', page.unlisted ? 'text-gray-500' : '']" @click="selectPage()">{{ page.name }}</div>
             <div class="" v-if="page.unlisted" class="text-gray-400 pl-2"><i class="fas fa-eye-slash"></i></div>
             <div class="text-gray-600 pl-2 text-lg" v-if="showChanges && (!page.published_version_id || page.can_be_published)"><i class="fas fa-pen-square"></i></div>
             <div class="text-xl px-2" v-if="showContentElements" @click="displayContentElements = !displayContentElements"><i class="fas fa-caret-square-down"></i></div>
         </div>
+
 
         <div class="pl-3" v-if="displayContentElements">
             <div class="hover:bg-white border-b border-gray-300 cursor-pointer overflow-hidden relative my-1" 
@@ -49,27 +63,21 @@
             </div>
         </div>
 
-        <page-list v-for="(p, index) in $lodash.orderBy(page.pages, ['sort_order'], ['asc'])" 
-            :page="p" 
-            :key="p.id" 
-            v-if="expand"  
-            :emit-event="emitEvent"
-            :show-changes="showChanges"
-            :show-content-elements="showContentElements"
-            :expanded="expanded"
-            @selected="$emit('selected', $event)"
-            @showContentElements="$emit('showContentElements', $event)"
-        ></page-list>
+        <transition-group name="page-sort">
+            <page-list v-for="(p, index) in $lodash.orderBy(page.pages, ['sort_order'], ['asc'])" 
+                :page="p" 
+                :key="p.id" 
+                v-if="expand"  
+                :emit-event="emitEvent"
+                :show-changes="showChanges"
+                :show-content-elements="showContentElements"
+                :expanded="expanded"
+                :sort="sort"
+                @selected="$emit('selected', $event)"
+                @showContentElements="$emit('showContentElements', $event)"
+            ></page-list>
+        </transition-group>
 
-        <div
-            v-if="page.id > 1"
-            class="tranistion-all duration-500"
-            :class="[hover ? 'bg-yellow-500' : 'bg-yellow-200', $store.state.dragging ? 'h-2' : 'h-0']"
-            @drop.stop='onDrop($event)'
-            @dragover.stop.prevent
-            @dragenter.stop.prevent="hover = true"
-            @dragleave.stop.prevent="hover = false"
-        ></div>
 
     </div>
 
@@ -83,7 +91,7 @@
 
         mixins: [Feedback],
 
-        props: ['page', 'emitEvent', 'showContentElements', 'expanded', 'showChanges'],
+        props: ['page', 'emitEvent', 'showContentElements', 'expanded', 'showChanges', 'sort'],
 
         components: {
             'page-list': () => import(/* webpackChunkName: "page-list" */ '@/Components/PageList'),
@@ -130,10 +138,6 @@
                 event.dataTransfer.setData('page', JSON.stringify(page));
             },
 
-            stopDrag: function(event, page) {
-                this.$store.dispatch('setDragging', false);
-            },
-
             onDrop (event) {
                 let page = JSON.parse(event.dataTransfer.getData('page'));
 
@@ -143,6 +147,8 @@
                 };
 
                 this.$store.dispatch('startSaving', 'page-tree');
+                this.$store.dispatch('setDragging', false);
+
                 this.$http.post('/pages/' + page.id + '/sort', input).then( response => {
                     this.processSuccess(response);
                     this.$eventer.$emit('refresh-page-tree');
@@ -158,23 +164,27 @@
 
 <style>
 
-    @keyframes page-list {
-        0% {
-            max-height: 0px;
-            opacity: 0;
-        }
-        100%   {
-            max-height: 25px;
-            opacity: 1;
-        }
+@keyframes page-sort {
+    0% {
+        opacity: 0;
+        max-height: 0;
     }
-
-    .page-list-enter-active {
-        animation: page-list var(--transition-time) ease-out;
+    100%   {
+        opacity: 1;
+        max-height: 24px;
     }
+}
 
-    .page-list-leave-active {
-        animation: page-list var(--transition-time) reverse;
+.page-sort-enter-active {
+    animation: page-sort var(--transition-time) ease-out;
+}
+
+.page-sort-leave-active {
+    animation: page-sort var(--transition-time) reverse;
+}
+
+    .page-sort-move {
+        transition: transform var(--transition-time) linear;
     }
 
 </style>

@@ -18,7 +18,7 @@ class PageAccessTest extends TestCase
     public function the_page_access_index_can_be_loaded()
     {
         $this->get( route('page-accesses.index'))
-             ->assertRedirect('/login');
+             ->assertRedirect( route('login'));
 
         $this->signIn( factory(User::class)->create());
 

@@ -23,6 +23,7 @@ const store = new Vuex.Store({
         },
         pageTree: {},
         youtubeReady: false,
+        dragging: false,
     },
 
     mutations: {
@@ -82,6 +83,10 @@ const store = new Vuex.Store({
 
         processing(state, data) {
             state.processing = data;
+        },
+
+        setDragging(state, dragging) {
+            state.dragging = dragging;
         },
     },
 
@@ -167,6 +172,10 @@ const store = new Vuex.Store({
 
         processing({ commit, state }, data) {
             commit('processing', data);
+        },
+
+        setDragging({ commit, state }, dragging) {
+            commit('setDragging', dragging);
         },
 
     }

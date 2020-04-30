@@ -12,6 +12,13 @@ class LoginTest extends TestCase
 {
 
     /** @test **/
+    public function a_user_is_redirected_to_google_auth_when_trying_to_login()
+    {
+        $this->get('/login')
+         ->assertRedirect();
+    }
+
+    /*
     public function if_an_editor_logs_in_editing_is_set_in_the_session()
     {
         $user = factory(User::class)->create([
@@ -29,4 +36,5 @@ class LoginTest extends TestCase
 
         $this->assertTrue(session()->get('editing'));
     }
+     */
 }

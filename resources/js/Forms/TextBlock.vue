@@ -49,7 +49,7 @@
 
             <div :class="content.full_width ? 'px-12 py-8' : 'text-block'">
                 <div class="">
-                    <input :class="first ? 'h1' : 'h2'" type="text" v-model="content.header" placeholder="Header" />
+                    <input :class="first ? 'h1' : 'h2'" @blur="content.header = content.header + ' '" type="text" v-model="content.header" placeholder="Header" />
                 </div>
 
                 <editor v-model="content.body" 

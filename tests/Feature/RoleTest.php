@@ -79,7 +79,11 @@ class RoleTest extends TestCase
     public function a_role_can_be_edited()
     {
         $role = factory(Role::class)->create();
+        $user = factory(User::class)->create();
         $input = factory(Role::class)->raw();
+        $input['users'] = [
+            $user->toArray(),
+        ];
 
         $this->json('POST', route('roles.update', ['id' => $role->id]), [])
              ->assertStatus(401);
@@ -102,10 +106,13 @@ class RoleTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => Arr::get($input, 'name').' Saved',
+                'name' => Arr::get($input, 'name'),
              ]);
 
         $role->refresh();
         $this->assertEquals(Arr::get($input, 'name'), $role->name);
+        $this->assertNotNull($role->users);
+        $this->assertTrue($role->users->contains('name', $user->name));
     }
 
 
@@ -113,6 +120,8 @@ class RoleTest extends TestCase
     public function the_roles_index_can_be_loaded()
     {
         $role = Role::all()->random();
+        $user = factory(User::class)->create();
+        $user->addRole($role);
 
         $this->get( route('roles.index'))
              ->assertRedirect('/login');
@@ -126,8 +135,70 @@ class RoleTest extends TestCase
         $this->signInAdmin();
 
         $this->get( route('roles.index'))
-            ->assertSuccessful();
+             ->assertSuccessful();
 
+    }
+
+    /*
+    public function a_user_can_be_removed_from_a_role()
+    {
+        $user = factory(User::class)->create();
+        $role = factory(Role::class)->create();
+
+        $user->addRole($role);
+
+        $user->refresh();
+        $role->refresh();
+
+        $this->assertTrue($role->users->contains('id', $user->id));
+
+        $this->signInAdmin();
+
+        $input = [
+            'user_id' => $user->id,
+        ];
+
+        $this->withoutExceptionHandling();
+
+        $this->json('POST', route('roles.remove-user', ['id' => $role->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => $user->name.' Removed From '.$role->name,
+             ]);
+
+        $role->refresh();
+
+        $this->assertFalse($role->users->contains('id', $user->id));
+    }
+     */
+
+
+    /** @test **/
+    public function a_roles_user_is_removed_if_it_is_not_included_in_the_save_input()
+    {
+        $user = factory(User::class)->create();   
+        $role = Role::all()->random();
+
+        $user->addRole($role);
+        $user->refresh();
+
+        $this->assertTrue($user->hasRole($role));
+
+        $input = factory(Role::class)->raw();
+        $input['users'] = [];
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+
+        $this->json('POST', route('roles.update', ['id' => $role->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => Arr::get($input, 'name').' Saved',
+             ]);
+
+        $role->refresh();
+        $this->assertFalse($role->users->contains('id', $user->id));
     }
 
 }

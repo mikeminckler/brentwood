@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Role;
 use App\Http\Requests\RoleValidation;
+use App\User;
 
 class RolesController extends Controller
 {
@@ -16,7 +17,7 @@ class RolesController extends Controller
             return redirect('/')->with('error', 'You do not have access to view Roles');
         }
 
-        $roles = Role::all();
+        $roles = Role::all()->load('users');
         return view('roles.index', compact('roles'));   
     }
 
@@ -37,6 +38,7 @@ class RolesController extends Controller
 
         return response()->json([
             'success' => $role->name.' Saved',
+            'role' => $role->refresh()->load('users'),
         ]);
     }
 
@@ -47,5 +49,20 @@ class RolesController extends Controller
         }
 
         return (new Role)->search();
+    }
+
+    public function removeUser($id)
+    {
+        $role = Role::findOrFail($id);
+        if (auth()->user()->can('update', $role)) {
+            $user = User::findOrFail(requestInput('user_id'));
+            $user->removeRole($role);
+
+            return response()->json([
+                'success' => $user->name.' Removed From '.$role->name,
+            ]);
+        } else {
+            return redirect()->route('home')->with(['error' => 'You do not have permission to update roles']);
+        }
     }
 }

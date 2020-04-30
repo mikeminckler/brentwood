@@ -51,7 +51,6 @@ class ContentElementPolicy
      */
     public function create(User $user)
     {
-        //
     }
 
     /**
@@ -63,7 +62,6 @@ class ContentElementPolicy
      */
     public function update(User $user, ContentElement $contentElement)
     {
-        //
     }
 
     /**

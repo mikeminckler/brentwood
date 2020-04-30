@@ -12,14 +12,18 @@ use App\ContentElement;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\PageAccess;
+use App\AppendAttributesTrait;
 
 class Page extends Model
 {
     use SoftDeletes;
+    use AppendAttributesTrait;
 
-    protected $with = ['pages', 'footerFgFileUpload', 'footerBgFileUpload'];
+    protected $with = ['pages'];
+    //protected $with = ['pages', 'footerFgFileUpload', 'footerBgFileUpload'];
 
-    protected $appends = [
+    public $append_attributes = [
+        'editable',
         'full_slug', 
         'can_be_published', 
         'content_elements', 
@@ -65,7 +69,7 @@ class Page extends Model
         $page->saveContentElements($input);
 
         cache()->tags([cache_name($page)])->flush();
-        return $page;    
+        return $page;
     }
 
     public function parentPage()
@@ -242,6 +246,15 @@ class Page extends Model
 
     public function getCanBePublishedAttribute() 
     {
+
+        if (!auth()->check()) {
+            return false;
+        }
+
+        if (!auth()->user()->hasRole('publisher')) {
+            return false;
+        }
+
         if (!$this->published_version_id && $this->contentElements->count()) {
             return true;
         }
@@ -373,4 +386,79 @@ class Page extends Model
     {
         return $this->hasMany(PageAccess::class);
     }
+
+    public function getEditableAttribute() 
+    {
+
+        if (!auth()->check()) {
+            return false;
+        }
+
+        if (!session()->has('editing')) {
+            return false;
+        }
+
+        return auth()->user()->can('update', $this);
+    }
+
+    public function appendRecursive($attributes = null)
+    {
+
+        if (!$attributes) {
+            $attribute = $this->append_attributes;
+        }
+
+        if (!is_array($attributes) && $attributes) {
+            $attributes = [$attributes];
+        }
+
+        $this->appendAttributes($attributes);
+
+        foreach ($this->pages as $page) {
+            $page->appendRecursive($attributes);
+        }
+
+    }
+
+    public function sortPages(Page $page, $input)
+    {
+        
+        $old_parent_page = $page->parentPage;
+
+        $page->sort_order = Arr::get($input, 'sort_order');
+        $page->parent_page_id = Arr::get($input, 'parent_page_id');
+
+        $parent_page = Page::findOrFail(Arr::get($input, 'parent_page_id'));
+
+        $this->reorderPages($parent_page, $page);
+
+        if ($old_parent_page->id != Arr::get($input, 'parent_page_id')) {
+            $this->reorderPages($old_parent_page, $page);
+        }
+
+    }
+
+    protected function reorderPages(Page $parent_page, Page $page)
+    {
+        
+        $pages = $parent_page->pages;
+
+        $pages = $pages->reject(function($p) use($page){
+            return $p->id === $page->id;
+        });
+
+        if ($page->parent_page_id === $parent_page->id) {
+            $pages = $pages->push($page);
+        }
+
+        $pages = $pages->sortBy(function($p) {
+            return $p->sort_order;
+        })
+        ->values()
+        ->each( function ($p, $index) {
+            $p->sort_order = $index + 1;
+            $p->save();
+        });
+    }
+
 }

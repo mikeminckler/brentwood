@@ -11,9 +11,9 @@
 |
 */
 
-Auth::routes();
+//Auth::routes();
 
-Route::get('login/google', 'Auth\LoginController@redirectToProvider');
+Route::get('login', 'Auth\LoginController@redirectToProvider')->name('login');
 Route::get('login/google/authorized', 'Auth\LoginController@handleProviderCallback');
 
 Route::get('/pages', 'PagesController@index')->name('pages.index');
@@ -29,6 +29,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/roles/create', 'RolesController@store')->name('roles.store');
     Route::post('/roles/{id}', 'RolesController@store')->name('roles.update')->where('id', '\d+');
     Route::post('/roles/search', 'RolesController@search')->name('roles.search');
+    //Route::post('/roles/{id}/remove-user', 'RolesController@removeUser')->name('roles.remove-user')->where('id', '\d+');
 
     Route::get('/page-accesses', 'PageAccessesController@index')->name('page-accesses.index');
     Route::get('/page-accesses/page/{id}', 'PageAccessesController@page')->name('page-accesses.page')->where('id', '\d+');
@@ -42,6 +43,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/pages/{id}/publish', 'PagesController@publish')->name('pages.publish')->where('id', '\d+');
     Route::post('/pages/{id}/remove', 'PagesController@remove')->name('pages.remove')->where('id', '\d+');
     Route::post('/pages/{id}/restore', 'PagesController@restore')->name('pages.restore')->where('id', '\d+');
+    Route::post('/pages/{id}/sort', 'PagesController@sortPage')->name('pages.sort')->where('id', '\d+');
 
     Route::post('/content-elements/create', 'ContentElementsController@store')->name('content-elements.store');
     Route::post('/content-elements/{id}', 'ContentElementsController@store')->name('content-elements.update')->where('id', '\d+');

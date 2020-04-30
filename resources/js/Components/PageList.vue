@@ -1,14 +1,26 @@
 <template>
 
-    <div class="pl-2" :class="[page.unlisted ? 'bg-gray-200' : '', !page.published_version_id ? 'text-gray-500 italic' : '', activePage ? 'bg-white text-black' : '']">
-        <div class="flex hover:bg-white border-b border-gray-300 items-center">
+    <div class="pl-2" 
+        :id="'page' + page.id" 
+        :data-page-id="page.id"
+        :draggable="page.id > 1 ? 'true' : 'false'"
+        @dragstart.stop="startDrag($event, page)"
+        @dragend.stop="stopDrag($event, page)"
+        :class="[
+            page.parent_page_id > 0 ? 'cursor-move sort-item' : '',
+            page.pages ? ( page.pages.length > 0 ? 'sort-container' : '') : '',
+            page.unlisted ? 'bg-gray-200' : '', 
+            !page.published_version_id ? 'text-gray-500 italic' : '', 
+         ]"
+    >
+        <div class="flex hover:bg-white border-b border-gray-300 items-center" :class="activePage ? 'bg-yellow-100 text-black' : ''">
             <div class="cursor-pointer w-3 mr-2 flex items-center justify-center caret text-lg leading-none" 
                 :class="{ 'rotate90' : expand }"
                 @click="expand = !expand" v-if="page.pages ? ( page.pages.length ? true : false ) : false"
             >
                 <i class="fas fa-caret-right"></i>
             </div>
-            <div class="cursor-pointer flex-1 pr-4" :class="[page.pages ? ( page.pages.length ? '' : 'pl-3' ) : 'pl-3', page.unlisted ? 'text-gray-500' : '']" @click="selectPage()">{{ page.name }}</div>
+        <div class="cursor-pointer flex-1 pr-4" :class="[page.pages ? ( page.pages.length ? '' : 'pl-3' ) : 'pl-3', page.unlisted ? 'text-gray-500' : '']" @click="selectPage()">{{ page.name }} {{ page.sort_order }}</div>
             <div class="" v-if="page.unlisted" class="text-gray-400 pl-2"><i class="fas fa-eye-slash"></i></div>
             <div class="text-gray-600 pl-2 text-lg" v-if="showChanges && (!page.published_version_id || page.can_be_published)"><i class="fas fa-pen-square"></i></div>
             <div class="text-xl px-2" v-if="showContentElements" @click="displayContentElements = !displayContentElements"><i class="fas fa-caret-square-down"></i></div>
@@ -37,7 +49,7 @@
             </div>
         </div>
 
-        <page-list v-for="p in page.pages" 
+        <page-list v-for="(p, index) in $lodash.orderBy(page.pages, ['sort_order'], ['asc'])" 
             :page="p" 
             :key="p.id" 
             v-if="expand"  
@@ -48,17 +60,33 @@
             @selected="$emit('selected', $event)"
             @showContentElements="$emit('showContentElements', $event)"
         ></page-list>
+
+        <div
+            v-if="page.id > 1"
+            class="tranistion-all duration-500"
+            :class="[hover ? 'bg-yellow-500' : 'bg-yellow-200', $store.state.dragging ? 'h-2' : 'h-0']"
+            @drop.stop='onDrop($event)'
+            @dragover.stop.prevent
+            @dragenter.stop.prevent="hover = true"
+            @dragleave.stop.prevent="hover = false"
+        ></div>
+
     </div>
 
 </template>
 
 <script>
+
+    import Feedback from '@/Mixins/Feedback';
+
     export default {
+
+        mixins: [Feedback],
+
         props: ['page', 'emitEvent', 'showContentElements', 'expanded', 'showChanges'],
 
         components: {
             'page-list': () => import(/* webpackChunkName: "page-list" */ '@/Components/PageList'),
-
             'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement'),
             'text-block': () => import(/* webpackChunkName: "text-block" */ '@/Forms/TextBlock'),
             'photo-block': () => import(/* webpackChunkName: "photo-block" */ '@/Forms/PhotoBlock'),
@@ -71,6 +99,7 @@
             return {
                 expand: false,
                 displayContentElements: false,
+                hover: false,
             }
         },
 
@@ -92,6 +121,36 @@
                 } else {
                     window.location.href = this.page.full_slug;
                 }
+            },
+
+            startDrag: function(event, page) {
+                this.$store.dispatch('setDragging', true);
+                event.dataTransfer.dropEffect = 'move';
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('page', JSON.stringify(page));
+            },
+
+            stopDrag: function(event, page) {
+                this.$store.dispatch('setDragging', false);
+            },
+
+            onDrop (event) {
+                let page = JSON.parse(event.dataTransfer.getData('page'));
+
+                let input = {
+                    sort_order: this.page.sort_order + .5,
+                    parent_page_id: this.page.parent_page_id,
+                };
+
+                this.$store.dispatch('startSaving', 'page-tree');
+                this.$http.post('/pages/' + page.id + '/sort', input).then( response => {
+                    this.processSuccess(response);
+                    this.$eventer.$emit('refresh-page-tree');
+                    this.$store.dispatch('completeSaving', 'page-tree');
+                }, error => {
+                    this.processErrors(error.response);
+                    this.$store.dispatch('completeSaving', 'page-tree');
+                });
             }
         },
     }

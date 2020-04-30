@@ -4,7 +4,7 @@
 
 <div class="flex flex-col flex-1">
 
-    @if (!session()->get('editing') || (session()->get('editing') && request('preview')))
+    @if (!$page->editable || ($page->editable && request('preview')))
         @foreach ($content_elements as $index => $content_element)
 
             @if ($index === 0 && $content_element->type === 'text-block')
@@ -34,9 +34,11 @@
         @endforeach
     @endif
 
-    @if (session()->get('editing') && !request('preview'))
-        <content-elements-editor v-if="$store.state.editing"></content-elements-editor>
-    @endif
+    @auth
+        @if ($page->editable && !request('preview'))
+            <content-elements-editor v-if="$store.state.editing"></content-elements-editor>
+        @endif
+    @endauth
 
 </div>
 

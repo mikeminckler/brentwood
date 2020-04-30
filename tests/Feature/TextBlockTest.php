@@ -44,16 +44,15 @@ class TextBlockTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), [])
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'text-block'])
+        $this->json('POST', route('content-elements.store'), ['type' => 'text-block', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
@@ -102,17 +101,17 @@ class TextBlockTest extends TestCase
              ->assertStatus(403);
 
         $this->signInAdmin();
+        $page = factory(Page::class)->create();
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'text-block'])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'text-block', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
@@ -125,7 +124,6 @@ class TextBlockTest extends TestCase
         $input['content']['header'] = Arr::get($text_block_input, 'header');
         $input['content']['body'] = Arr::get($text_block_input, 'body');
         $input['content']['style'] = Arr::get($text_block_input, 'style');
-        $page = factory(Page::class)->create();
         $input['pivot'] = [
             'page_id' => $page->id,
             'sort_order' => 1,

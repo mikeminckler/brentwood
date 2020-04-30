@@ -9,6 +9,7 @@ use Tests\TestCase;
 use App\ContentElement;
 use App\User;
 use App\Page;
+use App\TextBlock;
 
 class ContentElementTest extends TestCase
 {
@@ -126,4 +127,67 @@ class ContentElementTest extends TestCase
         $this->assertEquals(0, ContentElement::where('id', $published_content_element->id)->get()->count());
     }
 
+    /** @test **/
+    public function a_user_with_page_editing_can_update_content_elements()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+
+        $page = $content_element->pages->first();
+
+        $this->assertInstanceOf(Page::class, $page);
+
+        $user = factory(User::class)->create();
+        $page->createPageAccess($user);
+        $user->refresh();
+
+        $this->assertTrue($user->can('update', $page));
+
+        $content_element['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+        $input = $content_element->toArray();
+        $input['content'] = factory(TextBlock::class)->raw();
+
+        $this->signIn($user);
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+    }
+
+    /** @test **/
+    public function a_user_with_page_editing_can_create_content_elements()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+
+        $page = $content_element->pages->first();
+
+        $this->assertInstanceOf(Page::class, $page);
+
+        $user = factory(User::class)->create();
+        $page->createPageAccess($user);
+        $user->refresh();
+
+        $this->assertTrue($user->can('update', $page));
+
+        $content_element['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+        $input = $content_element->toArray();
+        $input['content'] = factory(TextBlock::class)->raw();
+
+        $this->signIn($user);
+        $this->json('POST', route('content-elements.store'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+    }
 }

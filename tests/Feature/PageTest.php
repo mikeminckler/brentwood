@@ -369,4 +369,230 @@ class PageTest extends TestCase
         $this->assertEquals($fg_photo->id, $fg_file_upload->id);
         $this->assertEquals($bg_photo->id, $bg_file_upload->id);
     }
+
+    /** @test **/
+    public function a_user_without_update_permisson_cannot_save_a_page()
+    {
+        $page = factory(Page::class)->create();
+        $user = factory(User::class)->create();
+
+        $input = factory(Page::class)->raw();   
+
+        $this->postJson(route('pages.update', ['id' => $page->id]), $input)
+             ->assertStatus(401);
+
+        $this->signIn($user);
+
+        $this->postJson(route('pages.update', ['id' => $page->id]), $input)
+             ->assertStatus(403);
+
+        $page->createPageAccess($user);
+
+        $user->refresh();
+
+        $this->postJson(route('pages.update', ['id' => $page->id]), $input)
+            ->assertSuccessful();
+        
+    }
+
+
+    /** @test **/
+    public function sorting_a_page_below_reorders_pages()
+    {
+        $parent_page = factory(Page::class)->create();
+        $page = factory(Page::class)->create([
+            'parent_page_id' => $parent_page->id,
+            'sort_order' => 2
+        ]);
+
+        $this->assertInstanceOf(Page::class, $parent_page);
+
+        $page_above = factory(Page::class)->create([
+            'parent_page_id' => $parent_page->id,
+            'sort_order' => 1,
+        ]);
+
+        $page_below = factory(Page::class)->create([
+            'parent_page_id' => $parent_page->id,
+            'sort_order' => 3,
+        ]);
+
+        $page_last = factory(Page::class)->create([
+            'parent_page_id' => $parent_page->id,
+            'sort_order' => 4,
+        ]);
+
+        $this->signInAdmin();
+
+        $input = [
+            // This sets the position, after the below page
+            'sort_order' => $page_below->sort_order + .5,
+            'parent_page_id' => $parent_page->id,
+        ];
+
+        //dump('ABOVE: '.$page_above->id);
+        //dump('BELOW: '.$page_below->id);
+        //dump('PAGE: '.$page->id);
+        //dump('LAST: '.$page_last->id);
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('pages.sort', ['id' => $page->id]), $input)
+             ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Page Saved',
+            ]);
+
+        $page->refresh();
+        $page_above->refresh();
+        $page_below->refresh();
+        $page_last->refresh();
+
+        $this->assertEquals(1, $page_above->sort_order);
+        $this->assertEquals(2, $page_below->sort_order);
+        $this->assertEquals(3, $page->sort_order);
+        $this->assertEquals(4, $page_last->sort_order);
+
+    }
+
+    /** @test **/
+    public function sorting_a_page_above_reorders_pages()
+    {
+        $parent_page = factory(Page::class)->create();
+        $page = factory(Page::class)->create([
+            'parent_page_id' => $parent_page->id,
+            'sort_order' => 2
+        ]);
+
+        $this->assertInstanceOf(Page::class, $parent_page);
+
+        $page_above = factory(Page::class)->create([
+            'parent_page_id' => $parent_page->id,
+            'sort_order' => 1,
+        ]);
+
+        $page_below = factory(Page::class)->create([
+            'parent_page_id' => $parent_page->id,
+            'sort_order' => 3,
+        ]);
+
+        $page_last = factory(Page::class)->create([
+            'parent_page_id' => $parent_page->id,
+            'sort_order' => 4,
+        ]);
+
+        $this->signInAdmin();
+
+        $input = [
+            // This sets the position, after the below page
+            'sort_order' => .5,
+            'parent_page_id' => $parent_page->id,
+        ];
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('pages.sort', ['id' => $page->id]), $input)
+             ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Page Saved',
+            ]);
+
+        $page->refresh();
+        $page_above->refresh();
+        $page_below->refresh();
+        $page_last->refresh();
+
+        $this->assertEquals(1, $page->sort_order);
+        $this->assertEquals(2, $page_above->sort_order);
+        $this->assertEquals(3, $page_below->sort_order);
+        $this->assertEquals(4, $page_last->sort_order);
+
+    }
+
+    /** @test **/
+    public function sorting_a_page_into_a_new_parent_sorts_the_old_parent_pages()
+    {
+        $parent_old = factory(Page::class)->create();
+        $parent_new = factory(Page::class)->create();
+        $page = factory(Page::class)->create([
+            'parent_page_id' => $parent_old->id,
+            'sort_order' => 2
+        ]);
+
+        $old_page1 = factory(Page::class)->create([
+            'parent_page_id' => $parent_old->id,
+            'sort_order' => 1
+        ]);
+
+        $old_page2 = factory(Page::class)->create([
+            'parent_page_id' => $parent_old->id,
+            'sort_order' => 3
+        ]);
+
+        $new_page1 = factory(Page::class)->create([
+            'parent_page_id' => $parent_new->id,
+            'sort_order' => 1
+        ]);
+
+        $new_page2 = factory(Page::class)->create([
+            'parent_page_id' => $parent_new->id,
+            'sort_order' => 2
+        ]);
+
+        $this->signInAdmin();
+
+        $input = [
+            // This sets the position, after the below page
+            'sort_order' => 1.5,
+            'parent_page_id' => $parent_new->id,
+        ];
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('pages.sort', ['id' => $page->id]), $input)
+             ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Page Saved',
+            ]);
+
+        $page->refresh();
+        $old_page1->refresh();
+        $old_page2->refresh();
+        $new_page1->refresh();
+        $new_page2->refresh();
+
+        $this->assertEquals(2, $page->sort_order);
+        $this->assertEquals(1, $new_page1->sort_order);
+        $this->assertEquals(3, $new_page2->sort_order);
+        $this->assertEquals(1, $old_page1->sort_order);
+        $this->assertEquals(2, $old_page2->sort_order);
+        
+    }
+
+    /** @test **/
+    public function sorting_a_first_level_page()
+    {
+        $page = factory(Page::class)->create([
+            'parent_page_id' => 1,
+            'sort_order' => 2,
+        ]);
+
+        $this->signInAdmin();
+
+        $input = [
+            // This sets the position, after the below page
+            'sort_order' => .5,
+            'parent_page_id' => 1,
+        ];
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('pages.sort', ['id' => $page->id]), $input)
+             ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Page Saved',
+            ]);
+
+        $page->refresh();
+
+        $this->assertEquals(1, $page->sort_order);
+        $this->assertEquals(1, $page->parentPage->id);
+
+    }
 }

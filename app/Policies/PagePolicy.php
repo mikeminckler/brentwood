@@ -63,7 +63,7 @@ class PagePolicy
      */
     public function update(User $user, Page $page)
     {
-        //
+        return $user->canEditPage($page);
     }
 
     /**

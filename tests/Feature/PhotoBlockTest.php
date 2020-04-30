@@ -62,10 +62,9 @@ class PhotoBlockTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'photo-block'])
+        $this->json('POST', route('content-elements.store'), ['type' => 'photo-block', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',

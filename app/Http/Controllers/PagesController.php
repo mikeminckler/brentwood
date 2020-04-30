@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Page;
 use App\Http\Requests\PageValidation;
 use App\Http\Controllers\SoftDeletesControllerTrait;
+use Illuminate\Support\Facades\Validator;
 
 class PagesController extends Controller
 {
@@ -40,6 +41,10 @@ class PagesController extends Controller
             $content_elements = $page->published_content_elements;
         }
 
+        if (session()->has('editing')) {
+            $page->appendAttributes();
+        }
+
         return view('page', compact('page', 'content_elements'));
     }
 
@@ -48,10 +53,11 @@ class PagesController extends Controller
      */
     public function index() 
     {
-        $home_page = Page::findOrFail(1);
+        $page = Page::findOrFail(1);
+        $page->appendRecursive(['full_slug', 'editable', 'can_be_published']);
 
         return response()->json([
-            'home_page' => $home_page,
+            'home_page' => $page,
         ]);
     }
 
@@ -75,6 +81,7 @@ class PagesController extends Controller
         }
 
         $page = (new Page)->savePage($id, requestInput());
+        $page->appendAttributes();
         return response()->json([
             'success' => 'Page Saved',
             'page' => $page,
@@ -130,5 +137,31 @@ class PagesController extends Controller
 
         return response()->json(['success' => 'Page Removed']);
         
+    }
+
+    public function sortPage($id)
+    {
+
+        if (!auth()->check()) {
+            abort(401);
+        }
+
+        $page = Page::findOrFail($id);
+
+        if (!auth()->user()->can('update', $page)) {
+            return response()->json(['error' => 'You do not have permission to sort pages'], 403);
+        }
+
+        Validator::make(request()->all(), [
+            'parent_page_id' => 'required|integer|min:1|exists:pages,id',
+            'sort_order' => 'required|numeric',
+        ])->validate();
+
+        (new Page)->sortPages($page, requestInput());
+
+        return response()->json([
+            'success' => 'Page Saved',
+        ]);
+
     }
 }

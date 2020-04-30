@@ -39,16 +39,15 @@ class EmbedCodeTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), [])
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'embed-code'])
+        $this->json('POST', route('content-elements.store'), ['type' => 'embed-code', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
@@ -70,6 +69,7 @@ class EmbedCodeTest extends TestCase
     {
         $embed_code = factory(EmbedCode::class)->create();
         $content_element = $embed_code->contentElement;
+        $page = factory(Page::class)->create();
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
 
@@ -83,16 +83,15 @@ class EmbedCodeTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'embed-code'])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'embed-code', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
@@ -101,7 +100,6 @@ class EmbedCodeTest extends TestCase
         $input = $content_element->toArray();
         $embed_code_input = factory(EmbedCode::class)->raw();
         $input['content']['code'] = Arr::get($embed_code_input, 'code');
-        $page = factory(Page::class)->create();
         $input['pivot'] = [
             'page_id' => $page->id,
             'sort_order' => 1,

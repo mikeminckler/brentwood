@@ -18,22 +18,8 @@ class ContentElementsController extends Controller
 
     public function store(ContentElementValidation $request, $id = null) 
     {
-        if ($id) {
-            /**
-             * here we check the policy file, App\Policies\ContentElementPolicy
-             * https://laravel.com/docs/master/authorization#creating-policies
-             */
-            if (!auth()->user()->can('update', ContentElement::findOrFail($id))) {
-                if (request()->expectsJson()) {
-                    return response()->json(['error', 'You do not have permission to update that content'], 403);
-                }
-                return redirect('/')->with(['error' => 'You do not have permission to update that content']);
-            }
-        }
-
-        $content_element = (new ContentElement)->saveContentElement($id, requestInput());
-
         $page = Page::findOrFail(requestInput('pivot.page_id'));
+        $content_element = (new ContentElement)->saveContentElement($id, requestInput());
         $content_element = $page->contentElements()->where('content_element_id', $content_element->id)->first();
 
         return response()->json([

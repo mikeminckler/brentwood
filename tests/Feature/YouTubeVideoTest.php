@@ -45,16 +45,15 @@ class YoutubeVideoTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), [])
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'youtube-video'])
+        $this->json('POST', route('content-elements.store'), ['type' => 'youtube-video', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
@@ -94,17 +93,17 @@ class YoutubeVideoTest extends TestCase
              ->assertStatus(403);
 
         $this->signInAdmin();
+        $page = factory(Page::class)->create();
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'youtube-video'])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'youtube-video', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
@@ -115,7 +114,6 @@ class YoutubeVideoTest extends TestCase
         $youtube_video_input = factory(YoutubeVideo::class)->raw();
         $input['content']['video_id'] = Arr::get($youtube_video_input, 'video_id');
         $input['content']['title'] = Arr::get($youtube_video_input, 'title');
-        $page = factory(Page::class)->create();
         $input['pivot'] = [
             'page_id' => $page->id,
             'sort_order' => 1,

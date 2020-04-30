@@ -54,16 +54,15 @@ class QuoteTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), [])
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'quote'])
+        $this->json('POST', route('content-elements.store'), ['type' => 'quote', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
@@ -110,17 +109,17 @@ class QuoteTest extends TestCase
              ->assertStatus(403);
 
         $this->signInAdmin();
+        $page = factory(Page::class)->create();
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'quote'])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'quote', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
@@ -134,7 +133,6 @@ class QuoteTest extends TestCase
         $input['content']['body'] = Arr::get($quote_input, 'body');
         $input['content']['author_name'] = Arr::get($quote_input, 'author_name');
         $input['content']['author_details'] = Arr::get($quote_input, 'author_details');
-        $page = factory(Page::class)->create();
         $input['pivot'] = [
             'page_id' => $page->id,
             'sort_order' => 1,

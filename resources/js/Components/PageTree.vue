@@ -24,7 +24,7 @@
 
     export default {
 
-        props: ['emitEvent', 'showContentElements', 'expanded', 'showChanges', 'maxHeight'],
+        props: ['emitEvent', 'showContentElements', 'expanded', 'showChanges', 'maxHeight', 'sort'],
         mixins: [Feedback],
 
         data() {
@@ -42,7 +42,7 @@
             },
             pageTree() {
                 return this.$store.state.pageTree;
-            }
+            },
         },
 
         watch: {
@@ -54,7 +54,7 @@
         methods: {
             goToPage: function(page) {
                 window.location.href = page.full_slug;
-            }
+            },
         },
 
     }

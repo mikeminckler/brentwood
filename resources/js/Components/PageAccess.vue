@@ -13,20 +13,9 @@
         <div class="flex-2">
 
             <div class="px-8" v-if="page.id">
-                <h2>Page Acccesses - {{ page.name }}</h2>
+
+                <h2>{{ page.name }}</h2>
                 <div class="italic">/{{ page.full_slug }}</div>
-
-                <div class="mt-4" v-if="!page.page_accesses.length">No Page Acceses</div>
-
-                <div class="mt-4">
-                    <div v-for="(page_access, index) in page.page_accesses" 
-                        :key="page_access.id" 
-                        class="flex items-center pl-2 pr-1 py-1 bg-gray-100 m-1 rounded border"
-                    >
-                        <div class="flex-1">{{ page_access.accessable_type.substring(4) }}: {{ page_access.accessable.name }}</div>
-                        <remove :dusk="'remove-page-access-' + page_access.id" @remove="removePageAccess(page_access, index)"></remove>
-                    </div>
-                </div>
 
                 <div class="form">
 
@@ -56,6 +45,21 @@
                     </div>
 
                 </div>
+                
+
+                <div class="mt-4" v-if="!page.page_accesses.length">No Page Acceses</div>
+
+                <h3>Page Acccess</h3>
+                <div class="mt-4">
+                    <div v-for="(page_access, index) in page.page_accesses" 
+                        :key="page_access.id" 
+                        class="flex items-center pl-2 pr-1 py-1 bg-gray-100 m-1 rounded border"
+                    >
+                        <div class="flex-1">{{ page_access.accessable_type.substring(4) }}: {{ page_access.accessable.name }}</div>
+                        <remove :dusk="'remove-page-access-' + page_access.id" @remove="removePageAccess(page_access, index)"></remove>
+                    </div>
+                </div>
+
 
             </div>
 
@@ -96,10 +100,14 @@
                 this.loadPage();
             },
             addRole() {
-                this.createPageAccess();
+                if (this.addRole) {
+                    this.createPageAccess();
+                }
             },
             addUser() {
-                this.createPageAccess();
+                if (this.addUser) {
+                    this.createPageAccess();
+                }
             }
         },
 
@@ -126,6 +134,8 @@
                 this.$http.post('/page-accesses/create', input).then( response => {
                     this.processSuccess(response);
                     this.page = response.data.page;
+                    this.addUser = null;
+                    this.addRole = null;
                 }, error => {
                     this.processErrors(error.response);
                 });

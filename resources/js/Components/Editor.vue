@@ -186,6 +186,9 @@
                         //this.json = getJSON()
                         this.html = getHTML()
                     }, 50),
+                    onBlur: ({ event, state, view }) => {
+                        //this.$emit('input', this.html);
+                    },
                 }),
                 //json: 'JSON',
                 html: 'HTML',

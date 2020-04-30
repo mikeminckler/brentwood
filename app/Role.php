@@ -8,6 +8,7 @@ use App\SearchTrait;
 use App\PageAccess;
 use App\Page;
 use Illuminate\Support\Arr;
+use App\User;
 
 class Role extends Model
 {
@@ -39,6 +40,18 @@ class Role extends Model
         $role->name = Arr::get($input, 'name');
         $role->save();
 
+        if (auth()->user()->hasRole('admin')) {
+            $role->users()->detach();
+            if (Arr::get($input, 'users')) {
+                foreach (Arr::get($input, 'users') as $user_data) {
+                    $user = User::find(Arr::get($user_data, 'id'));
+                    if ($user instanceof User) {
+                        $user->addRole($role);
+                    }
+                }
+            }
+        }
+
         return $role;
     }
 
@@ -64,5 +77,10 @@ class Role extends Model
         return $this->pageAccesses()
             ->get()
             ->contains('page_id', $page->id);
+    }
+
+    public function users() 
+    {
+        return $this->belongsToMany(User::class);
     }
 }

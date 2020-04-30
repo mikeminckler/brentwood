@@ -54,16 +54,15 @@ class BannerPhotoTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), [])
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['page_id' => $page->id] ])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'banner-photo'])
+        $this->json('POST', route('content-elements.store'), ['type' => 'banner-photo', 'pivot' => ['page_id' => $page->id]])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
-                'pivot.page_id',
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',

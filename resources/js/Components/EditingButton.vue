@@ -13,11 +13,16 @@
     export default {
 
         mixins: [Feedback],
+        props: ['enabled'],
 
         computed: {
             editingEnabled() {
                 return this.$store.state.editing;
             },
+        },
+
+        mounted() {
+            this.$store.dispatch('setEditing', this.enabled);
         },
 
         methods: {

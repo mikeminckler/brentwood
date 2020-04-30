@@ -17,11 +17,20 @@ use App\FileUpload;
 use Illuminate\Support\Str;
 use App\Role;
 use App\User;
+use Tests\Unit\AppendAttributesTestTrait;
+use Illuminate\Support\Arr;
 
 class PageTest extends TestCase
 {
 
     use WithFaker;
+    use AppendAttributesTestTrait;
+
+
+    protected function getModel()
+    {
+        return factory(Page::class)->create();
+    }
 
     /** @test **/
     public function a_page_has_a_parent()
@@ -256,6 +265,16 @@ class PageTest extends TestCase
         $content_element->refresh();
 
         $page->refresh();
+
+        $this->assertFalse($page->can_be_published);
+        $user = factory(User::class)->create();
+        $this->signIn($user);
+        $this->assertFalse($page->can_be_published);
+
+        $user->addRole('publisher');
+        $user->refresh();
+        $page->refresh();
+
         $this->assertTrue($page->can_be_published);
         $page->publish();
         $page->refresh();
@@ -512,5 +531,70 @@ class PageTest extends TestCase
         $page->createPageAccess($user);
 
         $this->assertTrue($user->canEditPage($page));
+    }
+
+    /** @test **/
+    public function a_page_can_check_if_it_is_editable()
+    {
+        $page = factory(Page::class)->create();
+
+        $this->assertNotNull($page->editable);
+        $this->assertFalse($page->editable);
+
+        $user1 = factory(User::class)->create();
+        $this->signIn($user1);
+
+        $this->assertFalse($page->editable);
+
+        $role = factory(Role::class)->create();
+        $page->createPageAccess($role);
+        $user1->addRole($role);
+
+        $user1->refresh();
+        $this->assertTrue($user1->hasRole($role));
+
+        $this->assertTrue($user1->canEditPage($page));
+        $this->assertFalse($page->editable);
+
+        session()->put('editing', true);
+        $this->assertTrue($page->editable);
+
+        $user2 = factory(User::class)->create();
+        $this->signIn($user2);
+
+        $this->assertFalse($page->editable);
+        $page->createPageAccess($user2);
+        $user2->refresh();
+        $this->assertTrue($page->editable);
+
+        $this->signInAdmin();
+        $this->assertTrue($page->editable);
+
+    }
+
+    /** @test **/
+    public function a_page_can_recursively_append_attributes()
+    {
+        $page1 = factory(Page::class)->create();
+        $page2 = factory(Page::class)->create([
+            'parent_page_id' => $page1->id,
+        ]);
+        $page3 = factory(Page::class)->create([
+            'parent_page_id' => $page2->id,
+        ]);
+
+        $page1->appendRecursive(['full_slug']);
+        $page_array = $page1->toArray();
+
+        $this->assertNotNull( Arr::get($page_array, 'full_slug'));
+        $this->assertEquals($page1->full_slug, Arr::get($page_array, 'full_slug'));
+
+        $this->assertNotNull( Arr::get($page_array, 'pages'));
+        $this->assertNotNull( Arr::get($page_array['pages'][0], 'full_slug'));
+        $this->assertEquals($page2->full_slug, Arr::get($page_array['pages'][0], 'full_slug'));
+
+        $this->assertNotNull( Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
+        $this->assertEquals($page3->full_slug, Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
+
     }
 }

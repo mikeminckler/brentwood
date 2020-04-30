@@ -19,7 +19,7 @@
                 <div class="sticky top-0 flex flex-col h-full">
                     <saving-indicator></saving-indicator>
                     <div class="flex-1">
-                        <page-tree :sortable="true" :expanded="true" :show-changes="true" max-height="100%"></page-tree>
+                        <page-tree :sort="true" :expanded="true" :show-changes="true" max-height="100%"></page-tree>
                     </div>
                     <div class="p-4 sticky bottom-0 bg-gray-100 shadow">
                         <div class=""><a href="/users">User Management</a></div>
@@ -32,13 +32,10 @@
 
         <div id="main" class="relative flex-1 flex flex-col">
 
-            <div id="header" class="sticky top-0 z-10 {{ session()->get('editing') && !request('preview') ? 'px-12' : '' }}">
+            <div id="header" class="sticky top-0 z-10 {{ optional($page ?? '')->editable && !request('preview') ? 'px-12' : '' }}">
 
-                @if (session()->get('editing'))
-                    <page-editor 
-                        :editing-enabled="{{ session()->has('editing') ? 'true' : 'false' }}"
-                        :current-page='@json($page ?? '')'
-                    ></page-editor>
+                @if (optional($page ?? '')->editable)
+                    <page-editor :current-page='@json($page ?? '')' ></page-editor>
                 @endif
 
                 <div class="flex justify-center relative bg-gray-100">
@@ -70,7 +67,7 @@
                                     <div class="w-full flex bg-gray-100">
 
                                         <div class="flex-1 md:flex relative w-full">
-                                            @foreach ($menu as $menu_page)
+                                            @foreach (App\Menu::getMenu() as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
 
                                                     <div class="font-oswald font-light text-base md:text-lg relative text-primary hover:bg-white md:flex md:items-center
@@ -111,7 +108,7 @@
 
                                                 @auth
                                                     @if (auth()->user()->hasRole('editor'))
-                                                        <editing-button class="ml-4"></editing-button>
+                                                        <editing-button class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}"></editing-button>
                                                     @endif
                                                 @endauth
                                             </div>
@@ -155,7 +152,7 @@
 
             <div id="footer" class="relative flex justify-center" style="min-height: 600px" :class="$store.state.editing ? 'px-12' : ''">
 
-                @if (session()->get('editing') && !request('preview'))
+            @if (optional($page ?? '')->editable && !request('preview'))
                     <footer-editor></footer-editor>
                 @endif
                 <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>

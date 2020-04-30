@@ -7,6 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
 use App\ContentElement;
+use App\Page;
 
 class ContentElementValidation extends FormRequest
 {
@@ -21,12 +22,9 @@ class ContentElementValidation extends FormRequest
             return false;
         }
 
-        if ($this->route('id')) {
-            $content_element = ContentElement::findorFail($this->route('id'));
-            return $this->user()->can('update', $content_element);
-        }
-        return $this->user()->can('create', ContentElement::class);
-        return false;
+        $page = Page::find(request('pivot.page_id') );
+
+        return auth()->user()->can('update', $page);
     }
 
     /**

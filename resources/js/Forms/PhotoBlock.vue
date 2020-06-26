@@ -1,11 +1,11 @@
 <template>
 
-    <div class="relative z-2">
+    <div class="relative z-2" id="form-photo-block">
 
         <div class="absolute flex flex-col justify-center items-center" style="left: -50px;" v-if="photos.length">
 
-            <div class="content-element-icons text-xl" @click="decreaseHeight()"><i class="fas fa-angle-double-up"></i></div>
-            <div class="content-element-icons text-xl" @click="increaseHeight()"><i class="fas fa-angle-double-down"></i></div>
+            <div class="content-element-icons text-xl" title="Increase Row Height" @click="decreaseHeight()"><i class="fas fa-angle-double-up"></i></div>
+            <div class="content-element-icons text-xl" title="Descrease Row Height" @click="increaseHeight()"><i class="fas fa-angle-double-down"></i></div>
 
             <div class="content-element-icons" @click="content.columns < 4 ? content.columns++ : null">
                 <div class=""><i class="fas fa-columns"></i></div>
@@ -31,7 +31,12 @@
 
         </div>
 
-        <transition-group name="photo-editor" tag="div" class="relative grid" :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'row-gap-2' : 'gap-2' ) : '']" style="min-height: 100px">
+        <transition-group name="photo-editor" 
+            tag="div" 
+            class="relative grid" 
+            :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'row-gap-2' : 'gap-2' ) : '']" 
+            style="min-height: 100px"
+        >
 
             <div class="flex items-center justify-center bg-gray-200" key="no-photos" v-if="photosCount === 0">
                 <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
@@ -51,53 +56,70 @@
                 <div v-if="index === (sortedPhotos.length - 1)" class="h-1 bg-gray-200 opacity-50 w-full absolute bottom-0 z-5"></div>
 
                 <div class="photo" :class="photo.fill ? 'fill' : 'fit'" v-if="photo">
-                    <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'" />
+                    <transition name="fade">
+                        <div v-if="photo.id < 1" class="absolute z-5 w-full h-full bg-white bg-opacity-50 flex items-center justify-center">
+                            <div class="flex shadow px-4 py-2 text-green-500 border border-green-300 bg-green-100">
+                                <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                                <div class="ml-2">Saving</div>
+                            </div>
+                        </div>
+                    </transition>
+                    <img :src="photo.large" 
+                        :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'" 
+                    />
                 </div>
 
-                <photo-controls :photo="photo"
-                    :span="1"
-                    :sort="1"
-                    :content="content"
-                    :photos="photos"
-                    @sortUp="sortUp(photo)"
-                    @sortDown="sortDown(photo)"
-                    @remove="removePhoto(photo, index)"
-                    :stat="true"
-                ></photo-controls>
+                <transition name="fade">
+                    <photo-controls :photo="photo"
+                        v-if="photo.id >= 1"
+                        :span="1"
+                        :sort="1"
+                        :content="content"
+                        :photos="photos"
+                        @sortUp="sortUp(photo)"
+                        @sortDown="sortDown(photo)"
+                        @remove="removePhoto(photo, index)"
+                        :stat="true"
+                    ></photo-controls>
+                </transition>
 
             </div>
 
             <div v-if="content.show_text" key="text" 
-                class="relative py-4" 
+                class="relative py-4 flex justify-center" 
                 :class="['col-span-' + content.text_span, textPosition.row, textPosition.column, content.text_style ? 'text-style-' + content.text_style : '']"
             >
 
-                <div class="text-block flex flex-col justify-center h-full">
-                    <div class="">
-                        <input class="h2" type="text" v-model="content.header" placeholder="Header" />
+                <div class="">
+
+                    <div class="text-block flex flex-col justify-center h-full">
+                        <div class="">
+                            <input class="h2" type="text" @blur="saveContent()" v-model="content.header" placeholder="Header" />
+                        </div>
+
+                        <editor v-model="content.body" 
+                                placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                                @blur="saveContent"
+                        ></editor>
                     </div>
 
-                    <editor v-model="content.body" 
-                            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                    ></editor>
-                </div>
+                    <div class="absolute bottom-0 flex text-xl items-end">
 
-                <div class="absolute bottom-0 flex text-xl items-end">
+                        <div class="">
+                            <div class="w-6 h-6 bg-transparent cursor-pointer flex items-center justify-center p-1" title="Background Transparent" @click="content.text_style = ''"><i class="fas fa-ban"></i></div>
+                            <div class="w-6 h-6 bg-white" title="Background White" @click="content.text_style = 'white'"></div>
+                            <div class="w-6 h-6 bg-gray-200" title="Background Grey" @click="content.text_style = 'gray'"></div>
+                            <div class="w-6 h-6 bg-blue-200" title="Background Blue" @click="content.text_style = 'blue'"></div>
+                        </div>
 
-                    <div class="">
-                        <div class="w-6 h-6 bg-transparent cursor-pointer" @click="content.text_style = ''"><i class="fas fa-ban"></i></div>
-                        <div class="w-6 h-6 bg-white" @click="content.text_style = 'white'"></div>
-                        <div class="w-6 h-6 bg-gray-200" @click="content.text_style = 'gray'"></div>
-                        <div class="w-6 h-6 bg-blue-200" @click="content.text_style = 'blue'"></div>
+                        <div class="flex ml-4">
+                            <div class="cursor-pointer mx-1" v-if="content.text_order > 1" title="Move Left" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
+                            <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" title="Move Right" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
+                            <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" title="Increase Width" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>
+                            <div class="cursor-pointer mx-1" v-if="content.text_span > 1" title="Descrease Width" @click="content.text_span--"><i class="fas fa-minus-circle"></i></div>
+                        </div>
+
                     </div>
-
-                    <div class="flex ml-4">
-                        <div class="cursor-pointer mx-1" v-if="content.text_order > 1" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="content.text_span > 1" @click="content.text_span--"><i class="fas fa-minus-circle"></i></div>
-                    </div>
-
                 </div>
 
             </div>
@@ -114,18 +136,20 @@
 
         <div class="flex bg-gray-200 p-2 shadow mt-4" v-if="photosCount > 0">
 
-            <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
-                <div class="">Upload Files</div>
+            <div class="flex-1">
+                <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
+                    <div class="">Upload Files</div>
+                </div>
             </div>
 
-            <div class="button mx-1" v-if="photos.length === 1" @click="setText1()"><img src="/images/text1.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 1" @click="setText2()"><img src="/images/text2.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 1" @click="setText3()"><img src="/images/text3.png" /></div>
+            <div class="button mx-1" v-if="photos.length === 1" @click="setText1()">Layout 1</div>
+            <div class="button mx-1" v-if="photos.length === 1" @click="setText2()">Layout 2</div>
+            <div class="button mx-1" v-if="photos.length === 1" @click="setText3()">Layout 3</div>
 
-            <div class="button mx-1" v-if="photos.length === 2" @click="setText4()"><img src="/images/text1.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 2" @click="setText5()"><img src="/images/text2.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 2" @click="setText6()"><img src="/images/text3.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 2" @click="setText7()"><img src="/images/text3.png" /></div>
+            <div class="button mx-1" v-if="photos.length === 2" @click="setText4()">Layout 1</div>
+            <div class="button mx-1" v-if="photos.length === 2" @click="setText5()">Layout 2</div>
+            <div class="button mx-1" v-if="photos.length === 2" @click="setText6()">Layout 3</div>
+            <div class="button mx-1" v-if="photos.length === 2" @click="setText7()">Layout 4</div>
 
         </div>
 
@@ -140,12 +164,13 @@
     import FileUploads from '@/Components/FileUploads';
     import Photos from '@/Mixins/Photos';
     import PhotoControls from '@/Components/PhotoControls';
+    import SaveContent from '@/Mixins/SaveContent';
 
     export default {
 
         props: [ 'content', 'uuid' ],
 
-        mixins: [Feedback, Photos],
+        mixins: [Feedback, Photos, SaveContent ],
 
         components: {
             'editor': Editor,

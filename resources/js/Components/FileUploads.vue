@@ -94,7 +94,7 @@
 
         mounted() {
             this.$eventer.$on('add-files', name => {
-                console.log(this.name + ':' + name);
+                //console.log(this.name + ':' + name);
                 if (this.name === name) {
                     this.addFiles();
                 }

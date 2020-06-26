@@ -1,52 +1,60 @@
 <template>
 
-    <div class="shadow mt-8 max-w-6xl absolute z-3 bg-gray-100" v-if="page ? ( page.id > 1 ? true : false ) : false">
-        
-        <transition name="slide-down">
-            <div class="absolute flex justify-center items-center w-full h-full bg-wash z-3" v-if="saving">
-                <div class="">
-                    <div class="flex text-green-600 bg-gray-100 px-4 py-2 border border-green-200 shadow">
-                        <div class="spin"><i class="fas fa-sync-alt"></i></div>
-                        <div class="ml-2">Saving</div>
+    <div class="relative z-3 w-full flex justify-center h-0 overflow-visible">
+        <div class="relative max-w-6xl flex w-full">
+
+            <div class="flex-1"></div>
+            <div class="flex-2 flex justify-center">
+                <div class="" v-if="page ? ( page.id > 1 ? true : false ) : false">
+                    
+                    <transition name="slide-down">
+                        <div class="absolute flex justify-center items-center w-full h-full bg-wash z-3" v-if="saving">
+                            <div class="">
+                                <div class="flex text-green-600 bg-gray-100 px-4 py-2 border border-green-200 shadow">
+                                    <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                                    <div class="ml-2">Saving</div>
+                                </div>
+                            </div>
+                        </div>
+                    </transition>
+
+                    <div class="relative flex items-center z-2 mx-4 my-2">
+
+                        <div class="">
+                            <div class="button" @click="$eventer.$emit('add-files', 'footer-fg')">
+                                <div class="">Change Footer Foreground</div>
+                            </div>
+                        </div>
+                    
+                        <div class="">
+                            <div class="button ml-4" @click="$eventer.$emit('add-files', 'footer-bg')">
+                                <div class="">Change Footer background</div>
+                            </div>
+                        </div>
+
+                        <div class="form pl-2">
+                            <input type="text" v-model="page.footer_color" @change="$eventer.$emit('save-page')" placeholder="Footer Color 255,255,255" />
+                        </div>
+
                     </div>
+
+                    <file-uploads
+                        name="footer-fg"
+                        v-model="fg"
+                        :multiple="false"
+                        type="image"
+                    ></file-uploads>
+                
+                    <file-uploads
+                        name="footer-bg"
+                        v-model="bg"
+                        :multiple="false"
+                        type="image"
+                    ></file-uploads>
+                    
                 </div>
             </div>
-        </transition>
-
-        <div class="relative flex items-center z-2 mx-4 my-2">
-
-            <div class="">
-                <div class="button" @click="$eventer.$emit('add-files', 'footer-fg')">
-                    <div class="">Change Footer Foreground</div>
-                </div>
-            </div>
-        
-            <div class="">
-                <div class="button ml-4" @click="$eventer.$emit('add-files', 'footer-bg')">
-                    <div class="">Change Footer background</div>
-                </div>
-            </div>
-
-            <div class="form pl-2">
-                <input type="text" v-model="page.footer_color" @change="$eventer.$emit('save-page')" placeholder="Footer Color 255,255,255" />
-            </div>
-
         </div>
-
-        <file-uploads
-            name="footer-fg"
-            v-model="fg"
-            :multiple="false"
-            type="image"
-        ></file-uploads>
-    
-        <file-uploads
-            name="footer-bg"
-            v-model="bg"
-            :multiple="false"
-            type="image"
-        ></file-uploads>
-        
     </div>
 
 </template>

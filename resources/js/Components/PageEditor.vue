@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full z-20 flex items-center justify-center bg-gray-100 p-1" v-if="editing && page">
+    <div class="relative w-full z-20 flex items-center justify-center bg-gray-100 p-1" v-if="editing && page">
 
         <div class="w-full max-w-6xl flex items-center bg-gray-200 p-2 shadow relative">
 
@@ -50,6 +50,12 @@
                 <div>Delete Page</div>
             </div>
 
+            <div class="cursor-pointer" v-if="debug" @click="showDebug = !showDebug"><i class="fas fa-bug"></i></div>
+
+        </div>
+
+        <div v-if="showDebug" class="w-full absolute bg-white px-2 py-2 max-w-6xl" style="top: 57px;">
+            Page Version: {{ page.published_version_id }}
         </div>
 
     </div>
@@ -64,9 +70,10 @@
     export default {
 
         mixins: [Feedback],
-        props: ['currentPage'],
+        props: ['currentPage', 'debug'],
         data() {
             return {
+                showDebug: false,
             }
         },
 
@@ -83,7 +90,7 @@
             },
             hasDraft() {
                 return this.$lodash.filter(this.page.content_elements, content_element => {
-                    return content_element.version_id !== this.page.published_version_id;
+                    return content_element.version.published_at ? false : true;
                 }).length ? true : false;
             },
         },

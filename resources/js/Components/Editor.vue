@@ -187,7 +187,7 @@
                         this.html = getHTML()
                     }, 50),
                     onBlur: ({ event, state, view }) => {
-                        //this.$emit('input', this.html);
+                        this.$emit('blur');
                     },
                 }),
                 //json: 'JSON',

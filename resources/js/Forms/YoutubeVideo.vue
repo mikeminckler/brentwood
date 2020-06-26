@@ -10,7 +10,7 @@
                          style="background-color: rgba(255,255,255,0.8)"
                          v-if="$store.state.editing && !content.full_width && !content.header"
                     >
-                        <input class="overflow-visible p-2 -my-2 text-center font-thin" type="text" v-model="content.title" placeholder="Title" />
+                        <input class="overflow-visible p-2 -my-2 text-center font-thin" type="text" @blur="saveContent()" v-model="content.title" placeholder="Title" />
                     </div>
                 </div>
 
@@ -28,11 +28,12 @@
                 <div class="text-block" :class="content.full_width ? 'bg-white max-w-2xl py-8 px-16' : ''">
 
                     <div class="">
-                        <input :class="first ? 'h1' : 'h2'" type="text" v-model="content.header" placeholder="Header" />
+                        <input :class="first ? 'h1' : 'h2'" type="text" @blur="saveContent()" v-model="content.header" placeholder="Header" />
                     </div>
 
                     <editor v-model="content.body" 
                         placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                        @blur="saveContent()"
                     ></editor>
 
                     <div v-if="first" class="h-1 w-16 bg-gray-400 my-4"></div>
@@ -82,11 +83,12 @@
     import FileUploads from '@/Components/FileUploads';
     import CheckboxInput from '@/Components/CheckboxInput';
     import Photos from '@/Mixins/Photos';
+    import SaveContent from '@/Mixins/SaveContent';
 
     export default {
 
         props: ['content', 'uuid', 'first'],
-        mixins: [Feedback, Photos],
+        mixins: [Feedback, Photos, SaveContent ],
 
         components: {
             'file-uploads': FileUploads,

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class FileUpload extends Model
 {
@@ -22,7 +23,7 @@ class FileUpload extends Model
         'pdf',
     ];
 
-    public $max_image_size = 5120;
+    public $max_image_size = 25120;
     public $image_extensions = [
         'jpg',
         'jpeg',
@@ -41,8 +42,9 @@ class FileUpload extends Model
         $storage_filename = Storage::putFile($directory, $file, $public);
         $file_upload->storage_filename = $storage_filename;
 
-        $file_upload->name = $file->getClientOriginalName();
-        $file_upload->filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $filename = Str::lower(preg_replace("/[^a-zA-Z0-9\.]+/", "", $file->getClientOriginalName()));
+        $file_upload->name = $filename;
+        $file_upload->filename = pathinfo($filename, PATHINFO_FILENAME);
         $file_upload->extension = strtolower($file->getClientOriginalExtension());
         $file_upload->mime = $file->getMimeType();
         $file_upload->size = $file->getSize();

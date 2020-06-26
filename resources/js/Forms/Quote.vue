@@ -12,16 +12,17 @@
                     <editor v-model="content.body" 
                             placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
                             class="mt-4 relative z-3 italic leading-relaxed"
+                            @blur="saveContent()"
                     ></editor>
 
                     <div class="h-1 w-16 bg-primary mb-4"></div>
 
                     <div class="flex flex-col w-full items-end">
                         <div class="inline-form">
-                            <input type="text" v-model="content.author_name" placeholder="Author" />
+                            <input type="text" v-model="content.author_name" @blur="saveContent()" placeholder="Author" />
                         </div>
                         <div class="inline-form mt-1">
-                            <input type="text" v-model="content.author_details" placeholder="Author Title / Position" />
+                            <input type="text" v-model="content.author_details" @blur="saveContent()" placeholder="Author Title / Position" />
                         </div>
                     </div>
                 </div>
@@ -70,12 +71,13 @@
     import FileUploads from '@/Components/FileUploads';
     import Photos from '@/Mixins/Photos';
     import PhotoControls from '@/Components/PhotoControls';
+    import SaveContent from '@/Mixins/SaveContent';
 
     export default {
 
         props: [ 'content', 'uuid' ],
 
-        mixins: [Feedback, Photos],
+        mixins: [Feedback, Photos, SaveContent ],
 
         components: {
             'editor': Editor,

@@ -19,6 +19,18 @@ Vue.component('youtube-player', YoutubePlayer);
 import Expander from '@/Components/Expander.vue'
 Vue.component('expander', Expander);
 
+import Echo from "laravel-echo"
+window.Pusher = require('pusher-js');
+Object.defineProperty(Vue.prototype, "$echo", { value: new Echo({
+        broadcaster: 'pusher',
+        key: process.env.MIX_PUSHER_APP_KEY,
+        wsHost: process.env.MIX_WEBSOCKET_HOST,
+        wsPort: process.env.MIX_WEBSOCKET_PORT,
+        disableStats: true,
+        encrypted: true,
+    })
+});
+
 const app = new Vue({
     el: "#app",
     store,
@@ -61,6 +73,11 @@ const app = new Vue({
 
         this.$once('hook:destroyed', () => {
             this.$eventer.$off('refresh-page-tree', refreshPageTree);
+        });
+
+        this.$store.dispatch('setWsState', this.$echo.connector.pusher.connection.state);
+        this.$echo.connector.pusher.connection.bind('state_change', states => {
+            this.$store.dispatch('setWsState', states.current);
         });
 
     },

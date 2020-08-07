@@ -25,6 +25,8 @@
                         <div class=""><a href="/users">User Management</a></div>
                         <div class=""><a href="/page-accesses">Page Access</a></div>
                         <div class=""><a href="/roles">Role Management</a></div>
+
+                        <div class="">Websocket @{{ $store.state.wsState.toUpperCase() }}</div>
                     </div>
                 </div>
             </div>
@@ -35,7 +37,7 @@
             <div id="header" class="sticky top-0 z-10 {{ optional($page ?? '')->editable && !request('preview') ? 'px-12' : '' }}">
 
                 @if (optional($page ?? '')->editable)
-                    <page-editor :current-page='@json($page ?? '')' ></page-editor>
+                    <page-editor :current-page='@json($page ?? '')' :debug="{{ optional(auth()->user())->hasRole('admin') }}"></page-editor>
                 @endif
 
                 <div class="flex justify-center relative bg-gray-100">
@@ -66,7 +68,7 @@
 
                                     <div class="w-full flex bg-gray-100">
 
-                                        <div class="flex-1 md:flex relative w-full">
+                                        <div id="menu" class="flex-1 md:flex relative w-full">
                                             @foreach (App\Menu::getMenu()->sortBy->sort_order as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
 
@@ -100,7 +102,6 @@
 
                                         <div class="bg-gray-200 md:bg-transparent flex items-center justify-center md:items-end flex-col px-2">
 
-
                                             <div class="flex items-center mb-2 md:mb-0">
                                         
                                                 <a href="/apply-now" class="button hidden md:block mr-4 my-4 whitespace-no-wrap text-base">Apply Now</a>
@@ -108,7 +109,7 @@
 
                                                 @auth
                                                     @if (auth()->user()->hasRole('editor'))
-                                                        <editing-button class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}"></editing-button>
+                                                        <editing-button v-show="{{ !request('preview') }}" class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}"></editing-button>
                                                     @endif
                                                 @endauth
                                             </div>
@@ -150,11 +151,12 @@
 
             </div>
 
+            @if (optional($page ?? '')->editable && !request('preview'))
+                <footer-editor></footer-editor>
+            @endif
+
             <div id="footer" class="relative flex justify-center" style="min-height: 600px" :class="$store.state.editing ? 'px-12' : ''">
 
-            @if (optional($page ?? '')->editable && !request('preview'))
-                    <footer-editor></footer-editor>
-                @endif
                 <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
                 <div class="absolute w-full h-full overflow-hidden">
                     <img src="{{ isset($page) ? ( $page->footer_fg_image ? $page->footer_fg_image : '/images/footer_fg.png' ) : '/images/footer_fg.png' }}" class="w-full h-full object-cover z-2 absolute" />

@@ -1,6 +1,9 @@
 <template>
 
-    <div class="flex relative" :class="content.full_width ? 'bg-white z-3' : ( photo && content.style ? 'text-style-' + content.style : '' )">
+    <div id="form-text-block" 
+        class="flex relative" 
+        :class="content.full_width ? 'bg-white z-3' : ( photo && content.style ? 'text-style-' + content.style : '' )"
+    >
 
         <div class="flex-1 relative flex flex-col" v-if="!content.full_width">
 
@@ -49,21 +52,22 @@
 
             <div :class="content.full_width ? 'px-12 py-8' : 'text-block'">
                 <div class="">
-                    <input :class="first ? 'h1' : 'h2'" @blur="content.header = content.header + ' '" type="text" v-model="content.header" placeholder="Header" />
+                    <input :class="first ? 'h1' : 'h2'" @blur="saveContent()" type="text" v-model="content.header" placeholder="Header" />
                 </div>
 
                 <editor v-model="content.body" 
                         :class="content.full_width ? 'columns-2' : ''"
-                    placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                        placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                        @blur="saveContent()"
                 ></editor>
 
                 <div v-if="first" class="h-1 w-16 bg-gray-400 my-4"></div>
 
                 <div class="flex">
-                    <div class="w-6 h-6 bg-transparent cursor-pointer" @click="content.style = ''"><i class="fas fa-ban"></i></div>
-                    <div class="w-6 h-6 bg-white cursor-pointer" @click="content.style = 'white'"></div>
-                    <div class="w-6 h-6 bg-gray-200 cursor-pointer" @click="content.style = 'gray'"></div>
-                    <div class="w-6 h-6 bg-blue-200 cursor-pointer" @click="content.style = 'blue'"></div>
+                    <div class="text-xl w-6 h-6 p-1 flex items-center justify-center bg-transparent cursor-pointer" title="Background Transparent" @click="content.style = ''"><i class="fas fa-ban"></i></div>
+                    <div class="w-6 h-6 bg-white cursor-pointer" title="Background White" @click="content.style = 'white'"></div>
+                    <div class="w-6 h-6 bg-gray-200 cursor-pointer" title="Background Grey" @click="content.style = 'gray'"></div>
+                    <div class="w-6 h-6 bg-blue-200 cursor-pointer" title="Background Blue" @click="content.style = 'blue'"></div>
                     <checkbox-input v-model="content.full_width" label="Full Width"></checkbox-input> 
                 </div>
             </div>
@@ -78,11 +82,12 @@
 
     import Photos from '@/Mixins/Photos';
     import Feedback from '@/Mixins/Feedback';
+    import SaveContent from '@/Mixins/SaveContent';
 
     export default {
 
         props: [ 'content', 'uuid', 'first'],
-        mixins: [ Photos, Feedback ],
+        mixins: [ Photos, Feedback, SaveContent ],
 
         components: {
             'editor': () => import(/* webpackChunkName: "editor" */ '@/Components/Editor.vue'),

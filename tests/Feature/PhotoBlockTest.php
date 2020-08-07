@@ -28,7 +28,7 @@ class PhotoBlockTest extends TestCase
     public function saving_a_photo_block()
     {
         Storage::fake();
-        $file_name = Str::random().'.jpg';
+        $file_name = Str::lower(Str::random().'.jpg');
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 

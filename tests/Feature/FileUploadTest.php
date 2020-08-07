@@ -96,7 +96,7 @@ class FileUploadsTest extends TestCase
     public function an_uploaded_image_needs_to_pass_validation()
     {
         Storage::fake();
-        $bad_image = UploadedFile::fake()->create('logo.pdf', 10124);
+        $bad_image = UploadedFile::fake()->create('logo.pdf', 30124);
         $good_image = UploadedFile::fake()->image('logo.png');
 
         $this->signInAdmin();
@@ -106,7 +106,7 @@ class FileUploadsTest extends TestCase
             ->assertJsonFragment([
                 'errors' => [
                     'file' => [
-                        'The file may not be greater than 5120 kilobytes.',
+                        'The file may not be greater than 20480 kilobytes.',
                         'The file must be a file of type: jpeg, png.',
                     ],
                 ],

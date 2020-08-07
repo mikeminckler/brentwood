@@ -37,12 +37,13 @@
             <div class="bg-white px-16 py-8 text-gray-600 w-full max-w-2xl shadow-lg z-4">
 
                 <div class="">
-                    <input :class="first ? 'h1' : 'h2'" type="text" v-model="content.header" placeholder="Header" />
+                    <input :class="first ? 'h1' : 'h2'" type="text" @blur="saveContent()" v-model="content.header" placeholder="Header" />
                 </div>
 
                 <editor v-model="content.body" 
                         placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
                         class="mt-4 relative leading-relaxed"
+                        @blur="saveContent()"
                 ></editor>
 
                 <div class="h-1 w-16 bg-gray-400 mt-4"></div>
@@ -59,12 +60,13 @@
 
     import Feedback from '@/Mixins/Feedback';
     import Photos from '@/Mixins/Photos';
+    import SaveContent from '@/Mixins/SaveContent';
 
     export default {
 
         props: [ 'content', 'uuid', 'first' ],
 
-        mixins: [Feedback, Photos],
+        mixins: [Feedback, Photos, SaveContent ],
 
         components: {
             'editor': () => import(/* webpackChunkName: "editor" */ '@/Components/Editor.vue'),

@@ -42,7 +42,7 @@ class FileUpload extends Model
         $storage_filename = Storage::putFile($directory, $file, $public);
         $file_upload->storage_filename = $storage_filename;
 
-        $file_name = $file->getClientOriginalName();
+        $file_name = Str::lower($file->getClientOriginalName());
         // remove any non standard characets from the file name
         $file_upload->name = preg_replace("/[^A-Za-z0-9\.\-_ ]/", '', $file_name);
         $file_upload->filename = pathinfo($file_name, PATHINFO_FILENAME);

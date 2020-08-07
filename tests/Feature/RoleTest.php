@@ -17,7 +17,7 @@ class RoleTest extends TestCase
     public function roles_can_be_searched()
     {
 
-        $role = Role::all()->random();
+        $role = Role::where('id', '!=', 1)->get()->random();
 
         $input = [
             'autocomplete' => true,

@@ -80,8 +80,12 @@ export default {
 
                     this.processSuccess(response);
 
-                    let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
-                    this.uploads.splice(uploadIndex, 1);
+                    if (this.multiplePhotos) {
+                        let uploadIndex = this.$lodash.findIndex(this.uploads, {'id': photo.file_upload.id});
+                        this.uploads.splice(uploadIndex, 1);
+                    } else {
+                        this.uploads = [];
+                    }
                     this.photos.splice(index, 1);
 
                 }, function (error) {

@@ -591,8 +591,8 @@ class PageTest extends TestCase
 
         $page->refresh();
 
-        $this->assertEquals(1, $page->sort_order);
         $this->assertEquals(1, $page->parentPage->id);
+        $this->assertEquals(1, $page->sort_order);
 
     }
 }

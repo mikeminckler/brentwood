@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: {
+        wsState: '',
         editing: false,
         showMenu: false,
         feedback: [],
@@ -27,6 +28,11 @@ const store = new Vuex.Store({
     },
 
     mutations: {
+
+        setWsState (state, wsState) {
+            state.wsState = wsState;
+        },
+
         setEditing(state, editing) {
             state.editing = editing;
         },
@@ -91,6 +97,11 @@ const store = new Vuex.Store({
     },
 
     actions: {
+
+        setWsState({ commit, state }, wsState) {
+            commit('setWsState', wsState);
+        },
+
         setEditing({ commit, state }, editing) {
             commit('setEditing', editing);
         },

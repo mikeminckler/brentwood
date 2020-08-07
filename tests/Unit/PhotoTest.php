@@ -130,7 +130,7 @@ class PhotoTest extends TestCase
     public function updating_a_file_upload_clears_the_generated_images()
     {
         Storage::fake();
-        $file_name = Str::random().'jpg';
+        $file_name = Str::lower(Str::random().'jpg');
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
@@ -145,7 +145,7 @@ class PhotoTest extends TestCase
         $this->assertTrue(Str::contains($photo->medium, $file_name));
         $this->assertTrue(Str::contains($photo->large, $file_name));
 
-        $file_name2 = Str::random().'jpg';
+        $file_name2 = Str::lower(Str::random().'jpg');
         $file2 = UploadedFile::fake()->image($file_name2);
         $file_upload2 = (new FileUpload)->saveFile($file2, 'photos', true);
 

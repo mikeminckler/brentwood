@@ -9,10 +9,12 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "beyondcode/laravel-websockets": "^1.4",
         "fideloper/proxy": "^4.4",
         "google/apiclient": "^2.7",
         "intervention/image": "^2.5",
         "laravel/framework": "^7.23",
+        "laravel/horizon": "^4.3",
         "laravel/socialite": "^4.4",
         "laravel/ui": "^2.1"
     },

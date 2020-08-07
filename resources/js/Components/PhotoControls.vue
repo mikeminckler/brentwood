@@ -47,15 +47,15 @@
                     <div v-if="!photo.fill"><i class="fas fa-compress"></i></div>
                 </div>
 
-                <div class="cursor-pointer mx-1" v-if="photo.sort_order > 1 && photos.length > 1 && sort" @click="$emit('sortUp')"><i class="fas fa-arrow-alt-circle-left"></i></div>
-                <div class="cursor-pointer mx-1" v-if="photo.sort_order < photos.length && photos.length > 1 && sort" @click="$emit('sortDown')"><i class="fas fa-arrow-alt-circle-right"></i></div>
-                <div class="cursor-pointer mx-1" v-if="photo.span < content.columns && content.columns > 1 && span" @click="photo.span++"><i class="fas fa-plus-circle"></i></div>
-                <div class="cursor-pointer mx-1" v-if="photo.span > 1 && content.columns > 1 && span" @click="photo.span--"><i class="fas fa-minus-circle"></i></div>
+                <div class="cursor-pointer mx-1" title="Move Left" v-if="photo.sort_order > 1 && photos.length > 1 && sort" @click="$emit('sortUp')"><i class="fas fa-arrow-alt-circle-left"></i></div>
+                <div class="cursor-pointer mx-1" title="Move Right" v-if="photo.sort_order < photos.length && photos.length > 1 && sort" @click="$emit('sortDown')"><i class="fas fa-arrow-alt-circle-right"></i></div>
+                <div class="cursor-pointer mx-1" title="Increase Width" v-if="photo.span < content.columns && content.columns > 1 && span" @click="photo.span++"><i class="fas fa-plus-circle"></i></div>
+                <div class="cursor-pointer mx-1" title="Descrease Width" v-if="photo.span > 1 && content.columns > 1 && span" @click="photo.span--"><i class="fas fa-minus-circle"></i></div>
             </div>
-            <div class="mx-2 cursor-pointer" v-if="photo.id >= 1" @click="showStat = !showStat"><i class="fas fa-align-justify"></i></div>
-            <div class="mx-2 cursor-pointer" v-if="photo.id >= 1" @click="$eventer.$emit('add-files', fileUploadName)"><i class="fas fa-edit"></i></div>
-            <div class="mx-2 cursor-pointer" v-if="photo.id >= 1" @click="showLinkMenu = !showLinkMenu"><i class="fas fa-link"></i></div>
-            <div class="mx-2 remove-icon" @click="$emit('remove')"><i class="fas fa-times"></i></div>
+            <div class="mx-2 cursor-pointer" title="Show Text" v-if="photo.id >= 1" @click="showStat = !showStat"><i class="fas fa-align-justify"></i></div>
+            <div class="mx-2 cursor-pointer" title="Replace Photo" v-if="photo.id >= 1" @click="$eventer.$emit('add-files', fileUploadName)"><i class="fas fa-edit"></i></div>
+            <div class="mx-2 cursor-pointer" title="Link" v-if="photo.id >= 1" @click="showLinkMenu = !showLinkMenu"><i class="fas fa-link"></i></div>
+            <div class="mx-2 remove-icon" title="Remove Photo" @click="$emit('remove')"><i class="fas fa-times"></i></div>
         </div>
 
         <file-uploads

@@ -1,11 +1,11 @@
 <template>
 
-    <div class="relative z-2">
+    <div class="relative z-2" id="form-photo-block">
 
         <div class="absolute flex flex-col justify-center items-center" style="left: -50px;" v-if="photos.length">
 
-            <div class="content-element-icons text-xl" @click="decreaseHeight()"><i class="fas fa-angle-double-up"></i></div>
-            <div class="content-element-icons text-xl" @click="increaseHeight()"><i class="fas fa-angle-double-down"></i></div>
+            <div class="content-element-icons text-xl" title="Increase Row Height" @click="decreaseHeight()"><i class="fas fa-angle-double-up"></i></div>
+            <div class="content-element-icons text-xl" title="Descrease Row Height" @click="increaseHeight()"><i class="fas fa-angle-double-down"></i></div>
 
             <div class="content-element-icons" @click="content.columns < 4 ? content.columns++ : null">
                 <div class=""><i class="fas fa-columns"></i></div>
@@ -29,7 +29,12 @@
 
         </div>
 
-        <transition-group name="photo-editor" tag="div" class="relative grid" :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'row-gap-2' : 'gap-2' ) : '']" style="min-height: 100px">
+        <transition-group name="photo-editor" 
+            tag="div" 
+            class="relative grid" 
+            :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'row-gap-2' : 'gap-2' ) : '']" 
+            style="min-height: 100px"
+        >
 
             <div class="flex items-center justify-center bg-gray-200" key="no-photos" v-if="photosCount === 0">
                 <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
@@ -73,36 +78,40 @@
             </div>
 
             <div v-if="content.show_text" key="text" 
-                class="relative py-4" 
+                class="relative py-4 flex justify-center" 
                 :class="['col-span-' + content.text_span, textPosition.row, textPosition.column, content.text_style ? 'text-style-' + content.text_style : '']"
             >
 
-                <div class="text-block flex flex-col justify-center h-full">
-                    <div class="">
-                        <input class="h2" type="text" v-model="content.header" placeholder="Header" />
+                <div class="">
+
+                    <div class="text-block flex flex-col justify-center h-full">
+                        <div class="">
+                            <input class="h2" type="text" @blur="saveContent()" v-model="content.header" placeholder="Header" />
+                        </div>
+
+                        <editor v-model="content.body" 
+                                placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                                @blur="saveContent"
+                        ></editor>
                     </div>
 
-                    <editor v-model="content.body" 
-                            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                    ></editor>
-                </div>
+                    <div class="absolute bottom-0 flex text-xl items-end">
 
-                <div class="absolute bottom-0 flex text-xl items-end">
+                        <div class="">
+                            <div class="w-6 h-6 bg-transparent cursor-pointer flex items-center justify-center p-1" title="Background Transparent" @click="content.text_style = ''"><i class="fas fa-ban"></i></div>
+                            <div class="w-6 h-6 bg-white" title="Background White" @click="content.text_style = 'white'"></div>
+                            <div class="w-6 h-6 bg-gray-200" title="Background Grey" @click="content.text_style = 'gray'"></div>
+                            <div class="w-6 h-6 bg-blue-200" title="Background Blue" @click="content.text_style = 'blue'"></div>
+                        </div>
 
-                    <div class="">
-                        <div class="w-6 h-6 bg-transparent cursor-pointer" @click="content.text_style = ''"><i class="fas fa-ban"></i></div>
-                        <div class="w-6 h-6 bg-white" @click="content.text_style = 'white'"></div>
-                        <div class="w-6 h-6 bg-gray-200" @click="content.text_style = 'gray'"></div>
-                        <div class="w-6 h-6 bg-blue-200" @click="content.text_style = 'blue'"></div>
+                        <div class="flex ml-4">
+                            <div class="cursor-pointer mx-1" v-if="content.text_order > 1" title="Move Left" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
+                            <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" title="Move Right" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
+                            <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" title="Increase Width" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>
+                            <div class="cursor-pointer mx-1" v-if="content.text_span > 1" title="Descrease Width" @click="content.text_span--"><i class="fas fa-minus-circle"></i></div>
+                        </div>
+
                     </div>
-
-                    <div class="flex ml-4">
-                        <div class="cursor-pointer mx-1" v-if="content.text_order > 1" @click="content.text_order--"><i class="fas fa-arrow-alt-circle-left"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="content.text_order < (totalCells + 1)" @click="content.text_order++"><i class="fas fa-arrow-alt-circle-right"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="content.text_span < content.columns" @click="content.text_span++"><i class="fas fa-plus-circle"></i></div>
-                        <div class="cursor-pointer mx-1" v-if="content.text_span > 1" @click="content.text_span--"><i class="fas fa-minus-circle"></i></div>
-                    </div>
-
                 </div>
 
             </div>
@@ -145,12 +154,13 @@
 
     import Feedback from '@/Mixins/Feedback';
     import Photos from '@/Mixins/Photos';
+    import SaveContent from '@/Mixins/SaveContent';
 
     export default {
 
         props: [ 'content', 'uuid' ],
 
-        mixins: [Feedback, Photos],
+        mixins: [Feedback, Photos, SaveContent ],
 
         components: {
             'editor': () => import(/* webpackChunkName: "editor" */ '@/Components/Editor.vue'),

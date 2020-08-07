@@ -7,6 +7,9 @@ Object.defineProperty(Vue.prototype, "$lodash", { value: lodash });
 import axios from "axios";
 Object.defineProperty(Vue.prototype, "$http", { value: axios });
 
+import moment from 'moment-timezone';
+Object.defineProperty(Vue.prototype, "$moment", { value: moment });
+
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 Object.defineProperty(Vue.prototype, "$eventer", { value: new Vue() });
@@ -36,6 +39,7 @@ const app = new Vue({
     store,
 
     components: {
+        'clock': () => import(/* webpackChunkName: "clock" */ '@/Components/Clock.vue'),
         'content-elements-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/ContentElementsEditor'),
         'page-editor': () => import(/* webpackChunkName: "page-editor" */ '@/Components/PageEditor'),
         'footer-editor': () => import(/* webpackChunkName: "footer-editor" */ '@/Components/FooterEditor'),

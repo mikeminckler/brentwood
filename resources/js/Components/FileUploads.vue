@@ -116,6 +116,8 @@
 
                 var vue = this;
                 let filesCount = this.files.length;
+                let completedUploads = 0;
+                let totalUploads = this.$refs[this.name].files.length;
 
                 this.$lodash.forEach(this.$refs[this.name].files, (file, index) => {
 
@@ -175,9 +177,15 @@
                             
                             this.$http.post('/file-uploads/create', formData, formOptions).then( response => {
                                 this.processSuccess(response);
+                                
+                                completedUploads++;
                                 this.$set(this.files, uploadingIndex, response.data.file_upload);
                                 //this.files[uploadingIndex].large = large;
-                                this.updateParent();
+
+                                if (completedUploads === totalUploads) {
+                                    this.updateParent();
+                                }
+
                             }, error => {
                                 this.processErrors(error.response);
                                 this.files.slice(uploadingIndex, 1);
@@ -208,7 +216,6 @@
                 if (file) {
                     file.progress = percentCompleted;
                 } else {
-                    console.log(uploadingIndex);
                 }
             },
 

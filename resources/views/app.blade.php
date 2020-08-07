@@ -176,6 +176,7 @@
                         <div class="flex-2 relative z-2">
                             <div class="flex flex-col md:flex-row items-center justify-center">
                                 <div class="">
+                                    <clock></clock>
                                     <a href="tel:2507435521">250.743.5521</a><br/>
                                     <a href="mailto:info@brentwood.ca">info@brentwood.ca</a>
                                     <div class="mt-4">2735 Mount Baker Road<br/>Mill Bay, BC, Canada VOR 2P1</div>

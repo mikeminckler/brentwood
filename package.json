@@ -29,6 +29,8 @@
     },
     "dependencies": {
         "laravel-echo": "^1.8.0",
+        "moment": "^2.27.0",
+        "moment-timezone": "^0.5.31",
         "pusher-js": "^6.0.3"
     }
 }

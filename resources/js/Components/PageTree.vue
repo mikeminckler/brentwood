@@ -21,7 +21,6 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback'
-    import PageList from '@/Components/PageList.vue'
 
     export default {
 
@@ -34,7 +33,7 @@
         },
 
         components: {
-            'page-list': PageList,
+            'page-list': () => import(/* webpackChunkName: "page-list" */ '@/Components/PageList.vue'),
         },
 
         computed: {

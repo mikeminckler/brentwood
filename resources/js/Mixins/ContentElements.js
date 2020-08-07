@@ -33,9 +33,11 @@ export default {
                         this.$nextTick(() => {
 
                             let newContent = document.getElementById('c-' + response.data.content_element.uuid);
-                            let elementRect = newContent.getBoundingClientRect();
-                            let middle = newContent.offsetTop - (elementRect.height / 3);
-                            window.scrollTo(0, middle);
+                            if (newContent) {
+                                let elementRect = newContent.getBoundingClientRect();
+                                let middle = newContent.offsetTop - (elementRect.height / 3);
+                                window.scrollTo(0, middle);
+                            }
 
                         });
                     } else {

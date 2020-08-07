@@ -193,4 +193,26 @@ class FileUploadsTest extends TestCase
                 'success' => 'File valid'
             ]);
     }
+
+    /** @test **/
+    public function a_file_upload_name_has_illegal_characters_removed()
+    {
+        $this->withoutExceptionHandling();
+        Storage::fake(); 
+        $file = UploadedFile::fake()->image('!@#$%^&*()foobar"[];<>\'.png');
+
+        $this->signInAdmin();
+
+        $this->json('POST', route('file-uploads.create'), ['file' => $file])
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'foobar.png Uploaded'
+            ]);
+
+        $file_upload = FileUpload::all()->last();
+
+        $this->assertInstanceOf(FileUpload::class, $file_upload);
+        Storage::assertExists('uploads/'.$file->hashName());
+        $this->assertEquals($file_upload->name, 'foobar.png');
+    }
 }

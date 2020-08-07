@@ -29,18 +29,16 @@
 
 <script>
 
-    import ContentElement from '@/Forms/ContentElement.vue';
     import ContentElements from '@/Mixins/ContentElements';
     import Feedback from '@/Mixins/Feedback';
-    import AddContentElement from '@/Components/AddContentElement.vue';
 
     export default {
 
         mixins: [Feedback, ContentElements],
 
         components: {
-            'form-content-element': ContentElement,
-            'add-content-element': AddContentElement,
+            'form-content-element': () => import(/* webpackChunkName: "form-content-element" */ '@/Forms/ContentElement.vue'),
+            'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement.vue'),
         },
 
         computed: {

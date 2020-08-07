@@ -59,7 +59,6 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback'
-    import CheckboxInput from '@/Components/CheckboxInput'
 
     export default {
 
@@ -71,7 +70,7 @@
         },
 
         components: {
-            'checkbox-input': CheckboxInput,
+            'checkbox-input': () => import(/* webpackChunkName: "checkbox-input" */ '@/Components/CheckboxInput.vue'),
         },
 
         computed: {

@@ -77,10 +77,7 @@
 
 <script>
 
-    import Editor from '@/Components/Editor.vue';
     import Feedback from '@/Mixins/Feedback';
-    import FileUploads from '@/Components/FileUploads';
-    import CheckboxInput from '@/Components/CheckboxInput';
     import Photos from '@/Mixins/Photos';
 
     export default {
@@ -89,9 +86,9 @@
         mixins: [Feedback, Photos],
 
         components: {
-            'file-uploads': FileUploads,
-            'checkbox-input': CheckboxInput,
-            'editor': Editor,
+            'editor': () => import(/* webpackChunkName: "editor" */ '@/Components/Editor.vue'),
+            'file-uploads': () => import(/* webpackChunkName: "file-uploads" */ '@/Components/FileUploads.vue'),
+            'checkbox-input': () => import(/* webpackChunkName: "checkbox-input" */ '@/Components/CheckboxInput.vue'),
         },
 
         data() {

@@ -43,6 +43,8 @@ export default {
 
             if (upload.id >= 1) {
 
+                //upload.large = null;
+
                 if (!this.$lodash.find(this.photos, function(u) {
                     return u.file_upload.id == upload.id;
                 })) {
@@ -60,7 +62,7 @@ export default {
                         stat_number: null,
                         stat_name: null,
                         link: null,
-                        large: upload.large,
+                        large: null,
                         file_upload: upload,
                     }
 

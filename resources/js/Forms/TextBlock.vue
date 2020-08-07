@@ -76,13 +76,8 @@
 
 <script>
 
-    import Editor from '@/Components/Editor.vue';
-    import FileUploads from '@/Components/FileUploads';
     import Photos from '@/Mixins/Photos';
     import Feedback from '@/Mixins/Feedback';
-    import PhotoControls from '@/Components/PhotoControls';
-    import Stat from '@/Components/Stat.vue';
-    import CheckboxInput from '@/Components/CheckboxInput';
 
     export default {
 
@@ -90,11 +85,11 @@
         mixins: [ Photos, Feedback ],
 
         components: {
-            'editor': Editor,
-            'file-uploads': FileUploads,
-            'photo-controls': PhotoControls,
-            'stat': Stat,
-            'checkbox-input': CheckboxInput,
+            'editor': () => import(/* webpackChunkName: "editor" */ '@/Components/Editor.vue'),
+            'file-uploads': () => import(/* webpackChunkName: "file-uploads" */ '@/Components/FileUploads.vue'),
+            'photo-controls': () => import(/* webpackChunkName: "photo-controls" */ '@/Components/PhotoControls.vue'),
+            'stat': () => import(/* webpackChunkName: "stat" */ '@/Components/Stat.vue'),
+            'checkbox-input': () => import(/* webpackChunkName: "checkbox-input" */ '@/Components/CheckboxInput.vue'),
         },
 
         data() {

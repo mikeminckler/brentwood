@@ -66,10 +66,7 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback';
-    import Editor from '@/Components/Editor.vue';
-    import FileUploads from '@/Components/FileUploads';
     import Photos from '@/Mixins/Photos';
-    import PhotoControls from '@/Components/PhotoControls';
 
     export default {
 
@@ -78,9 +75,9 @@
         mixins: [Feedback, Photos],
 
         components: {
-            'editor': Editor,
-            'file-uploads': FileUploads,
-            'photo-controls': PhotoControls,
+            'editor': () => import(/* webpackChunkName: "editor" */ '@/Components/Editor.vue'),
+            'file-uploads': () => import(/* webpackChunkName: "file-uploads" */ '@/Components/FileUploads.vue'),
+            'photo-controls': () => import(/* webpackChunkName: "photo-controls" */ '@/Components/PhotoControls.vue'),
         },
 
         data() {

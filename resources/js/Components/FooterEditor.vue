@@ -53,7 +53,6 @@
 
 <script>
 
-    import FileUploads from '@/Components/FileUploads';
     import Feedback from '@/Mixins/Feedback';
 
     export default {
@@ -61,7 +60,7 @@
         mixins: [Feedback],
 
         components: {
-            'file-uploads': FileUploads,
+            'file-uploads': () => import(/* webpackChunkName: "file-uploads" */ '@/Components/FileUploads.vue'),
         },
 
         data() {

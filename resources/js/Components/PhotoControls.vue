@@ -25,13 +25,13 @@
         <div class="relative">
             <div class="absolute right-0 bottom-0 transform rotate-90 origin-top-right w-32">
                 <div class="flex items-center px-2 py-1">
-                    <input type="range" v-model="photo.offsetY" min="0" max="100" />
+                    <input type="range" v-model="photo.offsetY" min="0" max="100" class="outline-none" />
                 </div>
             </div>
 
             <div class="absolute right-0 bottom-0 w-32">
                 <div class="flex items-center px-2 py-1">
-                    <input type="range" v-model="photo.offsetX" min="0" max="100" />
+                    <input type="range" v-model="photo.offsetX" min="0" max="100" class="outline-none" />
                 </div>
             </div>
         </div>
@@ -73,9 +73,6 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback';
-    import FileUploads from '@/Components/FileUploads';
-    import Stat from '@/Components/Stat.vue';
-    import PageTree from '@/Components/PageTree.vue';
 
     export default {
 
@@ -83,9 +80,9 @@
         props: ['photo', 'fill', 'sort', 'span', 'content', 'photos', 'stat'],
 
         components: {
-            'file-uploads': FileUploads,
-            'stat': Stat,
-            'page-tree': PageTree,
+            'file-uploads': () => import(/* webpackChunkName: "file-uploads" */ '@/Components/FileUploads.vue'),
+            'stat': () => import(/* webpackChunkName: "stat" */ '@/Components/Stat.vue'),
+            'page-tree': () => import(/* webpackChunkName: "page-tree" */ '@/Components/PageTree.vue'),
         },
 
         data() {

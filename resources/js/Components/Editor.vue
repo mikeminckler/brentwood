@@ -137,17 +137,14 @@
     import ToggleClass from '@/Components/EditorClasses/ToggleClass';
     import Align from '@/Components/EditorClasses/Align';
 
-    import CheckboxInput from '@/Components/CheckboxInput.vue';
-    import PageTree from '@/Components/PageTree.vue';
-
     export default {
 
         components: {
             EditorContent,
             EditorMenuBar,
             EditorMenuBubble,
-            'checkbox-input': CheckboxInput,
-            'page-tree': PageTree,
+            'checkbox-input': () => import(/* webpackChunkName: "checkbox-input" */ '@/Components/CheckboxInput.vue'),
+            'page-tree': () => import(/* webpackChunkName: "page-tree" */ '@/Components/PageTree.vue'),
         },
 
         props: ['value', 'placeholder', 'label', 'focus', 'showBg'],

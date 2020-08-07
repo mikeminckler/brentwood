@@ -6,7 +6,7 @@
             :name="name"
             :dusk="name"
             :id="name"
-            ref="files"
+            :ref="name"
             @change="uploadFiles()"
             :multiple="multiple"
             v-show="false"
@@ -20,7 +20,7 @@
                 v-if="!show ? (file.id >= 1 ? false : true) : true"
             >
 
-                <div class="relative w-full flex items-center">
+                <div class="relative w-full flex items-center text-gray-700">
                     <div class="absolute bg-green-200 absolute h-full top-0"  
                          v-if="file.progress <= 100" 
                         :style="'width: ' + file.progress + '%; transition: width 1000ms linear;'"></div>
@@ -68,6 +68,9 @@
         data() {
             return {
                 files: [],
+                addFiles: function() {
+                    this.$refs[this.name].click();
+                },
             }
         },
 
@@ -93,15 +96,17 @@
         },
 
         mounted() {
-            this.$eventer.$on('add-files', name => {
-                console.log(this.name + ':' + name);
+
+            const listener = name => {
                 if (this.name === name) {
                     this.addFiles();
                 }
-            });
+            };
+
+            this.$eventer.$on('add-files', listener);
 
             this.$once('hook:destroyed', () => {
-                this.$eventer.$off('add-files');
+                this.$eventer.$off('add-files', listener);
             });
         },
 
@@ -112,27 +117,38 @@
                 var vue = this;
                 let filesCount = this.files.length;
 
-                this.$lodash.forEach(this.$refs.files.files, (file, index) => {
+                this.$lodash.forEach(this.$refs[this.name].files, (file, index) => {
 
                     let reader = new FileReader();
                     reader.readAsDataURL(file);
 
                     reader.onload = e => {
-                        let large = e.target.result;
+                        //let large = e.target.result;
 
-                        let uploadingIndex = index + filesCount;
+                        let uploadingIndex;
+
+                        if (this.multiple) {
+                            uploadingIndex = index + filesCount;
+                        } else {
+                            uploadingIndex = 0;
+                        }
+
                         let newFile = {
                             id: '0.' + index,
                             name: file.name,
                             size: file.size,
-                            large: '',
+                            //large: '',
                             type: this.type,
                             progress: 0,
                         };
 
                         this.$http.post('/file-uploads/pre-validate', newFile).then( response => {
 
-                            this.files.push(newFile);
+                            if (this.multiple) {
+                                this.files.push(newFile);
+                            } else {
+                                this.files = [newFile];
+                            }
 
                             let formData = new FormData();
                             let formOptions = {
@@ -160,7 +176,7 @@
                             this.$http.post('/file-uploads/create', formData, formOptions).then( response => {
                                 this.processSuccess(response);
                                 this.$set(this.files, uploadingIndex, response.data.file_upload);
-                                this.files[uploadingIndex].large = large;
+                                //this.files[uploadingIndex].large = large;
                                 this.updateParent();
                             }, error => {
                                 this.processErrors(error.response);
@@ -175,6 +191,7 @@
                     }
                 });
 
+                this.$refs[this.name].value = null;
 
             },
 
@@ -188,12 +205,13 @@
 
             updateProgress: function(uploadingIndex, percentCompleted) {
                 let file = this.files[uploadingIndex];
-                file.progress = percentCompleted;
+                if (file) {
+                    file.progress = percentCompleted;
+                } else {
+                    console.log(uploadingIndex);
+                }
             },
 
-            addFiles: function() {
-                this.$refs.files.click();
-            },
 
             removeFile: function(file, index) {
 

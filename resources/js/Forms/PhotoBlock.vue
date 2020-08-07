@@ -22,12 +22,10 @@
                 <div v-if="!content.show_text" class="text-gray-400"><i class="fas fa-align-justify"></i></div>
             </div>
 
-            <transition name="fade">
-                <div class="content-element-icons text-xl" @click="content.padding = !content.padding" v-if="photos.length > 1">
-                    <div v-if="content.padding"><i class="fas fa-border-none"></i></div>
-                    <div v-if="!content.padding"><i class="fas fa-border-all"></i></div>
-                </div>
-            </transition>
+            <div class="content-element-icons text-xl" @click="content.padding = !content.padding" v-if="photos.length > 1">
+                <div v-if="content.padding"><i class="fas fa-border-none"></i></div>
+                <div v-if="!content.padding"><i class="fas fa-border-all"></i></div>
+            </div>
 
         </div>
 
@@ -51,10 +49,17 @@
                 <div v-if="index === (sortedPhotos.length - 1)" class="h-1 bg-gray-200 opacity-50 w-full absolute bottom-0 z-5"></div>
 
                 <div class="photo" :class="photo.fill ? 'fill' : 'fit'" v-if="photo">
-                    <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'" />
+                    <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'" v-if="photo.large" />
+                    <div class="flex items-center justify-center bg-gray-200 h-full relative z-3" v-if="!photo.large">
+                        <div class="flex bg-gray-100 text-green-500 px-2 py-1">
+                            <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                            <div class="ml-1">Processing Image</div>
+                        </div>
+                    </div>
                 </div>
 
                 <photo-controls :photo="photo"
+                    v-if="photo.id >= 1"
                     :span="1"
                     :sort="1"
                     :content="content"
@@ -104,6 +109,26 @@
 
         </transition-group>
 
+        <div class="flex bg-gray-200 p-2 shadow mt-4" v-if="photosCount > 0">
+
+            <div class="flex-1">
+                <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
+                    <div class="">Upload Files</div>
+                </div>
+            </div>
+
+            <div class="bg-primary ml-1" v-if="photos.length === 1" @click="setText1()"><img src="/images/text1.png" /></div>
+            <div class="bg-primary ml-1" v-if="photos.length === 1" @click="setText2()"><img src="/images/text2.png" /></div>
+            <div class="bg-primary ml-1" v-if="photos.length === 1" @click="setText3()"><img src="/images/text3.png" /></div>
+            <div class="bg-primary ml-1" v-if="photos.length === 1" @click="setText4()"><img src="/images/text4.png" /></div>
+
+            <div class="bg-primary ml-1" v-if="photos.length === 2" @click="setText5()"><img src="/images/text1.png" /></div>
+            <div class="bg-primary ml-1" v-if="photos.length === 2" @click="setText6()"><img src="/images/text2.png" /></div>
+            <div class="bg-primary ml-1" v-if="photos.length === 2" @click="setText7()"><img src="/images/text3.png" /></div>
+            <div class="bg-primary ml-1" v-if="photos.length === 2" @click="setText8()"><img src="/images/text3.png" /></div>
+
+        </div>
+
         <file-uploads
             :name="fileUploadName"
             v-model="uploads"
@@ -112,23 +137,6 @@
             type="image"
         ></file-uploads>
 
-        <div class="flex bg-gray-200 p-2 shadow mt-4" v-if="photosCount > 0">
-
-            <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
-                <div class="">Upload Files</div>
-            </div>
-
-            <div class="button mx-1" v-if="photos.length === 1" @click="setText1()"><img src="/images/text1.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 1" @click="setText2()"><img src="/images/text2.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 1" @click="setText3()"><img src="/images/text3.png" /></div>
-
-            <div class="button mx-1" v-if="photos.length === 2" @click="setText4()"><img src="/images/text1.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 2" @click="setText5()"><img src="/images/text2.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 2" @click="setText6()"><img src="/images/text3.png" /></div>
-            <div class="button mx-1" v-if="photos.length === 2" @click="setText7()"><img src="/images/text3.png" /></div>
-
-        </div>
-
     </div>
 
 </template>
@@ -136,10 +144,7 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback';
-    import Editor from '@/Components/Editor.vue';
-    import FileUploads from '@/Components/FileUploads';
     import Photos from '@/Mixins/Photos';
-    import PhotoControls from '@/Components/PhotoControls';
 
     export default {
 
@@ -148,9 +153,9 @@
         mixins: [Feedback, Photos],
 
         components: {
-            'editor': Editor,
-            'file-uploads': FileUploads,
-            'photo-controls': PhotoControls,
+            'editor': () => import(/* webpackChunkName: "editor" */ '@/Components/Editor.vue'),
+            'file-uploads': () => import(/* webpackChunkName: "file-uploads" */ '@/Components/FileUploads.vue'),
+            'photo-controls': () => import(/* webpackChunkName: "photo-controls" */ '@/Components/PhotoControls.vue'),
         },
 
         data() {
@@ -268,7 +273,7 @@
                     }
 
                     if (this.photos.length === 2) {
-                        this.setText4();
+                        this.setText5();
                     }
                 } else {
 
@@ -339,19 +344,17 @@
 
             setText4: function() {
 
-                if (this.photos.length === 2) {
+                if (this.photos.length === 1) {
                     this.content.columns = 3;
                     this.content.height = 100;
                     this.content.padding = 0;
                     this.content.show_text = 1;
-                    this.content.text_order = 3;
-                    this.content.text_span = 1;
-                    this.sortedPhotos[0].sort_order = 1;
-                    this.sortedPhotos[0].span = 2;
-                    this.sortedPhotos[1].sort_order = 2;
-                    this.sortedPhotos[1].span = 3;
+                    this.content.text_order = 1;
+                    this.content.text_span = 2;
+                    this.content.text_style = 'white';
+                    this.sortedPhotos[0].span = 1;
                 }
-
+                
             },
 
             setText5: function() {
@@ -361,7 +364,7 @@
                     this.content.height = 100;
                     this.content.padding = 0;
                     this.content.show_text = 1;
-                    this.content.text_order = 1;
+                    this.content.text_order = 3;
                     this.content.text_span = 1;
                     this.sortedPhotos[0].sort_order = 1;
                     this.sortedPhotos[0].span = 2;
@@ -378,6 +381,23 @@
                     this.content.height = 100;
                     this.content.padding = 0;
                     this.content.show_text = 1;
+                    this.content.text_order = 1;
+                    this.content.text_span = 1;
+                    this.sortedPhotos[0].sort_order = 1;
+                    this.sortedPhotos[0].span = 2;
+                    this.sortedPhotos[1].sort_order = 2;
+                    this.sortedPhotos[1].span = 3;
+                }
+
+            },
+
+            setText7: function() {
+
+                if (this.photos.length === 2) {
+                    this.content.columns = 3;
+                    this.content.height = 100;
+                    this.content.padding = 0;
+                    this.content.show_text = 1;
                     this.content.text_order = 2;
                     this.content.text_span = 1;
                     this.sortedPhotos[0].sort_order = 1;
@@ -388,7 +408,7 @@
 
             },
 
-            setText7: function() {
+            setText8: function() {
 
                 if (this.photos.length === 2) {
                     this.content.columns = 3;

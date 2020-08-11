@@ -44,11 +44,11 @@ class ContentElement extends Model
         $content_element->content_id = $content->id;
         $content_element->content_type = get_class($content);
 
-        // always draft?
         $content_element->version_id = $page->getDraftVersion()->id;
 
         $content_element->save();
 
+        // assign or update the content element to the page 
         if (!$content_element->pages()->get()->contains('id', $page->id)) {
             $content_element->pages()->attach($page->id, [
                 'sort_order' => Arr::get($input, 'pivot.sort_order'),

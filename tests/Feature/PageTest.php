@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use App\FileUpload;
 use App\Photo;
+use App\Version;
 
 class PageTest extends TestCase
 {
@@ -595,4 +596,79 @@ class PageTest extends TestCase
         $this->assertEquals(1, $page->sort_order);
 
     }
+
+    /** @test **/
+    public function a_previous_version_of_a_page_can_be_loaded()
+    {
+
+        $this->signInAdmin();
+        session()->put('editing', true);
+
+        $text_block = factory(TextBlock::class)->create();
+        $old_text = $text_block->body;
+        $content_element = $text_block->contentElement;
+        $this->assertInstanceOf(ContentElement::class, $content_element);
+
+        $page = $content_element->pages->first();
+
+        $this->assertInstanceOf(Page::class, $page);
+
+        $draft_version = $page->getDraftVersion();
+
+        $this->assertInstanceOf(Version::class, $draft_version);
+
+        $content_element->version_id = $draft_version->id;
+        $content_element->save();
+        $content_element->refresh();
+
+        $this->assertEquals($page->draft_version_id, $content_element->version_id);
+
+        $page->publish();
+        $page->refresh();
+        $content_element->refresh();
+        $content = $content_element->content;
+
+        $this->assertEquals($page->published_version_id, $content_element->version_id);
+
+        $new_text_block = factory(TextBlock::class)->raw();
+        $new_text = Arr::get($new_text_block, 'body');
+        $this->assertNotNull($new_text);
+        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input['type'] = 'text-block';
+        $input['content'] = $new_text_block;
+        $input['content']['id'] = $content->id;
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+
+        $saved_content_element = (new ContentElement)->saveContentElement($content_element->id, $input);
+
+        $this->assertNotEquals($page->getDraftVersion()->id, $page->publishedVersion->id);
+        $this->assertNotEquals($content_element->id, $saved_content_element->id);
+        $this->assertNotEquals($content->id, $saved_content_element->content->id);
+
+        $this->assertEquals($page->getDraftVersion()->id, $saved_content_element->version_id);
+        $page->publish();
+
+        $page->refresh();
+
+        $route  = route('pages.load', ['page' => $page->full_slug, 'version_id' => $draft_version->id]);
+        $this->assertTrue(Str::contains($route, 'version_id'));
+        $this->get($route)
+            ->assertSessionHas('editing')
+            ->assertSuccessful()
+            ->assertDontSee($new_text)
+            ->assertSee($old_text);
+
+    }
+
+
+
+
+    // when rolling back we will copy any old CEs and make new version numbers for them if we they dont have a draft
+    // individual content elements can be published, the other draft items become a new version
+
 }

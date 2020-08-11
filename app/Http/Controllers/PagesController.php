@@ -43,6 +43,7 @@ class PagesController extends Controller
 
         if (session()->has('editing')) {
             $page->appendAttributes();
+            $page->load('versions');
         }
 
         return view('page', compact('page', 'content_elements'));

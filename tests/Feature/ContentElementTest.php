@@ -190,4 +190,10 @@ class ContentElementTest extends TestCase
                 'success' => 'Text Block Saved',
              ]);
     }
+
+    /** @test **/
+    public function saving_a_new_content_element_when_there_is_already_a_draft_version_should_not_create_a_new_content_element()
+    {
+        $this->fail('Write this test');
+    }
 }

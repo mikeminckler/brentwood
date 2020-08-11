@@ -11,10 +11,8 @@ class Version extends Model
 {
     public function saveVersion($id = null, $input) 
     {
-        $update = false;
         if ($id) {
             $version = Version::findOrFail($id);
-            $update = true;
         } else {
             $version = new Version;
         }

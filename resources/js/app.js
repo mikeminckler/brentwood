@@ -34,6 +34,24 @@ Object.defineProperty(Vue.prototype, "$echo", { value: new Echo({
     })
 });
 
+import VCalendar from 'v-calendar';
+Vue.use(VCalendar, {
+    datePicker: {
+        popover: {
+            visibility: 'focus',
+        }
+    },
+    firstDayOfWeek: 1,
+    formats: {
+        title: 'MMMM YYYY',
+        weekdays: 'W',
+        navMonths: 'MMM',
+        input: ['L', 'YYYY-MM-DD', 'YYYY/MM/DD'],
+        dayPopover: 'WWW, MMM D, YYYY',
+        data: ['L', 'YYYY-MM-DD', 'YYYY/MM/DD'],
+    },
+});
+
 const app = new Vue({
     el: "#app",
     store,

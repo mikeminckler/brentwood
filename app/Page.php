@@ -160,10 +160,28 @@ class Page extends Model
         $draft_version = $this->getDraftVersion();
         $draft_version->publish();
         $this->published_version_id = $draft_version->id;
+        $this->publish_at = null;
         $this->save();
 
         cache()->tags([cache_name($this), cache_name($draft_version)])->flush();
         return $this;
+    }
+
+    public static function publishPages() 
+    {
+        $pages = Version::whereNull('published_at')
+            ->whereHas('page', function($query) {
+                $query->whereNotNull('publish_at')
+                      ->where('publish_at', '<', now());
+            })
+            ->get()
+            ->map(function($version) {
+                return $version->page;
+            })
+            ->each(function($page) {
+                $page->publish();
+            });
+
     }
 
     public function getDraftVersion() 
@@ -184,11 +202,23 @@ class Page extends Model
         return $this->getDraftVersion()->id; 
     }
 
+    public function getContentElements() 
+    {
+        $version_id = requestInput('version_id');
+        
+        if ($version_id) {
+            return $this->contentElements()
+                ->where('version_id', '<=', $version_id)
+                ->get();
+        } else {
+            return $this->contentElements()->get();
+        }
+    }
+
     public function getContentElementsAttribute() 
     {
         //return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-content-elements', function() {
-            return $this->contentElements()
-                         ->get()
+            return $this->getContentElements()
                          ->groupBy('uuid')
                          ->map(function($uuid) {
                             return $uuid->sortByDesc( function( $content_element) {
@@ -203,8 +233,7 @@ class Page extends Model
 
     public function getPublishedContentElementsAttribute() 
     {
-        return $this->contentElements()
-                     ->get()
+        return $this->getContentElements()
                      ->groupBy('uuid')
                      ->map(function($uuid) {
                         return $uuid->filter( function($content_element) {
@@ -228,8 +257,7 @@ class Page extends Model
         if (!session()->get('editing')) {
             return collect();
         }
-        return $this->contentElements()
-                     ->get()
+        return $this->getContentElements()
                      ->groupBy('uuid')
                      ->map(function($uuid) {
                         return $uuid->sortByDesc( function( $content_element) {

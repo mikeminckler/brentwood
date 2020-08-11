@@ -597,4 +597,30 @@ class PageTest extends TestCase
         $this->assertEquals($page3->full_slug, Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
 
     }
+
+    /** @test **/
+    public function a_page_can_be_published_in_the_future()
+    {
+        $page = factory(Page::class)->states('unpublished')->create([
+            'publish_at' => now()->addMinutes(1),
+        ]);
+
+        $this->assertInstanceOf(Version::class, $page->getDraftVersion());
+        $this->assertNull($page->published_at);
+
+        Page::publishPages();
+        $page->refresh();
+        $this->assertNull($page->published_at);
+
+        $page->publish_at = now()->subMinutes(1);
+        $page->save();
+        $page->refresh();
+
+        Page::publishPages();
+        $page->refresh();
+        $this->assertNotNull($page->published_at);
+        $this->assertNull($page->publish_at);
+
+    }
+
 }

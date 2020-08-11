@@ -26,7 +26,7 @@
                         <div class=""><a href="/page-accesses">Page Access</a></div>
                         <div class=""><a href="/roles">Role Management</a></div>
 
-                        <div class="">Websocket @{{ $store.state.wsState.toUpperCase() }}</div>
+                        <div class="">@{{ $store.state.wsState }}</div>
                     </div>
                 </div>
             </div>

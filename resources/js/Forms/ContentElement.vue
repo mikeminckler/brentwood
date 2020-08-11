@@ -27,11 +27,10 @@
             </transition>
 
             <transition name="draft">
-                <div class="relative flex items-center z-2" v-if="!contentElement.published_at">
-                    <div class="flex items-center bg-yellow-100 pl-2">
-                        <div class="text-xl mr-2 relative"><i class="fas fa-pen-square"></i></div>
+                <div class="absolute flex items-center z-3" v-if="!contentElement.published_at">
+                    <div class="flex items-center bg-yellow-100 pl-2 border border-yellow-300">
                         <div class="font-bold relative">DRAFT</div>
-                        <div class="remove-icon mx-2" @click="removeDraft()"><i class="fas fa-times"></i></div>
+                        <div class="remove-icon ml-2" @click="removeDraft()"><i class="fas fa-times"></i></div>
                     </div>
                 </div>
             </transition>

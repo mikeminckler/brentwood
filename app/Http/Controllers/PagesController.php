@@ -46,6 +46,13 @@ class PagesController extends Controller
             $page->load('versions');
         }
 
+        if (request()->wantsJson()) {
+            return response()->json([
+                'page' => $page, 
+                'content_elements' => $content_elements,
+            ]);
+        }
+
         return view('page', compact('page', 'content_elements'));
     }
 

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="input relative w-24">
+    <div class="input relative w-24" @blur="show = false">
 
         <transition name="text-sm">
             <div class="label" v-if="input">
@@ -15,7 +15,7 @@
         <div class="time-picker-input">
             <input type="text" 
                 :id="name" 
-                :placeholder="placeholder" 
+                :placeholder="placeholder ? placeholder : 'Time'" 
                 ref="input"
                 v-model="input" 
                 @change="validate()"
@@ -24,7 +24,7 @@
                 :dusk="name"
                 @focus="show = true"
                 autocomplete="off"
-                class="py-2 px-3 leading-tight border rounded border-gray-400 bg-white"
+                class="py-2 px-3 leading-tight border rounded border-gray-400 bg-white outline-none"
             />
         </div>
 
@@ -32,7 +32,7 @@
             <div class="flex bg-gray-100 p-2 absolute z-20 shadow rounded-b" v-if="show">
                 <div class="">
                     <div class="label">Hour</div>
-                    <div class=""><input type="range" min="0" max="23" v-model="hour" class="slider" id="time-slider" /></div>
+                    <div class=""><input type="range" min="0" max="23" v-model="hour" class="slider outline-none text-gray-600" id="time-slider" /></div>
                     <div class="label">Minutes</div>
                     <div class=""><input type="range" min="0" step="5" max="59" v-model="minute" class="slider" id="time-slider" /></div>
                 </div>
@@ -57,6 +57,7 @@
             'type', 
             'placeholder',
             'label',
+            'inline',
         ],
 
         data() {

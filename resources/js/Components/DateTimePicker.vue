@@ -18,7 +18,7 @@
                 <v-date-picker
                     v-model="date"
                     color="gray"
-                    :input-props="{ dusk: dusk, placeholder: placeholder }"
+                    :input-props="{ dusk: dusk, placeholder: placeholder ? placeholder : 'Select Date' }"
                     :is-inline="inline"
                 >
                 </v-date-picker>
@@ -26,10 +26,9 @@
             </div>
         </div>
 
-        <div class="">
+        <div class="text-gray-600">
             <time-picker
                 v-model="time"
-                placeholder="Time"    
             ></time-picker>
         </div>
 

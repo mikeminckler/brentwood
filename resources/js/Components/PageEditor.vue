@@ -39,15 +39,19 @@
                     <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white font-bold cursor-pointer justify-center items-center h-8 overflow-visible" 
                          v-if="(hasDraft && page.editable) && !$store.state.saving.length"
                     >
-                        <div class="px-2"><i class="fas fa-sign-out-alt"></i></div>
-                        <div @click="publishPage()">Publish</div>
+                        <transition name="slide">
+                            <div class="pl-2" v-if="!showPagePublishAt"><i class="fas fa-sign-out-alt"></i></div>
+                        </transition>
+                        <div class="pl-2 "@click="publishPage()">Publish</div>
                         <div class="px-2" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
                         <date-time-picker
                             v-show="showPagePublishAt"
                             v-model="page.publish_at"
-                            placeholder="Publish At"
-                            label="Publish At"
                         ></date-time-picker>
+                        <transition name="slide">
+                            <div class="px-2" v-if="showPagePublishAt" @click="savePage()"><i class="fas fa-save"></i></div>
+                            <div class="px-2" v-if="showPagePublishAt" @click="removePublishAt()"><i class="fas fa-times"></i></div>
+                        </transition>
                     </div>
                 </transition>
 
@@ -92,7 +96,7 @@
     export default {
 
         mixins: [Feedback],
-        props: ['currentPage', 'debug'],
+        props: ['currentPage'],
         data() {
             return {
                 showPageVersions: false,
@@ -215,6 +219,7 @@
                     this.processSuccess(response);
                 }, error => {
                     this.processErrors(error.response);
+                    this.$store.dispatch('completeSaving', 'page');
                 });
 
             }, 750),
@@ -228,12 +233,15 @@
 
             publishPage: function() {
 
-                this.$http.post('/pages/' + this.page.id + '/publish').then( response => {
-                    location.reload();
-                    //this.processSuccess(response);
-                }, error => {
-                    this.processErrors(error.response);
-                });
+                var answer = confirm('Are you sure you want to PUBLISH this page?');
+                if (answer == true) {
+                    this.$http.post('/pages/' + this.page.id + '/publish').then( response => {
+                        location.reload();
+                        //this.processSuccess(response);
+                    }, error => {
+                        this.processErrors(error.response);
+                    });
+                }
 
             },
 
@@ -259,6 +267,11 @@
                     window.location = this.page.full_slug;
                 }
             },
+
+            removePublishAt: function() {
+                this.page.publish_at = null;
+                this.savePage();
+            }
 
         },
 

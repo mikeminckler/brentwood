@@ -34,11 +34,39 @@ class PageValidation extends FormRequest
      */
     public function rules()
     {
-        return [
-            'name' => 'required|string',
-            'parent_page_id' => 'required|integer|min:1|exists:pages,id',
-            'unlisted' => 'boolean',
-            'sort_order' => 'required|integer',
-        ];
+
+        if ($this->route('id') == 1) {
+
+            return [
+                'name' => 'required|string',
+                'unlisted' => 'boolean',
+                'sort_order' => 'required|integer',
+                'parent_page_id' => [
+                    'required',
+                    'integer',
+                    function ($attribute, $value, $fail) {
+                        if ($value !== 0) {
+                            $fail('The home page parent id must be zero');
+                        }
+                    }
+                ],
+            ];
+        
+        } else {
+        
+            return [
+                'name' => 'required|string',
+                'unlisted' => 'boolean',
+                'sort_order' => 'required|integer',
+                'parent_page_id' => [
+                    'required',
+                    'integer',
+                    'exists:pages,id',
+                    'min:1',
+                ],
+            ];
+        
+        }
+
     }
 }

@@ -37,7 +37,7 @@
             <div id="header" class="sticky top-0 z-10 {{ optional($page ?? '')->editable && !request('preview') ? 'px-12' : '' }}">
 
                 @if (optional($page ?? '')->editable)
-                    <page-editor :current-page='@json($page ?? '')' :debug="{{ optional(auth()->user())->hasRole('admin') }}"></page-editor>
+                    <page-editor :current-page='@json($page ?? '')'></page-editor>
                 @endif
 
                 <div class="flex justify-center relative bg-gray-100">

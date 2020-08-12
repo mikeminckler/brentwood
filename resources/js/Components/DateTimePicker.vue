@@ -1,8 +1,8 @@
 <template>
 
-    <div class="relative flex" dusk="date-time-picker">
+    <div class="relative flex w-64 items-baseline" dusk="date-time-picker">
 
-        <div class="flex-1">
+        <div class="">
             <transition name="text-sm">
                 <div class="label" v-if="date">
                     <label for="name">{{ label ? label : placeholder }}</label>
@@ -13,7 +13,7 @@
                 <i class="fas fa-calendar"></i>
             </div>
 
-            <div class="date-picker">
+            <div class="date-picker-input">
 
                 <v-date-picker
                     v-model="date"
@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        <div class="flex-1">
+        <div class="">
             <time-picker
                 v-model="time"
                 placeholder="Time"    

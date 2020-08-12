@@ -194,6 +194,16 @@ iframe {
     @apply bg-white border-gray-300;
 }
 
+.input-icon {
+    @apply absolute flex items-center justify-center px-2 py-2 text-gray-500;
+}
+
+div.date-picker-input, div.time-picker-input {
+    & input {
+        @apply pl-8;
+    }
+}
+
 input, .editor {
     @apply w-full bg-transparent border border-transparent;
 }

@@ -1,7 +1,7 @@
 <template>
 
     <div class="flex items-baseline">
-        <div class="flex justify-center items-baseline font-bold">
+        <div class="flex justify-center items-baseline">
             <div class="">{{ time }}</div>
             <div class="">{{ ampm }}</div>
         </div>

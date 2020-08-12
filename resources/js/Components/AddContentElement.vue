@@ -2,13 +2,11 @@
 
     <div class="relative z-2 w-full mt-4" :class="[show ? 'bg-white' : '']">
 
-        <div class="flex items-center cursor-pointer rounded relative hover:text-primary z-2 p-2" @click="show = !show">
+        <div class="flex items-center cursor-pointer rounded relative hover:text-primary z-2 p-2" :class="show ? 'text-primary' : ''" @click="show = !show">
             <div class="text-2xl leading-none pr-2" title="Add Content">
                 <i class="fas fa-plus-square"></i>
             </div>
-
-            <div class="border-b-4 border-dashed border-gray-500 w-full" v-if="!show"></div>
-            <div class="" v-if="show">Add New Content</div>
+            <div class="border-b-4 border-dashed w-full" :class="show ? 'border-primary' : 'border-gray-500'"></div>
         </div>
 
         <transition name="add-content">

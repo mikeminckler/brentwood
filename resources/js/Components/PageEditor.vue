@@ -3,13 +3,6 @@
     <div class="relative w-full z-20 flex items-center justify-center" v-if="editing && page">
 
         <div class="fixed top-0 right-0" v-if="isPreview">
-            <div class="flex bg-green-600 hover:bg-green-500 text-white px-4 py-1 font-bold cursor-pointer w-32 justify-center" 
-                @click="publishPage()"
-                 v-if="(hasDraft && page.editable) && !$store.state.saving.length"
-            >
-                <div class="pr-2"><i class="fas fa-sign-out-alt"></i></div>
-                <div>Publish</div>
-            </div>
         </div>
 
         <div class="w-full max-w-6xl flex items-center bg-gray-200 p-1 shadow relative" v-if="!isPreview">
@@ -41,15 +34,20 @@
                 <div class="ml-1" v-if="!activeVersion.published_at" title="Draft"><i class="fas fa-drafting-compass"></i></div>
             </div>
 
-            <div class="relative flex overflow-hidden">
+            <div class="relative flex">
                 <transition name="slide-down">
-                    <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white px-4 py-1 font-bold cursor-pointer w-32 justify-center" 
-                        @click="publishPage()"
+                    <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white font-bold cursor-pointer justify-center items-center h-8 overflow-visible" 
                          v-if="(hasDraft && page.editable) && !$store.state.saving.length"
                     >
-                        <div class="pr-2"><i class="fas fa-sign-out-alt"></i></div>
-                        <div>Publish</div>
-                        <div class="pl-2" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
+                        <div class="px-2"><i class="fas fa-sign-out-alt"></i></div>
+                        <div @click="publishPage()">Publish</div>
+                        <div class="px-2" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
+                        <date-time-picker
+                            v-show="showPagePublishAt"
+                            v-model="page.publish_at"
+                            placeholder="Publish At"
+                            label="Publish At"
+                        ></date-time-picker>
                     </div>
                 </transition>
 
@@ -67,16 +65,6 @@
                 <div class="text-xl"><i class="fas fa-times"></i></div>
             </div>
 
-        </div>
-
-        <div v-if="showPagePublishAt" class="absolute w-full justify-end flex overflow-visible max-w-6xl" style="top: 50px;">
-            <div class="relative bg-white shadow px-2 py-1">
-                <date-time-picker
-                    v-model="page.publish_at"
-                    placeholder="Publish At"
-                    label="Publish At"
-                ></date-time-picker>
-            </div>
         </div>
 
         <div v-if="showPageVersions" class="absolute w-full justify-end flex overflow-visible max-w-6xl" style="top: 50px;">
@@ -108,7 +96,7 @@
         data() {
             return {
                 showPageVersions: false,
-                showPagePublishAt: false,
+                showPagePublishAt: true,
             }
         },
 

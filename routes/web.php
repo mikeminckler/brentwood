@@ -15,6 +15,7 @@
 
 Route::get('login', 'Auth\LoginController@redirectToProvider')->name('login');
 Route::get('login/google/authorized', 'Auth\LoginController@handleProviderCallback');
+Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::get('/pages', 'PagesController@index')->name('pages.index');
 

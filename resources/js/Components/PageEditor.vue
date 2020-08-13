@@ -43,13 +43,15 @@
                             <div class="pl-2" v-if="!showPagePublishAt"><i class="fas fa-sign-out-alt"></i></div>
                         </transition>
                         <div class="pl-2 "@click="publishPage()">Publish</div>
-                        <div class="px-2" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
+                        <div class="px-2 ml-2 h-full flex items-center bg-green-500" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
                         <date-time-picker
                             v-show="showPagePublishAt"
                             v-model="page.publish_at"
                         ></date-time-picker>
                         <transition name="slide">
                             <div class="px-2" v-if="showPagePublishAt" @click="savePage()"><i class="fas fa-save"></i></div>
+                        </transition>
+                        <transition name="slide">
                             <div class="px-2" v-if="showPagePublishAt" @click="removePublishAt()"><i class="fas fa-times"></i></div>
                         </transition>
                     </div>
@@ -100,7 +102,7 @@
         data() {
             return {
                 showPageVersions: false,
-                showPagePublishAt: true,
+                showPagePublishAt: false,
             }
         },
 
@@ -209,6 +211,7 @@
                     footer_fg_file_upload: this.page.footer_fg_file_upload,
                     footer_bg_file_upload: this.page.footer_bg_file_upload,
                     footer_color: this.page.footer_color,
+                    publish_at: this.page.publish_at,
                 };
 
                 this.$store.dispatch('startSaving', 'page');

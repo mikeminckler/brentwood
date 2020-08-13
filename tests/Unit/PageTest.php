@@ -19,6 +19,7 @@ use App\Role;
 use App\User;
 use Tests\Unit\AppendAttributesTestTrait;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Artisan;
 
 class PageTest extends TestCase
 {
@@ -608,18 +609,20 @@ class PageTest extends TestCase
         $this->assertInstanceOf(Version::class, $page->getDraftVersion());
         $this->assertNull($page->published_at);
 
-        Page::publishPages();
+        Page::publishScheduledContent();
         $page->refresh();
         $this->assertNull($page->published_at);
 
         $page->publish_at = now()->subMinutes(1);
         $page->save();
         $page->refresh();
+        $this->assertTrue($page->publish_at->isPast());
 
-        Page::publishPages();
+        Artisan::call('brentwood:publish-scheduled-content');
         $page->refresh();
         $this->assertNotNull($page->published_at);
         $this->assertNull($page->publish_at);
+
 
     }
 

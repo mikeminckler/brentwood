@@ -70,6 +70,7 @@ const app = new Vue({
         'user-management': () => import(/* webpackChunkName: "user-management" */ '@/Components/UserManagement'),
         'page-access': () => import(/* webpackChunkName: "page-access" */ '@/Components/PageAccess'),
         'role-management': () => import(/* webpackChunkName: "role-management" */ '@/Components/RoleManagement'),
+        'user-menu': () => import(/* webpackChunkName: "user-menu" */ '@/Components/UserMenu.vue'),
     },
 
     mounted() {
@@ -83,48 +84,31 @@ const app = new Vue({
             app.$store.dispatch('setYoutubeReady');
         }
 
-        /**
-        * here we setup a listener to refresh the page tree
-        * you can see the emitter in Components/ContentEditor
-        * you can emit refresh-page-tree from any component and the page tree will listen it
-        */
-        const refreshPageTree = event => {
-            this.loadPageTree();
-        };
-        this.$eventer.$on('refresh-page-tree', refreshPageTree);
-
-        this.$once('hook:destroyed', () => {
-            this.$eventer.$off('refresh-page-tree', refreshPageTree);
-        });
-
         this.$store.dispatch('setWsState', this.$echo.connector.pusher.connection.state);
         this.$echo.connector.pusher.connection.bind('state_change', states => {
             this.$store.dispatch('setWsState', states.current);
         });
 
+        this.$once('hook:destroyed', () => {
+            this.$echo.leave('public');
+        });
     },
 
     computed: {
-        editing() {
-            return this.$store.state.editing;
+        wsState() {
+            return this.$store.state.wsState;
         }
     },
 
     watch: {
-        editing() {
-            if (this.editing) {
-                this.loadPageTree();
-            }
+        wsState() {
+            this.joinEchos();
         }
     },
 
     methods: {
-        loadPageTree: _.debounce( function() {
-            this.$http.get('/pages').then( response => {
-                this.$store.dispatch('setPageTree', response.data.home_page);
-            }, error => {
-                //console.log(error.response);
-            });
-        }, 100),
+        joinEchos: function() {
+            this.$echo.channel('public');
+        },
     }
 });

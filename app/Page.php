@@ -13,12 +13,15 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\PageAccess;
 use App\AppendAttributesTrait;
+use App\Events\PagePublished;
+use Carbon\Carbon;
 
 class Page extends Model
 {
     use SoftDeletes;
     use AppendAttributesTrait;
 
+    protected $dates = ['publish_at'];
     protected $with = ['pages'];
     //protected $with = ['pages', 'footerFgFileUpload', 'footerBgFileUpload'];
 
@@ -64,6 +67,7 @@ class Page extends Model
         $page->footer_color = Arr::get($input, 'footer_color');
         $page->footer_fg_file_upload_id = Arr::get($input, 'footer_fg_file_upload.id');
         $page->footer_bg_file_upload_id = Arr::get($input, 'footer_bg_file_upload.id');
+        $page->publish_at = Arr::get($input, 'publish_at') ? Carbon::parse(Arr::get($input, 'publish_at')) : null;
         $page->save();
 
         $page->saveContentElements($input);
@@ -157,6 +161,23 @@ class Page extends Model
 
     public function publish() 
     {
+
+        $publish_at_content_elements = $this->contentElements()
+                                            ->where('publish_at', '<', now())
+                                            ->whereHas('version', function($query) {
+                                                $query->whereNull('published_at');
+                                            })
+                                            ->get();
+
+        $new_draft_content_elements = $this->contentElements()
+                                        ->whereHas('version', function($query) {
+                                            $query->whereNull('published_at');
+                                        })
+                                        ->get()
+                                        ->filter(function($content_element) use ($publish_at_content_elements) {
+                                            return !$publish_at_content_elements->contains('id', $content_element->id);
+                                        });
+
         $draft_version = $this->getDraftVersion();
         $draft_version->publish();
         $this->published_version_id = $draft_version->id;
@@ -164,15 +185,31 @@ class Page extends Model
         $this->save();
 
         cache()->tags([cache_name($this), cache_name($draft_version)])->flush();
+
+        if ($publish_at_content_elements->count()) {
+            foreach ($new_draft_content_elements as $new_draft_content_element) {
+                $new_draft_content_element->version_id = $this->getDraftVersion()->id;
+                $new_draft_content_element->save();
+            }
+        }
+
+        event(new PagePublished($this));
+
         return $this;
     }
 
-    public static function publishPages() 
+    public static function publishScheduledContent() 
     {
         $pages = Version::whereNull('published_at')
             ->whereHas('page', function($query) {
-                $query->whereNotNull('publish_at')
-                      ->where('publish_at', '<', now());
+                $query->where(function($query) {
+                    $query->whereNotNull('publish_at')
+                          ->where('publish_at', '<', now());
+                })
+                ->orWhereHas('contentElements', function($query) {
+                    $query->whereNotNull('publish_at')
+                          ->where('publish_at', '<', now());
+                });
             })
             ->get()
             ->map(function($version) {

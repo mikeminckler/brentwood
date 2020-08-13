@@ -46,15 +46,44 @@
         },
 
         watch: {
+            editing() {
+                if (this.editing) {
+                    this.loadPageTree();
+                }
+            }
         },
 
         mounted() {
+
+            /**
+            * here we setup a listener to refresh the page tree
+            * you can see the emitter in Components/ContentEditor
+            * you can emit refresh-page-tree from any component and the page tree will listen it
+            */
+            const refreshPageTree = event => {
+                this.loadPageTree();
+            };
+            this.$eventer.$on('refresh-page-tree', refreshPageTree);
+
+            this.$once('hook:destroyed', () => {
+                this.$eventer.$off('refresh-page-tree', refreshPageTree);
+            });
+
+            this.loadPageTree();
         },
 
         methods: {
             goToPage: function(page) {
                 window.location.href = page.full_slug;
             },
+
+            loadPageTree: _.debounce( function() {
+                this.$http.get('/pages').then( response => {
+                    this.$store.dispatch('setPageTree', response.data.home_page);
+                }, error => {
+                    //console.log(error.response);
+                });
+            }, 100),
         },
 
     }

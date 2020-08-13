@@ -20,6 +20,9 @@ use App\FileUpload;
 use App\Photo;
 use App\Version;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\PagePublished;
+
 class PageTest extends TestCase
 {
 
@@ -714,5 +717,118 @@ class PageTest extends TestCase
 
     // when rolling back we will copy any old CEs and make new version numbers for them if we they dont have a draft
     // individual content elements can be published, the other draft items become a new version
+
+
+    /** @test **/
+    public function individual_content_elements_can_be_published()
+    {
+        $text_block = factory(TextBlock::class)->create();
+        $content_element1 = $text_block->contentElement;
+        $page = $content_element1->pages->first();
+        
+        $this->assertInstanceOf(Page::class, $page);
+        $this->assertInstanceOf(ContentElement::class, $content_element1);
+
+        $content_element2 = factory(ContentElement::class)->states('text-block')->create();
+
+        $content_element2->pages()->detach();
+
+        $content_element2->pages()->attach($page, [
+            'sort_order' => 2,
+            'unlisted' => false,
+            'expandable' => false,
+        ]);
+
+        $this->assertEquals(2, $page->contentElements->count());
+
+        $page->publish();
+        $page->refresh();
+
+        $this->signInAdmin();
+
+        $content_element1['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+        $input = $content_element1->toArray();
+        $text_block_content = factory(TextBlock::class)->raw();
+        $input['content'] = $text_block_content;
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element1->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $content_element1->refresh();
+        $content_element1_version_id = $content_element1->version->id;
+        $page->refresh();
+
+        $this->assertEquals($page->draft_version_id, $content_element1->version->id);
+
+        $content_element2['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+        $input = $content_element2->toArray();
+        $input['publish_at'] = now()->subMinutes(5);
+        $text_block_content2 = factory(TextBlock::class)->raw();
+        $input['content'] = $text_block_content2;
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.update', ['id' => $content_element2->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $content_element2->refresh();
+        $this->assertNotNull($content_element2->publish_at);
+        $this->assertTrue($content_element2->publish_at->isPast());
+        $this->assertEquals($page->draft_version_id, $content_element2->version->id);
+
+        // publish command
+        // find pages where the page needs to be publish OR the content elements need to be published
+
+        $page->refresh();
+        $this->assertNull($page->publish_at);
+
+        Page::publishScheduledContent();
+
+        $page->refresh();
+        $content_element1->refresh();
+
+        $this->assertNotEquals($content_element1_version_id, $content_element1->version->id);
+        $this->assertEquals($page->getDraftVersion()->id, $content_element1->version->id);
+        $this->assertEquals($page->publishedVersion->id, $content_element2->version->id);
+
+    }
+
+    /** @test **/
+    public function when_a_page_is_published_an_event_is_broadcast()
+    {
+        Event::fake();
+        $page = factory(Page::class)->states('unpublished')->create();
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('pages.publish', ['id' => $page->id]))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Page Published',
+             ]);
+
+        $page->refresh();
+        $this->assertNotNull($page->published_version_id);
+
+        Event::assertDispatched(function (PagePublished $event) use ($page) {
+            return $event->page->id === $page->id;
+        });
+    }
 
 }

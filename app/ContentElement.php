@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Page;
 use App\Version;
 use App\TextBlock;
+use Carbon\Carbon;
 
 class ContentElement extends Model
 {
@@ -18,6 +19,7 @@ class ContentElement extends Model
 
     protected $with = ['content', 'version'];
     protected $appends = ['type', 'published_at'];
+    protected $dates = ['publish_at'];
 
     public function saveContentElement($id = null, $input) 
     {
@@ -45,6 +47,7 @@ class ContentElement extends Model
         $content_element->content_type = get_class($content);
 
         $content_element->version_id = $page->getDraftVersion()->id;
+        $content_element->publish_at = Arr::get($input, 'publish_at') ? Carbon::parse(Arr::get($input, 'publish_at')) : null;
 
         $content_element->save();
 

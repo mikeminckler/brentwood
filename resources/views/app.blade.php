@@ -21,7 +21,7 @@
                     <div class="flex-1">
                         <page-tree :sort="true" :expanded="true" :show-changes="true" max-height="100%"></page-tree>
                     </div>
-                    <div class="p-4 sticky bottom-0 bg-gray-100 shadow">
+                    <div class="p-4 sticky bottom-0 bg-gray-100 shadow z-3">
                         <div class=""><a href="/users">User Management</a></div>
                         <div class=""><a href="/page-accesses">Page Access</a></div>
                         <div class=""><a href="/roles">Role Management</a></div>
@@ -61,7 +61,7 @@
                                     <div class="md:hidden text-white bg-primary px-2 text-lg cursor-pointer" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
                                 </div>
 
-                                <div class="absolute md:relative w-screen md:w-auto top-0 mt-12 md:mt-0 right-0 md:right-auto md:h-auto md:flex z-5 md:pr-4 overflow-hidden"
+                                <div class="absolute md:relative w-screen md:w-auto top-0 mt-12 md:mt-0 right-0 md:right-auto md:h-auto md:flex z-5 md:overflow-visible overflow-hidden"
                                     :class="$store.state.showMenu ? 'max-h-screen' : 'max-h-0 md:max-h-screen'"
                                     style="transition: max-height var(--transition-time) ease"
                                 >
@@ -100,17 +100,19 @@
                                             @endforeach 
                                         </div>
 
-                                        <div class="bg-gray-200 md:bg-transparent flex items-center justify-center md:items-end flex-col px-2">
+                                        <div class="bg-gray-200 md:bg-transparent flex items-center justify-center md:items-end flex-col pl-2">
 
                                             <div class="flex items-center mb-2 md:mb-0">
                                         
                                                 <a href="/apply-now" class="button hidden md:block mr-4 my-4 whitespace-no-wrap text-base">Apply Now</a>
-                                                <a href="/search" class="hidden md:block text-xl text-gray-500 cursor-pointer"><i class="fas fa-search"></i></a>
+                                                <a href="/search" class="hidden md:block text-xl text-gray-500 cursor-pointer mr-4"><i class="fas fa-search"></i></a>
 
                                                 @auth
                                                     @if (auth()->user()->hasRole('editor'))
                                                         <editing-button v-show="{{ !request('preview') }}" class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}"></editing-button>
                                                     @endif
+
+                                                    <user-menu :user='@json(auth()->user())'></user-menu>
                                                 @endauth
                                             </div>
 

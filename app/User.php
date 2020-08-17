@@ -135,7 +135,11 @@ class User extends Authenticatable
 
     public function hasRole($role) 
     {
-        // TODO cache this
+
+        if (is_int($role)) {
+            $role = Role::findOrFail($role);
+        }
+
         if (!$role instanceof Role) {
             $role_name = $role;
             $role = Role::where('name', $role)->first();

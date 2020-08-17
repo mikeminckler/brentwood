@@ -27,12 +27,27 @@ class ContentElement extends Model
         if ($id) {
             $content_element = ContentElement::findOrFail($id);
             $uuid = $content_element->uuid;
+
             if (!$content_element->published_at) {
                 $new_version = false;
             } else {
-                $content_element = new ContentElement;
-                $content_element->uuid = $uuid;
+
+                $content_elements = ContentElement::where('uuid', $uuid)
+                    ->get()
+                    ->filter( function($content_element) {
+                        return $content_element->published_at ? false : true;
+                    })->sortByDesc(function($content_element) {
+                        return $content_element->version->id;
+                    });
+
+                if ($content_elements->count()) {
+                    $content_element = $content_elements->first();
+                } else {
+                    $content_element = new ContentElement;
+                    $content_element->uuid = $uuid;
+                }
             }
+
         } else {
             $content_element = new ContentElement;
             $content_element->uuid = Str::uuid();

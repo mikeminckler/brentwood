@@ -14,6 +14,7 @@ use Intervention\Image\Facades\Image;
 use App\PageAccess;
 use App\AppendAttributesTrait;
 use App\Events\PagePublished;
+use App\Events\PageSaved;
 use Carbon\Carbon;
 
 class Page extends Model
@@ -73,6 +74,9 @@ class Page extends Model
         $page->saveContentElements($input);
 
         cache()->tags([cache_name($page)])->flush();
+
+        event(new PageSaved($page));
+
         return $page;
     }
 
@@ -243,7 +247,7 @@ class Page extends Model
     {
         $version_id = requestInput('version_id');
         
-        if ($version_id) {
+        if ($version_id > 0) {
             return $this->contentElements()
                 ->where('version_id', '<=', $version_id)
                 ->get();

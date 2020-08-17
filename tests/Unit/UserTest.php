@@ -81,6 +81,8 @@ class UserTest extends TestCase
         $this->assertFalse($user->hasRole($role));
         // check by name
         $this->assertFalse($user->hasRole($role->name));
+        // check by id
+        $this->assertFalse($user->hasRole($role->id));
 
         $user->addRole($role);
         $user->refresh();
@@ -88,6 +90,8 @@ class UserTest extends TestCase
         $this->assertTrue($user->hasRole($role));
         // check by name
         $this->assertTrue($user->hasRole($role->name));
+        // check by id
+        $this->assertTrue($user->hasRole($role->id));
 
     }
 

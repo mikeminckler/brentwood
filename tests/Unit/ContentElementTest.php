@@ -79,9 +79,10 @@ class ContentElementTest extends TestCase
     public function a_new_content_element_is_created_if_the_one_updated_has_been_published()
     {
         $page = factory(Page::class)->states('published')->create();
-        $content_element = factory(ContentElement::class)->states('text-block')->create([
-            'version_id' => $page->published_version_id,
-        ]);
+        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element->version_id = $page->published_version_id;
+        $content_element->save();
+        $content_element->refresh();
 
         $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
 
@@ -116,9 +117,10 @@ class ContentElementTest extends TestCase
     public function a_content_element_can_get_its_previous_version()
     {
         $page = factory(Page::class)->states('published')->create();
-        $content_element1 = factory(ContentElement::class)->states('text-block')->create([
-            'version_id' => $page->published_version_id,
-        ]);
+        $content_element1 = factory(ContentElement::class)->states('text-block')->create();
+        $content_element1->version_id = $page->published_version_id;
+        $content_element1->save();
+        $content_element1->refresh();
 
         $content_element1->pages()->detach();
         $content_element1->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);

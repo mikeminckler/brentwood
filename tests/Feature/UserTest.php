@@ -21,6 +21,7 @@ class UserTest extends TestCase
 
         $this->signIn( factory(User::class)->create());
 
+        $this->withoutExceptionHandling();
         $this->get( route('users.index'))
             ->assertRedirect('/');
 

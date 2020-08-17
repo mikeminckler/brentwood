@@ -163,9 +163,7 @@ class ContentElementTest extends TestCase
     public function a_user_with_page_editing_can_create_content_elements()
     {
         $content_element = factory(ContentElement::class)->states('text-block')->create();   
-
         $page = $content_element->pages->first();
-
         $this->assertInstanceOf(Page::class, $page);
 
         $user = factory(User::class)->create();
@@ -194,6 +192,63 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function saving_a_new_content_element_when_there_is_already_a_draft_version_should_not_create_a_new_content_element()
     {
-        $this->fail('Write this test');
+        $this->signInAdmin();
+
+        $text_block = factory(TextBlock::class)->create();
+        $content_element = $text_block->contentElement;
+        $this->assertInstanceOf(ContentElement::class, $content_element);
+        $content_element_id = $content_element->id;
+        $this->assertEquals(1, $content_element->pages()->count());
+        $page = $content_element->pages->first();
+        $this->assertInstanceOf(Page::class, $page);
+
+        $this->json('POST', route('pages.publish', ['id' => $page->id]))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Page Published',
+             ]);
+
+        $page->refresh();
+        $content_element->refresh();
+        $this->assertEquals($content_element->version->id, $page->publishedVersion->id);
+
+        $content_element = ContentElement::find($content_element_id);
+
+        $this->assertNotNull($page->published_at);
+        $this->assertNotNull($content_element->published_at);
+        
+        $content_element['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+        $input = $content_element->toArray();
+        $input['content'] = factory(TextBlock::class)->raw();
+        //$input['version_id'] = $page->getDraftVersion()->id;
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+                'id' => $content_element_id + 1,
+             ]);
+
+        $draft_content_element = ContentElement::all()->last();
+
+        $this->assertNull($draft_content_element->published_at);
+        $this->assertNotEquals($content_element_id, $draft_content_element->id);
+        $this->assertEquals($content_element_id + 1, $draft_content_element->id);
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+                'id' => $draft_content_element->id,
+             ]);
+
+        $this->assertEquals($draft_content_element->id, ContentElement::all()->last()->id);
+
     }
 }

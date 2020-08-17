@@ -77,7 +77,12 @@ class TextBlockTest extends TestCase
         $this->assertEquals(Arr::get($input, 'content.full_width'), $text_block->full_width);
         $this->assertEquals(Arr::get($input, 'content.stat_number'), $text_block->stat_number);
         $this->assertEquals(Arr::get($input, 'content.stat_name'), $text_block->stat_name);
-        $this->assertTrue($page->content_elements->contains('uuid', $text_block->contentElement->uuid));
+
+        $this->assertEquals($page->id, $text_block->contentElement->pages->first()->id);
+        $this->assertTrue($page->contentElements()->count() > 0);
+        $this->assertTrue($page->contentElements()->get()->contains('uuid', $text_block->contentElement->uuid));
+        //$this->assertTrue($page->getContentElements()->contains('uuid', $text_block->contentElement->uuid));
+
         $pivot = $page->contentElements()->where('content_element_id', $text_block->contentElement->id)->first()->pivot;
         $this->assertEquals(1, $pivot->sort_order);
         $this->assertEquals(0, $pivot->unlisted);

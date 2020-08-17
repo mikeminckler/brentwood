@@ -5,7 +5,6 @@
         :data-page-id="page.id"
         :draggable="page.id > 1 ? 'true' : 'false'"
         @dragstart.stop="startDrag($event, page)"
-        @dragend.stop="stopDrag($event, page)"
         :class="[
             page.parent_page_id > 0 ? 'cursor-move sort-item' : '',
             page.pages ? ( page.pages.length > 0 ? 'sort-container' : '') : '',

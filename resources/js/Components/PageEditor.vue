@@ -217,8 +217,9 @@
                 this.$store.dispatch('startSaving', 'page');
 
                 this.$http.post('/pages/' + this.page.id, input).then( response => {
-                    //this.$eventer.$emit('refresh-page-tree');
-                    window.location = response.data.page.full_slug;
+                    this.$eventer.$emit('refresh-page-tree');
+                    //window.location = response.data.page.full_slug;
+                    this.$store.dispatch('setPage', response.data.page);
                     this.processSuccess(response);
                 }, error => {
                     this.processErrors(error.response);

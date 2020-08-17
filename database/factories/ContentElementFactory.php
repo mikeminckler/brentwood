@@ -24,6 +24,8 @@ $factory->define(ContentElement::class, function (Faker $faker) {
 
 $factory->afterCreating(ContentElement::class, function($content_element, $faker) {
     $page = factory(Page::class)->create();
+    $content_element->version_id = $page->getDraftVersion()->id;
+    $content_element->save();
     $content_element->pages()->attach($page, [
         'sort_order' => $faker->randomNumber(1),
         'unlisted' => false,

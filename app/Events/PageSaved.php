@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 
 use App\Page;
 
-class PagePublished implements ShouldBroadcast
+class PageSaved implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

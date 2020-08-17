@@ -59,17 +59,18 @@ const app = new Vue({
     components: {
         'clock': () => import(/* webpackChunkName: "clock" */ '@/Components/Clock.vue'),
         'content-elements-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/ContentElementsEditor'),
-        'page-editor': () => import(/* webpackChunkName: "page-editor" */ '@/Components/PageEditor'),
-        'footer-editor': () => import(/* webpackChunkName: "footer-editor" */ '@/Components/FooterEditor'),
+        'echos': () => import(/* webpackChunkName: "echos" */ '@/Components/Echos.vue'),
         'editing-button': () => import(/* webpackChunkName: "editing-button" */ '@/Components/EditingButton'),
+        'footer-editor': () => import(/* webpackChunkName: "footer-editor" */ '@/Components/FooterEditor'),
         'feedback': () => import(/* webpackChunkName: "feedback" */ '@/Components/Feedback'),
+        'page-access': () => import(/* webpackChunkName: "page-access" */ '@/Components/PageAccess'),
+        'page-editor': () => import(/* webpackChunkName: "page-editor" */ '@/Components/PageEditor'),
         'page-tree': () => import(/* webpackChunkName: "page-tree" */ '@/Components/PageTree'),
         'photo-viewer': () => import(/* webpackChunkName: "photo-viewer" */ '@/Components/PhotoViewer'),
         'processing': () => import(/* webpackChunkName: "processing" */ '@/Components/Processing'),
+        'role-management': () => import(/* webpackChunkName: "role-management" */ '@/Components/RoleManagement'),
         'saving-indicator': () => import(/* webpackChunkName: "saving-indicator" */ '@/Components/SavingIndicator'),
         'user-management': () => import(/* webpackChunkName: "user-management" */ '@/Components/UserManagement'),
-        'page-access': () => import(/* webpackChunkName: "page-access" */ '@/Components/PageAccess'),
-        'role-management': () => import(/* webpackChunkName: "role-management" */ '@/Components/RoleManagement'),
         'user-menu': () => import(/* webpackChunkName: "user-menu" */ '@/Components/UserMenu.vue'),
     },
 
@@ -89,26 +90,6 @@ const app = new Vue({
             this.$store.dispatch('setWsState', states.current);
         });
 
-        this.$once('hook:destroyed', () => {
-            this.$echo.leave('public');
-        });
     },
 
-    computed: {
-        wsState() {
-            return this.$store.state.wsState;
-        }
-    },
-
-    watch: {
-        wsState() {
-            this.joinEchos();
-        }
-    },
-
-    methods: {
-        joinEchos: function() {
-            this.$echo.channel('public');
-        },
-    }
 });

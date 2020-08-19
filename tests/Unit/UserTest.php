@@ -95,6 +95,21 @@ class UserTest extends TestCase
 
     }
 
+    /** @test **/
+    public function a_role_can_be_found_by_name_with_periods_in_the_title()
+    {
+        $role = factory(Role::class)->create([
+            'name' => 'foo.bar',
+        ]);
+
+        $user = factory(User::class)->create();
+        $user->addRole($role);
+        $user->refresh();
+
+        $this->assertTrue($user->hasRole($role->name));
+
+    }
+
 
     /** @test **/
     public function an_admin_user_has_all_roles()

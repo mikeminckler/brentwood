@@ -13,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Page;
 use App\Role;
 
-class PageSaved implements ShouldBroadcast
+class PageDraftCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

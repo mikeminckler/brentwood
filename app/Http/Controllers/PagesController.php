@@ -41,10 +41,7 @@ class PagesController extends Controller
             $content_elements = $page->published_content_elements;
         }
 
-        if (session()->has('editing')) {
-            $page->appendAttributes();
-            $page->load('versions');
-        }
+        $page = $this->loadPageAttributes($page);
 
         if (request()->wantsJson()) {
             return response()->json([
@@ -54,6 +51,16 @@ class PagesController extends Controller
         }
 
         return view('page', compact('page', 'content_elements'));
+    }
+
+    private function loadPageAttributes($page)
+    {
+        if (session()->has('editing')) {
+            $page->appendAttributes();
+            $page->load('versions');
+        }
+
+        return $page;
     }
 
     /**
@@ -89,7 +96,9 @@ class PagesController extends Controller
         }
 
         $page = (new Page)->savePage($id, requestInput());
-        $page->appendAttributes();
+
+        $page = $this->loadPageAttributes($page);
+
         return response()->json([
             'success' => 'Page Saved',
             'page' => $page,
@@ -116,7 +125,13 @@ class PagesController extends Controller
         }
 
         $page->publish();
-        return response()->json(['success' => 'Page Published']);
+
+        $page = $this->loadPageAttributes($page);
+
+        return response()->json([
+            'success' => 'Page Published',
+            'page' => $page,
+        ]);
     }
 
     public function remove($id) 

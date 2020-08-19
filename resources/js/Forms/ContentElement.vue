@@ -90,8 +90,11 @@
                 preventWatcher: false,
                 saveContent: _.debounce( function() {
                     // refer to the mixin for saving of the content element
-                    if (!this.preventWatcher && !this.isSaving) {
-                        this.saveContentElement();
+                    if (!this.preventWatcher && !this.isSaving && !this.pageLoading) {
+                        this.$nextTick(() => {
+                            console.log('SAVE CE: ' + this.contentElement.id);
+                            this.saveContentElement();
+                        });
                     } else {
                         this.preventWatcher = false;
                     }
@@ -104,6 +107,7 @@
                 handler: function(oldValue, newValue) {
                     // this gets tripped when the content is first loaded
                     // so we ignore the first watcher hit
+                    console.log('WATCHER: ' + this.contentElement.id);
                     this.changed = true;
                     this.saveContent();
                 },
@@ -122,11 +126,30 @@
 
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('save-content', listener);
+                this.$echo.leave('role.2');
             });
+
+            this.$echo.private('role.2')
+                .listen('ContentElementSaved', data => {
+                    if (this.contentElement.id === data.content_element.id) {
+                        this.loadContentElement();
+                    }
+                })
 
         },
 
         methods: {
+
+            loadContentElement: function() {
+
+                this.changed = false;
+                this.$http.post('/content-elements/' + this.contentElement.id + '/load', {page_id: this.$store.state.page.id}).then( response => {
+                    this.$emit('update', response.data.content_element);
+                }, error => {
+                    this.processErrors(error.response);
+                });
+                
+            },
 
             removeContentElement: function() {
 

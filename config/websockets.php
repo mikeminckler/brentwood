@@ -29,7 +29,7 @@ return [
             'secret' => env('PUSHER_APP_SECRET'),
             'path' => env('PUSHER_APP_PATH'),
             'capacity' => null,
-            'enable_client_messages' => false,
+            'enable_client_messages' => true,
             'enable_statistics' => true,
         ],
     ],
@@ -84,13 +84,13 @@ return [
         /*
          * Here you can specify the interval in seconds at which statistics should be logged.
          */
-        'interval_in_seconds' => 60,
+        'interval_in_seconds' => 5,
 
         /*
          * When the clean-command is executed, all recorded statistics older than
          * the number of days specified here will be deleted.
          */
-        'delete_statistics_older_than_days' => 60,
+        'delete_statistics_older_than_days' => 7,
 
         /*
          * Use an DNS resolver to make the requests to the statistics logger

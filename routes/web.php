@@ -48,6 +48,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('/content-elements/create', 'ContentElementsController@store')->name('content-elements.store');
     Route::post('/content-elements/{id}', 'ContentElementsController@store')->name('content-elements.update')->where('id', '\d+');
+    Route::post('/content-elements/{id}/load', 'ContentElementsController@load')->name('content-elements.load')->where('id', '\d+');
     Route::post('/content-elements/{id}/remove', 'ContentElementsController@remove')->name('content-elements.remove')->where('id', '\d+');
     Route::post('/content-elements/{id}/restore', 'ContentElementsController@restore')->name('content-elements.restore')->where('id', '\d+');
 

@@ -10,12 +10,15 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
+use App\ContentElement;
 use App\Page;
+use App\Role;
 
-class PagePublished implements ShouldBroadcast
+class ContentElementCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $content_element;
     public $page;
 
     /**
@@ -23,8 +26,9 @@ class PagePublished implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(Page $page)
+    public function __construct(ContentElement $content_element, Page $page)
     {
+        $this->content_element = $content_element;
         $this->page = $page;
     }
 
@@ -35,6 +39,6 @@ class PagePublished implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('editor');
+        return new PrivateChannel('role.'.Role::where('name', 'editor')->first()->id);
     }
 }

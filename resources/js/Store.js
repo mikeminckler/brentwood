@@ -26,6 +26,7 @@ const store = new Vuex.Store({
         pageTree: {},
         youtubeReady: false,
         dragging: false,
+        pageLoading: false,
     },
 
     mutations: {
@@ -98,6 +99,10 @@ const store = new Vuex.Store({
 
         setDragging(state, dragging) {
             state.dragging = dragging;
+        },
+
+        setPageLoading (state, loading) {
+            state.pageLoading = loading;
         },
     },
 
@@ -196,6 +201,11 @@ const store = new Vuex.Store({
 
         setDragging({ commit, state }, dragging) {
             commit('setDragging', dragging);
+        },
+
+        setPageLoading({ commit, state }, loading) {
+            console.log('PAGE LOADING: ' + loading);
+            commit('setPageLoading', loading);
         },
 
     }

@@ -59,6 +59,7 @@
                         :class="content.full_width ? 'columns-2' : ''"
                         placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
                         @blur="saveContent()"
+                        @focus="whisperEditing()"
                 ></editor>
 
                 <div v-if="first" class="h-1 w-16 bg-gray-400 my-4"></div>
@@ -83,11 +84,12 @@
     import Photos from '@/Mixins/Photos';
     import Feedback from '@/Mixins/Feedback';
     import SaveContent from '@/Mixins/SaveContent';
+    import Whisper from '@/Mixins/Whisper';
 
     export default {
 
         props: [ 'content', 'uuid', 'first'],
-        mixins: [ Photos, Feedback, SaveContent ],
+        mixins: [ Photos, Feedback, SaveContent, Whisper ],
 
         components: {
             'editor': () => import(/* webpackChunkName: "editor" */ '@/Components/Editor.vue'),

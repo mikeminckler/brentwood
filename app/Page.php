@@ -15,6 +15,7 @@ use App\PageAccess;
 use App\AppendAttributesTrait;
 use App\Events\PagePublished;
 use App\Events\PageSaved;
+use App\Events\PageDraftCreated;
 use Carbon\Carbon;
 
 class Page extends Model
@@ -75,7 +76,7 @@ class Page extends Model
 
         cache()->tags([cache_name($page)])->flush();
 
-        event(new PageSaved($page));
+        broadcast(new PageSaved($page));
 
         return $page;
     }
@@ -197,7 +198,7 @@ class Page extends Model
             }
         }
 
-        event(new PagePublished($this));
+        broadcast(new PageSaved($this));
 
         return $this;
     }
@@ -231,10 +232,14 @@ class Page extends Model
         if ($draft_version) {
             return $draft_version;
         } else {
-            return (new Version)->saveVersion(null, [
+            $version = (new Version)->saveVersion(null, [
                 'name' => $this->versions()->count() + 1,
                 'page_id' => $this->id,
             ]);
+
+            broadcast(new PageDraftCreated($this->load('versions')));
+
+            return $version;
         }
     }
 

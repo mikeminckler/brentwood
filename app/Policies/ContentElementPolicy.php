@@ -40,7 +40,7 @@ class ContentElementPolicy
      */
     public function view(User $user, ContentElement $contentElement)
     {
-        //
+        return $user->hasRole('editor');
     }
 
     /**

@@ -67,9 +67,15 @@
 
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('refresh-page-tree', refreshPageTree);
+                this.$echo.leave('role.2');
             });
 
             this.loadPageTree();
+
+            this.$echo.private('role.2')
+                .listen('PageSaved', data => {
+                    this.loadPageTree();
+                });
         },
 
         methods: {
@@ -78,8 +84,15 @@
             },
 
             loadPageTree: _.debounce( function() {
+
+                this.$store.dispatch('setPageLoading', true);
+
                 this.$http.get('/pages').then( response => {
                     this.$store.dispatch('setPageTree', response.data.home_page);
+
+                    this.$nextTick(() => {
+                        this.$store.dispatch('setPageLoading', false);
+                    });
                 }, error => {
                     //console.log(error.response);
                 });

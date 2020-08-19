@@ -21,6 +21,9 @@ use Tests\Unit\AppendAttributesTestTrait;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\PageDraftCreated;
+
 class PageTest extends TestCase
 {
 
@@ -624,6 +627,21 @@ class PageTest extends TestCase
         $this->assertNull($page->publish_at);
 
 
+    }
+
+    /** @test **/
+    public function creating_a_new_version_broadcasts_an_event()
+    {
+        
+        $page = factory(Page::class)->states('published')->create();
+
+        Event::fake();
+
+        $page->getDraftVersion();
+
+        Event::assertDispatched(function (PageDraftCreated $event) use ($page) {
+            return $event->page->id === $page->id;
+        });
     }
 
 }

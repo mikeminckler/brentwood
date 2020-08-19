@@ -10,23 +10,22 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-use App\Page;
+use App\ContentElement;
 use App\Role;
 
-class PageSaved implements ShouldBroadcast
+class ContentElementSaved implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $page;
-
+    public $content_element;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(Page $page)
+    public function __construct(ContentElement $content_element)
     {
-        $this->page = $page;
+        $this->content_element = $content_element;
     }
 
     /**

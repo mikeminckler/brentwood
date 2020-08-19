@@ -13,6 +13,9 @@ use App\Version;
 use App\TextBlock;
 use Carbon\Carbon;
 
+use App\Events\ContentElementSaved;
+use App\Events\ContentElementCreated;
+
 class ContentElement extends Model
 {
     use SoftDeletes;
@@ -84,6 +87,13 @@ class ContentElement extends Model
         // refresh the content element so that it updates its content
         $content_element->refresh();
         cache()->tags([cache_name($content_element), cache_name($page)])->flush();
+
+        if ($new_version) {
+            broadcast(new ContentElementCreated($content_element, $page))->toOthers();
+        } else {
+            broadcast(new ContentElementSaved($content_element))->toOthers();
+        }
+
         return $content_element;
     }
 

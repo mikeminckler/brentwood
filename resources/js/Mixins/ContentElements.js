@@ -3,7 +3,10 @@ export default {
     computed: {
         isSaving() {
             return this.$store.state.saving.find(save => save === this.contentElement.Id) ? true : false;
-        }
+        },
+        pageLoading() {
+            return this.$store.state.pageLoading;
+        },
     },
   
     methods: {

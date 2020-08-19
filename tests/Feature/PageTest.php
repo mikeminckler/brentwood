@@ -242,6 +242,9 @@ class PageTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Page Published',
+                'name' => $page->name,
+                'id' => $page->id,
+                'id' => $content_element->id
              ]);
 
         $page->refresh();
@@ -817,6 +820,7 @@ class PageTest extends TestCase
 
     }
 
+
     /** @test **/
     public function when_a_page_is_published_an_event_is_broadcast()
     {
@@ -835,10 +839,11 @@ class PageTest extends TestCase
         $page->refresh();
         $this->assertNotNull($page->published_version_id);
 
-        Event::assertDispatched(function (PagePublished $event) use ($page) {
+        Event::assertDispatched(function (PageSaved $event) use ($page) {
             return $event->page->id === $page->id;
         });
     }
+
 
     /** @test **/
     public function when_a_page_is_saved_an_event_is_broadcast()

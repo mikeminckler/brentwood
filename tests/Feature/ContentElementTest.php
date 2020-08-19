@@ -11,6 +11,10 @@ use App\User;
 use App\Page;
 use App\TextBlock;
 
+use Illuminate\Support\Facades\Event;
+use App\Events\ContentElementSaved;
+use App\Events\ContentElementCreated;
+
 class ContentElementTest extends TestCase
 {
     use WithFaker;
@@ -250,5 +254,76 @@ class ContentElementTest extends TestCase
 
         $this->assertEquals($draft_content_element->id, ContentElement::all()->last()->id);
 
+    }
+
+    /** @test **/
+    public function an_event_is_broadcast_when_a_content_element_is_saved()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+        $page = $content_element->pages->first();
+        $this->assertInstanceOf(Page::class, $page);
+
+        Event::fake();
+
+        $this->signInAdmin();
+
+        $content_element['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+        $input = $content_element->toArray();
+        $input['content'] = factory(TextBlock::class)->raw();
+
+        $this->json('POST', route('content-elements.store'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $content_element = ContentElement::all()->last();
+
+        Event::assertDispatched(function (ContentElementSaved $event) use ($content_element) {
+            return $event->content_element->id === $content_element->id;
+        });
+
+        Event::assertDispatched(function (ContentElementCreated $event) use ($content_element, $page) {
+            return $event->content_element->id === $content_element->id && $event->page->id === $page->id;
+        });
+    }
+
+    /** @test **/
+    public function a_content_element_can_be_loaded()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $page = $content_element->pages()->first();
+        $this->assertInstanceOf(Page::class, $page);
+        $sort_order = $page->pivot->sort_order;
+        $this->assertTrue($sort_order > 0);
+
+        $this->json('POST', route('content-elements.load', ['id' => $content_element->id]))
+            ->assertStatus(401);
+
+        $this->signIn(factory(User::class)->create());
+
+        $this->json('POST', route('content-elements.load', ['id' => $content_element->id]), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                'page_id',
+             ]);
+
+        $this->json('POST', route('content-elements.load', ['id' => $content_element->id]), ['page_id' => $page->id])
+            ->assertStatus(403);
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.load', ['id' => $content_element->id]), ['page_id' => $page->id])
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'id' => $content_element->id,
+                'sort_order' => $sort_order,
+            ]);
     }
 }

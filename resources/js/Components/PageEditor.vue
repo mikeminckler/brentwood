@@ -158,10 +158,39 @@
 
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('save-page', savePageEvent);
+                this.$echo.leave('role.2');
             });
+
+            // TODO we need a better way to find the roles here. Probably a mixin function
+            this.$echo.private('role.2')
+                .listen('PageSaved', data => {
+                    this.loadPage();
+                })
+                .listen('PageDraftCreated', data => {
+                    this.page.versions = data.page.versions;
+                })
+                .listen('ContentElementCreated', data => {
+                    if (this.page.id === data.page.id) {
+                        this.loadPage();
+                    }
+                });
         },
 
         methods: {
+
+            loadPage: function() {
+                this.$store.dispatch('setPageLoading', true);
+
+                this.$http.get(this.page.full_slug).then( response => {
+                    this.$store.dispatch('setPage', response.data.page);
+
+                    this.$nextTick(() => {
+                        this.$store.dispatch('setPageLoading', false);
+                    });
+                }, error => {
+                    this.processErrors(error.response);
+                });
+            },
 
             createSubPage: function() {
 
@@ -215,12 +244,18 @@
                 };
 
                 this.$store.dispatch('startSaving', 'page');
+                this.$store.dispatch('setPageLoading', true);
 
                 this.$http.post('/pages/' + this.page.id, input).then( response => {
                     this.$eventer.$emit('refresh-page-tree');
-                    //window.location = response.data.page.full_slug;
+
                     this.$store.dispatch('setPage', response.data.page);
                     this.processSuccess(response);
+                    this.$store.dispatch('completeSaving', 'page');
+
+                    this.$nextTick(() => {
+                        this.$store.dispatch('setPageLoading', false);
+                    });
                 }, error => {
                     this.processErrors(error.response);
                     this.$store.dispatch('completeSaving', 'page');
@@ -239,9 +274,17 @@
 
                 var answer = confirm('Are you sure you want to PUBLISH this page?');
                 if (answer == true) {
+
+                    this.$store.dispatch('setPageLoading', true);
+
                     this.$http.post('/pages/' + this.page.id + '/publish').then( response => {
-                        location.reload();
-                        //this.processSuccess(response);
+                        //location.reload();
+                        this.$store.dispatch('setPage', response.data.page);
+                        this.processSuccess(response);
+
+                        this.$nextTick(() => {
+                            this.$store.dispatch('setPageLoading', false);
+                        });
                     }, error => {
                         this.processErrors(error.response);
                     });

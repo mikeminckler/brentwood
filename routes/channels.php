@@ -18,3 +18,9 @@ Broadcast::channel('user.{id}', function ($user, $id) {
 Broadcast::channel('role.{id}', function ($user, $id) {
     return $user->hasRole((int) $id);
 });
+
+Broadcast::channel('page.{id}', function ($user, $id) {
+    if ($user) {
+        return ['id' => $user->id, 'name' => $user->name];
+    }
+});

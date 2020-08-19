@@ -51,15 +51,23 @@
         <div class="flex-2 flex justify-center relative" :class="!photo && content.style ? 'text-style-' + content.style : ''">
 
             <div :class="content.full_width ? 'px-12 py-8' : 'text-block'">
-                <div class="">
-                    <input :class="first ? 'h1' : 'h2'" @blur="saveContent()" type="text" v-model="content.header" placeholder="Header" />
+                <div class="relative">
+                    <div class="lock-icon" v-if="isLocked('header')" :title="isLocked('header')"><i class="fas fa-lock"></i></div>
+                    <input :class="[first ? 'h1' : 'h2', isLocked('header') ? 'locked' : '']" 
+                        @blur="blurInput('header')" 
+                        @focus="whisperEditing('header')" 
+                        type="text" 
+                        v-model="content.header" 
+                        placeholder="Header" 
+                        :readonly="isLocked('header')"
+                    />
                 </div>
 
                 <editor v-model="content.body" 
                         :class="content.full_width ? 'columns-2' : ''"
                         placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                        @blur="saveContent()"
-                        @focus="whisperEditing()"
+                        @blur="blurInput('body')"
+                        @focus="whisperEditing('body')"
                 ></editor>
 
                 <div v-if="first" class="h-1 w-16 bg-gray-400 my-4"></div>
@@ -116,6 +124,12 @@
         },
 
         methods: {
+            blurInput: function(field) {
+
+                this.whisperEditingComplete(field);
+                this.saveContent();
+
+            }
         },
 
     }

@@ -164,10 +164,14 @@
             // TODO we need a better way to find the roles here. Probably a mixin function
             this.$echo.private('role.2')
                 .listen('PageSaved', data => {
-                    this.loadPage();
+                    if (this.page.id === data.page.id) {
+                        this.loadPage();
+                    }
                 })
                 .listen('PageDraftCreated', data => {
-                    this.page.versions = data.page.versions;
+                    if (this.page.id === data.page.id) {
+                        this.page.versions = data.page.versions;
+                    }
                 })
                 .listen('ContentElementCreated', data => {
                     if (this.page.id === data.page.id) {

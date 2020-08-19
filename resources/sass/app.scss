@@ -208,6 +208,14 @@ input, .editor {
     @apply w-full bg-transparent border border-transparent;
 }
 
+.locked {
+}
+
+.lock-icon {
+    @apply h-full flex items-center absolute px-1 text-gray-500;
+    left: -22px;
+}
+
 .inline-form {
     & input {
         @apply w-auto;

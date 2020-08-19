@@ -132,6 +132,8 @@
 
                         </div>
 
+                        <echos></echos>
+
                     </div>
 
                 </div>
@@ -213,8 +215,6 @@
         ></feedback>
 
         <photo-viewer></photo-viewer>
-
-        <echos></echos>
 
     </div>
 

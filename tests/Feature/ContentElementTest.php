@@ -50,13 +50,17 @@ class ContentElementTest extends TestCase
         $this->signIn(factory(User::class)->create());
 
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['page_id']);
+
+        $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['page_id' => $page->id])
             ->assertStatus(403);
 
         $this->assertEquals(1, ContentElement::where('id', $content_element->id)->get()->count());
         $this->signInAdmin();
 
         $this->withoutExceptionHandling();
-        $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]))
+        $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['page_id' => $page->id])
             ->assertSuccessful()
             ->assertJsonFragment([
                 'success' => 'Text Block Removed',
@@ -116,13 +120,17 @@ class ContentElementTest extends TestCase
         $this->signIn(factory(User::class)->create());
 
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['remove_all' => true])
+             ->assertStatus(422)
+         ->assertJsonValidationErrors(['page_id']);
+
+        $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['remove_all' => true, 'page_id' => $page->id])
             ->assertStatus(403);
 
         $this->assertEquals(1, ContentElement::where('id', $content_element->id)->get()->count());
         $this->signInAdmin();
 
         $this->withoutExceptionHandling();
-        $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['remove_all' => true])
+        $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['remove_all' => true, 'page_id' => $page->id])
             ->assertSuccessful()
             ->assertJsonFragment([
                 'success' => 'Text Block Removed',
@@ -277,7 +285,7 @@ class ContentElementTest extends TestCase
         $input = $content_element->toArray();
         $input['content'] = factory(TextBlock::class)->raw();
 
-        $this->json('POST', route('content-elements.store'), $input)
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
@@ -288,6 +296,35 @@ class ContentElementTest extends TestCase
         Event::assertDispatched(function (ContentElementSaved $event) use ($content_element) {
             return $event->content_element->id === $content_element->id;
         });
+    }
+
+    /** @test **/
+    public function an_event_is_broadcast_when_a_content_element_is_created()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+        $page = $content_element->pages->first();
+        $this->assertInstanceOf(Page::class, $page);
+
+        Event::fake();
+
+        $this->signInAdmin();
+
+        $content_element['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+        $input = $content_element->toArray();
+        $input['content'] = factory(TextBlock::class)->raw();
+
+        $this->json('POST', route('content-elements.store'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $content_element = ContentElement::all()->last();
 
         Event::assertDispatched(function (ContentElementCreated $event) use ($content_element, $page) {
             return $event->content_element->id === $content_element->id && $event->page->id === $page->id;

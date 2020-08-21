@@ -139,4 +139,34 @@ class ContentElementTest extends TestCase
         $this->assertEquals($content_element1->id, $content_element2->getPreviousVersion()->id);
         $this->assertEquals($content_element1->uuid, $content_element2->uuid);
     }
+
+    /** @test **/
+    public function saving_pubish_at_persits_the_correct_value()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content = $content_element->content;
+
+        $page = factory(Page::class)->states('published')->create();
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+
+        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input['type'] = 'text-block';
+        $input['content'] = factory(TextBlock::class)->raw();
+        $input['content']['id'] = $content->id;
+        $input['publish_at'] = '2020-08-23T12:00:00.000000Z';
+        $input['pivot'] = [
+            'page_id' => $page->id,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+
+        (new ContentElement)->saveContentElement($content_element->id, $input);
+
+        $content_element->refresh();
+
+        $content_element_array = $content_element->toArray();
+        $this->assertEquals('2020-08-23T12:00:00.000000Z', Arr::get($content_element_array, 'publish_at'));
+
+    }
 }

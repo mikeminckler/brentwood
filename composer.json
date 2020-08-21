@@ -13,7 +13,7 @@
         "fideloper/proxy": "^4.4",
         "google/apiclient": "^2.7",
         "intervention/image": "^2.5",
-        "laravel/framework": "^7.23",
+        "laravel/framework": "^7.25",
         "laravel/horizon": "^4.3",
         "laravel/socialite": "^4.4",
         "laravel/ui": "^2.1"
@@ -21,12 +21,12 @@
     "require-dev": { 
         "facade/ignition": "^2.3",
         "fzaninotto/faker": "^1.9",
-        "itsgoingd/clockwork": "^4.2",
+        "itsgoingd/clockwork": "^4.1",
         "laravel/dusk": "6.4",
         "laravel/tinker": "^2.4",
         "mockery/mockery": "^1.4",
         "nunomaduro/collision": "^4.2",
-        "phpunit/phpunit": "^9.2"
+        "phpunit/phpunit": "^9.3"
     },
     "config": {
         "optimize-autoloader": true,

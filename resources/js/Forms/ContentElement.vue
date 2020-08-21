@@ -6,6 +6,7 @@
     >
 
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
+            <div class="content-element-icons" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!contentElement.published_at"><i class="fas fa-clock"></i></div>
             <div class="content-element-icons" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
             <div class="content-element-icons" @click="$emit('sortDown')" title="Move Down"><i class="fas fa-arrow-alt-circle-down"></i></div>
             <div class="content-element-icons" @click="contentElement.pivot.unlisted = 0" v-if="contentElement.pivot.unlisted" title="Hide Content"><i class="fas fa-eye"></i></div>
@@ -13,7 +14,6 @@
             <div class="content-element-icons text-gray-800" @click="contentElement.pivot.expandable = 0" v-if="contentElement.pivot.expandable" title="Disable Expandable"><i class="fas fa-angle-double-down"></i></div>
             <div class="content-element-icons text-gray-400" @click="contentElement.pivot.expandable = 1" v-if="!contentElement.pivot.expandable" title="Make Expandable"><i class="fas fa-angle-double-down"></i></div>
             <div class="content-element-icons" title="Versioning/History?"><i class="fas fa-exchange-alt"></i></div>
-            <div class="content-element-icons" title="Set Publish Date" @click="showPublishAt = !showPublishAt"><i class="fas fa-clock"></i></div>
             <div class="remove-icon" title="Remove Content" @click="removeContentElement()"><i class="fas fa-times"></i></div>
         </div>
 

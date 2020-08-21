@@ -55,10 +55,10 @@ class PagesController extends Controller
 
     private function loadPageAttributes($page)
     {
-        if (session()->has('editing')) {
+        //if (session()->has('editing')) {
             $page->appendAttributes();
             $page->load('versions');
-        }
+        //}
 
         return $page;
     }

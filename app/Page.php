@@ -16,7 +16,6 @@ use App\AppendAttributesTrait;
 use App\Events\PagePublished;
 use App\Events\PageSaved;
 use App\Events\PageDraftCreated;
-use Carbon\Carbon;
 
 class Page extends Model
 {
@@ -69,7 +68,7 @@ class Page extends Model
         $page->footer_color = Arr::get($input, 'footer_color');
         $page->footer_fg_file_upload_id = Arr::get($input, 'footer_fg_file_upload.id');
         $page->footer_bg_file_upload_id = Arr::get($input, 'footer_bg_file_upload.id');
-        $page->publish_at = Arr::get($input, 'publish_at') ? Carbon::parse(Arr::get($input, 'publish_at')) : null;
+        $page->publish_at = Arr::get($input, 'publish_at');
         $page->save();
 
         $page->saveContentElements($input);

@@ -50,24 +50,26 @@
 
         <div class="flex-2 flex justify-center relative" :class="!photo && content.style ? 'text-style-' + content.style : ''">
 
-            <div :class="content.full_width ? 'px-12 py-8' : 'text-block'">
-                <div class="relative">
-                    <div class="lock-icon" v-if="isLocked('header')" :title="isLocked('header')"><i class="fas fa-lock"></i></div>
+            <div :class="content.full_width ? 'px-12 py-8' : 'text-block'" class="relative">
+                <div class="" :class="isLocked('header') ? 'locked relative' : ''">
                     <input :class="[first ? 'h1' : 'h2', isLocked('header') ? 'locked' : '']" 
-                        @blur="blurInput('header')" 
+                        class="outline-none"
                         @focus="whisperEditing('header')" 
+                        @blur="whisperEditingComplete('header')"
                         type="text" 
                         v-model="content.header" 
                         placeholder="Header" 
-                        :readonly="isLocked('header')"
+                        :disabled="isLocked('header')"
                     />
                 </div>
 
                 <editor v-model="content.body" 
-                        :class="content.full_width ? 'columns-2' : ''"
+                        :class="[content.full_width ? 'columns-2' : '']"
+                        :isLocked="isLocked('body')"
                         placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                        @blur="blurInput('body')"
                         @focus="whisperEditing('body')"
+                        @blur="whisperEditingComplete('body')"
+                        @save="saveContent()"
                 ></editor>
 
                 <div v-if="first" class="h-1 w-16 bg-gray-400 my-4"></div>
@@ -124,12 +126,6 @@
         },
 
         methods: {
-            blurInput: function(field) {
-
-                this.whisperEditingComplete(field);
-                this.saveContent();
-
-            }
         },
 
     }

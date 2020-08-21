@@ -41,9 +41,9 @@
                     <page-editor :current-page='@json($page ?? '')'></page-editor>
                 @endif
 
-                <div class="flex justify-center relative bg-gray-100">
+                <div class="flex justify-center relative">
                     
-                    <div class="flex flex-col w-full relative max-w-6xl shadow">
+                    <div class="flex flex-col w-full relative max-w-6xl shadow bg-gray-100">
 
                         <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p"></div>
 
@@ -132,7 +132,11 @@
 
                         </div>
 
-                        <echos></echos>
+                        @auth
+                            @if (auth()->user()->hasRole('editor'))
+                                <echos :editing="{{ session()->get('editing') ? 'true' : 'false' }}"></echos>
+                            @endif
+                        @endauth
 
                     </div>
 

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative flex w-64 items-baseline" dusk="date-time-picker">
+    <div class="bg-white relative flex w-64 items-center" dusk="date-time-picker">
 
         <div class="">
             <transition name="text-sm">
@@ -16,7 +16,7 @@
             <div class="date-picker-input">
 
                 <v-date-picker
-                    v-model="date"
+                    v-model="datePicker"
                     color="gray"
                     :input-props="{ dusk: dusk, placeholder: placeholder ? placeholder : 'Select Date' }"
                     :is-inline="inline"
@@ -26,16 +26,12 @@
             </div>
         </div>
 
-        <div class="text-gray-600">
-            <time-picker
-                v-model="time"
-            ></time-picker>
+        <div class="">
+            <time-picker v-model="time" ></time-picker>
         </div>
 
-        <div class="icon remove" @click="clear()" v-if="remove">
-            <i class="fas fa-times-circle"></i>
-        </div>
-
+        <div class="remove-icon px-1" @click="clear()" v-if="remove">
+            <i class="fas fa-times"></i>
         </div>
 
     </div>
@@ -44,11 +40,9 @@
 
 <script>
 
-    import Dates from '@/Mixins/Dates';
-
     export default {
 
-        mixins: [Dates],
+        mixins: [],
         props: [
             'inline', 
             'value',
@@ -65,13 +59,19 @@
         data() {
             return {
                 date: null,
-                time: '',
+                time: null,
+                datePicker: null,
             }
         },
 
         computed: {
             input() {
-                return this.formatDateForInput(this.date) + ' ' + this.time + ':00';
+                if (this.date && this.time) {
+                    let json = this.$moment(this.date + ' ' + this.time + ':00', 'YYYY-MM-DD HH:mm:ss').toJSON();
+                    return json.substring(0, json.length - 1) + '000Z';
+                } else {
+                    return null;
+                }
             }
         },
 
@@ -81,6 +81,14 @@
             },
             input() {
                 this.emitInput();
+            },
+            datePicker() {
+                this.date = this.$moment(this.datePicker).format('YYYY-MM-DD');
+            },
+            date() {
+                if (this.date !== this.$moment(this.datePicker).format('YYYY-MM-DD')) {
+                    this.datePicker = this.$moment(this.date, 'YYYY-MM-DD').toDate();
+                }
             }
         },
 
@@ -91,27 +99,33 @@
         },
 
         methods: {
+
             setInput: function() {
                 if (this.value) {
-                    if (!this.date) {
-                        this.date = this.formatDateForDateRange(this.value);
-                        this.time = this.formatTime(this.value);
+
+                    if (!this.input) {
+                        this.date = this.$moment(this.value).format('YYYY-MM-DD');
+                        this.time = this.$moment(this.value).format('HH:mm');
                     } else {
-                        if (this.formatDateForInput(this.date) != this.value) {
-                            this.date = this.formatDateForDateRange(this.value);
+                        if (this.input != this.value) {
+                            this.date = this.$moment(this.value).format('YYYY-MM-DD');
+                            this.time = this.$moment(this.value).format('HH:mm');
                         }
                     }
                 } else {
                     this.date = null;
+                    this.time = null;
                 }
             },
+
             emitInput: function() {
-                if (this.date) {
+                if (this.input) {
                     this.$emit('input', this.input);
                 } else {
                     this.$emit('input', null);
                 }
             },
+
             clear: function() {
                 this.date = null;
                 this.time = null;

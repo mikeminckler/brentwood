@@ -209,11 +209,19 @@ input, .editor {
 }
 
 .locked {
+    @apply text-gray-500;
 }
 
-.lock-icon {
-    @apply h-full flex items-center absolute px-1 text-gray-500;
-    left: -22px;
+.locked::before {
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\f023";
+    @apply absolute text-gray-500 h-full flex items-center bg-gray-200 border-r border-gray-300 px-1;
+    left: -32px;
 }
 
 .inline-form {
@@ -222,7 +230,7 @@ input, .editor {
     }
 }
 
-input:hover, input:focus, .editor:hover, .editor:focus {
+input:not(.locked):hover, input:focus, .editor:not(.locked):hover, .editor:focus {
     @apply border-gray-300;
 }
 

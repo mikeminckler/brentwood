@@ -55,7 +55,7 @@
 
         </editor-menu-bar>
 
-        <div class="editor" :class="showBg ? 'bg-gray-100 border px-4 py-2' : ''">
+        <div class="editor" :class="[showBg ? 'bg-gray-100 border px-4 py-2' : '', isLocked ? 'locked' : '']">
 
             <editor-menu-bubble
                 :editor="editor" 
@@ -147,11 +147,12 @@
             'page-tree': () => import(/* webpackChunkName: "page-tree" */ '@/Components/PageTree.vue'),
         },
 
-        props: ['value', 'placeholder', 'label', 'focus', 'showBg'],
+        props: ['value', 'placeholder', 'label', 'focus', 'showBg', 'isLocked'],
 
         data() {
             return {
                 editor: new Editor({
+                    editable: true,
                     extensions: [
                         new Blockquote(),
                         new BulletList(),
@@ -181,10 +182,18 @@
                     ],
                     onUpdate: _.debounce( ({ getJSON, getHTML }) => {
                         //this.json = getJSON()
-                        this.html = getHTML()
-                    }, 50),
+                        this.html = getHTML();
+                        this.changed = true;
+                    }, 250),
                     onBlur: ({ event, state, view }) => {
                         this.$emit('blur');
+                        if (this.changed) {
+                            this.$emit('save');
+                            this.changed = false;
+                        }
+                    },
+                    onFocus: ({ event, state, view }) => {
+                        this.$emit('focus');
                     },
                 }),
                 //json: 'JSON',
@@ -195,6 +204,7 @@
                 linkFloatRight: false,
                 linkMenuIsActive: false,
                 showMenu: false,
+                changed: false,
             }
         },
 
@@ -237,6 +247,12 @@
             focused: _.debounce( function() {
                 this.showMenu = this.focused;
             }, 250),
+
+            isLocked() {
+                this.editor.setOptions({
+                    editable: !this.isLocked,
+                });
+            },
 
         },
 

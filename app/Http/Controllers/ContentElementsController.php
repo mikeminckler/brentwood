@@ -9,6 +9,7 @@ use App\ContentElement;
 use Illuminate\Support\Str;
 use App\Page;
 use Illuminate\Support\Facades\Validator;
+use App\Events\ContentElementRemoved;
 
 class ContentElementsController extends Controller
 {
@@ -58,7 +59,13 @@ class ContentElementsController extends Controller
 
     public function remove($id) 
     {
+
+        Validator::make(request()->all(), [
+            'page_id' => 'required|exists:pages,id',
+        ])->validate();
+
         $content_element = ContentElement::findOrFail($id);
+        $page = Page::findOrFail(requestInput('page_id'));
 
         if (!auth()->check()) {
             return abort(401);
@@ -70,6 +77,8 @@ class ContentElementsController extends Controller
             }
             return redirect('/')->with(['error' => 'You do not have permission to remove that item']);
         }
+
+        broadcast( new ContentElementRemoved($content_element, $page));
 
         if (requestInput('remove_all')) {
             ContentElement::where('uuid', $content_element->uuid)->delete();

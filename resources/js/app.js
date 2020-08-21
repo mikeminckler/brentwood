@@ -90,6 +90,11 @@ const app = new Vue({
             this.$store.dispatch('setWsState', states.current);
         });
 
+        this.$http.interceptors.request.use((config) => {
+            config.headers['X-Socket-Id'] = this.$echo.socketId();
+            return config;
+        });
+
     },
 
 });

@@ -14,6 +14,7 @@ use App\TextBlock;
 use Illuminate\Support\Facades\Event;
 use App\Events\ContentElementSaved;
 use App\Events\ContentElementCreated;
+use App\Events\ContentElementRemoved;
 
 class ContentElementTest extends TestCase
 {
@@ -325,5 +326,33 @@ class ContentElementTest extends TestCase
                 'id' => $content_element->id,
                 'sort_order' => $sort_order,
             ]);
+    }
+
+    /** @test **/
+    public function an_event_is_broadcast_when_a_content_element_is_deleted()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+        $page = $content_element->pages->first();
+        $this->assertInstanceOf(Page::class, $page);
+
+        Event::fake();
+
+        $this->signInAdmin();
+
+        $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors(['page_id']);
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['page_id' => $page->id])
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Text Block Removed',
+                //'uuid' => $content_element->uuid,
+            ]);
+
+        Event::assertDispatched(function (ContentElementRemoved $event) use ($content_element, $page) {
+            return $event->content_element->id === $content_element->id && $event->page->id === $page->id;
+        });
     }
 }

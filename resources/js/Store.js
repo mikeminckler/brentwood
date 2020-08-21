@@ -204,7 +204,7 @@ const store = new Vuex.Store({
         },
 
         setPageLoading({ commit, state }, loading) {
-            console.log('PAGE LOADING: ' + loading);
+            //console.log('PAGE LOADING: ' + loading);
             commit('setPageLoading', loading);
         },
 

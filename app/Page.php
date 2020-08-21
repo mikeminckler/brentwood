@@ -76,7 +76,7 @@ class Page extends Model
 
         cache()->tags([cache_name($page)])->flush();
 
-        broadcast(new PageSaved($page));
+        broadcast(new PageSaved($page))->toOthers();
 
         return $page;
     }
@@ -198,7 +198,7 @@ class Page extends Model
             }
         }
 
-        broadcast(new PageSaved($this));
+        broadcast(new PageSaved($this))->toOthers();
 
         return $this;
     }

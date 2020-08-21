@@ -13,6 +13,7 @@
             <div class="content-element-icons text-gray-800" @click="contentElement.pivot.expandable = 0" v-if="contentElement.pivot.expandable" title="Disable Expandable"><i class="fas fa-angle-double-down"></i></div>
             <div class="content-element-icons text-gray-400" @click="contentElement.pivot.expandable = 1" v-if="!contentElement.pivot.expandable" title="Make Expandable"><i class="fas fa-angle-double-down"></i></div>
             <div class="content-element-icons" title="Versioning/History?"><i class="fas fa-exchange-alt"></i></div>
+            <div class="content-element-icons" title="Set Publish Date" @click="showPublishAt = !showPublishAt"><i class="fas fa-clock"></i></div>
             <div class="remove-icon" title="Remove Content" @click="removeContentElement()"><i class="fas fa-times"></i></div>
         </div>
 
@@ -43,6 +44,10 @@
             <div class="flex bg-orange-200 px-2 py-1" v-if="contentElement.pivot.expandable">
                 <div class=""><i class="fas fa-angle-double-down"></i></div>
                 <div class="ml-2">Expandable</div>
+            </div>
+
+            <div class="absolute z-4" v-if="showPublishAt">
+                <date-time-picker v-model="contentElement.publish_at" :remove="true"></date-time-picker>
             </div>
 
         </div>
@@ -82,20 +87,23 @@
             'youtube-video': () => import(/* webpackChunkName: "youtube-video" */ '@/Forms/YoutubeVideo'),
             'embed-code': () => import(/* webpackChunkName: "embed-code" */ '@/Forms/EmbedCode'),
             'banner-photo': () => import(/* webpackChunkName: "banner-photo" */ '@/Forms/BannerPhoto'),
+            'date-time-picker': () => import(/* webpackChunkName: "date-time-picker" */ '@/Components/DateTimePicker.vue'),
         },
 
         data() {
             return {
+                showPublishAt: false,
                 changed: false,
                 preventWatcher: false,
                 saveContent: _.debounce( function() {
                     // refer to the mixin for saving of the content element
-                    if (!this.preventWatcher && !this.isSaving && !this.pageLoading) {
+                    if (!this.preventWatcher && !this.isSaving) {
                         this.$nextTick(() => {
-                            console.log('SAVE CE: ' + this.contentElement.id);
+                            //console.log('SAVE CE: ' + this.contentElement.id);
                             this.saveContentElement();
                         });
                     } else {
+                        //console.log('WATCHER PREVENTED');
                         this.preventWatcher = false;
                     }
                 }, 500),
@@ -107,9 +115,11 @@
                 handler: function(oldValue, newValue) {
                     // this gets tripped when the content is first loaded
                     // so we ignore the first watcher hit
-                    console.log('WATCHER: ' + this.contentElement.id);
-                    this.changed = true;
-                    this.saveContent();
+                    if (!this.pageLoading) {
+                        //console.log('WATCHER: ' + this.contentElement.id);
+                        this.changed = true;
+                        this.saveContent();
+                    }
                 },
                 deep: true
             },
@@ -132,6 +142,8 @@
             this.$echo.private('role.2')
                 .listen('ContentElementSaved', data => {
                     if (this.contentElement.id === data.content_element.id) {
+                        //console.log('LOAD CE: ' + this.contentElement.id);
+                        this.preventWatcher = true;
                         this.loadContentElement();
                     }
                 })
@@ -156,7 +168,7 @@
                 var answer = confirm('Are you sure you want to delete this content element?');
                 if (answer == true) {
 
-                    this.$http.post('/content-elements/' + this.contentElement.id + '/remove', {remove_all: true}).then( response => {
+                    this.$http.post('/content-elements/' + this.contentElement.id + '/remove', {remove_all: true, page_id: this.$store.state.page.id}).then( response => {
                         this.$emit('remove');
                         this.processSuccess(response);
                     }, error => {
@@ -171,7 +183,7 @@
                 var answer = confirm('Are you sure you want to restore to the current version?');
                 if (answer == true) {
 
-                    this.$http.post('/content-elements/' + this.contentElement.id + '/remove').then( response => {
+                    this.$http.post('/content-elements/' + this.contentElement.id + '/remove', {page_id: this.$store.state.page.id}).then( response => {
                         this.preventWatcher = true;
                         if (response.data.content_element) {
                             this.$emit('update', response.data.content_element);

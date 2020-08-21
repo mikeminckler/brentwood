@@ -39,15 +39,14 @@
                     <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white font-bold cursor-pointer justify-center items-center h-8 overflow-visible" 
                          v-if="(hasDraft && page.editable) && !$store.state.saving.length"
                     >
-                        <transition name="slide">
-                            <div class="pl-2" v-if="!showPagePublishAt"><i class="fas fa-sign-out-alt"></i></div>
-                        </transition>
-                        <div class="pl-2 "@click="publishPage()">Publish</div>
+                        <div class="flex" @click="publishPage()">
+                            <transition name="slide">
+                                <div class="pl-2" v-if="!showPagePublishAt"><i class="fas fa-sign-out-alt"></i></div>
+                            </transition>
+                            <div class="pl-2">Publish</div>
+                        </div>
                         <div class="px-2 ml-2 h-full flex items-center bg-green-500" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
-                        <date-time-picker
-                            v-show="showPagePublishAt"
-                            v-model="page.publish_at"
-                        ></date-time-picker>
+                        <date-time-picker v-show="showPagePublishAt" v-model="page.publish_at" ></date-time-picker>
                         <transition name="slide">
                             <div class="px-2" v-if="showPagePublishAt" @click="savePage()"><i class="fas fa-save"></i></div>
                         </transition>
@@ -177,6 +176,11 @@
                     if (this.page.id === data.page.id) {
                         this.loadPage();
                     }
+                })
+                .listen('ContentElementRemoved', data => {
+                    if (this.page.id === data.page.id) {
+                        this.loadPage();
+                    }
                 });
         },
 
@@ -283,6 +287,7 @@
 
                     this.$http.post('/pages/' + this.page.id + '/publish').then( response => {
                         //location.reload();
+                        console.log('SET PAGE AFTER PUBLISH');
                         this.$store.dispatch('setPage', response.data.page);
                         this.processSuccess(response);
 

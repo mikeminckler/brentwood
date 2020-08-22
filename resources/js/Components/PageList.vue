@@ -126,7 +126,17 @@
                 if (this.emitEvent) {
                     this.$emit('selected', this.page.id);
                 } else {
-                    window.location.href = this.page.full_slug;
+                    this.$store.dispatch('setPageLoading', true);
+
+                    this.$http.get(this.page.full_slug).then( response => {
+                        this.$store.dispatch('setPage', response.data.page);
+
+                        this.$nextTick(() => {
+                            this.$store.dispatch('setPageLoading', false);
+                        });
+                    }, error => {
+                        this.processErrors(error.response);
+                    });
                 }
             },
 

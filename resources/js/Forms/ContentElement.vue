@@ -6,7 +6,7 @@
     >
 
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
-            <div class="content-element-icons" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!contentElement.published_at"><i class="fas fa-clock"></i></div>
+            <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!contentElement.published_at"><i class="fas fa-clock"></i></div>
             <div class="content-element-icons" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
             <div class="content-element-icons" @click="$emit('sortDown')" title="Move Down"><i class="fas fa-arrow-alt-circle-down"></i></div>
             <div class="content-element-icons" @click="contentElement.pivot.unlisted = 0" v-if="contentElement.pivot.unlisted" title="Hide Content"><i class="fas fa-eye"></i></div>

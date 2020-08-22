@@ -68,8 +68,12 @@
             input() {
                 if (this.date && this.time) {
                     let utc = this.$moment(this.date + ' ' + this.time + ':00', 'YYYY-MM-DD HH:mm:ss').utc();
-                    let json = utc.toJSON();
-                    return json.substring(0, json.length - 1) + '000Z';
+                    if (utc.isValid()) {
+                        let json = utc.toJSON();
+                        return json.substring(0, json.length - 1) + '000Z';
+                    } else {
+                        return null;
+                    }
                 } else {
                     return null;
                 }

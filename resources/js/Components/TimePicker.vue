@@ -21,9 +21,9 @@
                 @input="updateValue($event.target.value)"
                 @keyup.enter="show = false"
                 :dusk="name"
-                @focus="show = true"
                 autocomplete="off"
                 class="py-2 px-3 leading-tight border rounded border-gray-400 bg-white outline-none"
+                @focus="show = true"
             />
         </div>
 
@@ -31,9 +31,9 @@
             <div class="flex p-2 absolute z-20 shadow rounded-b" v-if="show">
                 <div class="">
                     <div class="label">Hour</div>
-                    <div class=""><input type="range" min="0" max="23" v-model="hour" class="slider outline-none" id="time-slider" /></div>
+                    <div class=""><input type="range" min="0" max="23" v-model="hour" class="slider outline-none" id="time-slider" @blur="hide()" @focus="show = true" /></div>
                     <div class="label">Minutes</div>
-                    <div class=""><input type="range" min="0" step="5" max="59" v-model="minute" class="slider outline-none" id="time-slider" /></div>
+                    <div class=""><input type="range" min="0" step="5" max="59" v-model="minute" class="slider outline-none" id="time-slider" @blur="hide()" @focus="show = true" /></div>
                 </div>
                 <div class="pl-1">
                     <div class="icon" @click="show = false"><i class="fas fa-times"></i></div>
@@ -66,6 +66,9 @@
                 show: false,
                 hour: 0,
                 minute: 0,
+                hide: _.debounce( function() {
+                    this.show = false;
+                }, 1000),
             }
         },
 
@@ -80,6 +83,8 @@
             value() {
                 if (this.$moment(this.value, 'H:mm', true).isValid()) {
                     this.input = this.value;
+                } else {
+                    this.input = null;
                 }
             },
 

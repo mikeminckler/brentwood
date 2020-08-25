@@ -13,7 +13,7 @@ class VersionTest extends TestCase
     /** @test **/
     public function a_version_can_be_published()
     {
-        $version = factory(Version::class)->create();
+        $version = factory(Version::class)->states('page')->create();
         $version->publish();
 
         $version->refresh();
@@ -23,7 +23,7 @@ class VersionTest extends TestCase
     /** @test **/
     public function a_version_belongs_to_a_page()
     {
-        $version = factory(Version::class)->create();
-        $this->assertInstanceOf(Page::class, $version->page);
+        $version = factory(Version::class)->states('page')->create();
+        $this->assertInstanceOf(Page::class, $version->versionable);
     }
 }

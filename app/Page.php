@@ -13,14 +13,17 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\PageAccess;
 use App\AppendAttributesTrait;
-use App\Events\PagePublished;
+use App\VersioningTrait;
+use App\HasContentElementsTrait;
+
 use App\Events\PageSaved;
-use App\Events\PageDraftCreated;
 
 class Page extends Model
 {
     use SoftDeletes;
     use AppendAttributesTrait;
+    use VersioningTrait;
+    use HasContentElementsTrait;
 
     protected $dates = ['publish_at'];
     protected $with = ['pages'];
@@ -132,80 +135,10 @@ class Page extends Model
         return Str::kebab($this->name);
     }
 
-    public function contentElements() 
-    {
-        return $this->belongsToMany(ContentElement::class)->withPivot('sort_order', 'unlisted', 'expandable');
-    }
-
-    public function saveContentElements($input) 
-    {
-        if (Arr::get($input, 'content_elements')) {
-            foreach (Arr::get($input, 'content_elements') as $content_element) {
-                $content_element = (new ContentElement)->saveContentElement(Arr::get($content_element, 'id'), $content_element);
-            }
-        }
-
-        return $this;
-    }
-
-    public function versions() 
-    {
-        return $this->hasMany(Version::class);   
-    }
-
-    public function publishedVersion() 
-    {
-        return $this->belongsTo(Version::class, 'published_version_id');   
-    }
-
-    public function getPublishedAtAttribute() 
-    {
-        return optional($this->publishedVersion)->published_at;   
-    }
-
-    public function publish() 
-    {
-
-        $publish_at_content_elements = $this->contentElements()
-                                            ->where('publish_at', '<', now())
-                                            ->whereHas('version', function($query) {
-                                                $query->whereNull('published_at');
-                                            })
-                                            ->get();
-
-        $new_draft_content_elements = $this->contentElements()
-                                        ->whereHas('version', function($query) {
-                                            $query->whereNull('published_at');
-                                        })
-                                        ->get()
-                                        ->filter(function($content_element) use ($publish_at_content_elements) {
-                                            return !$publish_at_content_elements->contains('id', $content_element->id);
-                                        });
-
-        $draft_version = $this->getDraftVersion();
-        $draft_version->publish();
-        $this->published_version_id = $draft_version->id;
-        $this->publish_at = null;
-        $this->save();
-
-        cache()->tags([cache_name($this), cache_name($draft_version)])->flush();
-
-        if ($publish_at_content_elements->count()) {
-            foreach ($new_draft_content_elements as $new_draft_content_element) {
-                $new_draft_content_element->version_id = $this->getDraftVersion()->id;
-                $new_draft_content_element->save();
-            }
-        }
-
-        broadcast(new PageSaved($this))->toOthers();
-
-        return $this;
-    }
-
     public static function publishScheduledContent() 
     {
         $pages = Version::whereNull('published_at')
-            ->whereHas('page', function($query) {
+            ->whereHasMorph('versionable', ['App\Page', 'App\Blog'], function($query) {
                 $query->where(function($query) {
                     $query->whereNotNull('publish_at')
                           ->where('publish_at', '<', now());
@@ -217,104 +150,12 @@ class Page extends Model
             })
             ->get()
             ->map(function($version) {
-                return $version->page;
+                return $version->versionable;
             })
             ->each(function($page) {
                 $page->publish();
             });
 
-    }
-
-    public function getDraftVersion() 
-    {
-        $draft_version = $this->versions()->whereNull('published_at')->first();
-        if ($draft_version) {
-            return $draft_version;
-        } else {
-            $version = (new Version)->saveVersion(null, [
-                'name' => $this->versions()->count() + 1,
-                'page_id' => $this->id,
-            ]);
-
-            broadcast(new PageDraftCreated($this->load('versions')));
-
-            return $version;
-        }
-    }
-
-    public function getDraftVersionIdAttribute() 
-    {
-        return $this->getDraftVersion()->id; 
-    }
-
-    public function getContentElements() 
-    {
-        $version_id = requestInput('version_id');
-        
-        if ($version_id > 0) {
-            return $this->contentElements()
-                ->where('version_id', '<=', $version_id)
-                ->get();
-        } else {
-            return $this->contentElements()->get();
-        }
-    }
-
-    public function getContentElementsAttribute() 
-    {
-        //return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-content-elements', function() {
-            return $this->getContentElements()
-                         ->groupBy('uuid')
-                         ->map(function($uuid) {
-                            return $uuid->sortByDesc( function( $content_element) {
-                                return $content_element->version_id;
-                            })->first();
-                         })
-                         ->sortBy(function($content_element) {
-                            return $content_element->sort_order;
-                         })->values();
-        //});
-    }
-
-    public function getPublishedContentElementsAttribute() 
-    {
-        return $this->getContentElements()
-                     ->groupBy('uuid')
-                     ->map(function($uuid) {
-                        return $uuid->filter( function($content_element) {
-                            return $content_element->published_at ? true : false;
-                        })
-                        ->sortByDesc( function( $content_element) {
-                            return $content_element->version_id;
-                        })->first();
-                     })
-                     ->filter()
-                     ->filter( function($content_element) {
-                        return $content_element->pivot->unlisted ? false : true;
-                     })
-                     ->sortBy(function($content_element) {
-                        return $content_element->pivot->sort_order;
-                     })->values();
-    }
-
-    public function getPreviewContentElementsAttribute() 
-    {
-        if (!session()->get('editing')) {
-            return collect();
-        }
-        return $this->getContentElements()
-                     ->groupBy('uuid')
-                     ->map(function($uuid) {
-                        return $uuid->sortByDesc( function( $content_element) {
-                            return $content_element->version_id;
-                        })->first();
-                     })
-                     ->filter( function($content_element) {
-                        return $content_element->pivot->unlisted ? false : true;
-                     })
-                     ->sortBy(function($content_element) {
-                        return $content_element->pivot->sort_order;
-                     })->values();
     }
 
     public function getCanBePublishedAttribute() 

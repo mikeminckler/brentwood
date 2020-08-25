@@ -29,7 +29,7 @@ $factory->state(Page::class, 'slug', function ($faker) {
 
 $factory->state(Page::class, 'published', function ($faker) {
     return [
-        'published_version_id' => factory(Version::class)->states('published')->create()->id,
+        'published_version_id' => factory(Version::class)->states('page', 'published')->create()->id,
     ];
 });
 

@@ -11,5 +11,4 @@ trait ContentElementTrait
     {
         return $this->morphOne(ContentElement::class, 'content');
     }
-
 }

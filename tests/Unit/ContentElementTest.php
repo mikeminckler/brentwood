@@ -10,6 +10,7 @@ use App\TextBlock;
 use App\Page;
 use App\Version;
 use Illuminate\Support\Arr;
+use App\Blog;
 
 class ContentElementTest extends TestCase
 {
@@ -55,10 +56,17 @@ class ContentElementTest extends TestCase
     }
 
     /** @test **/
-    public function a_content_element_belongs_to_many_page()
+    public function a_content_element_belongs_to_many_pages()
     {
         $content_element = factory(ContentElement::class)->states('text-block')->create();
         $this->assertInstanceOf(Page::class, $content_element->pages->first());
+    }
+
+    /** @test **/
+    public function a_content_element_belongs_to_many_blogs()
+    {
+        $content_element = factory(ContentElement::class)->states('text-block', 'blog')->create();
+        $this->assertInstanceOf(Blog::class, $content_element->blogs->first());
     }
 
     /** @test **/

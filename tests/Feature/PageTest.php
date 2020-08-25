@@ -203,7 +203,7 @@ class PageTest extends TestCase
         ];
 
         $this->postJson(route('pages.update', ['id' => $home_page->id]), $input)
-            //->assertSuccessful()
+            ->assertSuccessful()
             ->assertJsonFragment([
                 'success' => 'Page Saved',
             ]);
@@ -233,6 +233,7 @@ class PageTest extends TestCase
 
         $this->signIn( factory(User::class)->create());
 
+        $this->withoutExceptionHandling();
         $this->json('POST', route('pages.publish', ['id' => $page->id]))
             ->assertStatus(403);
 

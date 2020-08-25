@@ -6,6 +6,7 @@ use App\ContentElement;
 use Faker\Generator as Faker;
 
 use App\Page;
+use App\Blog;
 use App\Version;
 use App\TextBlock;
 use App\Quote;
@@ -18,7 +19,7 @@ use App\BannerPhoto;
 $factory->define(ContentElement::class, function (Faker $faker) {
     return [
         'uuid' => Str::uuid(),
-        'version_id' => factory(Version::class)->create()->id,
+        'version_id' => factory(Version::class)->states('page')->create()->id,
     ];
 });
 
@@ -32,6 +33,22 @@ $factory->afterCreating(ContentElement::class, function($content_element, $faker
         'expandable' => false,
     ]);
 });
+
+$factory->state(ContentElement::class, 'blog', function ($faker) {
+    return [
+    ];
+});
+
+$factory->afterCreatingState(ContentElement::class, 'blog', function($content_element, $faker) {
+    $content_element->pages()->detach();
+    $blog = factory(Blog::class)->create();
+    $content_element->blogs()->attach($blog, [
+        'sort_order' => $faker->randomNumber(1),
+        'unlisted' => false,
+        'expandable' => false,
+    ]);
+});
+
 
 $factory->state(ContentElement::class, 'unlisted', function ($faker) {
     return [

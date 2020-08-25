@@ -98,7 +98,12 @@ class ContentElement extends Model
 
     public function pages() 
     {
-        return $this->belongsToMany(Page::class)->withPivot('sort_order', 'unlisted', 'expandable');
+        return $this->morphedByMany(Page::class, 'contentable')->withPivot('sort_order', 'unlisted', 'expandable');
+    }
+
+    public function blogs() 
+    {
+        return $this->morphedByMany(Blog::class, 'contentable')->withPivot('sort_order', 'unlisted', 'expandable');
     }
 
     public function content() 

@@ -5,8 +5,6 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
-use App\Page;
-
 class Version extends Model
 {
     public function saveVersion($id = null, $input) 
@@ -18,7 +16,10 @@ class Version extends Model
         }
 
         $version->name = Arr::get($input, 'name');
-        $version->page_id = Page::findOrFail(Arr::get($input, 'page_id'))->id;
+
+        // TODO we should validate if the morph exits
+        $version->versionable_type = Arr::get($input, 'versionable_type');
+        $version->versionable_id = Arr::get($input, 'versionable_id');
         $version->save();
 
         cache()->tags([cache_name($version)])->flush();
@@ -26,9 +27,9 @@ class Version extends Model
 
     }
 
-    public function page() 
+    public function versionable() 
     {
-        return $this->belongsTo(Page::class);   
+        return $this->morphTo();
     }
 
     public function publish() 

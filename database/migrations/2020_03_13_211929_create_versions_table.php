@@ -16,7 +16,9 @@ class CreateVersionsTable extends Migration
         Schema::create('versions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->unsignedBigInteger('page_id');
+
+            $table->morphs('versionable');
+            
             $table->dateTime('published_at')->nullable();
             $table->timestamps();
         });

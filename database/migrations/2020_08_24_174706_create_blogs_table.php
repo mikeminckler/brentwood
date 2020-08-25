@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateContentElementsTable extends Migration
+class CreateBlogsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,16 @@ class CreateContentElementsTable extends Migration
      */
     public function up()
     {
-        Schema::create('content_elements', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->uuid('uuid');
-            $table->morphs('content');
-            $table->unsignedBigInteger('version_id');
+        Schema::create('blogs', function (Blueprint $table) {
+            $table->id();
+
+            $table->string('name')->index();
+            $table->string('slug')->nullable();
+            $table->unsignedBigInteger('published_version_id')->nullable();
+            $table->boolean('unlisted')->default(false);
             $table->dateTime('publish_at')->nullable();
             $table->softDeletes();
+
             $table->timestamps();
         });
     }
@@ -31,6 +34,6 @@ class CreateContentElementsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('content_elements');
+        Schema::dropIfExists('blogs');
     }
 }

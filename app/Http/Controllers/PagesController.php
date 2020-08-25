@@ -6,61 +6,26 @@ use Illuminate\Http\Request;
 
 use App\Page;
 use App\Http\Requests\PageValidation;
-use App\Http\Controllers\SoftDeletesControllerTrait;
+use App\Http\Controllers\PagesControllerTrait;
 use Illuminate\Support\Facades\Validator;
 
 class PagesController extends Controller
 {
-    use SoftDeletesControllerTrait;
+    use PagesControllerTrait;
 
     protected function getModel()
     {
         return new Page;
     }
 
-    /**
-     * Find the page associated with the requested URL path
-     * This is the main function to render all content pages
-     */
-    public function load() 
+    protected function getValidation()
     {
-        $page = Page::findByFullSlug(request()->path());
-
-        if (!$page) {
-            return abort(404);
-        }
-
-        // if the page hasn't been published and we are not logged in dont show
-        if (!$page->published_at && !auth()->check()) {
-            return abort(404);
-        }
-
-        if (session()->has('editing') && request('preview')) {
-            $content_elements = $page->content_elements;
-        } else {
-            $content_elements = $page->published_content_elements;
-        }
-
-        $page = $this->loadPageAttributes($page);
-
-        if (request()->wantsJson()) {
-            return response()->json([
-                'page' => $page, 
-                'content_elements' => $content_elements,
-            ]);
-        }
-
-        return view('page', compact('page', 'content_elements'));
+        return (new PageValidation);
     }
 
-    private function loadPageAttributes($page)
+    protected function findPage($path)
     {
-        //if (session()->has('editing')) {
-            $page->appendAttributes();
-            $page->load('versions');
-        //}
-
-        return $page;
+        return Page::findByFullSlug($path);
     }
 
     /**
@@ -74,92 +39,6 @@ class PagesController extends Controller
         return response()->json([
             'home_page' => $page,
         ]);
-    }
-
-    /**
-     * Save a page and all its stuff
-     * Look in App\Page for the actual save function
-     */
-    public function store(PageValidation $request, $id = null) 
-    {
-        if ($id) {
-            /**
-             * here we check the policy file, App\Policies\PagePolicy
-             * https://laravel.com/docs/master/authorization#creating-policies
-             */
-            if (!auth()->user()->can('update', Page::findOrFail($id))) {
-                if (request()->expectsJson()) {
-                    return response()->json(['error' => 'You do not have permission to update that page'], 403);
-                }
-                return redirect('/')->with(['error' => 'You do not have permission to update that page']);
-            }
-        }
-
-        $page = (new Page)->savePage($id, requestInput());
-
-        $page = $this->loadPageAttributes($page);
-
-        return response()->json([
-            'success' => 'Page Saved',
-            'page' => $page,
-        ]);
-    }
-
-    public function publish($id) 
-    {
-
-        if (!auth()->check()) {
-            if (request()->expectsJson()) {
-                return response()->json(['error' => 'You do not have permission to publish that page'], 403);
-            }
-            return redirect('/')->with(['error' => 'You do not have permission to publish that page']);
-        }
-
-        $page = Page::findOrFail($id);
-
-        if (!auth()->user()->can('publish', $page)) {
-            if (request()->expectsJson()) {
-                return response()->json(['error' => 'You do not have permission to publish that page'], 403);
-            }
-            return redirect('/')->with(['error' => 'You do not have permission to publish that page']);
-        }
-
-        $page->publish();
-
-        $page = $this->loadPageAttributes($page);
-
-        return response()->json([
-            'success' => 'Page Published',
-            'page' => $page,
-        ]);
-    }
-
-    public function remove($id) 
-    {
-        $page = Page::findOrFail($id);
-
-        if (!auth()->check()) {
-            return abort(401);
-        }
-
-        if ($page->slug === '/') {
-            if (request()->expectsJson()) {
-                return response()->json(['error' => 'The home page cannot be deleted'], 403);
-            }
-            return redirect('/')->with(['error' => 'The home page cannot be deleted']);
-        }
-
-        if (!auth()->user()->can('delete', $page)) {
-            if (request()->expectsJson()) {
-                return response()->json(['error' => 'You do not have permission to remove that page'], 403);
-            }
-            return redirect('/')->with(['error' => 'You do not have permission to remove that page']);
-        }
-
-        $page->delete();
-
-        return response()->json(['success' => 'Page Removed']);
-        
     }
 
     public function sortPage($id)

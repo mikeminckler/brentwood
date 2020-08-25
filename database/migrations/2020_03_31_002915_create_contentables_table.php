@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateContentElementPageTable extends Migration
+class CreateContentablesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,15 @@ class CreateContentElementPageTable extends Migration
      */
     public function up()
     {
-        Schema::create('content_element_page', function (Blueprint $table) {
+        Schema::create('contentables', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('content_element_id');
-            $table->unsignedBigInteger('page_id');
+            $table->morphs('contentable');
+
             $table->integer('sort_order');
             $table->boolean('unlisted');
             $table->boolean('expandable');
+
             $table->timestamps();
         });
     }
@@ -31,6 +33,6 @@ class CreateContentElementPageTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('content_element_page');
+        Schema::dropIfExists('contentables');
     }
 }

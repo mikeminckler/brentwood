@@ -32,10 +32,10 @@ class PageValidation extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules($id = null)
     {
 
-        if ($this->route('id') == 1) {
+        if ($id === 1) {
 
             return [
                 'name' => 'required|string',

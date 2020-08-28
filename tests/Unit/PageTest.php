@@ -203,9 +203,9 @@ class PageTest extends TestCase
     public function a_page_has_many_versions()
     {
         $page = factory(Page::class)->create();
-        $version = factory(Version::class)->create([
-            'page_id' => $page->id,
-        ]);
+        $version = factory(Version::class)->states('page')->create();
+        $version->versionable_id = $page->id;
+        $version->save();
         $page->refresh();
         $this->assertTrue($page->versions->contains('id', $version->id));
     }

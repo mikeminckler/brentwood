@@ -64,7 +64,7 @@ trait PagesControllerTrait
     public function store($id = null) 
     {
 
-        Validator::make(request()->all(), $this->getValidation()->rules())->validate();
+        Validator::make(request()->all(), $this->getValidation()->rules((int) $id))->validate();
 
         if ($id) {
             /**
@@ -120,7 +120,7 @@ trait PagesControllerTrait
 
     public function remove($id) 
     {
-        $page = Page::findOrFail($id);
+        $page = $this->getModel()->findOrFail($id);
 
         if (!auth()->check()) {
             return abort(401);

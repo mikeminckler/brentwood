@@ -202,11 +202,13 @@ class PageTest extends TestCase
             'sort_order' => $this->faker->numberBetween(10,100),
         ];
 
-        $this->postJson(route('pages.update', ['id' => $home_page->id]), $input)
-            ->assertSuccessful()
+        $this->assertTrue($home_page->id === 1);
+        $this->assertTrue(Str::contains(route('pages.update', ['id' => $home_page->id]), 1));
+        $this->json('POST', route('pages.update', ['id' => $home_page->id]), $input)
             ->assertJsonFragment([
                 'success' => 'Page Saved',
-            ]);
+            ])
+            ->assertSuccessful();
 
         $home_page->refresh();
 
@@ -326,6 +328,7 @@ class PageTest extends TestCase
 
         $this->signInAdmin();
 
+        $this->withoutExceptionHandling();
         $this->json('POST', route('pages.remove', ['id' => $home_page->id]))
              ->assertStatus(403)
              ->assertJsonFragment([
@@ -715,11 +718,11 @@ class PageTest extends TestCase
         $this->signInAdmin();
 
         $this->json('POST', route('pages.update', ['id' => 1]), $input)
-            //->assertSuccessful()
             ->assertJsonFragment([
                 'success' => 'Page Saved',
                 'full_slug' => '/',
-            ]);
+            ])
+            ->assertSuccessful();
             
     }
 

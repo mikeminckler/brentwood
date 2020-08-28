@@ -63,7 +63,7 @@ class TextBlockTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
-                'page_id' => $page->id,
+                'versionable_id' => $page->id,
                 'sort_order' => 1,
                 'unlisted' => 0,
                 'expandable' => 0,
@@ -225,7 +225,7 @@ class TextBlockTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
-                'page_id' => $page->id,
+                'versionable_id' => $page->id,
                 'sort_order' => 1,
                 'unlisted' => 0,
                 'expandable' => 0,
@@ -243,7 +243,7 @@ class TextBlockTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
-                'page_id' => $page->id,
+                'versionable_id' => $page->id,
                 'sort_order' => 2,
                 'unlisted' => 1,
                 'expandable' => 1,

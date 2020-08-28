@@ -11,7 +11,6 @@ use App\Blog;
 $factory->define(Version::class, function (Faker $faker) {
     return [
         'name' => $faker->firstName,
-        //'page_id' => factory(Page::class)->create()->id,
     ];
 });
 

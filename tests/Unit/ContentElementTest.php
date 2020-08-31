@@ -27,7 +27,8 @@ class ContentElementTest extends TestCase
             'type' => 'text-block',
             'content' => $text_block,
             'pivot' => [
-                'page_id' => $page->id,
+                'contentable_id' => $page->id,
+                'contentable_type' => get_class($page),
                 'sort_order' => 1,
                 'unlisted' => false,
                 'expandable' => false,
@@ -37,6 +38,10 @@ class ContentElementTest extends TestCase
         $content_element = (new ContentElement)->saveContentElement(null, $input);
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
+
+        $page->refresh();
+        $this->assertInstanceOf(ContentElement::class, $page->contentElements()->first());
+        $this->assertEquals($content_element->id, $page->contentElements()->first()->id);
 
         $this->assertEquals($page->id, $content_element->pages->first()->id);
         $this->assertEquals(1, $content_element->pages->first()->pivot->sort_order);
@@ -51,14 +56,14 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function a_content_element_belongs_to_a_version()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $this->assertInstanceOf(Version::class, $content_element->version);
     }
 
     /** @test **/
     public function a_content_element_belongs_to_many_pages()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $this->assertInstanceOf(Page::class, $content_element->pages->first());
     }
 
@@ -72,14 +77,14 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function a_content_element_can_have_a_text_block()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $this->assertInstanceOf(TextBlock::class, $content_element->content);
     }
 
     /** @test **/
     public function a_content_element_has_a_content_type()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $this->assertEquals('text-block', $content_element->type);
     }
 
@@ -87,7 +92,7 @@ class ContentElementTest extends TestCase
     public function a_new_content_element_is_created_if_the_one_updated_has_been_published()
     {
         $page = factory(Page::class)->states('published')->create();
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $content_element->version_id = $page->published_version_id;
         $content_element->save();
         $content_element->refresh();
@@ -105,7 +110,8 @@ class ContentElementTest extends TestCase
         $input['content'] = factory(TextBlock::class)->raw();
         $input['content']['id'] = $content->id;
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,
@@ -149,7 +155,7 @@ class ContentElementTest extends TestCase
     }
 
     /** @test **/
-    public function saving_pubish_at_persits_the_correct_value()
+    public function saving_publish_at_persits_the_correct_value()
     {
         $content_element = factory(ContentElement::class)->states('text-block')->create();
         $content = $content_element->content;
@@ -162,8 +168,10 @@ class ContentElementTest extends TestCase
         $input['content'] = factory(TextBlock::class)->raw();
         $input['content']['id'] = $content->id;
         $input['publish_at'] = '2020-08-23T12:00:00.000000Z';
+
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,

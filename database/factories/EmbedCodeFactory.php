@@ -14,7 +14,7 @@ $factory->define(EmbedCode::class, function (Faker $faker) {
 });
 
 $factory->afterCreating(EmbedCode::class, function ($embed_code, $faker) {
-    $content_element = factory(ContentElement::class)->create([
+    $content_element = factory(ContentElement::class)->states('page')->create([
         'content_id' => $embed_code->id,
         'content_type' => get_class($embed_code),
     ]);

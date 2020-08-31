@@ -70,10 +70,10 @@ class BlogPolicy
      * Determine whether the user can publish the page.
      *
      * @param  \App\User  $user
-     * @param  \App\Page  $page
+     * @param  \App\Blog  $blog
      * @return mixed
      */
-    public function publish(User $user, Page $page)
+    public function publish(User $user, Blog $blog)
     {
         return $user->hasRole('publisher');
     }

@@ -15,7 +15,7 @@ $factory->define(YoutubeVideo::class, function (Faker $faker) {
 });
 
 $factory->afterCreating(YoutubeVideo::class, function ($youtube_video, $faker) {
-    $content_element = factory(ContentElement::class)->create([
+    $content_element = factory(ContentElement::class)->states('page')->create([
         'content_id' => $youtube_video->id,
         'content_type' => get_class($youtube_video),
     ]);

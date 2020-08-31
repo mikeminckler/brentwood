@@ -29,7 +29,8 @@ class YoutubeVideoTest extends TestCase
         $input['content'] = factory(YoutubeVideo::class)->states('text')->raw();
         $page = factory(Page::class)->create();
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -41,24 +42,31 @@ class YoutubeVideoTest extends TestCase
         $this->signIn( factory(User::class)->create());
 
         $this->json('POST', route('content-elements.store'), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                 'pivot.contentable_id',
+                 'pivot.contentable_type',
+             ]);
+
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(403);
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), ['pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'youtube-video', 'pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.store'), ['type' => 'youtube-video', 'pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
-                //'content.video_id',
              ]);
+
 
         $this->withoutExceptionHandling();
         $this->json('POST', route('content-elements.store'), $input)
@@ -81,6 +89,7 @@ class YoutubeVideoTest extends TestCase
     {
         $youtube_video = factory(YoutubeVideo::class)->create();
         $content_element = $youtube_video->contentElement;
+        $page = factory(Page::class)->create();
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
 
@@ -90,24 +99,29 @@ class YoutubeVideoTest extends TestCase
         $this->signIn( factory(User::class)->create());
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                 'pivot.contentable_id',
+                 'pivot.contentable_type',
+             ]);
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(403);
 
         $this->signInAdmin();
-        $page = factory(Page::class)->create();
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'youtube-video', 'pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'youtube-video', 'pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
-                //'content.video_id',
              ]);
 
         $input = $content_element->toArray();
@@ -115,7 +129,8 @@ class YoutubeVideoTest extends TestCase
         $input['content']['video_id'] = Arr::get($youtube_video_input, 'video_id');
         $input['content']['title'] = Arr::get($youtube_video_input, 'title');
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -157,7 +172,8 @@ class YoutubeVideoTest extends TestCase
         $input['content']['photos'] = [$photo_input];
         $page = factory(Page::class)->create();
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -207,7 +223,8 @@ class YoutubeVideoTest extends TestCase
         $input['content']['photos'] = [$photo_input];
         $page = factory(Page::class)->create();
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,

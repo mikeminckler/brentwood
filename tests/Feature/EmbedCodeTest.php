@@ -23,7 +23,8 @@ class EmbedCodeTest extends TestCase
         $input['content'] = factory(EmbedCode::class)->raw();
         $page = factory(Page::class)->create();
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -35,17 +36,24 @@ class EmbedCodeTest extends TestCase
         $this->signIn( factory(User::class)->create());
 
         $this->json('POST', route('content-elements.store'), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                 'pivot.contentable_id',
+                 'pivot.contentable_type',
+             ]);
+
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(403);
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), ['pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'embed-code', 'pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.store'), ['type' => 'banner-photo', 'pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.sort_order',
@@ -79,17 +87,24 @@ class EmbedCodeTest extends TestCase
         $this->signIn( factory(User::class)->create());
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                 'pivot.contentable_id',
+                 'pivot.contentable_type',
+             ]);
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(403);
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'embed-code', 'pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'embed-code', 'pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.sort_order',
@@ -100,15 +115,17 @@ class EmbedCodeTest extends TestCase
         $input = $content_element->toArray();
         $embed_code_input = factory(EmbedCode::class)->raw();
         $input['content']['code'] = Arr::get($embed_code_input, 'code');
+
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
         ];
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
-             //->assertSuccessful()
+             ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Embed Code Saved',
                 'code' => Arr::get($input, 'content.code'),

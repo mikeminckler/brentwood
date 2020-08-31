@@ -126,7 +126,8 @@
                 return {
                     id: '0.' + this.contentElements.length,
                     pivot: {
-                        page_id: this.$store.state.page.id,
+                        contentable_id: this.$store.state.page.id,
+                        contentable_type: this.$store.state.page.type,
                         sort_order: sortOrder,
                         unlisted: 0,
                         expandable: 0,

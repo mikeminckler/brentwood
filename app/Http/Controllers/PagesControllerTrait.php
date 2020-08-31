@@ -118,6 +118,7 @@ trait PagesControllerTrait
         ]);
     }
 
+    /*
     public function remove($id) 
     {
         $page = $this->getModel()->findOrFail($id);
@@ -145,6 +146,7 @@ trait PagesControllerTrait
         return response()->json(['success' => 'Page Removed']);
         
     }
+     */
 
 
 }

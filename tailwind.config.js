@@ -61,5 +61,8 @@ module.exports = {
     margin: ['responsive', 'first', 'last'],
     padding: ['responsive', 'first', 'last'],
   },
-  plugins: []
+  plugins: [],
+  future: {
+    removeDeprecatedGapUtilities: true,
+  },
 }

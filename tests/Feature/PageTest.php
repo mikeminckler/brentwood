@@ -13,7 +13,6 @@ use Illuminate\Support\Str;
 use App\ContentElement;
 use App\User;
 use App\TextBlock;
-use Tests\Feature\SoftDeletesTestTrait;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use App\FileUpload;
@@ -24,15 +23,23 @@ use Illuminate\Support\Facades\Event;
 use App\Events\PagePublished;
 use App\Events\PageSaved;
 
+use Tests\Feature\SoftDeletesTestTrait;
+use Tests\Feature\VersioningTestTrait;
+
 class PageTest extends TestCase
 {
 
     use WithFaker;
     use SoftDeletesTestTrait;
+    use VersioningTestTrait;
 
     protected function getModel()
     {
         return factory(Page::class)->create();
+    }
+    protected function getClassname()
+    {
+        return 'page';
     }
 
     /** @test **/
@@ -218,46 +225,6 @@ class PageTest extends TestCase
     }
 
     /** @test **/
-    public function a_page_can_be_published()
-    {
-        $content_element = factory(ContentElement::class)->states('text-block')->create([
-        ]);
-        $page = $content_element->pages->first();
-
-        $content_element->version_id = $page->getDraftVersion()->id;
-        $content_element->save();
-        $content_element->refresh();
-
-        $this->assertNull($page->published_at);
-
-        $this->json('POST', route('pages.publish', ['id' => $page->id]))
-            ->assertStatus(401);
-
-        $this->signIn( factory(User::class)->create());
-
-        $this->withoutExceptionHandling();
-        $this->json('POST', route('pages.publish', ['id' => $page->id]))
-            ->assertStatus(403);
-
-        $this->signInAdmin();
-
-        $this->json('POST', route('pages.publish', ['id' => $page->id]))
-             ->assertSuccessful()
-             ->assertJsonFragment([
-                'success' => 'Page Published',
-                'name' => $page->name,
-                'id' => $page->id,
-                'id' => $content_element->id
-             ]);
-
-        $page->refresh();
-        $content_element->refresh();
-
-        $this->assertNotNull($page->published_version_id);
-        $this->assertEquals($page->published_version_id, $content_element->version_id);
-    }
-
-    /** @test **/
     public function a_published_page_can_be_updated()
     {
         $page = factory(Page::class)->states('published')->create();
@@ -268,7 +235,8 @@ class PageTest extends TestCase
         $content_element->refresh();
 
         $content_element['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,
@@ -611,73 +579,6 @@ class PageTest extends TestCase
     }
      */
 
-    /** @test **/
-    public function a_previous_version_of_a_page_can_be_loaded()
-    {
-
-        $this->signInAdmin();
-        session()->put('editing', true);
-
-        $text_block = factory(TextBlock::class)->create();
-        $old_text = $text_block->body;
-        $content_element = $text_block->contentElement;
-        $this->assertInstanceOf(ContentElement::class, $content_element);
-
-        $page = $content_element->pages->first();
-
-        $this->assertInstanceOf(Page::class, $page);
-
-        $draft_version = $page->getDraftVersion();
-
-        $this->assertInstanceOf(Version::class, $draft_version);
-
-        $content_element->version_id = $draft_version->id;
-        $content_element->save();
-        $content_element->refresh();
-
-        $this->assertEquals($page->draft_version_id, $content_element->version_id);
-
-        $page->publish();
-        $page->refresh();
-        $content_element->refresh();
-        $content = $content_element->content;
-
-        $this->assertEquals($page->published_version_id, $content_element->version_id);
-
-        $new_text_block = factory(TextBlock::class)->raw();
-        $new_text = Arr::get($new_text_block, 'body');
-        $this->assertNotNull($new_text);
-        $input = factory(ContentElement::class)->states('text-block')->raw();
-        $input['type'] = 'text-block';
-        $input['content'] = $new_text_block;
-        $input['content']['id'] = $content->id;
-        $input['pivot'] = [
-            'page_id' => $page->id,
-            'sort_order' => $this->faker->randomNumber(1),
-            'unlisted' => false,
-            'expandable' => false,
-        ];
-
-        $saved_content_element = (new ContentElement)->saveContentElement($content_element->id, $input);
-
-        $this->assertNotEquals($page->getDraftVersion()->id, $page->publishedVersion->id);
-        $this->assertNotEquals($content_element->id, $saved_content_element->id);
-        $this->assertNotEquals($content->id, $saved_content_element->content->id);
-
-        $this->assertEquals($page->getDraftVersion()->id, $saved_content_element->version_id);
-        $page->publish();
-
-        $page->refresh();
-
-        $route  = route('pages.load', ['page' => $page->full_slug, 'version_id' => $draft_version->id]);
-        $this->assertTrue(Str::contains($route, 'version_id'));
-        $this->get($route)
-            ->assertSessionHas('editing')
-            ->assertSuccessful()
-            ->assertDontSee($new_text)
-            ->assertSee($old_text);
-
-    }
 
     /** @test **/
     public function a_page_can_be_loaded_via_ajax()
@@ -730,8 +631,8 @@ class PageTest extends TestCase
     /** @test **/
     public function individual_content_elements_can_be_published()
     {
-        $text_block = factory(TextBlock::class)->create();
-        $content_element1 = $text_block->contentElement;
+        $content_element1 = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $text_block = $content_element1->content;
         $page = $content_element1->pages->first();
         $content_element1->version_id = $page->getDraftVersion()->id;
         $content_element1->save();
@@ -740,8 +641,8 @@ class PageTest extends TestCase
         $this->assertInstanceOf(Page::class, $page);
         $this->assertInstanceOf(ContentElement::class, $content_element1);
 
-        $text_block2 = factory(TextBlock::class)->create();
-        $content_element2 = $text_block2->contentElement;
+        $content_element2 = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $text_block2 = $content_element2->content;
 
         $content_element2->pages()->detach();
 
@@ -763,7 +664,8 @@ class PageTest extends TestCase
         $this->signInAdmin();
 
         $content_element1['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,
@@ -785,7 +687,8 @@ class PageTest extends TestCase
         $this->assertEquals($page->getDraftVersion()->id, $content_element1->version->id);
 
         $content_element2['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,
@@ -872,6 +775,25 @@ class PageTest extends TestCase
         Event::assertDispatched(function (PageSaved $event) use ($page) {
             return $event->page->id === $page->id;
         });
+    }
+
+    /** @test **/
+    public function loading_a_pages_content_elements_includes_the_contentable_property()
+    {
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $page = $content_element->pages->first();
+
+        $this->assertInstanceOf(Page::class, $page);
+
+        $this->signInAdmin();
+
+        $this->json('GET', route('pages.load', ['page' => $page->full_slug]))
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'contentable_id' => $page->id,
+                'contentable_type' => 'page',
+            ]);
+
     }
 
 }

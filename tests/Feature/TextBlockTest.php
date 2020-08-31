@@ -28,7 +28,8 @@ class TextBlockTest extends TestCase
         $input['content'] = factory(TextBlock::class)->states('stat')->raw();
         $page = factory(Page::class)->create();
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -40,23 +41,31 @@ class TextBlockTest extends TestCase
         $this->signIn( factory(User::class)->create());
 
         $this->json('POST', route('content-elements.store'), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                 'pivot.contentable_id',
+                 'pivot.contentable_type',
+             ]);
+
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(403);
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), ['pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'text-block', 'pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.store'), ['type' => 'banner-photo', 'pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
              ]);
+
 
         $this->withoutExceptionHandling();
         $this->json('POST', route('content-elements.store'), $input)
@@ -94,34 +103,38 @@ class TextBlockTest extends TestCase
     {
         $text_block = factory(TextBlock::class)->create();
         $content_element = $text_block->contentElement;
+        $page = factory(Page::class)->create();
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
-
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
             ->assertStatus(401);
 
         $this->signIn( factory(User::class)->create());
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                 'pivot.contentable_id',
+                 'pivot.contentable_type',
+             ]);
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(403);
 
         $this->signInAdmin();
-        $page = factory(Page::class)->create();
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'text-block', 'pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), ['type' => 'embed-code', 'pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.sort_order',
                 'pivot.unlisted',
                 'pivot.expandable',
-                //'content.header',
-                //'content.body',
              ]);
 
         $input = $content_element->toArray();
@@ -130,7 +143,8 @@ class TextBlockTest extends TestCase
         $input['content']['body'] = Arr::get($text_block_input, 'body');
         $input['content']['style'] = Arr::get($text_block_input, 'style');
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -175,7 +189,8 @@ class TextBlockTest extends TestCase
         $input['content']['photos'] = [$photo_input];
         $page = factory(Page::class)->create();
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -212,7 +227,8 @@ class TextBlockTest extends TestCase
         $input['content'] = factory(TextBlock::class)->raw();
         $page = factory(Page::class)->create();
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -232,7 +248,8 @@ class TextBlockTest extends TestCase
              ]);
 
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 2,
             'unlisted' => true,
             'expandable' => true,

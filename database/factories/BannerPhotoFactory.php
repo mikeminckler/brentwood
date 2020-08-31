@@ -14,7 +14,7 @@ $factory->define(BannerPhoto::class, function (Faker $faker) {
 });
 
 $factory->afterCreating(BannerPhoto::class, function ($banner_photo, $faker) {
-    $content_element = factory(ContentElement::class)->create([
+    $content_element = factory(ContentElement::class)->states('page')->create([
         'content_id' => $banner_photo->id,
         'content_type' => get_class($banner_photo),
     ]);

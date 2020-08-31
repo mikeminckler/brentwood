@@ -26,7 +26,7 @@ class ContentElementCreated implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(ContentElement $content_element, Page $page)
+    public function __construct(ContentElement $content_element, $page)
     {
         $this->content_element = $content_element;
         $this->page = $page;

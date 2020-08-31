@@ -17,23 +17,32 @@ use App\FileUpload;
 use Illuminate\Support\Str;
 use App\Role;
 use App\User;
-use Tests\Unit\AppendAttributesTestTrait;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\PageDraftCreated;
 
+use Tests\Unit\AppendAttributesTestTrait;
+use Tests\Unit\ContentElementsTestTrait;
+use Tests\Unit\VersioningTestTrait;
+
 class PageTest extends TestCase
 {
 
     use WithFaker;
     use AppendAttributesTestTrait;
-
+    use ContentElementsTestTrait;
+    use VersioningTestTrait;
 
     protected function getModel()
     {
         return factory(Page::class)->create();
+    }
+
+    protected function getClassname()
+    {
+        return 'page';
     }
 
     /** @test **/
@@ -131,93 +140,6 @@ class PageTest extends TestCase
     }
 
     /** @test **/
-    public function a_page_can_have_many_content_elements()
-    {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
-        $page = $content_element->pages->first();
-
-        $page->refresh();
-
-        $this->assertNotNull($page->contentElements);
-        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
-    }
-
-    /** @test **/
-    public function a_page_can_save_its_content_elements()
-    {
-        $page = factory(Page::class)->create();
-        $content_element_input = factory(ContentElement::class)->states('text-block')->raw();
-        $content_element_input['type'] = 'text-block';
-        $content_element_input['content'] = factory(TextBlock::class)->raw();
-        $content_element_input['pivot'] = [
-            'page_id' => $page->id,
-            'sort_order' => 1,
-            'unlisted' => false,
-            'expandable' => false,
-        ];
-        $input = [
-            'content_elements' => [
-                $content_element_input,
-            ],
-        ];
-
-        $page->saveContentElements($input);
-        $page->refresh();
-
-        $this->assertEquals(1, $page->contentElements->count());
-        $content_element = $page->contentElements->first();
-    }
-
-    /** @test **/
-    public function a_page_can_get_its_draft_version()
-    {
-        $page = factory(Page::class)->create();
-
-        $this->assertInstanceOf(Page::class, $page);
-        $draft_version = $page->getDraftVersion();
-        $this->assertInstanceOf(Version::class, $draft_version);
-    }
-
-    /** @test **/
-    public function a_page_has_a_published_version()
-    {
-        $page = factory(Page::class)->states('published')->create();   
-        $this->assertNotNull($page->published_version_id);
-        $this->assertNotNull($page->publishedVersion);
-        $this->assertInstanceOf(Version::class, $page->publishedVersion);
-    }
-
-    /** @test **/
-    public function a_page_can_be_published()
-    {
-        $page = factory(Page::class)->create();   
-        $page->publish();
-        $this->assertNotNull($page->published_version_id);
-        $this->assertNotNull($page->publishedVersion);
-        $this->assertInstanceOf(Version::class, $page->publishedVersion);
-        $this->assertNotNull($page->publishedVersion->published_at);
-        $this->assertNotNull($page->published_at);
-    }
-
-    /** @test **/
-    public function a_page_has_many_versions()
-    {
-        $page = factory(Page::class)->create();
-        $version = factory(Version::class)->states('page')->create();
-        $version->versionable_id = $page->id;
-        $version->save();
-        $page->refresh();
-        $this->assertTrue($page->versions->contains('id', $version->id));
-    }
-
-    /** @test **/
-    public function if_a_page_doesnt_have_a_draft_version_one_is_created()
-    {
-        $page = factory(Page::class)->create();
-        $this->assertInstanceOf(Version::class, $page->getDraftVersion());
-    }
-
-    /** @test **/
     public function a_page_can_be_unlisted_from_the_menu()
     {
         $page = factory(Page::class)->states('unlisted')->create();
@@ -225,172 +147,9 @@ class PageTest extends TestCase
     }
 
     /** @test **/
-    public function a_page_can_get_its_content_elements()
-    {
-        // this checks for the proper grouping of content elements by UUID
-        $page = factory(Page::class)->states('published')->create();
-
-        $published_content_element = factory(ContentElement::class)->states('text-block')->create([
-            'version_id' => $page->published_version_id,
-        ]);
-
-        $published_content_element->pages()->detach();
-        $published_content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
-
-        $unpublished_content_element = factory(ContentElement::class)->states('text-block')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
-
-        $unpublished_content_element->pages()->detach();
-        $unpublished_content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
-
-        $page->refresh();
-        $this->assertNotNull($page->content_elements);
-        $this->assertInstanceOf(Collection::class, $page->content_elements);
-        $this->assertTrue($page->content_elements->contains('id', $unpublished_content_element->id));
-        $this->assertTrue($page->content_elements->contains('id', $published_content_element->id));
-    }
-
-    /** @test **/
-    public function a_page_has_a_draft_version_id_attribute()
-    {
-        $page = factory(Page::class)->create();   
-        $this->assertNotNull($page->draft_version_id);
-        $this->assertEquals($page->getDraftVersion()->id, $page->draft_version_id);
-    }
-
-    /** @test **/
-    public function a_page_has_a_can_be_published_attribute()
-    {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
-        $page = $content_element->pages->first();
-        $content_element->version_id = $page->draft_version_id;
-        $content_element->save();
-        $content_element->refresh();
-
-        $page->refresh();
-
-        $this->assertFalse($page->can_be_published);
-        $user = factory(User::class)->create();
-        $this->signIn($user);
-        $this->assertFalse($page->can_be_published);
-
-        $user->addRole('publisher');
-        $user->refresh();
-        $page->refresh();
-
-        $this->assertTrue($page->can_be_published);
-        $page->publish();
-        $page->refresh();
-        $this->assertFalse($page->can_be_published);
-
-        $content_element = factory(ContentElement::class)->states('text-block')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
-
-        $content_element->pages()->detach();
-        $content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
-        $content_element->version_id = $page->draft_version_id;
-        $content_element->save();
-        
-        $page->refresh();
-        $this->assertTrue($page->can_be_published);
-
-    }
-
-    /** @test **/
-    public function a_page_can_get_its_published_content_elements()
-    {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
-        $this->assertEquals(1, $content_element->pages()->count());
-        $page = $content_element->pages->first();
-        $content_element->version_id = $page->getDraftVersion()->id;
-        $content_element->save();
-
-        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
-        $this->assertTrue($page->content_elements->contains('id', $content_element->id));
-        $this->assertEquals($page->getDraftVersion()->id, $content_element->version_id);
-
-        $page->publish();
-        $page->refresh();
-
-        $content_element->refresh();
-        $this->assertNotNull($content_element->published_at);
-        $this->assertTrue($page->published_content_elements->contains('id', $content_element->id));
-
-        $unlisted_content_element = factory(ContentElement::class)->states('unlisted', 'text-block')->create([
-            'version_id' => $page->published_version_id,
-        ]);
-
-        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
-
-        $unpublished_content_element = factory(ContentElement::class)->states('text-block')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
-
-        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false, 'expandable' => false,]);
-
-        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
-        $this->assertTrue($page->contentElements->contains('id', $unpublished_content_element->id));
-        $this->assertTrue($page->contentElements->contains('id', $unlisted_content_element->id));
-
-        $page->refresh();
-        $this->assertFalse($page->published_content_elements->contains('id', $unlisted_content_element->id));
-        $this->assertFalse($page->published_content_elements->contains('id', $unpublished_content_element->id));
-    }
-
-    /** @test **/
-    public function a_page_can_get_its_preview_content_elements()
-    {
-        $this->signInAdmin();
-        session()->put('editing', true);
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
-        $this->assertEquals(1, $content_element->pages()->count());
-        $page = $content_element->pages->first();
-        $content_element->version_id = $page->getDraftVersion()->id;
-        $content_element->save();
-
-        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
-        $this->assertTrue($page->content_elements->contains('id', $content_element->id));
-        $this->assertEquals($page->getDraftVersion()->id, $content_element->version_id);
-        $this->assertEquals(0, $page->pivot->unlisted);
-
-        $page->publish();
-        $page->refresh();
-        $content_element->refresh();
-
-        $this->assertNotNull($content_element->published_at);
-        $this->assertEquals(1, $page->contentElements->count());
-        $this->assertTrue(session()->get('editing'));
-        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
-        $this->assertTrue($page->preview_content_elements->contains('id', $content_element->id));
-
-        $unlisted_content_element = factory(ContentElement::class)->states('unlisted', 'text-block')->create([
-            'version_id' => $page->published_version_id,
-        ]);
-
-        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
-
-        $unpublished_content_element = factory(ContentElement::class)->states('text-block')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
-
-        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false, 'expandable' => false]);
-
-        $this->assertTrue($page->contentElements->contains('id', $content_element->id));
-        $this->assertTrue($page->contentElements->contains('id', $unpublished_content_element->id));
-        $this->assertTrue($page->contentElements->contains('id', $unlisted_content_element->id));
-
-        $page->refresh();
-        $this->assertFalse($page->preview_content_elements->contains('id', $unlisted_content_element->id));
-        $this->assertTrue($page->preview_content_elements->contains('id', $content_element->id));
-        $this->assertTrue($page->preview_content_elements->contains('id', $unpublished_content_element->id));
-    }
-
-    /** @test **/
     public function if_session_editing_preview_content_elements_are_appended()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $this->assertEquals(1, $content_element->pages()->count());
         $page = $content_element->pages->first();
         $content_element->version_id = $page->getDraftVersion()->id;
@@ -600,48 +359,6 @@ class PageTest extends TestCase
         $this->assertNotNull( Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
         $this->assertEquals($page3->full_slug, Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
 
-    }
-
-    /** @test **/
-    public function a_page_can_be_published_in_the_future()
-    {
-        $page = factory(Page::class)->states('unpublished')->create([
-            'publish_at' => now()->addMinutes(1),
-        ]);
-
-        $this->assertInstanceOf(Version::class, $page->getDraftVersion());
-        $this->assertNull($page->published_at);
-
-        Page::publishScheduledContent();
-        $page->refresh();
-        $this->assertNull($page->published_at);
-
-        $page->publish_at = now()->subMinutes(1);
-        $page->save();
-        $page->refresh();
-        $this->assertTrue($page->publish_at->isPast());
-
-        Artisan::call('brentwood:publish-scheduled-content');
-        $page->refresh();
-        $this->assertNotNull($page->published_at);
-        $this->assertNull($page->publish_at);
-
-
-    }
-
-    /** @test **/
-    public function creating_a_new_version_broadcasts_an_event()
-    {
-        
-        $page = factory(Page::class)->states('published')->create();
-
-        Event::fake();
-
-        $page->getDraftVersion();
-
-        Event::assertDispatched(function (PageDraftCreated $event) use ($page) {
-            return $event->page->id === $page->id;
-        });
     }
 
 }

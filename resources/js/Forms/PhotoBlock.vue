@@ -32,7 +32,7 @@
         <transition-group name="photo-editor" 
             tag="div" 
             class="relative grid" 
-            :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'row-gap-2' : 'gap-2' ) : '']" 
+            :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'gap-y-2' : 'gap-2' ) : '']" 
             style="min-height: 100px"
         >
 

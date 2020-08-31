@@ -47,9 +47,9 @@ class ContentElementsController extends Controller
 
     public function store(ContentElementValidation $request, $id = null) 
     {
-        $page = Page::findOrFail(requestInput('pivot.page_id'));
+        $contentable = ContentElement::findContentable(requestInput());
         $content_element = (new ContentElement)->saveContentElement($id, requestInput());
-        $content_element = $page->contentElements()->where('content_element_id', $content_element->id)->first();
+        $content_element = $contentable->contentElements()->where('content_element_id', $content_element->id)->first();
 
         return response()->json([
             'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Saved',

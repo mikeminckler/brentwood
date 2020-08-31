@@ -15,7 +15,7 @@ $factory->define(Quote::class, function (Faker $faker) {
 });
 
 $factory->afterCreating(Quote::class, function ($quote, $faker) {
-    $content_element = factory(ContentElement::class)->create([
+    $content_element = factory(ContentElement::class)->states('page')->create([
         'content_id' => $quote->id,
         'content_type' => get_class($quote),
     ]);

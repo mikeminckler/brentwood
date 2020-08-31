@@ -143,7 +143,7 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function a_user_with_page_editing_can_update_content_elements()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
 
         $page = $content_element->pages->first();
 
@@ -156,7 +156,8 @@ class ContentElementTest extends TestCase
         $this->assertTrue($user->can('update', $page));
 
         $content_element['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,
@@ -166,16 +167,16 @@ class ContentElementTest extends TestCase
 
         $this->signIn($user);
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
-             ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
-             ]);
+             ])
+             ->assertSuccessful();
     }
 
     /** @test **/
     public function a_user_with_page_editing_can_create_content_elements()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
         $page = $content_element->pages->first();
         $this->assertInstanceOf(Page::class, $page);
 
@@ -186,7 +187,6 @@ class ContentElementTest extends TestCase
         $this->assertTrue($user->can('update', $page));
 
         $content_element['pivot'] = [
-            'page_id' => $page->id,
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,
@@ -195,6 +195,17 @@ class ContentElementTest extends TestCase
         $input['content'] = factory(TextBlock::class)->raw();
 
         $this->signIn($user);
+
+        $this->json('POST', route('content-elements.store'), $input)
+             ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'pivot.contentable_id',
+                'pivot.contentable_type',
+            ]);
+
+            $input['pivot']['contentable_id'] = $page->id;
+            $input['pivot']['contentable_type'] = get_class($page);
+
         $this->json('POST', route('content-elements.store'), $input)
              ->assertSuccessful()
              ->assertJsonFragment([
@@ -211,9 +222,9 @@ class ContentElementTest extends TestCase
         $content_element = $text_block->contentElement;
         $this->assertInstanceOf(ContentElement::class, $content_element);
         $content_element_id = $content_element->id;
-        $this->assertEquals(1, $content_element->pages()->count());
         $page = $content_element->pages->first();
         $this->assertInstanceOf(Page::class, $page);
+        $this->assertEquals(1, $content_element->pages()->count());
 
         $this->json('POST', route('pages.publish', ['id' => $page->id]))
              ->assertSuccessful()
@@ -231,7 +242,8 @@ class ContentElementTest extends TestCase
         $this->assertNotNull($content_element->published_at);
         
         $content_element['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,
@@ -268,7 +280,7 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function an_event_is_broadcast_when_a_content_element_is_saved()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
         $page = $content_element->pages->first();
         $this->assertInstanceOf(Page::class, $page);
 
@@ -277,7 +289,8 @@ class ContentElementTest extends TestCase
         $this->signInAdmin();
 
         $content_element['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,
@@ -301,7 +314,7 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function an_event_is_broadcast_when_a_content_element_is_created()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
         $page = $content_element->pages->first();
         $this->assertInstanceOf(Page::class, $page);
 
@@ -310,7 +323,8 @@ class ContentElementTest extends TestCase
         $this->signInAdmin();
 
         $content_element['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => false,
             'expandable' => false,
@@ -334,7 +348,7 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function a_content_element_can_be_loaded()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $page = $content_element->pages()->first();
         $this->assertInstanceOf(Page::class, $page);
         $sort_order = $page->pivot->sort_order;
@@ -368,7 +382,7 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function an_event_is_broadcast_when_a_content_element_is_deleted()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
         $page = $content_element->pages->first();
         $this->assertInstanceOf(Page::class, $page);
 

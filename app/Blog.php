@@ -20,13 +20,13 @@ class Blog extends Model
     use VersioningTrait;
 
     protected $dates = ['publish_at'];
-    //protected $with = [];
 
     public $append_attributes = [
         //'full_slug', 
         //'can_be_published', 
         'content_elements', 
         'preview_content_elements',
+        'type',
     ];
 
     public function savePage($id = null, $input) 

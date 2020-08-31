@@ -1,4 +1,4 @@
-<div class="relative z-2 md:grid md:grid-cols-{{ $content->columns }} {{ $content->padding ? ($content->columns === 3 ? 'row-gap-2' : 'gap-2') : '' }}">
+<div class="relative z-2 md:grid md:grid-cols-{{ $content->columns }} {{ $content->padding ? ($content->columns === 3 ? 'gap-y-2' : 'gap-2') : '' }}">
 
 
     @foreach ($content->photos->sortBy('sort_order') as $index => $photo)

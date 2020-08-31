@@ -24,7 +24,7 @@ class PageDraftCreated implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(Page $page)
+    public function __construct($page)
     {
         $this->page = $page;
     }

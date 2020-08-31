@@ -27,7 +27,6 @@ class Page extends Model
 
     protected $dates = ['publish_at'];
     protected $with = ['pages'];
-    //protected $with = ['pages', 'footerFgFileUpload', 'footerBgFileUpload'];
 
     public $append_attributes = [
         'editable',
@@ -38,6 +37,7 @@ class Page extends Model
         'footer_fg_image',
         'footer_bg_image',
         'sub_menu',
+        'type',
     ];
 
     public function savePage($id = null, $input) 
@@ -156,26 +156,6 @@ class Page extends Model
                 $page->publish();
             });
 
-    }
-
-    public function getCanBePublishedAttribute() 
-    {
-
-        if (!auth()->check()) {
-            return false;
-        }
-
-        if (!auth()->user()->hasRole('publisher')) {
-            return false;
-        }
-
-        if (!$this->published_version_id && $this->contentElements->count()) {
-            return true;
-        }
-
-        return $this->content_elements->filter(function($content_element) {
-                return $content_element->published_at ? false : true;
-            })->count() ? true : false;
     }
 
     public function footerFgFileUpload() 

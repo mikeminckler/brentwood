@@ -38,7 +38,8 @@ class BannerPhotoTest extends TestCase
         $input['content']['photos'] = [$photo_input];
         $page = factory(Page::class)->create();
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -50,17 +51,24 @@ class BannerPhotoTest extends TestCase
         $this->signIn( factory(User::class)->create());
 
         $this->json('POST', route('content-elements.store'), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                 'pivot.contentable_id',
+                 'pivot.contentable_type',
+             ]);
+
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(403);
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), ['pivot' => ['page_id' => $page->id] ])
+        $this->json('POST', route('content-elements.store'), ['pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'type',
              ]);
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'banner-photo', 'pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.store'), ['type' => 'banner-photo', 'pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.sort_order',

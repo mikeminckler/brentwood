@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -25,6 +26,9 @@ class ContentElement extends Model
 
     public function saveContentElement($id = null, $input) 
     {
+
+        $contentable = self::findContentable($input);
+
         $new_version = true;
         if ($id) {
             $content_element = ContentElement::findOrFail($id);
@@ -55,28 +59,30 @@ class ContentElement extends Model
             $content_element->uuid = Str::uuid();
         }
 
-        $page = Page::findOrFail(Arr::get($input, 'pivot.page_id'));
-
         $content_class = 'App\\'.Str::studly(Arr::get($input, 'type'));
         $content = (new $content_class)->saveContent($new_version ? null : Arr::get($input, 'content.id'), Arr::get($input, 'content'));
 
         $content_element->content_id = $content->id;
         $content_element->content_type = get_class($content);
 
-        $content_element->version_id = $page->getDraftVersion()->id;
+        $content_element->version_id = $contentable->getDraftVersion()->id;
         $content_element->publish_at = Arr::get($input, 'publish_at');
 
         $content_element->save();
 
-        // assign or update the content element to the page 
-        if (!$content_element->pages()->get()->contains('id', $page->id)) {
-            $content_element->pages()->attach($page->id, [
+        // assign or update the content element to the contentable 
+
+        if (!$contentable->contentElements()->get()->contains('id', $content_element->id)) {
+
+            $contentable->contentElements()->attach($content_element, [
                 'sort_order' => Arr::get($input, 'pivot.sort_order'),
                 'unlisted' => Arr::get($input, 'pivot.unlisted'),
                 'expandable' => Arr::get($input, 'pivot.expandable'),
             ]);
+
         } else {
-            $content_element->pages()->updateExistingPivot($page->id, [
+        
+            $contentable->contentElements()->updateExistingPivot($content_element, [
                 'sort_order' => Arr::get($input, 'pivot.sort_order'),
                 'unlisted' => Arr::get($input, 'pivot.unlisted'),
                 'expandable' => Arr::get($input, 'pivot.expandable'),
@@ -85,15 +91,42 @@ class ContentElement extends Model
 
         // refresh the content element so that it updates its content
         $content_element->refresh();
-        cache()->tags([cache_name($content_element), cache_name($page)])->flush();
+        cache()->tags([cache_name($content_element), cache_name($contentable)])->flush();
 
         if ($new_version) {
-            broadcast(new ContentElementCreated($content_element, $page))->toOthers();
+            broadcast(new ContentElementCreated($content_element, $contentable))->toOthers();
         } else {
             broadcast(new ContentElementSaved($content_element))->toOthers();
         }
 
         return $content_element;
+    }
+
+    public static function findContentable($input) 
+    {
+        
+        if (Str::contains(Arr::get($input, 'pivot.contentable_type'), 'App\\')) {
+            $class_name = Arr::get($input, 'pivot.contentable_type');
+        } else {
+            $class_name = 'App\\'.Str::studly(Arr::get($input, 'pivot.contentable_type'));
+        }
+
+        Validator::make($input, [
+            'pivot.contentable_id' => ['required', function ($attribute, $value, $fail) use ($input, $class_name) {
+                $id_check = resolve($class_name)->find($value);
+                if (!$id_check) {
+                    $fail('No related object found when saving the content element');
+                }
+            }],
+            'pivot.contentable_type' => ['required', function ($attribute, $value, $fail) use ($input, $class_name) {
+                $class = resolve($class_name);
+                if (!$class) {
+                    $fail('No related class found when saving the content element');
+                }
+            }],
+        ])->validate();
+
+        return (new $class_name)->findOrFail(Arr::get($input, 'pivot.contentable_id'));
     }
 
     public function pages() 

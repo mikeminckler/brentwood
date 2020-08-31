@@ -37,7 +37,7 @@ class PhotoBlockTest extends TestCase
 
         $page = factory(Page::class)->create();
 
-        $input = factory(ContentElement::class)->states('photo-block')->raw();
+        $input = factory(ContentElement::class)->states('page', 'photo-block')->raw();
         $input['type'] = 'photo-block';
 
         $input['content'] = [
@@ -54,7 +54,8 @@ class PhotoBlockTest extends TestCase
         ];
 
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -62,7 +63,7 @@ class PhotoBlockTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.store'), ['type' => 'photo-block', 'pivot' => ['page_id' => $page->id]])
+        $this->json('POST', route('content-elements.store'), ['type' => 'photo-block', 'pivot' => ['contentable_id' => $page->id, 'contentable_type' => 'page']])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                 'pivot.sort_order',
@@ -128,7 +129,8 @@ class PhotoBlockTest extends TestCase
         $input['content'] = factory(PhotoBlock::class)->raw();
         $input['content']['photos'] = [factory(Photo::class)->states('photo-block')->create(['content_id' => $photo_block->id])];
         $input['pivot'] = [
-            'page_id' => $page->id,
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'sort_order' => 1,
             'unlisted' => false,
             'expandable' => false,
@@ -177,7 +179,7 @@ class PhotoBlockTest extends TestCase
 
         $page = factory(Page::class)->create();
 
-        $input = factory(ContentElement::class)->states('photo-block')->raw();
+        $input = factory(ContentElement::class)->states('page', 'photo-block')->raw();
         $input['type'] = 'photo-block';
 
         $input['content'] = [
@@ -195,6 +197,8 @@ class PhotoBlockTest extends TestCase
         ];
 
         $input['pivot'] = [
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
             'page_id' => $page->id,
             'sort_order' => 1,
             'unlisted' => false,

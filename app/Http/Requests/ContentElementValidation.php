@@ -22,9 +22,8 @@ class ContentElementValidation extends FormRequest
             return false;
         }
 
-        $page = Page::find(request('pivot.page_id') );
-
-        return auth()->user()->can('update', $page);
+        $contentable = ContentElement::findContentable(requestInput()); 
+        return auth()->user()->can('update', $contentable);
     }
 
     /**
@@ -44,7 +43,8 @@ class ContentElementValidation extends FormRequest
         $content_class = '\App\\Http\\Requests\\'.Str::studly(requestInput('type')).'Validation';
 
         $rules = collect([
-            'pivot.page_id' => 'required|exists:pages,id',
+            'pivot.contentable_id' => 'required',
+            'pivot.contentable_type' => 'required',
             'pivot.sort_order' => 'required|integer',
             'pivot.unlisted' => 'required|boolean',
             'pivot.expandable' => 'required|boolean',

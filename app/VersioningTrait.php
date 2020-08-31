@@ -85,5 +85,24 @@ trait VersioningTrait
         return $this->getDraftVersion()->id; 
     }
 
+    public function getCanBePublishedAttribute() 
+    {
+
+        if (!auth()->check()) {
+            return false;
+        }
+
+        if (!auth()->user()->hasRole('publisher')) {
+            return false;
+        }
+
+        if (!$this->published_version_id && $this->contentElements->count()) {
+            return true;
+        }
+
+        return $this->content_elements->filter(function($content_element) {
+                return $content_element->published_at ? false : true;
+            })->count() ? true : false;
+    }
 
 }

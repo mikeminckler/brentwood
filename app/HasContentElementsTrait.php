@@ -2,7 +2,9 @@
 
 namespace App;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 trait HasContentElementsTrait
 {
@@ -10,6 +12,11 @@ trait HasContentElementsTrait
     public function contentElements() 
     {
         return $this->morphToMany(ContentElement::class, 'contentable')->withPivot('sort_order', 'unlisted', 'expandable');
+    }
+
+    public function getTypeAttribute() 
+    {
+        return Str::kebab(class_basename($this));
     }
 
     public function saveContentElements($input) 
@@ -39,7 +46,7 @@ trait HasContentElementsTrait
     public function getContentElementsAttribute() 
     {
         //return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-content-elements', function() {
-            return $this->getContentElements()
+            $content_elements = $this->getContentElements()
                          ->groupBy('uuid')
                          ->map(function($uuid) {
                             return $uuid->sortByDesc( function( $content_element) {
@@ -48,13 +55,16 @@ trait HasContentElementsTrait
                          })
                          ->sortBy(function($content_element) {
                             return $content_element->sort_order;
-                         })->values();
+                         })
+                         ->values();
+
+            return $this->addContentableAttributes($content_elements);
         //});
     }
 
     public function getPublishedContentElementsAttribute() 
     {
-        return $this->getContentElements()
+        $content_elements = $this->getContentElements()
                      ->groupBy('uuid')
                      ->map(function($uuid) {
                         return $uuid->filter( function($content_element) {
@@ -71,6 +81,8 @@ trait HasContentElementsTrait
                      ->sortBy(function($content_element) {
                         return $content_element->pivot->sort_order;
                      })->values();
+
+        return $this->addContentableAttributes($content_elements);
     }
 
     public function getPreviewContentElementsAttribute() 
@@ -78,7 +90,7 @@ trait HasContentElementsTrait
         if (!session()->get('editing')) {
             return collect();
         }
-        return $this->getContentElements()
+        $content_elements = $this->getContentElements()
                      ->groupBy('uuid')
                      ->map(function($uuid) {
                         return $uuid->sortByDesc( function( $content_element) {
@@ -91,5 +103,16 @@ trait HasContentElementsTrait
                      ->sortBy(function($content_element) {
                         return $content_element->pivot->sort_order;
                      })->values();
+
+        return $this->addContentableAttributes($content_elements);
+    }
+
+    protected function addContentableAttributes(Collection $content_elements)
+    {
+         return $content_elements->map(function($content_element) {
+            $content_element->contentable_id = $this->id;
+            $content_element->contentable_type = $this->type;
+            return $content_element;
+         });
     }
 }

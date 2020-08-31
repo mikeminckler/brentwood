@@ -66,4 +66,33 @@ class PagesController extends Controller
         ]);
 
     }
+
+    public function remove($id)
+    {
+        $page = Page::findOrFail($id);
+
+        if (!auth()->check()) {
+            return abort(401);
+        }
+
+        if ($page->slug === '/') {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'The home page cannot be deleted'], 403);
+            }
+            return redirect('/')->with(['error' => 'The home page cannot be deleted']);
+        }
+
+        if (!auth()->user()->can('delete', $page)) {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'You do not have permission to remove that page'], 403);
+            }
+            return redirect('/')->with(['error' => 'You do not have permission to remove that page']);
+        }
+
+        $page->delete();
+
+        return response()->json(['success' => 'Page Removed']);
+
+    }
+
 }

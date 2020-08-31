@@ -17,7 +17,7 @@ $factory->define(PhotoBlock::class, function (Faker $faker) {
 });
 
 $factory->afterCreating(PhotoBlock::class, function ($photo_block, $faker) {
-    $content_element = factory(ContentElement::class)->create([
+    $content_element = factory(ContentElement::class)->states('page')->create([
         'content_id' => $photo_block->id,
         'content_type' => get_class($photo_block),
     ]);

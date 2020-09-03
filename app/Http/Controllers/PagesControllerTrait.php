@@ -15,8 +15,8 @@ trait PagesControllerTrait
     private function loadPageAttributes($page)
     {
         //if (session()->has('editing')) {
-            $page->appendAttributes();
-            $page->load('versions');
+        $page->appendAttributes();
+        $page->load('versions');
         //}
 
         return $page;
@@ -26,7 +26,7 @@ trait PagesControllerTrait
      * Find the page associated with the requested URL path
      * This is the main function to render all content pages
      */
-    public function load() 
+    public function load()
     {
         $page = $this->findPage(request()->path());
 
@@ -49,7 +49,7 @@ trait PagesControllerTrait
 
         if (request()->wantsJson()) {
             return response()->json([
-                'page' => $page, 
+                'page' => $page,
                 'content_elements' => $content_elements,
             ]);
         }
@@ -61,9 +61,8 @@ trait PagesControllerTrait
      * Save a page and all its stuff
      * Look in App\Page for the actual save function
      */
-    public function store($id = null) 
+    public function store($id = null)
     {
-
         Validator::make(request()->all(), $this->getValidation()->rules((int) $id))->validate();
 
         if ($id) {
@@ -89,9 +88,8 @@ trait PagesControllerTrait
         ]);
     }
 
-    public function publish($id) 
+    public function publish($id)
     {
-
         if (!auth()->check()) {
             if (request()->expectsJson()) {
                 return response()->json(['error' => 'You do not have permission to publish that page'], 403);
@@ -119,7 +117,7 @@ trait PagesControllerTrait
     }
 
     /*
-    public function remove($id) 
+    public function remove($id)
     {
         $page = $this->getModel()->findOrFail($id);
 
@@ -144,9 +142,7 @@ trait PagesControllerTrait
         $page->delete();
 
         return response()->json(['success' => 'Page Removed']);
-        
+
     }
      */
-
-
 }

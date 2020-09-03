@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests\Feature;
+
 use Illuminate\Support\Arr;
 
 use App\Version;
@@ -16,9 +17,8 @@ use App\TextBlock;
 
 trait VersioningTestTrait
 {
-
-    protected abstract function getModel();
-    protected abstract function getClassname();
+    abstract protected function getModel();
+    abstract protected function getClassname();
 
     /** @test **/
     public function a_page_can_be_published()
@@ -35,7 +35,7 @@ trait VersioningTestTrait
         $this->json('POST', route(Str::plural($this->getClassname()).'.publish', ['id' => $page->id]))
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(factory(User::class)->create());
 
         $this->withoutExceptionHandling();
         $this->json('POST', route(Str::plural($this->getClassname()).'.publish', ['id' => $page->id]))
@@ -62,7 +62,6 @@ trait VersioningTestTrait
     /** @test **/
     public function a_previous_version_of_a_page_can_be_loaded()
     {
-
         $this->signInAdmin();
         session()->put('editing', true);
 
@@ -119,14 +118,13 @@ trait VersioningTestTrait
 
         $page->refresh();
 
-        $route  = route(Str::plural($this->getClassname()).'.load', ['page' => $page->full_slug, 'version_id' => $draft_version->id]);
+        $route  = route(Str::plural($this->getClassname()).'.load', ['page' => $page->slug, 'version_id' => $draft_version->id]);
+        
         $this->assertTrue(Str::contains($route, 'version_id'));
         $this->get($route)
             ->assertSessionHas('editing')
             ->assertSuccessful()
             ->assertDontSee($new_text)
             ->assertSee($old_text);
-
     }
-
 }

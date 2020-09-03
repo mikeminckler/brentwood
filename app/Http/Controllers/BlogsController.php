@@ -10,7 +10,6 @@ use App\Http\Controllers\PagesControllerTrait;
 
 class BlogsController extends Controller
 {
-
     use PagesControllerTrait;
 
     protected function getModel()
@@ -25,7 +24,15 @@ class BlogsController extends Controller
 
     protected function findPage($path)
     {
-        return Blog::where('name', $path)->first();
+        return (new Blog)->findByFullSlug($path);
     }
 
+    public function index()
+    {
+        if (!auth()->user()->can('viewAny', Blog::class)) {
+            return redirect('/')->with('error', 'You do not have access to view Blogs');
+        }
+
+        return view('blogs.index');
+    }
 }

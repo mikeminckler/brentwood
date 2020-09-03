@@ -29,7 +29,6 @@ use Tests\Unit\VersioningTestTrait;
 
 class PageTest extends TestCase
 {
-
     use WithFaker;
     use AppendAttributesTestTrait;
     use ContentElementsTestTrait;
@@ -64,7 +63,6 @@ class PageTest extends TestCase
     /** @test **/
     public function the_page_tree_can_be_created()
     {
-
         $first_level_page = factory(Page::class)->create();
         $second_level_page = factory(Page::class)->states('secondLevel')->create([
             'parent_page_id' => $first_level_page->id,
@@ -76,7 +74,6 @@ class PageTest extends TestCase
         $this->assertTrue($first_level->contains('id', $first_level_page->id));
         $second_level = $first_level_page->pages;
         $this->assertTrue($second_level->contains('id', $second_level_page->id));
-   
     }
 
     /** @test **/
@@ -101,7 +98,7 @@ class PageTest extends TestCase
                     'name' => 'Rock N Roll',
                 ]),
             ]),
-        ]);   
+        ]);
 
         $this->assertNotNull($page->parentPage);
         $this->assertEquals('rock-n-roll/led-zeppelin/jimmy-page', $page->full_slug);
@@ -118,11 +115,11 @@ class PageTest extends TestCase
                     'name' => $this->faker->firstName,
                 ]),
             ]),
-        ]);   
+        ]);
 
         $page_slug = $page->full_slug;
 
-        $found_page = Page::findByFullSlug($page->full_slug);
+        $found_page = (new Page)->findByFullSlug($page->full_slug);
 
         $this->assertInstanceOf(Page::class, $found_page);
         $this->assertEquals($page->id, $found_page->id);
@@ -162,7 +159,7 @@ class PageTest extends TestCase
     }
 
     /** @test **/
-    public function a_page_has_footer_images_and_a_footer_color_that_can_be_inherited() 
+    public function a_page_has_footer_images_and_a_footer_color_that_can_be_inherited()
     {
         Storage::fake();
         $fg_file_name = Str::random().'.jpg';
@@ -332,7 +329,6 @@ class PageTest extends TestCase
 
         $this->signInAdmin();
         $this->assertTrue($page->editable);
-
     }
 
     /** @test **/
@@ -349,16 +345,14 @@ class PageTest extends TestCase
         $page1->appendRecursive(['full_slug']);
         $page_array = $page1->toArray();
 
-        $this->assertNotNull( Arr::get($page_array, 'full_slug'));
+        $this->assertNotNull(Arr::get($page_array, 'full_slug'));
         $this->assertEquals($page1->full_slug, Arr::get($page_array, 'full_slug'));
 
-        $this->assertNotNull( Arr::get($page_array, 'pages'));
-        $this->assertNotNull( Arr::get($page_array['pages'][0], 'full_slug'));
+        $this->assertNotNull(Arr::get($page_array, 'pages'));
+        $this->assertNotNull(Arr::get($page_array['pages'][0], 'full_slug'));
         $this->assertEquals($page2->full_slug, Arr::get($page_array['pages'][0], 'full_slug'));
 
-        $this->assertNotNull( Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
+        $this->assertNotNull(Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
         $this->assertEquals($page3->full_slug, Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
-
     }
-
 }

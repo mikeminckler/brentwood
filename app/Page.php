@@ -15,6 +15,7 @@ use App\PageAccess;
 use App\AppendAttributesTrait;
 use App\VersioningTrait;
 use App\HasContentElementsTrait;
+use App\SlugTrait;
 
 use App\Events\PageSaved;
 
@@ -24,15 +25,16 @@ class Page extends Model
     use AppendAttributesTrait;
     use VersioningTrait;
     use HasContentElementsTrait;
+    use SlugTrait;
 
     protected $dates = ['publish_at'];
     protected $with = ['pages'];
 
     public $append_attributes = [
         'editable',
-        'full_slug', 
-        'can_be_published', 
-        'content_elements', 
+        'full_slug',
+        'can_be_published',
+        'content_elements',
         'preview_content_elements',
         'footer_fg_image',
         'footer_bg_image',
@@ -40,7 +42,7 @@ class Page extends Model
         'type',
     ];
 
-    public function savePage($id = null, $input) 
+    public function savePage($id = null, $input)
     {
         $home_page = false;
         if ($id) {
@@ -92,15 +94,15 @@ class Page extends Model
         }
     }
 
-    public function pages() 
+    public function pages()
     {
-        return $this->hasMany(Page::class, 'parent_page_id');   
+        return $this->hasMany(Page::class, 'parent_page_id');
     }
 
-    public function getFullSlugAttribute() 
+    public function getFullSlugAttribute()
     {
         if (!$this->slug) {
-            $slug = Str::kebab($this->name);   
+            $slug = Str::kebab($this->name);
         } else {
             $slug = $this->slug;
         }
@@ -119,56 +121,39 @@ class Page extends Model
         return $slug;
     }
 
-    public static function findByFullSlug($slug) 
-    {
-        return Page::all()->filter(function($page) use($slug) {
-            return $page->full_slug === $slug;
-        })->last();
-    }
-
-    public function getSlugAttribute($value) 
-    {
-        if ($value) {
-            return $value;
-        }   
-
-        return Str::kebab($this->name);
-    }
-
-    public static function publishScheduledContent() 
+    public static function publishScheduledContent()
     {
         $pages = Version::whereNull('published_at')
-            ->whereHasMorph('versionable', ['App\Page', 'App\Blog'], function($query) {
-                $query->where(function($query) {
+            ->whereHasMorph('versionable', ['App\Page', 'App\Blog'], function ($query) {
+                $query->where(function ($query) {
                     $query->whereNotNull('publish_at')
                           ->where('publish_at', '<', now());
                 })
-                ->orWhereHas('contentElements', function($query) {
+                ->orWhereHas('contentElements', function ($query) {
                     $query->whereNotNull('publish_at')
                           ->where('publish_at', '<', now());
                 });
             })
             ->get()
-            ->map(function($version) {
+            ->map(function ($version) {
                 return $version->versionable;
             })
-            ->each(function($page) {
+            ->each(function ($page) {
                 $page->publish();
             });
-
     }
 
-    public function footerFgFileUpload() 
+    public function footerFgFileUpload()
     {
-        return $this->belongsTo(FileUpload::class, 'footer_fg_file_upload_id');   
+        return $this->belongsTo(FileUpload::class, 'footer_fg_file_upload_id');
     }
 
-    public function footerBgFileUpload() 
+    public function footerBgFileUpload()
     {
-        return $this->belongsTo(FileUpload::class, 'footer_bg_file_upload_id');   
+        return $this->belongsTo(FileUpload::class, 'footer_bg_file_upload_id');
     }
 
-    public function getFooterFgAttribute() 
+    public function getFooterFgAttribute()
     {
         if ($this->footerFgFileUpload) {
             return $this->footerFgFileUpload;
@@ -181,7 +166,7 @@ class Page extends Model
         }
     }
 
-    public function getFooterBgAttribute() 
+    public function getFooterBgAttribute()
     {
         if ($this->footerBgFileUpload) {
             return $this->footerBgFileUpload;
@@ -194,7 +179,7 @@ class Page extends Model
         }
     }
 
-    public function getFooterColorAttribute($value) 
+    public function getFooterColorAttribute($value)
     {
         if ($value) {
             return $value;
@@ -210,7 +195,6 @@ class Page extends Model
     public function getFooterFgImageAttribute()
     {
         return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-footer-fg-image', function () {
-
             if ($this->footer_fg) {
                 if (Storage::disk('public')->exists('/photos/footers/fg-'.$this->footer_fg->name)) {
                     return '/photos/footers/fg-'.$this->footer_fg->name;
@@ -218,14 +202,12 @@ class Page extends Model
                     return $this->createImage($this->footer_fg, 'fg');
                 }
             }
-
         });
     }
 
     public function getFooterBgImageAttribute()
     {
         return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-footer-bg-image', function () {
-
             if ($this->footer_bg) {
                 if (Storage::disk('public')->exists('/photos/footers/bg-'.$this->footer_bg->name)) {
                     return '/photos/footers/bg-'.$this->footer_bg->name;
@@ -233,7 +215,6 @@ class Page extends Model
                     return $this->createImage($this->footer_bg, 'bg');
                 }
             }
-
         });
     }
 
@@ -249,7 +230,7 @@ class Page extends Model
                 $constraint->aspectRatio();
                 $constraint->upsize();
             });
-            //})->encode('png');
+        //})->encode('png');
 
         $file_name = '/photos/footers/'.$prefix.'-'.$file_upload->name;
         Storage::disk('public')->put($file_name, $image->stream());
@@ -257,7 +238,7 @@ class Page extends Model
         return $file_name;
     }
 
-    public function getSubMenuAttribute() 
+    public function getSubMenuAttribute()
     {
         if ($this->id !== 1) {
             return $this->pages;
@@ -281,9 +262,8 @@ class Page extends Model
         return $this->hasMany(PageAccess::class);
     }
 
-    public function getEditableAttribute() 
+    public function getEditableAttribute()
     {
-
         if (!auth()->check()) {
             return false;
         }
@@ -297,7 +277,6 @@ class Page extends Model
 
     public function appendRecursive($attributes = null)
     {
-
         if (!$attributes) {
             $attribute = $this->append_attributes;
         }
@@ -311,12 +290,10 @@ class Page extends Model
         foreach ($this->pages as $page) {
             $page->appendRecursive($attributes);
         }
-
     }
 
     public function sortPages(Page $page, $input)
     {
-        
         $old_parent_page = $page->parentPage;
 
         $page->sort_order = Arr::get($input, 'sort_order');
@@ -329,15 +306,13 @@ class Page extends Model
         if ($old_parent_page->id != Arr::get($input, 'parent_page_id')) {
             $this->reorderPages($old_parent_page, $page);
         }
-
     }
 
     protected function reorderPages(Page $parent_page, Page $page)
     {
-        
         $pages = $parent_page->pages;
 
-        $pages = $pages->reject(function($p) use($page){
+        $pages = $pages->reject(function ($p) use ($page) {
             return $p->id === $page->id;
         });
 
@@ -345,14 +320,13 @@ class Page extends Model
             $pages = $pages->push($page);
         }
 
-        $pages = $pages->sortBy(function($p) {
+        $pages = $pages->sortBy(function ($p) {
             return $p->sort_order;
         })
         ->values()
-        ->each( function ($p, $index) {
+        ->each(function ($p, $index) {
             $p->sort_order = $index + 1;
             $p->save();
         });
     }
-
 }

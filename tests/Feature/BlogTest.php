@@ -9,13 +9,13 @@ use Tests\TestCase;
 use Illuminate\Support\Arr;
 
 use App\Blog;
+use App\User;
 
 use Tests\Feature\SoftDeletesTestTrait;
 use Tests\Feature\VersioningTestTrait;
 
 class BlogTest extends TestCase
 {
-
     use WithFaker;
     use SoftDeletesTestTrait;
     use VersioningTestTrait;
@@ -38,29 +38,25 @@ class BlogTest extends TestCase
     /** @test **/
     public function the_blog_index_can_be_loaded()
     {
-        $blog = factory(Blog::class)->create();
+        $this->get(route('blogs.index'))
+             ->assertRedirect('/login');
 
-        $this->visit( route('blogs.index'))
-            ->assertStatus(401);
+        $this->signIn(factory(User::class)->create());
 
-        $this->signIn( factory(User::class)->create());
-
-        $this->visit( route('blogs.index'))
-            ->assertStatus(403);
+        $this->withoutExceptionHandling();
+        $this->get(route('blogs.index'))
+             ->assertRedirect('/');
 
         $this->signInAdmin();
 
-        $this->visit( route('blogs.index'))
-            ->assertSucessful();
+        $this->get(route('blogs.index'))
+             ->assertSuccessful();
     }
-
-
 
     /** @test **/
     public function a_blog_article_can_be_created()
     {
-
-        $input = factory(Blog::class)->raw();   
+        $input = factory(Blog::class)->raw();
 
         $this->postJson(route('blogs.store'), [])
             ->assertStatus(401);
@@ -82,14 +78,14 @@ class BlogTest extends TestCase
 
         $blog = Blog::all()->last();
 
-        $this->assertEquals( Arr::get($input, 'name'), $blog->name);
+        $this->assertEquals(Arr::get($input, 'name'), $blog->name);
     }
 
     /** @test **/
     public function a_blog_can_be_updated()
     {
         $blog = factory(Blog::class)->create();
-        $input = factory(Blog::class)->raw();   
+        $input = factory(Blog::class)->raw();
 
         $this->postJson(route('blogs.update', ['id' => $blog->id]), [])
             ->assertStatus(401);
@@ -111,6 +107,6 @@ class BlogTest extends TestCase
 
         $blog->refresh();
 
-        $this->assertEquals( Arr::get($input, 'name'), $blog->name);
+        $this->assertEquals(Arr::get($input, 'name'), $blog->name);
     }
 }

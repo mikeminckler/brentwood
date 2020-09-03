@@ -25,13 +25,13 @@ class PagesController extends Controller
 
     protected function findPage($path)
     {
-        return Page::findByFullSlug($path);
+        return (new Page)->findByFullSlug($path);
     }
 
     /**
      * This returns a page tree for the editing side bar
      */
-    public function index() 
+    public function index()
     {
         $page = Page::findOrFail(1);
         $page->appendRecursive(['full_slug', 'editable', 'can_be_published']);
@@ -43,7 +43,6 @@ class PagesController extends Controller
 
     public function sortPage($id)
     {
-
         if (!auth()->check()) {
             abort(401);
         }
@@ -64,7 +63,6 @@ class PagesController extends Controller
         return response()->json([
             'success' => 'Page Saved',
         ]);
-
     }
 
     public function remove($id)
@@ -92,7 +90,5 @@ class PagesController extends Controller
         $page->delete();
 
         return response()->json(['success' => 'Page Removed']);
-
     }
-
 }

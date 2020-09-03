@@ -7,38 +7,36 @@ use App\Events\PageDraftCreated;
 
 trait VersioningTrait
 {
-
-    public function versions() 
+    public function versions()
     {
-        return $this->morphMany(Version::class, 'versionable');   
+        return $this->morphMany(Version::class, 'versionable');
     }
 
-    public function publishedVersion() 
+    public function publishedVersion()
     {
-        return $this->belongsTo(Version::class, 'published_version_id');   
+        return $this->belongsTo(Version::class, 'published_version_id');
     }
 
-    public function getPublishedAtAttribute() 
+    public function getPublishedAtAttribute()
     {
-        return optional($this->publishedVersion)->published_at;   
+        return optional($this->publishedVersion)->published_at;
     }
 
-    public function publish() 
+    public function publish()
     {
-
         $publish_at_content_elements = $this->contentElements()
                                             ->where('publish_at', '<', now())
-                                            ->whereHas('version', function($query) {
+                                            ->whereHas('version', function ($query) {
                                                 $query->whereNull('published_at');
                                             })
                                             ->get();
 
         $new_draft_content_elements = $this->contentElements()
-                                        ->whereHas('version', function($query) {
+                                        ->whereHas('version', function ($query) {
                                             $query->whereNull('published_at');
                                         })
                                         ->get()
-                                        ->filter(function($content_element) use ($publish_at_content_elements) {
+                                        ->filter(function ($content_element) use ($publish_at_content_elements) {
                                             return !$publish_at_content_elements->contains('id', $content_element->id);
                                         });
 
@@ -62,7 +60,7 @@ trait VersioningTrait
         return $this;
     }
 
-    public function getDraftVersion() 
+    public function getDraftVersion()
     {
         $draft_version = $this->versions()->whereNull('published_at')->first();
         if ($draft_version) {
@@ -80,14 +78,13 @@ trait VersioningTrait
         }
     }
 
-    public function getDraftVersionIdAttribute() 
+    public function getDraftVersionIdAttribute()
     {
-        return $this->getDraftVersion()->id; 
+        return $this->getDraftVersion()->id;
     }
 
-    public function getCanBePublishedAttribute() 
+    public function getCanBePublishedAttribute()
     {
-
         if (!auth()->check()) {
             return false;
         }
@@ -100,9 +97,8 @@ trait VersioningTrait
             return true;
         }
 
-        return $this->content_elements->filter(function($content_element) {
-                return $content_element->published_at ? false : true;
-            })->count() ? true : false;
+        return $this->content_elements->filter(function ($content_element) {
+            return $content_element->published_at ? false : true;
+        })->count() ? true : false;
     }
-
 }

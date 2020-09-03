@@ -20,7 +20,6 @@ Route::post('logout', 'Auth\LoginController@logout')->name('logout');
 Route::get('/pages', 'PagesController@index')->name('pages.index');
 
 Route::group(['middleware' => ['auth']], function () {
-
     Route::get('/users', 'UsersController@index')->name('users.index');
     Route::get('/users/load', 'UsersController@load')->name('users.load');
     Route::post('/users/{id}', 'UsersController@store')->name('users.update')->where('id', '\d+');
@@ -60,6 +59,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/file-uploads/pre-validate', 'FileUploadsController@preValidateFile')->name('file-uploads.pre-validate');
     Route::post('/file-uploads/{id}/destroy', 'FileUploadsController@destroy')->name('file-uploads.destroy')->where('id', '\d+');
 
+    Route::get('/blogs', 'BlogsController@index')->name('blogs.index');
     Route::post('/blogs/create', 'BlogsController@store')->name('blogs.store');
     Route::post('/blogs/{id}', 'BlogsController@store')->name('blogs.update')->where('id', '\d+');
     Route::post('/blogs/{id}/publish', 'BlogsController@publish')->name('blogs.publish')->where('id', '\d+');
@@ -67,4 +67,5 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/blogs/{id}/restore', 'BlogsController@restore')->name('blogs.restore')->where('id', '\d+');
 });
 
+Route::get('/blogs/{page}', 'BlogsController@load')->name('blogs.load')->where('page', '.*');
 Route::get('{page}', 'PagesController@load')->name('pages.load')->where('page', '.*');

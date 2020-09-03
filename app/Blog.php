@@ -7,29 +7,31 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Events\BlogSaved;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use App\HasContentElementsTrait;
 use App\AppendAttributesTrait;
 use App\VersioningTrait;
+use App\SlugTrait;
 
 class Blog extends Model
 {
-
     use SoftDeletes;
     use AppendAttributesTrait;
     use HasContentElementsTrait;
     use VersioningTrait;
+    use SlugTrait;
 
     protected $dates = ['publish_at'];
 
     public $append_attributes = [
-        //'full_slug', 
-        //'can_be_published', 
-        'content_elements', 
+        //'full_slug',
+        //'can_be_published',
+        'content_elements',
         'preview_content_elements',
         'type',
     ];
 
-    public function savePage($id = null, $input) 
+    public function savePage($id = null, $input)
     {
         if ($id) {
             $blog = Blog::findOrFail($id);
@@ -49,5 +51,10 @@ class Blog extends Model
         broadcast(new BlogSaved($blog))->toOthers();
 
         return $blog;
+    }
+
+    public function getFullSlugAttribute()
+    {
+        return 'blogs/'.Str::kebab($this->slug);
     }
 }

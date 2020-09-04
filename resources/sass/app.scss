@@ -312,6 +312,16 @@ button, .button {
     transform: rotate(90deg);
 }
 
+/* SIDE MENU */
+
+.side-menu-link {
+    @apply flex items-center text-primary cursor-pointer py-1; 
+}
+
+.side-menu-link:hover {
+    @apply bg-yellow-100;
+}
+
 /* MENU */
 
 .sub-menu {

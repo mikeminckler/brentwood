@@ -22,13 +22,7 @@
                     <div class="flex-1">
                         <page-tree :sort="true" :expanded="true" :show-changes="true" max-height="100%"></page-tree>
                     </div>
-                    <div class="p-4 sticky bottom-0 bg-gray-100 shadow z-3">
-                        <div class=""><a href="/users">User Management</a></div>
-                        <div class=""><a href="/page-accesses">Page Access</a></div>
-                        <div class=""><a href="/roles">Role Management</a></div>
-
-                        <div class="">@{{ $store.state.wsState }}</div>
-                    </div>
+                    @include ('side-menu')
                 </div>
             </div>
         @endif

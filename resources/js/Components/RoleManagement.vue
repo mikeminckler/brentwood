@@ -6,7 +6,7 @@
             <h1>Roles</h1>
 
             <div class="">
-                <div class="flex link" @click="createRole">
+                <div class="flex link mb-4" @click="createRole">
                     <div class="icon"><i class="fas fa-plus"></i></div>
                     <div class="ml-2">Create Role</div>
                 </div>

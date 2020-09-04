@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 
 use App\Blog;
 use App\User;
+use App\ContentElement;
 
 use Tests\Feature\SoftDeletesTestTrait;
 use Tests\Feature\VersioningTestTrait;
@@ -108,5 +109,28 @@ class BlogTest extends TestCase
         $blog->refresh();
 
         $this->assertEquals(Arr::get($input, 'name'), $blog->name);
+    }
+
+    /** @test **/
+    public function blogs_can_be_loaded_for_pagination()
+    {
+        $content_element = factory(ContentElement::class)->states('blog', 'text-block')->create();
+        $blog = $content_element->blogs->first();
+
+        $this->json('GET', route('blogs.index'))
+            ->assertStatus(401);
+
+        $this->signIn(factory(User::class)->create());
+
+        $this->json('GET', route('blogs.index'))
+            ->assertStatus(403);
+
+        $this->signInAdmin();
+
+        $this->json('GET', route('blogs.index'))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'body' => $content_element->content->body,
+             ]);
     }
 }

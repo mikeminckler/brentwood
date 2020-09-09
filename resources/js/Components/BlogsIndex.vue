@@ -1,24 +1,22 @@
 <template>
 
-    <div class="">
+    <div class="mt-8">
 
-        <h1>Blogs</h1>
+        <div class="" v-if="$store.state.page.id < 1">
 
-        <div class="flex link mb-4" @click="createBlog">
-            <div class="icon"><i class="fas fa-plus"></i></div>
-            <div class="ml-2">Create Blog</div>
-        </div>
+            <h1>Blogs</h1>
 
-        <div class="">
-            <div class="" v-for="(blog, index) in blogs" v-if="!selectedBlog">
-                <div class="" @click="selectedBlog = blog">{{ blog.name }}</div>
+            <div class="flex link my-4" @click="createBlog()">
+                <div class="icon"><i class="fas fa-plus"></i></div>
+                <div class="ml-2">Create Blog</div>
+            </div>
+
+            <div class="">
+                <paginator resource="blogs" @selected="$store.dispatch('setPage', $event)"></paginator>
             </div>
         </div>
 
-        <div class="" v-if="selectedBlog">
-            <remove @remove="selectedBlog = null"></remove>
-            <div class="form"><input type="text" v-model="blog.name" @enter="saveBlog" @focus="$event.target.select()" @change="saveBlog()" /></div>
-        </div>
+        <blog v-if="$store.state.page.id > 0"></blog>
 
     </div>
 
@@ -27,7 +25,6 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback.js';
-    
 
     export default {
 
@@ -35,13 +32,12 @@
         mixins: [Feedback],
 
         components: {
-            'remove': () => import(/* webpackChunkName: "remove" */ '@/Components/Remove'),
+            'blog': () => import(/* webpackChunkName: "blog" */ '@/Forms/Blog.vue'),
+            'paginator': () => import(/* webpackChunkName: "paginator" */ '@/Components/Paginator.vue'),
         },
 
         data() {
             return {
-                blogs: [],
-                selectedBlog: null,
             }
         },
 
@@ -52,18 +48,9 @@
         },
 
         mounted() {
-            this.loadBlogs();
         },
 
         methods: {
-
-            loadBlogs: function() {
-                this.$http.get('/blogs').then( response => {
-                    this.blogs = response.data.data;
-                }, error => {
-                    this.processErrors(error.response);
-                })
-            },
 
             createBlog: function() {
 
@@ -76,40 +63,11 @@
 
                 this.$http.post('/blogs/create', input).then( response => {
                     this.processSuccess(response);
-                    this.selectedBlog = response.data.page;
+                    this.$store.dispatch('setPage', response.data.page);
                 }, error => {
                     this.processErrors(error.response);
                 });
             },
-
-            saveBlog: _.debounce(function() {
-
-                let input = {
-                    name: this.page.name,
-                    unlisted: this.page.unlisted ? true : false,
-                    sort_order: this.page.sort_order,
-                    content_elements: this.page.content_elements,
-                    publish_at: this.page.publish_at,
-                };
-
-                this.$store.dispatch('startSaving', 'blog');
-                this.$store.dispatch('setPageLoading', true);
-
-                this.$http.post('/blogs/' + this.blog.id, input).then( response => {
-
-                    this.processSuccess(response);
-                    this.$store.dispatch('completeSaving', 'blog');
-
-                    this.$nextTick(() => {
-                        this.$store.dispatch('setPageLoading', false);
-                    });
-                }, error => {
-                    this.processErrors(error.response);
-                    this.$store.dispatch('completeSaving', 'blog');
-                });
-
-            }, 750),
-
 
         },
 

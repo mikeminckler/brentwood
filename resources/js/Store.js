@@ -22,6 +22,7 @@ const store = new Vuex.Store({
             unlisted: 0,
             sort_order: 0,
             content_elements: [],
+            type: '',
         },
         pageTree: {},
         youtubeReady: false,
@@ -58,6 +59,19 @@ const store = new Vuex.Store({
 
         setPage(state, page) {
             state.page = page;
+        },
+
+        resetPage(state) {
+            publish_at: '',
+            state.page = {
+                id: 0,
+                name: '',
+                parent_page_id: '',
+                unlisted: 0,
+                sort_order: 0,
+                content_elements: [],
+                publish_at: '',
+            };
         },
 
         setPageTree(state, pageTree) {
@@ -135,6 +149,10 @@ const store = new Vuex.Store({
 
         setPage({ commit, state }, page) {
             commit('setPage', page);
+        },
+
+        resetPage({ commit, state }) {
+            commit('resetPage');
         },
 
         setPageTree({ commit, state }, pageTree) {

@@ -1,10 +1,11 @@
 <template>
 
-    <div class="p-8">
+    <div class="mt-8">
+
         <h1>User Management</h1>
 
 
-        <div class="flex">
+        <div class="flex my-4">
 
             <div class="flex-1">
 

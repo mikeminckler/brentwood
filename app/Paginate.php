@@ -16,7 +16,7 @@ class Paginate
             }
         });
 
-        $page = request()->input('page', 1);
+        $page = request('page', 1);
         $requested_number = request('count', 10);
         session()->put('paginate_count', $requested_number);
         $items = new Paginator(

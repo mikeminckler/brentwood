@@ -2,17 +2,22 @@
 
     <div class="relative w-full z-20 flex items-center justify-center" v-if="editing && page">
 
-        <div class="fixed top-0 right-0" v-if="isPreview">
-        </div>
+        <div class="fixed top-0 right-0" v-if="isPreview"></div>
 
         <div class="w-full max-w-6xl flex items-center bg-gray-200 p-1 shadow relative" v-if="!isPreview">
 
-            <div class="button mx-2" @click="createPage()" v-if="page.id > 1" title="Create Page Below">
-                <div class=""><i class="fas fa-file-medical"></i></div>
+            <div class="" v-if="showNew">
+                <div class="button mx-2" @click="createPage()" v-if="page.id > 1" title="Create Page Below">
+                    <div class=""><i class="fas fa-file-medical"></i></div>
+                </div>
+
+                <div class="button mx-2" @click="createSubPage()" title="Create Sub Page">
+                    <div class=""><i class="fas fa-file-download"></i></div>
+                </div>
             </div>
 
-            <div class="button mx-2" @click="createSubPage()" title="Create Sub Page">
-                <div class=""><i class="fas fa-file-download"></i></div>
+            <div class="" v-if="showClose">
+                <div class="remove-icon" @click="$emit('close')"><i class="fas fa-times"></i></div>
             </div>
 
             <div class="button mx-2" @click="preview()" title="Preview">
@@ -67,7 +72,7 @@
             </div>
 
             <div class="flex px-2 mx-2 items-center cursor-pointer hover:bg-primary hover:text-white" @click="removePage()" v-if="page.id !== 1" title="Delete Page">
-                <div class="text-xl"><i class="fas fa-times"></i></div>
+                <div class="text-xl"><i class="fas fa-trash-alt"></i></div>
             </div>
 
         </div>
@@ -97,7 +102,7 @@
     export default {
 
         mixins: [Feedback],
-        props: ['currentPage'],
+        props: ['resource', 'showNew', 'showClose'],
         data() {
             return {
                 showPageVersions: false,
@@ -148,7 +153,6 @@
              * and set it as the page to edit so that the pages properties 
              * will be reactive
              */
-            this.$store.dispatch('setPage', this.currentPage);
 
             const savePageEvent = event => {
                 this.savePage();
@@ -210,7 +214,7 @@
                     content_elements: [],
                 }
 
-                this.$http.post('/pages/create', input).then( response => {
+                this.$http.post('/' + this.resource + '/create', input).then( response => {
                     this.processSuccess(response);
                     window.location = response.data.page.full_slug;
                 }, error => {
@@ -228,7 +232,7 @@
                     content_elements: [],
                 }
 
-                this.$http.post('/pages/create', input).then( response => {
+                this.$http.post('/' + this.resource + '/create', input).then( response => {
                     this.processSuccess(response);
                     window.location = response.data.page.full_slug;
                 }, error => {
@@ -254,7 +258,7 @@
                 this.$store.dispatch('startSaving', 'page');
                 this.$store.dispatch('setPageLoading', true);
 
-                this.$http.post('/pages/' + this.page.id, input).then( response => {
+                this.$http.post('/' + this.resource + '/' + this.page.id, input).then( response => {
                     this.$eventer.$emit('refresh-page-tree');
 
                     this.$store.dispatch('setPage', response.data.page);
@@ -285,7 +289,7 @@
 
                     this.$store.dispatch('setPageLoading', true);
 
-                    this.$http.post('/pages/' + this.page.id + '/publish').then( response => {
+                    this.$http.post('/' + this.resource + '/' + this.page.id + '/publish').then( response => {
                         //location.reload();
                         console.log('SET PAGE AFTER PUBLISH');
                         this.$store.dispatch('setPage', response.data.page);
@@ -305,7 +309,7 @@
                 var answer = confirm('Are you sure you want to delete this page?');
                 if (answer == true) {
 
-                    this.$http.post('/pages/' + this.page.id + '/remove').then( response => {
+                    this.$http.post('/' + this.resource + '/' + this.page.id + '/remove').then( response => {
                         window.location.href = '/';
                         this.processSuccess(response);
                     }, error => {

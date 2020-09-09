@@ -39,7 +39,8 @@ class BlogsController extends Controller
         }
 
         if (request()->expectsJson()) {
-            return Paginate::create(Blog::all()->sortByDesc('id'));
+            $blogs = Blog::orderBy('id', 'desc')->get();
+            return Paginate::create($blogs);
         } else {
             return view('blogs.index');
         }

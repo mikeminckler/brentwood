@@ -335,6 +335,42 @@ button, .button {
     }
 }
 
+/* GRID */
+
+.grid {
+    display: grid;
+    grid-gap: 0;
+}
+
+div.cell {
+    @apply px-2 border-b border-l border-gray-500;
+}
+
+.grid-blogs {
+    grid-template-columns: 1fr auto;
+}
+
+.ignore {
+    display: contents;
+
+    > div {
+        @apply bg-gray-200;
+    }
+
+}
+
+.ignore:hover, .ignore:nth-child(even):hover {
+    > div {
+        @apply bg-white;
+    }
+}
+
+.ignore:nth-child(even) {
+    > div {
+        @apply bg-gray-100;
+    }
+}
+
 /* CONTENT */
 
 .text-block {

@@ -40,6 +40,7 @@ class Page extends Model
         'footer_bg_image',
         'sub_menu',
         'type',
+        'resource',
     ];
 
     public function savePage($id = null, $input)
@@ -243,36 +244,6 @@ class Page extends Model
         if ($this->id !== 1) {
             return $this->pages;
         }
-    }
-
-    public function createPageAccess($object)
-    {
-        $page_access = (new PageAccess)->savePageAccess($this, $object);
-        return $this;
-    }
-
-    public function removePageAccess($object)
-    {
-        $page_access = (new PageAccess)->removePageAccess($this, $object);
-        return $this;
-    }
-
-    public function pageAccesses()
-    {
-        return $this->hasMany(PageAccess::class);
-    }
-
-    public function getEditableAttribute()
-    {
-        if (!auth()->check()) {
-            return false;
-        }
-
-        if (!session()->has('editing')) {
-            return false;
-        }
-
-        return auth()->user()->can('update', $this);
     }
 
     public function appendRecursive($attributes = null)

@@ -15,7 +15,7 @@ class CreatePageAccessesTable extends Migration
     {
         Schema::create('page_accesses', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('page_id');
+            $table->morphs('pageable');
             $table->morphs('accessable');
             $table->timestamps();
         });

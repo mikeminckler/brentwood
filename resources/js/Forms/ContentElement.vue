@@ -5,6 +5,8 @@
         v-if="contentElement.id >= 1"
     >
 
+        <add-content-element v-if="!hideAddContent" :sort-order="contentElement.pivot.sort_order"></add-content-element>
+
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
             <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!contentElement.published_at"><i class="fas fa-clock"></i></div>
             <div class="content-element-icons" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
@@ -62,8 +64,6 @@
             </div>
         </expander>
 
-        <add-content-element :sort-order="contentElement.pivot.sort_order"></add-content-element>
-
     </div>
 
 </template>
@@ -77,7 +77,7 @@
 
         mixins: [Feedback, ContentElements],
 
-        props: ['contentElement', 'first'],
+        props: ['contentElement', 'first', 'hideAddContent'],
 
         components: {
             'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement'),

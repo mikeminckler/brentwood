@@ -17,20 +17,19 @@ class PageAccessTest extends TestCase
     /** @test **/
     public function the_page_access_index_can_be_loaded()
     {
-        $this->get( route('page-accesses.index'))
-             ->assertRedirect( route('login'));
+        $this->get(route('page-accesses.index'))
+             ->assertRedirect(route('login'));
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(factory(User::class)->create());
 
         $this->withoutExceptionHandling();
-        $this->get( route('page-accesses.index'))
+        $this->get(route('page-accesses.index'))
              ->assertRedirect('/');
 
         $this->signInAdmin();
 
-        $this->get( route('page-accesses.index'))
+        $this->get(route('page-accesses.index'))
             ->assertSuccessful();
-
     }
 
     /** @test **/
@@ -115,13 +114,14 @@ class PageAccessTest extends TestCase
         $page_access = $page->pageAccesses->last();
 
         $this->assertInstanceOf(PageAccess::class, $page_access);
-        $this->assertEquals($page->id, $page_access->page_id);
+        $this->assertEquals($page->id, $page_access->pageable_id);
+        $this->assertInstanceOf(get_class($page), $page_access->pageable);
         $this->assertEquals($role->id, $page_access->accessable->id);
 
         $this->json('GET', route('page-accesses.page', ['id' => $page->id]))
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(factory(User::class)->create());
 
         $this->json('GET', route('page-accesses.page', ['id' => $page->id]))
             ->assertStatus(403);
@@ -135,14 +135,11 @@ class PageAccessTest extends TestCase
                 'accessable_id' => $role->id,
                 'name' => $role->name,
              ]);
-
-
     }
 
     /** @test **/
     public function page_access_can_be_removed()
     {
-
         $page = factory(Page::class)->create();
         $role = factory(Role::class)->create();
 
@@ -154,13 +151,13 @@ class PageAccessTest extends TestCase
         $page_access = $page->pageAccesses->last();
 
         $this->assertInstanceOf(PageAccess::class, $page_access);
-        $this->assertEquals($page->id, $page_access->page_id);
+        $this->assertEquals($page->id, $page_access->pageable->id);
         $this->assertEquals($role->id, $page_access->accessable->id);
 
         $this->json('POST', route('page-accesses.destroy', ['id' => $page_access->id]))
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(factory(User::class)->create());
 
         $this->json('POST', route('page-accesses.destroy', ['id' => $page_access->id]))
             ->assertStatus(403);
@@ -172,6 +169,5 @@ class PageAccessTest extends TestCase
              ->assertJsonFragment(['success' => 'Page Access Removed']);
 
         $this->assertNull(PageAccess::find($page_access->id));
-        
     }
 }

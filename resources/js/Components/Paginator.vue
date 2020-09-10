@@ -174,7 +174,7 @@
             
                 this.startProcessing('Loading ' + this.$lodash.startCase(this.resource));
 
-                this.paginator.data = [];
+                //this.paginator.data = [];
 
                 if (this.terms) {
 

@@ -24,11 +24,13 @@ class Blog extends Model
     protected $dates = ['publish_at'];
 
     public $append_attributes = [
-        //'full_slug',
-        //'can_be_published',
+        'editable',
+        'full_slug',
+        'can_be_published',
         'content_elements',
         'preview_content_elements',
         'type',
+        'resource',
     ];
 
     public function savePage($id = null, $input)

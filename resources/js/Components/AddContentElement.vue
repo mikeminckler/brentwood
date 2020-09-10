@@ -53,7 +53,7 @@
 <script>
     export default {
 
-        props: ['sortOrder', 'expanded'],
+        props: ['sortOrder', 'alwaysShow'],
         data() {
             return {
                 show: false,
@@ -67,7 +67,7 @@
         },
 
         mounted() {
-            if (this.expanded) {
+            if (this.alwaysShow) {
                 this.show = true;
             }
         },
@@ -75,8 +75,10 @@
         methods: {
 
             add: function(type) {
-                this.show = false;
-                this.$eventer.$emit('add-content-element', {type: type, sortOrder: this.sortOrder + 1})
+                if (!this.alwaysShow) {
+                    this.show = false;
+                }
+                this.$eventer.$emit('add-content-element', {type: type, sortOrder: this.sortOrder})
             }
         },
 

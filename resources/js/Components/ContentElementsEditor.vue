@@ -13,13 +13,13 @@
                 @remove="removeContentElement(contentElement)"
                 @update="updateContentElement(contentElement, $event)"
                 :first="isFirst(contentElement)"
+                :hide-add-content="index === 0"
             >
             </form-content-element>
         </transition-group>
 
         <add-content-element 
-            v-if="!contentElements.length && $store.state.page.name !== 'Untitled Page'"
-            :expanded="true" 
+            :always-show="true" 
             :sort-order="contentElements.length"
         ></add-content-element>
 

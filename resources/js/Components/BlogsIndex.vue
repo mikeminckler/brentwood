@@ -12,11 +12,9 @@
             </div>
 
             <div class="">
-                <paginator resource="blogs" @selected="$store.dispatch('setPage', $event)"></paginator>
+                <paginator resource="blogs" @selected="editBlog($event)"></paginator>
             </div>
         </div>
-
-        <blog v-if="$store.state.page.id > 0"></blog>
 
     </div>
 
@@ -32,7 +30,6 @@
         mixins: [Feedback],
 
         components: {
-            'blog': () => import(/* webpackChunkName: "blog" */ '@/Forms/Blog.vue'),
             'paginator': () => import(/* webpackChunkName: "paginator" */ '@/Components/Paginator.vue'),
         },
 
@@ -68,6 +65,10 @@
                     this.processErrors(error.response);
                 });
             },
+
+            editBlog: function(blog) {
+                window.location.href = blog.full_slug;
+            }
 
         },
 

@@ -12,7 +12,6 @@ use App\User;
 
 class Role extends Model
 {
-
     use SearchTrait;
 
     protected $appends = ['search_label'];
@@ -72,14 +71,16 @@ class Role extends Model
         return $this;
     }
 
-    public function canEditPage(Page $page)
+    public function canEditPage($pageable)
     {
         return $this->pageAccesses()
             ->get()
-            ->contains('page_id', $page->id);
+            ->contains(function ($page_access) use ($pageable) {
+                return $page_access->pageable_id === $pageable->id && $page_access->pageable_type == get_class($pageable);
+            });
     }
 
-    public function users() 
+    public function users()
     {
         return $this->belongsToMany(User::class);
     }

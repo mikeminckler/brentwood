@@ -22,7 +22,7 @@ const store = new Vuex.Store({
             unlisted: 0,
             sort_order: 0,
             content_elements: [],
-            type: '',
+            type: null,
         },
         pageTree: {},
         youtubeReady: false,
@@ -148,7 +148,9 @@ const store = new Vuex.Store({
         },
 
         setPage({ commit, state }, page) {
-            commit('setPage', page);
+            if (page.type) {
+                commit('setPage', page);
+            }
         },
 
         resetPage({ commit, state }) {

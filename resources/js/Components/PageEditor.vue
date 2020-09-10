@@ -6,7 +6,7 @@
 
         <div class="w-full max-w-6xl flex items-center bg-gray-200 p-1 shadow relative" v-if="!isPreview">
 
-            <div class="" v-if="showNew">
+            <div class="" v-if="page.type === 'page'">
                 <div class="button mx-2" @click="createPage()" v-if="page.id > 1" title="Create Page Below">
                     <div class=""><i class="fas fa-file-medical"></i></div>
                 </div>
@@ -14,10 +14,6 @@
                 <div class="button mx-2" @click="createSubPage()" title="Create Sub Page">
                     <div class=""><i class="fas fa-file-download"></i></div>
                 </div>
-            </div>
-
-            <div class="" v-if="showClose">
-                <div class="remove-icon" @click="$emit('close')"><i class="fas fa-times"></i></div>
             </div>
 
             <div class="button mx-2" @click="preview()" title="Preview">
@@ -102,7 +98,7 @@
     export default {
 
         mixins: [Feedback],
-        props: ['resource', 'showNew', 'showClose'],
+        props: ['currentPage', 'resource'],
         data() {
             return {
                 showPageVersions: false,
@@ -153,6 +149,10 @@
              * and set it as the page to edit so that the pages properties 
              * will be reactive
              */
+
+            if (this.currentPage) {
+                this.$store.dispatch('setPage', this.currentPage);
+            }
 
             const savePageEvent = event => {
                 this.savePage();

@@ -5,7 +5,7 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\ModelNotFoundException;      
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use App\User;
 use App\Role;
@@ -81,7 +81,7 @@ class User extends Authenticatable
             $user->roles()->detach();
             if (Arr::get($input, 'roles')) {
                 foreach (Arr::get($input, 'roles') as $role_data) {
-                    $user->addRole( Role::findOrFail(Arr::get($role_data, 'id')));
+                    $user->addRole(Role::findOrFail(Arr::get($role_data, 'id')));
                 }
             }
         }
@@ -133,9 +133,8 @@ class User extends Authenticatable
         return $this;
     }
 
-    public function hasRole($role) 
+    public function hasRole($role)
     {
-
         if (is_int($role)) {
             $role = Role::findOrFail($role);
         }
@@ -161,7 +160,7 @@ class User extends Authenticatable
         return $this->morphMany(FileUpload::class, 'fileable');
     }
 
-    public static function createOrUpdateFromGoogle(SocialiteUser $data) 
+    public static function createOrUpdateFromGoogle(SocialiteUser $data)
     {
         $validator = Validator::make([
             'id' => $data->getId(),
@@ -188,12 +187,10 @@ class User extends Authenticatable
         $user->save();
 
         return $user;
-
     }
 
-    public function setGroupsFromGoogle() 
+    public function setGroupsFromGoogle()
     {
-        
         $client = new Google_Client();
         $client->setScopes(Google_Service_Directory::ADMIN_DIRECTORY_GROUP_READONLY);
         $client->setAuthConfig(base_path('service.json'));
@@ -234,29 +231,28 @@ class User extends Authenticatable
         return $this;
     }
 
-    public function canEditPage(Page $page)
+    public function canEditPage($pageable)
     {
         if ($this->hasRole('admin')) {
             return true;
         }
 
-        return cache()->tags([cache_name($this), cache_name($page)])->rememberForever(cache_name($this).'-can-access-'.$page->id, function () use ($page) {
-            $page_accesses = $this->pageAccesses;
+        //return cache()->tags([cache_name($this), cache_name($pageable)])->rememberForever(cache_name($this).'-can-access-'.cache_name($pageable), function () use ($pageable) {
+        $page_accesses = $this->pageAccesses;
 
-            $this->roles->each(function ($role) use ($page_accesses) {
-                $role->pageAccesses()->get()->each(function ($pa) use ($page_accesses) {
-                    $page_accesses->push($pa);
-                });
+        $this->roles->each(function ($role) use ($page_accesses) {
+            $role->pageAccesses()->get()->each(function ($pa) use ($page_accesses) {
+                $page_accesses->push($pa);
             });
-
-            $page_accesses = $page_accesses->unique(function ($pa) {
-                return $pa->page->id;
-            });
-
-            if ($page_accesses->contains('page_id', $page->id)) {
-                return true;
-            }
-            return false;
         });
+
+        $page_accesses = $page_accesses->unique(function ($pa) {
+            return class_basename($pa->pageable).$pa->pageable->id;
+        });
+
+        return $page_accesses->contains(function ($page_access) use ($pageable) {
+            return $page_access->pageable_id === $pageable->id && $page_access->pageable_type === get_class($pageable);
+        });
+        //});
     }
 }

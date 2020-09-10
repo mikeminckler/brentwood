@@ -63,7 +63,7 @@ class BlogPolicy
      */
     public function update(User $user, Blog $blog)
     {
-        //
+        return $user->canEditPage($blog);
     }
 
     /**

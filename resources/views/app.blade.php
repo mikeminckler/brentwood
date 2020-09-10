@@ -32,7 +32,7 @@
             <div id="header" class="sticky top-0 z-10 {{ optional($page ?? '')->editable && !request('preview') ? 'px-12' : '' }}">
 
                 @if (optional($page ?? '')->editable)
-                    <page-editor resource="pages" :show-new="true"></page-editor>
+                    <page-editor :current-page='@json($page ?? '')' resource="{{ $page ?  $page->resource : '' }}"></page-editor>
                 @endif
 
                 <div class="flex justify-center relative">

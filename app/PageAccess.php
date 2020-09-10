@@ -4,8 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-use App\Page;
-
 class PageAccess extends Model
 {
     public function accessable()
@@ -13,28 +11,31 @@ class PageAccess extends Model
         return $this->morphTo();
     }
 
-    public function page()
+    public function pageable()
     {
-        return $this->belongsTo(Page::class);
+        return $this->morphTo();
     }
 
-    public function savePageAccess(Page $page, $object)
+    public function savePageAccess($pagable, $object)
     {
         $page_access = new PageAccess;
-        $page_access->page_id = $page->id;
+        $page_access->pageable_id = $pagable->id;
+        $page_access->pageable_type = get_class($pagable);
 
-        if (!$object->pageAccesses()->get()->contains('page_id', $page->id)) {
+        if (!$object->pageAccesses()->where('pageable_type', get_class($pagable))->get()->contains('pageable_id', $pagable->id)) {
             $object->pageAccesses()->save($page_access);
         }
 
-        cache()->tags([cache_name($page), cache_name($object)])->flush();
+        cache()->tags([cache_name($pagable), cache_name($object)])->flush();
         return $page_access;
     }
 
-    public function removePageAccess($page, $object)
+    public function removePageAccess($pagable, $object)
     {
-        $object->pageAccesses()->where('page_id', $page->id)->delete();
-        cache()->tags([cache_name($page), cache_name($object)])->flush();
+        $object->pageAccesses()->where('pageable_id', $pagable->id)
+                               ->where('pageable_type', get_class($pagable))
+                               ->delete();
+        cache()->tags([cache_name($pagable), cache_name($object)])->flush();
         return $object;
     }
 }

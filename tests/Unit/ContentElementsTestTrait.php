@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests\Unit;
+
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -9,12 +10,13 @@ use Illuminate\Support\Collection;
 use App\ContentElement;
 use App\TextBlock;
 use App\Page;
+use App\User;
+use App\Role;
 
 trait ContentElementsTestTrait
 {
-
-    protected abstract function getModel();
-    protected abstract function getClassname();
+    abstract protected function getModel();
+    abstract protected function getClassname();
 
     /** @test **/
     public function a_page_can_have_many_content_elements()
@@ -180,5 +182,83 @@ trait ContentElementsTestTrait
         $this->assertEquals(Str::kebab(class_basename($this->getModel())), $page->type);
     }
 
+    /** @test **/
+    public function a_page_has_a_resource_attribute()
+    {
+        $page = $this->getModel();
 
+        $this->assertNotNull($page->resource);
+        $this->assertEquals(Str::kebab(Str::plural(class_basename($this->getModel()))), $page->resource);
+    }
+
+    /** @test **/
+    public function a_page_has_many_page_accesses()
+    {
+        $page = $this->getModel();
+        $role = factory(Role::class)->create();
+
+        $page->createPageAccess($role);
+
+        $this->assertInstanceOf(Collection::class, $page->pageAccesses()->get());
+    }
+
+    /** @test **/
+    public function a_page_can_grant_access_to_a_role()
+    {
+        $page = $this->getModel();
+        $role = factory(Role::class)->create();
+
+        $page->createPageAccess($role);
+
+        $this->assertTrue($role->canEditPage($page));
+    }
+
+    /** @test **/
+    public function a_page_can_grant_access_to_a_user()
+    {
+        $page = $this->getModel();
+        $user = factory(User::class)->create();
+
+        $page->createPageAccess($user);
+
+        $this->assertTrue($user->canEditPage($page));
+    }
+
+    /** @test **/
+    public function a_page_can_check_if_it_is_editable()
+    {
+        $page = $this->getModel();
+
+        $this->assertNotNull($page->editable);
+        $this->assertFalse($page->editable);
+
+        $user1 = factory(User::class)->create();
+        $this->signIn($user1);
+
+        $this->assertFalse($page->editable);
+
+        $role = factory(Role::class)->create();
+        $page->createPageAccess($role);
+        $user1->addRole($role);
+
+        $user1->refresh();
+        $this->assertTrue($user1->hasRole($role));
+
+        $this->assertTrue($user1->canEditPage($page));
+        $this->assertFalse($page->editable);
+
+        session()->put('editing', true);
+        $this->assertTrue($page->editable);
+
+        $user2 = factory(User::class)->create();
+        $this->signIn($user2);
+
+        $this->assertFalse($page->editable);
+        $page->createPageAccess($user2);
+        $user2->refresh();
+        $this->assertTrue($page->editable);
+
+        $this->signInAdmin();
+        $this->assertTrue($page->editable);
+    }
 }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\SoftDeletesControllerTrait;
 use Illuminate\Support\Facades\Validator;
 
+use Illuminate\Support\Str;
+
 trait PagesControllerTrait
 {
     use SoftDeletesControllerTrait;
@@ -14,10 +16,11 @@ trait PagesControllerTrait
 
     private function loadPageAttributes($page)
     {
-        //if (session()->has('editing')) {
         $page->appendAttributes();
-        $page->load('versions');
-        //}
+
+        if (session()->has('editing')) {
+            $page->load('versions');
+        }
 
         return $page;
     }
@@ -145,4 +148,66 @@ trait PagesControllerTrait
 
     }
      */
+
+    public function unlist($id)
+    {
+        if (!auth()->check()) {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'You do not have permission to hide that page'], 403);
+            }
+            return redirect('/')->with(['error' => 'You do not have permission to hide that page']);
+        }
+
+        $page = $this->getModel()->findOrFail($id);
+
+        if (!auth()->user()->can('update', $page)) {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'You do not have permission to hide that page'], 403);
+            }
+            return redirect('/')->with(['error' => 'You do not have permission to hide that page']);
+        }
+
+        $page->unlisted = 1;
+        $page->save();
+       
+        $page->refresh();
+
+        $page = $this->loadPageAttributes($page);
+
+        return response()->json([
+            'success' => Str::title(class_basename($page)).' Hidden',
+            $page->type => $page,
+        ]);
+    }
+
+    public function reveal($id)
+    {
+        if (!auth()->check()) {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'You do not have permission to unhide that page'], 403);
+            }
+            return redirect('/')->with(['error' => 'You do not have permission to unhide that page']);
+        }
+
+        $page = $this->getModel()->findOrFail($id);
+
+        if (!auth()->user()->can('update', $page)) {
+            if (request()->expectsJson()) {
+                return response()->json(['error' => 'You do not have permission to unhide that page'], 403);
+            }
+            return redirect('/')->with(['error' => 'You do not have permission to unhide that page']);
+        }
+
+        $page->unlisted = 0;
+        $page->save();
+        
+        $page->refresh();
+
+        $page = $this->loadPageAttributes($page);
+
+        return response()->json([
+            'success' => Str::title(class_basename($page)).' Revealed',
+            $page->type => $page,
+        ]);
+    }
 }

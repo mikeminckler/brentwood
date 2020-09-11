@@ -23,7 +23,7 @@
             <div class="flex items-center flex-1">
                 <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
                 <div class="">
-                    <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> 
+                    <checkbox-input v-model="page.hide" @change="savePage()" label="Unlisted"></checkbox-input> 
                 </div>
 
             </div>
@@ -209,7 +209,7 @@
                 let input = {
                     name: 'Untitled Page',
                     parent_page_id: this.page.id,
-                    unlisted: false,
+                    hide: false,
                     sort_order: this.page.pages.length + 1,
                     content_elements: [],
                 }
@@ -227,7 +227,7 @@
                 let input = {
                     name: 'Untitled Page',
                     parent_page_id: this.page.parent_page_id,
-                    unlisted: false,
+                    hide: false,
                     sort_order: this.page.sort_order + 1,
                     content_elements: [],
                 }
@@ -246,7 +246,7 @@
                 let input = {
                     name: this.page.name,
                     parent_page_id: this.page.parent_page_id,
-                    unlisted: this.page.unlisted ? true : false,
+                    hide: this.page.hide ? true : false,
                     sort_order: this.page.sort_order,
                     content_elements: this.page.content_elements,
                     footer_fg_file_upload: this.page.footer_fg_file_upload,

@@ -9,6 +9,7 @@ use Faker\Generator as Faker;
 $factory->define(Blog::class, function (Faker $faker) {
     return [
         'name' => $faker->firstName.$faker->randomNumber(3),
+        'unlisted' => 0,
     ];
 });
 

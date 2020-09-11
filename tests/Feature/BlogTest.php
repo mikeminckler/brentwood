@@ -14,12 +14,14 @@ use App\ContentElement;
 
 use Tests\Feature\SoftDeletesTestTrait;
 use Tests\Feature\VersioningTestTrait;
+use Tests\Feature\PagesTestTrait;
 
 class BlogTest extends TestCase
 {
     use WithFaker;
     use SoftDeletesTestTrait;
     use VersioningTestTrait;
+    use PagesTestTrait;
 
     protected function getModel()
     {

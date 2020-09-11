@@ -28,7 +28,12 @@ class Page extends Model
     use SlugTrait;
 
     protected $dates = ['publish_at'];
+
     protected $with = ['pages'];
+    
+    protected $casts = [
+        'unlisted' => 'boolean',
+    ];
 
     public $append_attributes = [
         'editable',
@@ -41,6 +46,7 @@ class Page extends Model
         'sub_menu',
         'type',
         'resource',
+        'published_at',
     ];
 
     public function savePage($id = null, $input)

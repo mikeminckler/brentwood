@@ -44,6 +44,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/pages/{id}/remove', 'PagesController@remove')->name('pages.remove')->where('id', '\d+');
     Route::post('/pages/{id}/restore', 'PagesController@restore')->name('pages.restore')->where('id', '\d+');
     Route::post('/pages/{id}/sort', 'PagesController@sortPage')->name('pages.sort')->where('id', '\d+');
+    Route::post('/pages/{id}/unlist', 'PagesController@unlist')->name('pages.unlist')->where('id', '\d+');
+    Route::post('/pages/{id}/reveal', 'PagesController@reveal')->name('pages.reveal')->where('id', '\d+');
 
     Route::post('/content-elements/create', 'ContentElementsController@store')->name('content-elements.store');
     Route::post('/content-elements/{id}', 'ContentElementsController@store')->name('content-elements.update')->where('id', '\d+');
@@ -66,6 +68,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/blogs/{id}/publish', 'BlogsController@publish')->name('blogs.publish')->where('id', '\d+');
     Route::post('/blogs/{id}/remove', 'BlogsController@remove')->name('blogs.remove')->where('id', '\d+');
     Route::post('/blogs/{id}/restore', 'BlogsController@restore')->name('blogs.restore')->where('id', '\d+');
+    Route::post('/blogs/{id}/unlist', 'BlogsController@unlist')->name('blogs.unlist')->where('id', '\d+');
+    Route::post('/blogs/{id}/reveal', 'BlogsController@reveal')->name('blogs.reveal')->where('id', '\d+');
 });
 
 Route::get('/blogs/{page}', 'BlogsController@load')->name('blogs.load')->where('page', '.*');

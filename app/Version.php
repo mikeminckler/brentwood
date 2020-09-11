@@ -7,7 +7,9 @@ use Illuminate\Support\Arr;
 
 class Version extends Model
 {
-    public function saveVersion($id = null, $input) 
+    protected $dates = ['published_at'];
+
+    public function saveVersion($id = null, $input)
     {
         if ($id) {
             $version = Version::findOrFail($id);
@@ -23,16 +25,15 @@ class Version extends Model
         $version->save();
 
         cache()->tags([cache_name($version)])->flush();
-        return $version;    
-
+        return $version;
     }
 
-    public function versionable() 
+    public function versionable()
     {
         return $this->morphTo();
     }
 
-    public function publish() 
+    public function publish()
     {
         $this->published_at = now();
         $this->save();

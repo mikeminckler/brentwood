@@ -24,7 +24,6 @@ class PageValidation extends FormRequest
             return $this->user()->can('update', $page);
         }
         return $this->user()->can('create', Page::class);
-
     }
 
     /**
@@ -34,9 +33,7 @@ class PageValidation extends FormRequest
      */
     public function rules($id = null)
     {
-
         if ($id === 1) {
-
             return [
                 'name' => 'required|string',
                 'unlisted' => 'boolean',
@@ -51,9 +48,7 @@ class PageValidation extends FormRequest
                     }
                 ],
             ];
-        
         } else {
-        
             return [
                 'name' => 'required|string',
                 'unlisted' => 'boolean',
@@ -65,8 +60,6 @@ class PageValidation extends FormRequest
                     'min:1',
                 ],
             ];
-        
         }
-
     }
 }

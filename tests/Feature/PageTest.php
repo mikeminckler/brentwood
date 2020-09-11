@@ -25,13 +25,14 @@ use App\Events\PageSaved;
 
 use Tests\Feature\SoftDeletesTestTrait;
 use Tests\Feature\VersioningTestTrait;
+use Tests\Feature\PagesTestTrait;
 
 class PageTest extends TestCase
 {
-
     use WithFaker;
     use SoftDeletesTestTrait;
     use VersioningTestTrait;
+    use PagesTestTrait;
 
     protected function getModel()
     {
@@ -45,7 +46,7 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_be_created()
     {
-        $input = factory(Page::class)->raw();   
+        $input = factory(Page::class)->raw();
 
         $this->postJson(route('pages.store'), [])
             ->assertStatus(401);
@@ -70,9 +71,9 @@ class PageTest extends TestCase
 
         $page = Page::all()->last();
 
-        $this->assertEquals( Arr::get($input, 'name'), $page->name);
-        $this->assertEquals( Arr::get($input, 'parent_page_id'), $page->parent_page_id);
-        $this->assertEquals( Arr::get($input, 'sort_order'), $page->sort_order);
+        $this->assertEquals(Arr::get($input, 'name'), $page->name);
+        $this->assertEquals(Arr::get($input, 'parent_page_id'), $page->parent_page_id);
+        $this->assertEquals(Arr::get($input, 'sort_order'), $page->sort_order);
     }
 
     /** @test **/
@@ -110,7 +111,7 @@ class PageTest extends TestCase
     public function a_page_can_be_updated()
     {
         $page = factory(Page::class)->create();
-        $input = factory(Page::class)->raw();   
+        $input = factory(Page::class)->raw();
 
         $this->postJson(route('pages.update', ['id' => $page->id]), [])
             ->assertStatus(401);
@@ -135,13 +136,13 @@ class PageTest extends TestCase
 
         $page->refresh();
 
-        $this->assertEquals( Arr::get($input, 'name'), $page->name);
-        $this->assertEquals( Arr::get($input, 'parent_page_id'), $page->parent_page_id);
-        $this->assertEquals( Arr::get($input, 'sort_order'), $page->sort_order);
+        $this->assertEquals(Arr::get($input, 'name'), $page->name);
+        $this->assertEquals(Arr::get($input, 'parent_page_id'), $page->parent_page_id);
+        $this->assertEquals(Arr::get($input, 'sort_order'), $page->sort_order);
     }
 
     /** @test **/
-    public function a_page_can_be_unlisted()
+    public function a_page_can_be_hidden()
     {
         $page = factory(Page::class)->create();
         $input = factory(Page::class)->raw([
@@ -184,10 +185,10 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_gets_404_response_if_no_page_can_be_found()
     {
-        $slug = Str::random(8);   
+        $slug = Str::random(8);
 
         //$this->withoutExceptionHandling();
-        $this->get( $slug )
+        $this->get($slug)
             ->assertStatus(404);
     }
 
@@ -206,7 +207,7 @@ class PageTest extends TestCase
             'name' => $this->faker->firstName,
             'slug' => $this->faker->firstName,
             'parent_page_id' => 0,
-            'sort_order' => $this->faker->numberBetween(10,100),
+            'sort_order' => $this->faker->numberBetween(10, 100),
         ];
 
         $this->assertTrue($home_page->id === 1);
@@ -221,7 +222,6 @@ class PageTest extends TestCase
 
         $this->assertEquals($home_page_slug, $home_page->slug);
         $this->assertEquals($home_page_parent_page_id, $home_page->parent_page_id);
-        
     }
 
     /** @test **/
@@ -270,7 +270,6 @@ class PageTest extends TestCase
 
         $this->assertNotNull($page->published_version_id);
         $this->assertEquals($page->published_version_id, $new_content_element->version_id);
-
     }
 
 
@@ -279,13 +278,13 @@ class PageTest extends TestCase
     {
         $page = factory(Page::class)->states('unpublished')->create();
 
-        $this->get( $page->full_slug )
+        $this->get($page->full_slug)
             ->assertStatus(404);
         
         $page->publish();
 
         $this->withoutExceptionHandling();
-        $this->get( $page->full_slug )
+        $this->get($page->full_slug)
             ->assertSuccessful();
     }
 
@@ -317,7 +316,7 @@ class PageTest extends TestCase
         $bg_file_upload = (new FileUpload)->saveFile($bg_file, 'photos', true);
 
         $page = factory(Page::class)->create();
-        $input = factory(Page::class)->raw();   
+        $input = factory(Page::class)->raw();
         $input['footer_fg_file_upload'] = $fg_file_upload;
         $input['footer_bg_file_upload'] = $bg_file_upload;
         $input['footer_color'] = $this->faker->hexcolor;
@@ -334,12 +333,12 @@ class PageTest extends TestCase
 
         $page->refresh();
 
-        $this->assertEquals( Arr::get($input, 'name'), $page->name);
-        $this->assertEquals( Arr::get($input, 'parent_page_id'), $page->parent_page_id);
-        $this->assertEquals( Arr::get($input, 'sort_order'), $page->sort_order);
-        $this->assertEquals( Arr::get($input, 'footer_color'), $page->footer_color);
-        $this->assertEquals( Arr::get($input, 'footer_fg_file_upload.id'), $page->footer_fg_file_upload_id);
-        $this->assertEquals( Arr::get($input, 'footer_bg_file_upload.id'), $page->footer_bg_file_upload_id);
+        $this->assertEquals(Arr::get($input, 'name'), $page->name);
+        $this->assertEquals(Arr::get($input, 'parent_page_id'), $page->parent_page_id);
+        $this->assertEquals(Arr::get($input, 'sort_order'), $page->sort_order);
+        $this->assertEquals(Arr::get($input, 'footer_color'), $page->footer_color);
+        $this->assertEquals(Arr::get($input, 'footer_fg_file_upload.id'), $page->footer_fg_file_upload_id);
+        $this->assertEquals(Arr::get($input, 'footer_bg_file_upload.id'), $page->footer_bg_file_upload_id);
 
         $fg_photo = $page->footerFgFileUpload;
         $bg_photo = $page->footerBgFileUpload;
@@ -357,7 +356,7 @@ class PageTest extends TestCase
         $page = factory(Page::class)->create();
         $user = factory(User::class)->create();
 
-        $input = factory(Page::class)->raw();   
+        $input = factory(Page::class)->raw();
 
         $this->postJson(route('pages.update', ['id' => $page->id]), $input)
              ->assertStatus(401);
@@ -373,7 +372,6 @@ class PageTest extends TestCase
 
         $this->postJson(route('pages.update', ['id' => $page->id]), $input)
             ->assertSuccessful();
-        
     }
 
 
@@ -432,7 +430,6 @@ class PageTest extends TestCase
         $this->assertEquals(2, $page_below->sort_order);
         $this->assertEquals(3, $page->sort_order);
         $this->assertEquals(4, $page_last->sort_order);
-
     }
 
     /** @test **/
@@ -485,7 +482,6 @@ class PageTest extends TestCase
         $this->assertEquals(2, $page_above->sort_order);
         $this->assertEquals(3, $page_below->sort_order);
         $this->assertEquals(4, $page_last->sort_order);
-
     }
 
     /** @test **/
@@ -544,7 +540,6 @@ class PageTest extends TestCase
         $this->assertEquals(3, $new_page2->sort_order);
         $this->assertEquals(1, $old_page1->sort_order);
         $this->assertEquals(2, $old_page2->sort_order);
-        
     }
 
     /*
@@ -599,7 +594,6 @@ class PageTest extends TestCase
             ->assertJsonFragment([
                 'body' => $text_block->body,
             ]);
-
     }
 
     /** @test **/
@@ -624,7 +618,6 @@ class PageTest extends TestCase
                 'full_slug' => '/',
             ])
             ->assertSuccessful();
-            
     }
 
 
@@ -724,7 +717,6 @@ class PageTest extends TestCase
         $this->assertNotEquals($content_element1_version_id, $content_element1->version->id);
         $this->assertEquals($page->getDraftVersion()->id, $content_element1->version->id);
         $this->assertEquals($page->publishedVersion->id, $content_element2->version->id);
-
     }
 
 
@@ -758,7 +750,7 @@ class PageTest extends TestCase
         Event::fake();
 
         $page = factory(Page::class)->create();
-        $input = factory(Page::class)->raw();   
+        $input = factory(Page::class)->raw();
 
         $this->signInAdmin();
 
@@ -793,7 +785,5 @@ class PageTest extends TestCase
                 'contentable_id' => $page->id,
                 'contentable_type' => 'page',
             ]);
-
     }
-
 }

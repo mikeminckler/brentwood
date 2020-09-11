@@ -12,6 +12,7 @@ $factory->define(Page::class, function (Faker $faker) {
         'name' => $faker->firstName.$faker->randomNumber(3),
         'parent_page_id' => 1,
         'sort_order' => $faker->randomNumber(1),
+        'unlisted' => 0,
     ];
 });
 

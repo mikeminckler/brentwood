@@ -137,7 +137,7 @@ class PageTest extends TestCase
     }
 
     /** @test **/
-    public function a_page_can_be_unlisted_from_the_menu()
+    public function a_page_can_be_hidden_from_the_menu()
     {
         $page = factory(Page::class)->states('unlisted')->create();
         $this->assertEquals(1, $page->unlisted);

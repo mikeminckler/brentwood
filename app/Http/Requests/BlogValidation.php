@@ -24,7 +24,6 @@ class BlogValidation extends FormRequest
             return $this->user()->can('update', $blog);
         }
         return $this->user()->can('create', Blog::class);
-
     }
 
     /**
@@ -34,11 +33,9 @@ class BlogValidation extends FormRequest
      */
     public function rules()
     {
-
         return [
             'name' => 'required|string',
             'unlisted' => 'boolean',
         ];
-
     }
 }

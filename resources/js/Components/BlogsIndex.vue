@@ -6,9 +6,14 @@
 
             <h1>Blogs</h1>
 
-            <div class="flex link my-4" @click="createBlog()">
-                <div class="icon"><i class="fas fa-plus"></i></div>
-                <div class="ml-2">Create Blog</div>
+            <div class="grid grid-blogs mt-2 py-2">
+                <div class="flex link" @click="createBlog()">
+                    <div class="icon"><i class="fas fa-plus"></i></div>
+                    <div class="ml-2">Create Blog</div>
+                </div>
+                <div class="font-bold">Published At</div>
+                <div class="font-bold">Scheduled Launch</div>
+                <div class=""></div>
             </div>
 
             <div class="">
@@ -60,7 +65,7 @@
 
                 this.$http.post('/blogs/create', input).then( response => {
                     this.processSuccess(response);
-                    this.$store.dispatch('setPage', response.data.page);
+                    window.location.href = response.data.page.full_slug;
                 }, error => {
                     this.processErrors(error.response);
                 });

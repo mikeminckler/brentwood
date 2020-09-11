@@ -31,6 +31,11 @@ class Blog extends Model
         'preview_content_elements',
         'type',
         'resource',
+        'published_at',
+    ];
+
+    protected $casts = [
+        'unlisted' => 'boolean',
     ];
 
     public function savePage($id = null, $input)

@@ -41,13 +41,12 @@ class Photo extends Model
             }
         } else {
 
-            // we need to check for the same filename 
+            // we need to check for the same filename
             // in the content element as we can save
             // the content element while the image is still processing
 
             if ($content->photos()->count()) {
-                
-                $existing_photo = $content->photos()->get()->filter( function($photo) use ($input) {
+                $existing_photo = $content->photos()->get()->filter(function ($photo) use ($input) {
                     return $photo->fileUpload->id === Arr::get($input, 'file_upload.id');
                 })->first();
 
@@ -56,7 +55,6 @@ class Photo extends Model
                 } else {
                     $photo = new Photo;
                 }
-
             } else {
                 $photo = new Photo;
             }
@@ -105,7 +103,7 @@ class Photo extends Model
         return $photo;
     }
 
-    public function content() 
+    public function content()
     {
         return $this->morphTo();
     }
@@ -215,7 +213,7 @@ class Photo extends Model
         }
     }
 
-    public function getLinkAttribute($value) 
+    public function getLinkAttribute($value)
     {
         return PageLink::convertLink($value);
     }

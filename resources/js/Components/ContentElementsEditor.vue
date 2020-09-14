@@ -2,6 +2,8 @@
 
     <div class="relative">
 
+        <h1 class="mt-8" v-if="$store.state.page.type === 'blog'">{{ $store.state.page.name }}</h1>
+
         <transition-group name="content-elements" tag="div" class="relative mt-8 first:mt-0">
             <form-content-element 
                 v-for="(contentElement, index) in sortedContentElements"

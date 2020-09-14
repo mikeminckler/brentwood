@@ -14,7 +14,7 @@ class FileUploadsController extends Controller
 {
     public function store()
     {
-        $class_name = 'App\\Http\\Requests\\'.(request('type') ? Str::studly(request('type')): 'FileUpload').'Validation';
+        $class_name = 'App\\Http\\Requests\\'.(request('type') ? Str::studly(request('type')) : 'FileUpload').'Validation';
         $rules = (new $class_name)->rules();
         $validator = request()->validate($rules);
 

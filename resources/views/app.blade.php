@@ -31,10 +31,6 @@
 
             <div id="header" class="sticky top-0 z-10 {{ optional($page ?? '')->editable && !request('preview') ? 'px-12' : '' }}">
 
-                @if (optional($page ?? '')->editable)
-                    <page-editor :current-page='@json($page ?? '')' resource="{{ $page ?  $page->resource : '' }}"></page-editor>
-                @endif
-
                 <div class="flex justify-center relative">
                     
                     <div class="flex flex-col w-full relative max-w-6xl shadow bg-gray-100">
@@ -135,6 +131,11 @@
                     </div>
 
                 </div>
+
+                @if (optional($page ?? '')->editable)
+                    <page-editor :current-page='@json($page ?? '')' resource="{{ $page ?  $page->resource : '' }}"></page-editor>
+                @endif
+
             </div>
 
 

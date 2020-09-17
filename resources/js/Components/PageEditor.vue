@@ -22,6 +22,9 @@
 
             <div class="flex items-center flex-1">
                 <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
+                <div class="" v-if="page.type === 'blog'">
+                    <div class="form"><input type="text" placeholder="Author" v-model="page.author" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
+                </div>
                 <div class="">
                     <checkbox-input v-model="page.hide" @change="savePage()" label="Unlisted"></checkbox-input> 
                 </div>

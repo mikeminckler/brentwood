@@ -721,55 +721,6 @@ class PageTest extends TestCase
 
 
     /** @test **/
-    public function when_a_page_is_published_an_event_is_broadcast()
-    {
-        Event::fake();
-        $page = factory(Page::class)->states('unpublished')->create();
-
-        $this->signInAdmin();
-
-        $this->withoutExceptionHandling();
-        $this->json('POST', route('pages.publish', ['id' => $page->id]))
-             ->assertSuccessful()
-             ->assertJsonFragment([
-                'success' => 'Page Published',
-             ]);
-
-        $page->refresh();
-        $this->assertNotNull($page->published_version_id);
-
-        Event::assertDispatched(function (PageSaved $event) use ($page) {
-            return $event->page->id === $page->id;
-        });
-    }
-
-
-    /** @test **/
-    public function when_a_page_is_saved_an_event_is_broadcast()
-    {
-        Event::fake();
-
-        $page = factory(Page::class)->create();
-        $input = factory(Page::class)->raw();
-
-        $this->signInAdmin();
-
-        $this->withoutExceptionHandling();
-        $this->postJson(route('pages.update', ['id' => $page->id]), $input)
-            ->assertSuccessful()
-            ->assertJsonFragment([
-                'success' => 'Page Saved',
-                'full_slug' => $page->refresh()->full_slug,
-            ]);
-
-        $page->refresh();
-
-        Event::assertDispatched(function (PageSaved $event) use ($page) {
-            return $event->page->id === $page->id;
-        });
-    }
-
-    /** @test **/
     public function loading_a_pages_content_elements_includes_the_contentable_property()
     {
         $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();

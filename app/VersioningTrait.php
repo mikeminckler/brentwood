@@ -2,9 +2,6 @@
 
 namespace App;
 
-use App\Events\PageSaved;
-use App\Events\PageDraftCreated;
-
 trait VersioningTrait
 {
     public function versions()
@@ -55,7 +52,9 @@ trait VersioningTrait
             }
         }
 
-        broadcast(new PageSaved($this))->toOthers();
+        $event_class = '\\App\\Events\\'.class_basename($this).'Saved';
+
+        broadcast(new $event_class($this))->toOthers();
 
         return $this;
     }
@@ -72,7 +71,8 @@ trait VersioningTrait
                 'versionable_id' => $this->id,
             ]);
 
-            broadcast(new PageDraftCreated($this->load('versions')));
+            $event_class = '\\App\\Events\\'.class_basename($this).'DraftCreated';
+            broadcast(new $event_class($this->load('versions')));
 
             return $version;
         }

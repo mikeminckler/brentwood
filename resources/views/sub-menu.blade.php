@@ -12,4 +12,15 @@
             </div>
         </div>
     @endif
+
+    @if ($page->author)
+        <div class="w-full md:flex relative">
+            <div class="flex-1"></div>
+            <div class="flex-2">
+                <div class="mt-4 mx-4 italic">{{ $page->author }}</div>
+            </div>
+        </div>
+    @endif
 @endif
+
+

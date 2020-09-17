@@ -354,7 +354,7 @@ div.cell {
     display: contents;
 
     > div {
-        @apply bg-gray-200;
+        @apply bg-gray-200 z-2;
     }
 
 }

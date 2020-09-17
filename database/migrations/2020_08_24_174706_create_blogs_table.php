@@ -21,6 +21,7 @@ class CreateBlogsTable extends Migration
             $table->unsignedBigInteger('published_version_id')->nullable();
             $table->boolean('unlisted')->default(false);
             $table->dateTime('publish_at')->nullable();
+            $table->string('author')->nullable();
             $table->softDeletes();
 
             $table->timestamps();

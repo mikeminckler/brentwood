@@ -62,7 +62,7 @@ class BlogTest extends TestCase
             'name' => $name,
         ]);
 
-        $this->assertNotNull($blog->slug);
-        $this->assertEquals(Str::kebab($name), $blog->slug);
+        $this->assertNotNull($blog->getSlug());
+        $this->assertEquals(Str::kebab($name), $blog->getSlug());
     }
 }

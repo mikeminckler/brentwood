@@ -47,6 +47,7 @@ class Blog extends Model
         }
 
         $blog->name = Arr::get($input, 'name');
+        $blog->author = Arr::get($input, 'author');
         $blog->unlisted = Arr::get($input, 'unlisted') == true ? true : false;
         $blog->publish_at = Arr::get($input, 'publish_at');
         $blog->save();
@@ -62,6 +63,6 @@ class Blog extends Model
 
     public function getFullSlugAttribute()
     {
-        return 'blogs/'.Str::kebab($this->slug);
+        return 'blogs/'.$this->getSlug();
     }
 }

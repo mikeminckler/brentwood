@@ -1,12 +1,14 @@
 <?php
 
 namespace Tests\Unit;
+
 use Illuminate\Support\Arr;
 
 use App\Version;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use App\Events\PageDraftCreated;
+use App\Events\BlogDraftCreated;
 use App\Page;
 use Illuminate\Support\Str;
 
@@ -15,9 +17,8 @@ use App\User;
 
 trait VersioningTestTrait
 {
-
-    protected abstract function getModel();
-    protected abstract function getClassname();
+    abstract protected function getModel();
+    abstract protected function getClassname();
 
     /** @test **/
     public function a_page_can_get_its_draft_version()
@@ -32,7 +33,7 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_has_a_published_version()
     {
-        $page = factory(get_class($this->getModel()))->states('published')->create();   
+        $page = factory(get_class($this->getModel()))->states('published')->create();
         $this->assertNotNull($page->published_version_id);
         $this->assertNotNull($page->publishedVersion);
         $this->assertInstanceOf(Version::class, $page->publishedVersion);
@@ -41,7 +42,7 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_can_be_published()
     {
-        $page = factory(get_class($this->getModel()))->create();   
+        $page = factory(get_class($this->getModel()))->create();
         $page->publish();
         $this->assertNotNull($page->published_version_id);
         $this->assertNotNull($page->publishedVersion);
@@ -71,7 +72,7 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_has_a_draft_version_id_attribute()
     {
-        $page = factory(get_class($this->getModel()))->create();   
+        $page = factory(get_class($this->getModel()))->create();
         $this->assertNotNull($page->draft_version_id);
         $this->assertEquals($page->getDraftVersion()->id, $page->draft_version_id);
     }
@@ -104,16 +105,21 @@ trait VersioningTestTrait
     /** @test **/
     public function creating_a_new_version_broadcasts_an_event()
     {
-        
         $page = factory(get_class($this->getModel()))->states('published')->create();
 
         Event::fake();
 
         $page->getDraftVersion();
 
-        Event::assertDispatched(function (PageDraftCreated $event) use ($page) {
-            return $event->page->id === $page->id;
-        });
+        if ($this->getClassname() === 'page') {
+            Event::assertDispatched(function (PageDraftCreated $event) use ($page) {
+                return $event->{$this->getClassname()}->id === $page->id;
+            });
+        } elseif ($this->getClassname() === 'blog') {
+            Event::assertDispatched(function (BlogDraftCreated $event) use ($page) {
+                return $event->{$this->getClassname()}->id === $page->id;
+            });
+        }
     }
 
     /** @test **/
@@ -152,7 +158,5 @@ trait VersioningTestTrait
         
         $page->refresh();
         $this->assertTrue($page->can_be_published);
-
     }
-
 }

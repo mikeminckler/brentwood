@@ -114,7 +114,7 @@ trait PagesControllerTrait
         $page = $this->loadPageAttributes($page);
 
         return response()->json([
-            'success' => 'Page Published',
+            'success' => class_basename($page).' Published',
             'page' => $page,
         ]);
     }

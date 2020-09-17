@@ -17,6 +17,7 @@ use App\FileUpload;
 use Illuminate\Support\Str;
 use App\Role;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 
@@ -83,8 +84,8 @@ class PageTest extends TestCase
             'name' => 'Foo Bar Baz',
         ]);
 
-        $this->assertNotNull($page->slug);
-        $this->assertEquals('foo-bar-baz', $page->slug);
+        $this->assertNotNull($page->getSlug());
+        $this->assertEquals('foo-bar-baz', $page->getSlug());
     }
 
     /** @test **/
@@ -283,5 +284,17 @@ class PageTest extends TestCase
 
         $this->assertNotNull(Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
         $this->assertEquals($page3->full_slug, Arr::get($page_array['pages'][0]['pages'][0], 'full_slug'));
+    }
+
+    /** @test **/
+    public function a_pages_full_slug_removes_any_non_word_characters()
+    {
+        $unsanitized_name = 'FOOBAR, baz, "Foo"';
+
+        $page = factory(Page::class)->create([
+            'name' => $unsanitized_name,
+        ]);
+
+        $this->assertEquals('foobar-baz-foo', $page->full_slug);
     }
 }

@@ -108,18 +108,14 @@ class Page extends Model
 
     public function getFullSlugAttribute()
     {
-        if (!$this->slug) {
-            $slug = Str::kebab($this->name);
-        } else {
-            $slug = $this->slug;
-        }
+        $slug = $this->getSlug();
 
         if ($this->parent_page_id > 0) {
             $parent_page = Page::find($this->parent_page_id);
             
             if ($parent_page instanceof Page) {
                 while ($parent_page->id > 1) {
-                    $slug = Str::kebab($parent_page->name).'/'.$slug;
+                    $slug = $parent_page->getSlug().'/'.$slug;
                     $parent_page = Page::find($parent_page->parent_page_id);
                 }
             }

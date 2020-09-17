@@ -82,6 +82,7 @@ class BlogTest extends TestCase
         $blog = Blog::all()->last();
 
         $this->assertEquals(Arr::get($input, 'name'), $blog->name);
+        $this->assertEquals(Arr::get($input, 'author'), $blog->author);
     }
 
     /** @test **/
@@ -111,6 +112,7 @@ class BlogTest extends TestCase
         $blog->refresh();
 
         $this->assertEquals(Arr::get($input, 'name'), $blog->name);
+        $this->assertEquals(Arr::get($input, 'author'), $blog->author);
     }
 
     /** @test **/

@@ -15,12 +15,23 @@ trait SlugTrait
         })->last();
     }
 
-    public function getSlugAttribute($value)
+    public function getSlug()
     {
-        if ($value) {
-            return $value;
+        if ($this->slug === '/') {
+            return $this->slug;
         }
 
-        return Str::kebab($this->name);
+        if ($this->slug) {
+            $slug = $this->slug;
+        } else {
+            $slug = $this->name;
+        }
+
+        $slug = Str::lower($slug);
+
+        $slug = preg_replace("/[^A-Za-z0-9 ]/", '', $slug);
+        $slug = Str::kebab($slug);
+
+        return $slug;
     }
 }

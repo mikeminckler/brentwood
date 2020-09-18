@@ -70,6 +70,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/blogs/{id}/restore', 'BlogsController@restore')->name('blogs.restore')->where('id', '\d+');
     Route::post('/blogs/{id}/unlist', 'BlogsController@unlist')->name('blogs.unlist')->where('id', '\d+');
     Route::post('/blogs/{id}/reveal', 'BlogsController@reveal')->name('blogs.reveal')->where('id', '\d+');
+
+    Route::post('/tags/search', 'TagsController@search')->name('tags.search');
 });
 
 Route::get('/blogs/{page}', 'BlogsController@load')->name('blogs.load')->where('page', '.*');

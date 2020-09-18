@@ -13,14 +13,22 @@
         </div>
     @endif
 
-    @if ($page->author)
+    @if ($page->author || $page->tags)
         <div class="w-full md:flex relative">
             <div class="flex-1"></div>
-            <div class="flex-2">
-                <div class="mt-4 mx-4 italic">{{ $page->author }}</div>
+            <div class="flex-2 flex justify-center">
+                <div class="text-block flex justify-between">
+                    <div class="italic">{{ $page->author }}</div>
+                    <div class="">
+                        @foreach ($page->tags as $tag)
+                            <div class="mx-4 px-2 py-1 rounded-lg bg-gray-200 border border-gray-300">{{ $tag->name }}</div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
     @endif
+
 @endif
 
 

@@ -12,6 +12,7 @@ use App\HasContentElementsTrait;
 use App\AppendAttributesTrait;
 use App\VersioningTrait;
 use App\SlugTrait;
+use App\TagsTrait;
 
 class Blog extends Model
 {
@@ -20,6 +21,7 @@ class Blog extends Model
     use HasContentElementsTrait;
     use VersioningTrait;
     use SlugTrait;
+    use TagsTrait;
 
     protected $dates = ['publish_at'];
 

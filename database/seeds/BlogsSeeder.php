@@ -26,6 +26,7 @@ class BlogsSeeder extends Seeder
                 SELECT * 
                 FROM tt_news
                 WHERE hidden = 0
+                LIMIT 10
             "
         ));
 
@@ -101,7 +102,7 @@ class BlogsSeeder extends Seeder
                                 ))->first();
 
                                 $url = 'https://www.brentwood.bc.ca/fileadmin'.$image->identifier;
-                                $this->createImage($blog, $url, 1, $banner ? $sort_order : 1);
+                                $this->createImage($blog, $url, $tt_content_images->count() > 2 ? 3 : $tt_content_images->count(), $banner ? $sort_order : 1);
                                 if ($banner) {
                                     $sort_order++;
                                 } else {
@@ -126,6 +127,27 @@ class BlogsSeeder extends Seeder
                             }
                         } else {
                             //$this->command->error('NOT FOUND EXTENDED TT_CONTENT: '.$tt_content_uid);
+                        }
+                    }
+                }
+
+
+                $tags = collect(DB::connection('www_brentwood')->select(
+                    "SELECT *
+                    FROM tt_news_cat_mm
+                    WHERE uid_local = ".$data->uid
+                ));
+
+                if ($tags->count()) {
+                    foreach ($tags as $tag_data) {
+                        $tag = collect(DB::connection('www_brentwood')->select(
+                            "SELECT *
+                            FROM tt_news_cat
+                            WHERE uid = ".$tag_data->uid_foreign
+                        ))->first();
+
+                        if ($tag) {
+                            $blog->addTag($tag->title);
                         }
                     }
                 }

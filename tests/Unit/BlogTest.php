@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\Unit\AppendAttributesTestTrait;
 use Tests\Unit\ContentElementsTestTrait;
 use Tests\Unit\VersioningTestTrait;
+use Tests\Unit\TagsTrait;
 
 use App\Blog;
 use Illuminate\Support\Str;
@@ -18,6 +19,7 @@ class BlogTest extends TestCase
     use AppendAttributesTestTrait;
     use ContentElementsTestTrait;
     use VersioningTestTrait;
+    use TagsTrait;
 
     protected function getModel()
     {

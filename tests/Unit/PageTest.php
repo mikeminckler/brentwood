@@ -27,6 +27,7 @@ use App\Events\PageDraftCreated;
 use Tests\Unit\AppendAttributesTestTrait;
 use Tests\Unit\ContentElementsTestTrait;
 use Tests\Unit\VersioningTestTrait;
+use Tests\Unit\TagsTrait;
 
 class PageTest extends TestCase
 {
@@ -34,6 +35,7 @@ class PageTest extends TestCase
     use AppendAttributesTestTrait;
     use ContentElementsTestTrait;
     use VersioningTestTrait;
+    use TagsTrait;
 
     protected function getModel()
     {

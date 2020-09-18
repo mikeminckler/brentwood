@@ -16,6 +16,7 @@ use App\AppendAttributesTrait;
 use App\VersioningTrait;
 use App\HasContentElementsTrait;
 use App\SlugTrait;
+use App\TagsTrait;
 
 use App\Events\PageSaved;
 
@@ -26,6 +27,7 @@ class Page extends Model
     use VersioningTrait;
     use HasContentElementsTrait;
     use SlugTrait;
+    use TagsTrait;
 
     protected $dates = ['publish_at'];
 

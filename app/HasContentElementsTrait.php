@@ -60,7 +60,7 @@ trait HasContentElementsTrait
                              })->first();
                          })
                          ->sortBy(function ($content_element) {
-                             return $content_element->sort_order;
+                             return $content_element->pivot->sort_order;
                          })
                          ->values();
 

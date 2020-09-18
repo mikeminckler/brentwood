@@ -25,8 +25,6 @@ class BlogsSeeder extends Seeder
             "
                 SELECT * 
                 FROM tt_news
-                WHERE hidden = 0
-                LIMIT 10
             "
         ));
 
@@ -47,16 +45,18 @@ class BlogsSeeder extends Seeder
                 'name' => $data->title,
                 'author' => $data->author,
                 'content_elements' => [],
+                'unlisted' => $data->hidden === 1 || $data->deleted === 1 ? true : false,
             ];
 
             if (Validator::make($input, [
-                'name' => 'required'
+                'name' => 'required',
             ])->valid()) {
                 //$this->command->info('CREATED: '.$data->title);
 
                 $blog = (new Blog)->savePage(null, $input);
 
                 if ($data->image) {
+                    $images = collect();
                     if (Str::contains($data->image, ',')) {
                         $data_images = collect(explode(',', $data->image));
                     } else {
@@ -65,12 +65,15 @@ class BlogsSeeder extends Seeder
 
                     foreach ($data_images as $data_index => $data_image) {
                         $url = 'https://www.brentwood.bc.ca/uploads/pics/'.$data_image;
-                        $this->createImage($blog, $url, $data_images->count(), $banner ? $sort_order : 1);
-                        if ($banner) {
-                            $sort_order++;
-                        } else {
-                            $banner = true;
-                        }
+                        $images->push($url);
+                    }
+
+                    $this->createImage($blog, $images, $banner ? $sort_order : 1);
+
+                    if ($banner) {
+                        $sort_order++;
+                    } else {
+                        $banner = true;
                     }
                 }
 
@@ -78,7 +81,9 @@ class BlogsSeeder extends Seeder
                     if ($data->title) {
                         $title_used = true;
                     }
-                    $this->createTextBlock($blog, $data->title, $data->bodytext, $paragraph ? $sort_order : 2);
+
+                    $this->createTextBlock($blog, null, $data->bodytext, $paragraph ? $sort_order : 2);
+
                     if ($paragraph) {
                         $sort_order++;
                     } else {
@@ -96,18 +101,21 @@ class BlogsSeeder extends Seeder
                         ));
 
                         if ($tt_content_images->count()) {
+                            $images = collect();
                             foreach ($tt_content_images as $tt_image) {
                                 $image = collect(DB::connection('www_brentwood')->select(
                                     "SELECT * FROM sys_file WHERE uid = ".$tt_image->uid_local
                                 ))->first();
 
                                 $url = 'https://www.brentwood.bc.ca/fileadmin'.$image->identifier;
-                                $this->createImage($blog, $url, $tt_content_images->count() > 2 ? 3 : $tt_content_images->count(), $banner ? $sort_order : 1);
-                                if ($banner) {
-                                    $sort_order++;
-                                } else {
-                                    $banner = true;
-                                }
+                                $images->push($url);
+                            }
+
+                            $this->createImage($blog, $images, $banner ? $sort_order : 1);
+                            if ($banner) {
+                                $sort_order++;
+                            } else {
+                                $banner = true;
                             }
                         }
 
@@ -118,7 +126,7 @@ class BlogsSeeder extends Seeder
                         ))->first();
 
                         if ($tt_content) {
-                            $this->createTextBlock($blog, $title_used ? $tt_content->header : $data->title, $tt_content->bodytext, $paragraph ? $sort_order : 2);
+                            $this->createTextBlock($blog, $title_used ? $tt_content->header : null, $tt_content->bodytext, $paragraph ? $sort_order : 2);
                             $title_used = true;
                             if ($paragraph) {
                                 $sort_order++;
@@ -183,44 +191,49 @@ class BlogsSeeder extends Seeder
         ]);
     }
 
-    protected function createImage($blog, $url, $count = 1, $sort_order)
+    protected function createImage($blog, $urls, $sort_order)
     {
-        $info = pathinfo($url);
-        $contents = file_get_contents($url);
-        $file = '/tmp/' . $info['basename'];
-        file_put_contents($file, $contents);
+        $photos = collect();
 
-        $uploaded_file = new UploadedFile($file, $info['basename']);
-        $file_upload = (new FileUpload)->saveFile($uploaded_file);
+        foreach ($urls as $index => $url) {
+            $info = pathinfo($url);
+            $contents = file_get_contents($url);
+            $file = '/tmp/' . $info['basename'];
+            file_put_contents($file, $contents);
+
+            $uploaded_file = new UploadedFile($file, $info['basename']);
+            $file_upload = (new FileUpload)->saveFile($uploaded_file);
+
+            $photo = [
+                'alt' => "",
+                'description' => "",
+                'file_upload' => $file_upload,
+                'fill' => true,
+                'id' => 0,
+                'large' => null,
+                'link' => null,
+                'name' => "",
+                'offsetX' => 50,
+                'offsetY' => 50,
+                'sort_order' => $index + 1,
+                'span' => 1,
+                'stat_name' => null,
+                'stat_number' => null,
+            ];
+            $photos->push($photo);
+        }
 
         $image = (new ContentElement)->saveContentElement(null, [
             'type' => 'photo-block',
             'content' => [
                 'id' => 0,
                 'body' => '',
-                'columns' => $count,
+                'columns' => $urls->count() === 4 ? 2 : ($urls->count() > 2 ? 3 : $urls->count()),
                 'header' => '',
                 'height' => 50,
                 'id' => 0,
                 'padding' => 0,
-                'photos' => [
-                    [
-                        'alt' => "",
-                        'description' => "",
-                        'file_upload' => $file_upload,
-                        'fill' => true,
-                        'id' => 0,
-                        'large' => null,
-                        'link' => null,
-                        'name' => "",
-                        'offsetX' => 50,
-                        'offsetY' => 50,
-                        'sort_order' => 1,
-                        'span' => 1,
-                        'stat_name' => null,
-                        'stat_number' => null,
-                    ],
-                ],
+                'photos' => $photos,
                 'show_text' => 0,
                 'text_order' => 1,
                 'text_span' => 1,

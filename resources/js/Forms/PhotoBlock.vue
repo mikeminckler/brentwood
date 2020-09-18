@@ -146,6 +146,15 @@
             type="image"
         ></file-uploads>
 
+        <div class="flex mt-8" v-if="contentElementIndex === 0">
+            <div class="flex-1"></div>
+            <div class="flex-2 flex justify-center">
+                <div class="text-block">
+                    <page-attributes></page-attributes>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 </template>
@@ -158,7 +167,7 @@
 
     export default {
 
-        props: [ 'content', 'uuid' ],
+        props: [ 'content', 'uuid', 'contentElementIndex' ],
 
         mixins: [Feedback, Photos, SaveContent ],
 
@@ -166,6 +175,7 @@
             'editor': () => import(/* webpackChunkName: "editor" */ '@/Components/Editor.vue'),
             'file-uploads': () => import(/* webpackChunkName: "file-uploads" */ '@/Components/FileUploads.vue'),
             'photo-controls': () => import(/* webpackChunkName: "photo-controls" */ '@/Components/PhotoControls.vue'),
+            'page-attributes': () => import(/* webpackChunkName: "page-attributes" */ '@/Forms/PageAttributes.vue'),
         },
 
         data() {

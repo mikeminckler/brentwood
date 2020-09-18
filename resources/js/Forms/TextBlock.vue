@@ -51,7 +51,12 @@
         <div class="flex-2 flex justify-center relative" :class="!photo && content.style ? 'text-style-' + content.style : ''">
 
             <div :class="content.full_width ? 'px-12 py-8' : 'text-block'" class="relative">
-                <div class="" :class="isLocked('header') ? 'locked relative' : ''">
+
+                <page-attributes v-if="contentElementIndex === 0"></page-attributes>
+
+                <div v-show="first && $store.state.page.type === 'blog' ? false : true" 
+                    class="" 
+                    :class="isLocked('header') ? 'locked relative' : ''">
                     <input :class="[first ? 'h1' : 'h2', isLocked('header') ? 'locked' : '']" 
                         class="outline-none"
                         @focus="whisperEditing('header')" 
@@ -98,7 +103,7 @@
 
     export default {
 
-        props: [ 'content', 'uuid', 'first'],
+        props: [ 'content', 'uuid', 'first', 'contentElementIndex'],
         mixins: [ Photos, Feedback, SaveContent, Whisper ],
 
         components: {
@@ -107,6 +112,7 @@
             'photo-controls': () => import(/* webpackChunkName: "photo-controls" */ '@/Components/PhotoControls.vue'),
             'stat': () => import(/* webpackChunkName: "stat" */ '@/Components/Stat.vue'),
             'checkbox-input': () => import(/* webpackChunkName: "checkbox-input" */ '@/Components/CheckboxInput.vue'),
+            'page-attributes': () => import(/* webpackChunkName: "page-attributes" */ '@/Forms/PageAttributes.vue'),
         },
 
         data() {

@@ -5,7 +5,7 @@
         v-if="contentElement.id >= 1"
     >
 
-        <add-content-element v-if="!hideAddContent" :sort-order="contentElement.pivot.sort_order"></add-content-element>
+        <add-content-element v-if="contentElementIndex === 0" :sort-order="contentElement.pivot.sort_order"></add-content-element>
 
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
             <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!contentElement.published_at"><i class="fas fa-clock"></i></div>
@@ -60,6 +60,7 @@
                     :content="contentElement.content"
                     :uuid="contentElement.uuid"
                     :first="first"
+                    :content-element-index="contentElementIndex"
                 ></component>
             </div>
         </expander>
@@ -77,7 +78,7 @@
 
         mixins: [Feedback, ContentElements],
 
-        props: ['contentElement', 'first', 'hideAddContent'],
+        props: ['contentElement', 'first', 'contentElementIndex'],
 
         components: {
             'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement'),

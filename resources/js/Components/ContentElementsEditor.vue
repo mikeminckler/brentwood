@@ -13,7 +13,7 @@
                 @remove="removeContentElement(contentElement)"
                 @update="updateContentElement(contentElement, $event)"
                 :first="isFirst(contentElement)"
-                :hide-add-content="index === 0"
+                :content-element-index="index"
             >
             </form-content-element>
         </transition-group>
@@ -42,6 +42,9 @@
         },
 
         computed: {
+            page() {
+                return this.$store.state.page;
+            },
             contentElements() {
                 return this.$store.state.page.content_elements;
             },

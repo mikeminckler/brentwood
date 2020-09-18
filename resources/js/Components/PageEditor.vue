@@ -22,13 +22,9 @@
 
             <div class="flex items-center flex-1">
                 <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
-                <div class="" v-if="page.type === 'blog'">
-                    <div class="form"><input type="text" placeholder="Author" v-model="page.author" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
-                </div>
                 <div class="">
                     <checkbox-input v-model="page.hide" @change="savePage()" label="Unlisted"></checkbox-input> 
                 </div>
-
             </div>
 
             <div class="cursor-pointer flex" @click="showPageVersions = !showPageVersions" v-if="activeVersion">
@@ -248,6 +244,7 @@
 
                 let input = {
                     name: this.page.name,
+                    author: this.page.author,
                     parent_page_id: this.page.parent_page_id,
                     hide: this.page.hide ? true : false,
                     sort_order: this.page.sort_order,
@@ -276,7 +273,7 @@
                     this.$store.dispatch('completeSaving', 'page');
                 });
 
-            }, 750),
+            }, 500),
 
             preview: function() {
                 window.open(this.page.full_slug + '?preview=true', this.page.full_slug);

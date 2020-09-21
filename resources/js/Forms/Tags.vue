@@ -1,7 +1,7 @@
 <template>
 
     <div class="">
-
+        TAGS
     </div>
 
 </template>

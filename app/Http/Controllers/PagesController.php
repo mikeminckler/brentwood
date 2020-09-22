@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use App\Page;
-use App\Http\Requests\PageValidation;
-use App\Http\Controllers\PagesControllerTrait;
 use Illuminate\Support\Facades\Validator;
+
+use App\Models\Page;
+use App\Http\Requests\PageValidation;
+use App\Traits\PagesControllerTrait;
 
 class PagesController extends Controller
 {

@@ -60,7 +60,7 @@
                                     <div class="w-full flex bg-gray-100">
 
                                         <div id="menu" class="flex-1 md:flex relative w-full">
-                                            @foreach (App\Menu::getMenu()->sortBy->sort_order as $menu_page)
+                                            @foreach (App\Utilities\Menu::getMenu()->sortBy->sort_order as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
 
                                                     <div class="font-oswald font-light text-base md:text-lg relative text-primary hover:bg-white md:flex md:items-center

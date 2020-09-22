@@ -1,33 +1,54 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\Blog;
-use App\Version;
-use Faker\Generator as Faker;
+use App\Models\Blog;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-$factory->define(Blog::class, function (Faker $faker) {
-    return [
-        'name' => $faker->firstName.$faker->randomNumber(3),
-        'author' => $faker->firstName.' '.$faker->lastName,
-        'unlisted' => 0,
-    ];
-});
+use App\Models\Version;
 
-$factory->state(Blog::class, 'published', function ($faker) {
-    return [
-        'published_version_id' => factory(Version::class)->states('page', 'published')->create()->id,
-    ];
-});
+class BlogFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Blog::class;
 
-$factory->state(Blog::class, 'unpublished', function ($faker) {
-    return [
-        'published_version_id' => null,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->firstName.$this->faker->randomNumber(3),
+            'author' => $this->faker->firstName.' '.$this->faker->lastName,
+            'unlisted' => 0,
+        ];
+    }
 
-$factory->state(Blog::class, 'unlisted', function ($faker) {
-    return [
-        'unlisted' => 1,
-    ];
-});
+    public function published()
+    {
+        return $this->state([
+            'published_version_id' => Version::factory()->published(),
+        ]);
+    }
+
+    public function unpublished()
+    {
+        return $this->state([
+            'published_version_id' => null,
+        ]);
+    }
+
+    public function unlisted()
+    {
+        return $this->state([
+            'unlisted' => 1,
+        ]);
+    }
+}

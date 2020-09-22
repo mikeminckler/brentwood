@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\ContentElementValidation;
-
-use App\ContentElement;
 use Illuminate\Support\Str;
-use App\Page;
 use Illuminate\Support\Facades\Validator;
+
+use App\Models\ContentElement;
+use App\Models\Page;
 use App\Events\ContentElementRemoved;
 
 class ContentElementsController extends Controller
@@ -22,9 +22,8 @@ class ContentElementsController extends Controller
      * Find the page associated with the requested URL path
      * This is the main function to render all content pages
      */
-    public function load($id) 
+    public function load($id)
     {
-
         Validator::make(request()->all(), [
             'page_id' => 'required|exists:pages,id',
         ])->validate();
@@ -45,7 +44,7 @@ class ContentElementsController extends Controller
         ]);
     }
 
-    public function store(ContentElementValidation $request, $id = null) 
+    public function store(ContentElementValidation $request, $id = null)
     {
         $contentable = ContentElement::findContentable(requestInput());
         $content_element = (new ContentElement)->saveContentElement($id, requestInput());
@@ -57,9 +56,8 @@ class ContentElementsController extends Controller
         ]);
     }
 
-    public function remove($id) 
+    public function remove($id)
     {
-
         Validator::make(request()->all(), [
             'page_id' => 'required|exists:pages,id',
         ])->validate();
@@ -78,7 +76,7 @@ class ContentElementsController extends Controller
             return redirect('/')->with(['error' => 'You do not have permission to remove that item']);
         }
 
-        broadcast( new ContentElementRemoved($content_element, $page));
+        broadcast(new ContentElementRemoved($content_element, $page));
 
         if (requestInput('remove_all')) {
             ContentElement::where('uuid', $content_element->uuid)->delete();
@@ -86,7 +84,6 @@ class ContentElementsController extends Controller
                 'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Removed',
             ]);
         } else {
-
             $previous_content_element = $content_element->getPreviousVersion();
             $content_element->delete();
 
@@ -95,10 +92,9 @@ class ContentElementsController extends Controller
                 'content_element' => $previous_content_element,
             ]);
         }
-        
     }
 
-    public function restore($id) 
+    public function restore($id)
     {
         $content_element = ContentElement::onlyTrashed()
             ->where('id', $id)

@@ -10,8 +10,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-use App\Blog;
-use App\Role;
+use App\Models\Blog;
+use App\Models\Role;
 
 class BlogSaved implements ShouldBroadcast
 {

@@ -1,31 +1,40 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\TextBlock;
-use Faker\Generator as Faker;
+use App\Models\TextBlock;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-use App\ContentElement;
+class TextBlockFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = TextBlock::class;
 
-$factory->define(TextBlock::class, function (Faker $faker) {
-    return [
-        'header' => $faker->sentence($faker->numberBetween(1,5)),
-        'body' => $faker->paragraph,
-        'style' => 'gray',
-        'full_width' => false,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'header' => $this->faker->sentence($this->faker->numberBetween(1, 5)),
+            'body' => $this->faker->paragraph,
+            'style' => 'gray',
+            'full_width' => false,
+        ];
+    }
 
-$factory->afterCreating(TextBlock::class, function ($text_block, $faker) {
-    $content_element = factory(ContentElement::class)->states('page')->create([
-        'content_id' => $text_block->id,
-        'content_type' => get_class($text_block),
-    ]);
-});
-
-$factory->state(TextBlock::class, 'stat', function ($faker) {
-    return [
-        'stat_number' => $faker->randomNumber(2),
-        'stat_name' => $faker->word,
-    ];
-});
+    public function stat()
+    {
+        return $this->state([
+            'stat_number' => $this->faker->randomNumber(2),
+            'stat_name' => $this->faker->word,
+        ]);
+    }
+}

@@ -10,9 +10,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-use App\ContentElement;
-use App\Page;
-use App\Role;
+use App\Models\ContentElement;
+use App\Models\Role;
 
 class ContentElementRemoved implements ShouldBroadcast
 {
@@ -26,7 +25,7 @@ class ContentElementRemoved implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(ContentElement $content_element, Page $page)
+    public function __construct(ContentElement $content_element, $page)
     {
         $this->content_element = $content_element;
         $this->page = $page;

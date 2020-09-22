@@ -3,30 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use App\PageAccess;
-use App\Http\Requests\PageAccessValidation;
-use App\User;
-use App\Role;
-use App\Page;
 use Illuminate\Support\Arr;
+
+use App\Models\PageAccess;
+use App\Http\Requests\PageAccessValidation;
+
+use App\Models\User;
+use App\Models\Role;
+use App\Models\Page;
 
 class PageAccessesController extends Controller
 {
-
-    public function index() 
+    public function index()
     {
-
         if (!auth()->user()->can('viewAny', PageAccess::class)) {
             return redirect('/')->with(['error' => 'You do not have permission to view that page']);
         }
 
-        return view('page-accesses.index');   
+        return view('page-accesses.index');
     }
 
-    public function page($id) 
+    public function page($id)
     {
-
         if (!auth()->user()->can('viewAny', PageAccess::class)) {
             return response()->json(['error' => 'You do not have permission to view page accesses'], 403);
         }
@@ -63,7 +61,7 @@ class PageAccessesController extends Controller
         ]);
     }
 
-    public function destroy($id) 
+    public function destroy($id)
     {
         $page_access = PageAccess::findOrFail($id);
 
@@ -74,6 +72,5 @@ class PageAccessesController extends Controller
         $page_access->delete();
 
         return response()->json(['success' => 'Page Access Removed']);
-        
     }
 }

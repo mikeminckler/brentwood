@@ -1,21 +1,30 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\BannerPhoto;
-use Faker\Generator as Faker;
-use App\ContentElement;
+use App\Models\BannerPhoto;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-$factory->define(BannerPhoto::class, function (Faker $faker) {
-    return [
-        'body' => $faker->paragraph,
-        'header' => $faker->sentence,
-    ];
-});
+class BannerPhotoFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = BannerPhoto::class;
 
-$factory->afterCreating(BannerPhoto::class, function ($banner_photo, $faker) {
-    $content_element = factory(ContentElement::class)->states('page')->create([
-        'content_id' => $banner_photo->id,
-        'content_type' => get_class($banner_photo),
-    ]);
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'body' => $this->faker->paragraph,
+            'header' => $this->faker->sentence,
+        ];
+    }
+}

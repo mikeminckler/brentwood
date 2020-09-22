@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\User;
+use App\Models\User;
 use App\Http\Requests\UserValidation;
 
 class UsersController extends Controller
 {
-
-    public function index() 
+    public function index()
     {
-
         if (!auth()->user()->can('viewAny', User::class)) {
             return redirect('/')->with(['error' => 'You do not have permission to view that page']);
         }
@@ -20,7 +18,7 @@ class UsersController extends Controller
         return view('users.index');
     }
 
-    public function load() 
+    public function load()
     {
         if (!auth()->user()->can('viewAny', User::class)) {
             return response()->json([
@@ -50,14 +48,12 @@ class UsersController extends Controller
         ]);
     }
 
-    public function search() 
+    public function search()
     {
-
         if (!auth()->user()->can('viewAny', User::class)) {
             return response()->json([ 'error' => 'You do not have permission to search for users' ], 403);
         }
 
         return (new User)->search();
-
     }
 }

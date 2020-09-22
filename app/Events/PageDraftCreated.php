@@ -10,8 +10,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-use App\Page;
-use App\Role;
+use App\Models\Page;
+use App\Models\Role;
 
 class PageDraftCreated implements ShouldBroadcast
 {

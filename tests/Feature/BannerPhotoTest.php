@@ -6,16 +6,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\BannerPhoto;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
-use App\Photo;
-use App\FileUpload;
-use App\User;
-use App\Page;
-use App\ContentElement;
+
+use App\Models\BannerPhoto;
+use App\Models\Photo;
+use App\Models\FileUpload;
+use App\Models\User;
+use App\Models\Page;
+use App\Models\ContentElement;
 
 class BannerPhotoTest extends TestCase
 {
@@ -23,20 +24,19 @@ class BannerPhotoTest extends TestCase
     /** @test **/
     public function a_banner_photo_content_element_can_be_created()
     {
-
         Storage::fake();
         $file_name = Str::random().'.jpg';
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $photo_input = factory(Photo::class)->raw();
+        $photo_input = Photo::factory()->raw();
         $photo_input['file_upload'] = $file_upload;
 
-        $input = factory(ContentElement::class)->states('banner-photo')->raw();
+        $input = ContentElement::factory()->raw();
         $input['type'] = 'banner-photo';
-        $input['content'] = factory(BannerPhoto::class)->raw();
+        $input['content'] = BannerPhoto::factory()->raw();
         $input['content']['photos'] = [$photo_input];
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -48,7 +48,7 @@ class BannerPhotoTest extends TestCase
         $this->json('POST', route('content-elements.store'), [])
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.store'), [])
              ->assertStatus(422)

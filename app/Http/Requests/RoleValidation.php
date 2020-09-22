@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-use App\Role;
+use App\Models\Role;
 
 class RoleValidation extends FormRequest
 {
@@ -15,7 +15,6 @@ class RoleValidation extends FormRequest
      */
     public function authorize()
     {
-
         if (!auth()->check()) {
             return false;
         }

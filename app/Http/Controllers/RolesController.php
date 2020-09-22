@@ -4,21 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Role;
 use App\Http\Requests\RoleValidation;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 
 class RolesController extends Controller
 {
-
-    public function index() 
+    public function index()
     {
         if (!auth()->user()->can('viewAny', Role::class)) {
             return redirect('/')->with('error', 'You do not have access to view Roles');
         }
 
         $roles = Role::all()->load('users');
-        return view('roles.index', compact('roles'));   
+        return view('roles.index', compact('roles'));
     }
 
     public function store(RoleValidation $request, $id = null)
@@ -42,7 +41,7 @@ class RolesController extends Controller
         ]);
     }
 
-    public function search() 
+    public function search()
     {
         if (!auth()->user()->can('viewAny', Role::class)) {
             return response()->json([ 'error' => 'You do not have permission to search for roles' ], 403);

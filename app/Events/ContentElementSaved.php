@@ -10,8 +10,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-use App\ContentElement;
-use App\Role;
+use App\Models\ContentElement;
+use App\Models\Role;
 
 class ContentElementSaved implements ShouldBroadcast
 {

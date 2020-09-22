@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\FileUpload;
-use App\User;
+use App\Models\FileUpload;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FileUploadPolicy

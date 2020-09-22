@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\PageAccess;
-use App\User;
+use App\Models\PageAccess;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PageAccessPolicy

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-use App\Photo;
+use App\Models\Photo;
 
 class PhotoValidation extends FormRequest
 {

@@ -1,22 +1,29 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\Quote;
-use Faker\Generator as Faker;
-use App\ContentElement;
+use App\Models\Quote;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-$factory->define(Quote::class, function (Faker $faker) {
-    return [
-        'body' => $faker->paragraph,
-        'author_name' => $faker->name,
-        'author_details' => $faker->sentence,
-    ];
-});
+class QuoteFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Quote::class;
 
-$factory->afterCreating(Quote::class, function ($quote, $faker) {
-    $content_element = factory(ContentElement::class)->states('page')->create([
-        'content_id' => $quote->id,
-        'content_type' => get_class($quote),
-    ]);
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            //
+        ];
+    }
+}

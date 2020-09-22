@@ -1,22 +1,29 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\EmbedCode;
-use Faker\Generator as Faker;
+use App\Models\EmbedCode;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-use App\ContentElement;
+class EmbedCodeFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = EmbedCode::class;
 
-$factory->define(EmbedCode::class, function (Faker $faker) {
-    return [
-        'code' => $faker->paragraph,
-    ];
-});
-
-$factory->afterCreating(EmbedCode::class, function ($embed_code, $faker) {
-    $content_element = factory(ContentElement::class)->states('page')->create([
-        'content_id' => $embed_code->id,
-        'content_type' => get_class($embed_code),
-    ]);
-});
-
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            //
+        ];
+    }
+}

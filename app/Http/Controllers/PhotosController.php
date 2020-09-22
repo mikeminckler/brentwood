@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Photo;
-use App\Http\Controllers\SoftDeletesControllerTrait;
+use App\Models\Photo;
+use App\Traits\SoftDeletesControllerTrait;
 use App\Http\Requests\PhotoValidation;
 
 class PhotosController extends Controller

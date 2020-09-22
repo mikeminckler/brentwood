@@ -6,8 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 use Illuminate\Support\Str;
 
-use App\ContentElement;
-use App\Page;
+use App\Models\ContentElement;
 
 class ContentElementValidation extends FormRequest
 {
@@ -22,7 +21,7 @@ class ContentElementValidation extends FormRequest
             return false;
         }
 
-        $contentable = ContentElement::findContentable(requestInput()); 
+        $contentable = ContentElement::findContentable(requestInput());
         return auth()->user()->can('update', $contentable);
     }
 
@@ -33,7 +32,6 @@ class ContentElementValidation extends FormRequest
      */
     public function rules()
     {
-
         if (!requestInput('type')) {
             return [
                 'type' => 'required',

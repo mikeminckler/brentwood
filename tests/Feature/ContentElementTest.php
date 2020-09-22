@@ -6,10 +6,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\ContentElement;
-use App\User;
-use App\Page;
-use App\TextBlock;
+use App\Models\ContentElement;
+use App\Models\User;
+use App\Models\Page;
+use App\Models\TextBlock;
+use App\Models\Version;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\ContentElementSaved;
@@ -28,15 +29,25 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function a_content_elements_draft_can_be_removed()
     {
-        $page = factory(Page::class)->states('published')->create();
-        $published_content_element = factory(ContentElement::class)->states('text-block')->create([
+        $published_content_element = ContentElement::factory()
+                                ->page()
+                                ->hasAttached(Page::factory()->published(), ['sort_order' => 1, 'unlisted' => 0, 'expandable' => 0])
+                                ->for(TextBlock::factory(), 'content')
+                                ->create();
+
+        /*
+        $page = Page::factory()->published()->create();
+        $published_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'version_id' => $page->published_version_id,
         ]);
+         */
 
-        $published_content_element->pages()->detach();
-        $published_content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+        $this->assertInstanceOf(Page::class, $published_content_element->pages()->first());
+        $page = $published_content_element->pages()->first();
+        $this->assertNotNull($page->publishedVersion);
+        $this->assertInstanceOf(Version::class, $page->publishedVersion);
 
-        $content_element = factory(ContentElement::class)->states('text-block')->create([
+        $content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'uuid' => $published_content_element->uuid,
             'version_id' => $page->draft_version_id,
         ]);
@@ -47,7 +58,7 @@ class ContentElementTest extends TestCase
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]))
             ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]))
             ->assertStatus(422)
@@ -143,7 +154,7 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function a_user_with_page_editing_can_update_content_elements()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
 
         $page = $content_element->pages->first();
 
@@ -176,7 +187,7 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function a_user_with_page_editing_can_create_content_elements()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $page = $content_element->pages->first();
         $this->assertInstanceOf(Page::class, $page);
 
@@ -203,8 +214,8 @@ class ContentElementTest extends TestCase
                 'pivot.contentable_type',
             ]);
 
-            $input['pivot']['contentable_id'] = $page->id;
-            $input['pivot']['contentable_type'] = get_class($page);
+        $input['pivot']['contentable_id'] = $page->id;
+        $input['pivot']['contentable_type'] = get_class($page);
 
         $this->json('POST', route('content-elements.store'), $input)
              ->assertSuccessful()
@@ -274,13 +285,12 @@ class ContentElementTest extends TestCase
              ]);
 
         $this->assertEquals($draft_content_element->id, ContentElement::all()->last()->id);
-
     }
 
     /** @test **/
     public function an_event_is_broadcast_when_a_content_element_is_saved()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $page = $content_element->pages->first();
         $this->assertInstanceOf(Page::class, $page);
 
@@ -314,7 +324,7 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function an_event_is_broadcast_when_a_content_element_is_created()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $page = $content_element->pages->first();
         $this->assertInstanceOf(Page::class, $page);
 
@@ -382,7 +392,7 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function an_event_is_broadcast_when_a_content_element_is_deleted()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();   
+        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
         $page = $content_element->pages->first();
         $this->assertInstanceOf(Page::class, $page);
 

@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Blog;
-use App\Paginate;
+use App\Models\Blog;
+use App\Utilities\Paginate;
 use App\Http\Requests\BlogValidation;
-use App\Http\Controllers\PagesControllerTrait;
+use App\Traits\PagesControllerTrait;
 
 class BlogsController extends Controller
 {

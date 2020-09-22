@@ -1,66 +1,51 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\Photo;
-use Faker\Generator as Faker;
-use App\FileUpload;
-use App\PhotoBlock;
-use App\Quote;
-use App\YoutubeVideo;
-use App\Page;
+use App\Models\Photo;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-$factory->define(Photo::class, function (Faker $faker) {
-    return [
-        'name' => $faker->name,
-        'description' => $faker->sentence,
-        'alt' => $faker->sentence(5),
-        'sort_order' => 1,
-        'span' => 1,
-        'offsetX' => 50,
-        'offsetY' => 50,
-        'fill' => true,
-    ];
-});
+class PhotoFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Photo::class;
 
-$factory->afterCreating(Photo::class, function ($photo, $faker) {
-    $photo->fileUpload()->save(factory(FileUpload::class)->states('jpg')->create());
-    $photo->load('fileUpload');
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->name,
+            'description' => $this->faker->sentence,
+            'alt' => $this->faker->sentence(5),
+            'sort_order' => 1,
+            'span' => 1,
+            'offsetX' => 50,
+            'offsetY' => 50,
+            'fill' => true,
+        ];
+    }
 
-$factory->state(Photo::class, 'photo-block', function ($faker) {
-    $photo_block = factory(PhotoBlock::class)->create();
-    return [
-        'content_id' => $photo_block->id,
-        'content_type' => get_class($photo_block),
-    ];
-});
+    public function stat()
+    {
+        return $this->state([
+            'stat_number' => $this->faker->randomNumber(2),
+            'stat_name' => $this->faker->sentence,
+        ]);
+    }
 
-$factory->state(Photo::class, 'quote', function ($faker) {
-    $quote = factory(Quote::class)->create();
-    return [
-        'content_id' => $quote->id,
-        'content_type' => get_class($quote),
-    ];
-});
-
-$factory->state(Photo::class, 'youtube-video', function ($faker) {
-    $youtube_video = factory(YoutubeVideo::class)->create();
-    return [
-        'content_id' => $youtube_video->id,
-        'content_type' => get_class($youtube_video),
-    ];
-});
-
-$factory->state(Photo::class, 'stat', function ($faker) {
-    return [
-        'stat_number' => $faker->randomNumber(2),
-        'stat_name' => $faker->sentence,
-    ];
-});
-
-$factory->state(Photo::class, 'link', function ($faker) {
-    return [
-        'link' => factory(Page::class)->create()->id,
-    ];
-});
+    public function link()
+    {
+        return $this->state([
+            'link' => Page::factory(),
+        ]);
+    }
+}

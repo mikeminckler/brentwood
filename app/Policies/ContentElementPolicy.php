@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\ContentElement;
-use App\User;
+use App\Models\ContentElement;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ContentElementPolicy

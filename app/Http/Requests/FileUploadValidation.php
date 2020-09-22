@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-use App\FileUpload;
+use App\Models\FileUpload;
 
 class FileUploadValidation extends FormRequest
 {

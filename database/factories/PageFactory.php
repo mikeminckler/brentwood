@@ -1,47 +1,69 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\Page;
-use Faker\Generator as Faker;
+use App\Models\Page;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-use App\Version;
+use App\Models\Version;
 
-$factory->define(Page::class, function (Faker $faker) {
-    return [
-        'name' => $faker->firstName.$faker->randomNumber(3),
-        'parent_page_id' => 1,
-        'sort_order' => $faker->randomNumber(1),
-        'unlisted' => 0,
-    ];
-});
+class PageFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Page::class;
 
-$factory->state(Page::class, 'secondLevel', function ($faker) {
-    return [
-        'parent_page_id' => factory(Page::class)->create()->id,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->firstName.$this->faker->randomNumber(3),
+            'parent_page_id' => 1,
+            'sort_order' => $this->faker->randomNumber(1),
+            'unlisted' => 0,
+        ];
+    }
 
-$factory->state(Page::class, 'slug', function ($faker) {
-    return [
-        'slug' => $faker->firstName,
-    ];
-});
+    public function secondLevel()
+    {
+        return $this->state([
+            'parent_page_id' => Page::factory(),
+        ]);
+    }
 
-$factory->state(Page::class, 'published', function ($faker) {
-    return [
-        'published_version_id' => factory(Version::class)->states('page', 'published')->create()->id,
-    ];
-});
+    public function slug()
+    {
+        return $this->state([
+            'slug' => $this->faker->firstName,
+        ]);
+    }
 
-$factory->state(Page::class, 'unpublished', function ($faker) {
-    return [
-        'published_version_id' => null,
-    ];
-});
+    public function published()
+    {
+        return $this->state([
+            'published_version_id' => Version::factory()->published()->for(Page::factory(), 'versionable'),
+        ]);
+    }
 
-$factory->state(Page::class, 'unlisted', function ($faker) {
-    return [
-        'unlisted' => 1,
-    ];
-});
+    public function unpublished()
+    {
+        return $this->state([
+            'published_version_id' => null,
+        ]);
+    }
+
+    public function unlisted()
+    {
+        return $this->state([
+            'unlisted' => 1,
+        ]);
+    }
+}

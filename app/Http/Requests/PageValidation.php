@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-use App\Page;
+use App\Models\Page;
 
 class PageValidation extends FormRequest
 {

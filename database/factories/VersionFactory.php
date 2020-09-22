@@ -1,37 +1,36 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\Version;
-use Faker\Generator as Faker;
+use App\Models\Version;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-use App\Page;
-use App\Blog;
+class VersionFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Version::class;
 
-$factory->define(Version::class, function (Faker $faker) {
-    return [
-        'name' => $faker->firstName,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->firstName,
+        ];
+    }
 
-$factory->state(Version::class, 'page', function ($faker) {
-    $page = factory(Page::class)->create();
-    return [
-        'versionable_id' => $page->id,
-        'versionable_type' => get_class($page),
-    ];
-});
-
-$factory->state(Version::class, 'blog', function ($faker) {
-    $blog = factory(Blog::class)->create();
-    return [
-        'versionable_id' => $blog->id,
-        'versionable_type' => get_class($blog),
-    ];
-});
-
-$factory->state(Version::class, 'published', function ($faker) {
-    return [
-        'published_at' => now(),
-    ];
-});
+    public function published()
+    {
+        return $this->state([
+            'published_at' => now(),
+        ]);
+    }
+}

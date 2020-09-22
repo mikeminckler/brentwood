@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
-use App\Page;
+use App\Models\Page;
 
 class PublishScheduledContent extends Command
 {

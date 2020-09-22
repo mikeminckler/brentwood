@@ -1,29 +1,29 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories;
 
-use App\YoutubeVideo;
-use Faker\Generator as Faker;
-use App\ContentElement;
+use App\Models\YoutubeVideo;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-$factory->define(YoutubeVideo::class, function (Faker $faker) {
-    return [
-        'video_id' => '1tW0Zj3YoJ4',
-        'title' => $faker->sentence,
-        'full_width' => false,
-    ];
-});
+class YoutubeVideoFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = YoutubeVideo::class;
 
-$factory->afterCreating(YoutubeVideo::class, function ($youtube_video, $faker) {
-    $content_element = factory(ContentElement::class)->states('page')->create([
-        'content_id' => $youtube_video->id,
-        'content_type' => get_class($youtube_video),
-    ]);
-});
-
-$factory->state(YoutubeVideo::class, 'text', function ($faker) {
-    return [
-        'header' => $faker->sentence,
-        'body' => $faker->paragraph,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            //
+        ];
+    }
+}

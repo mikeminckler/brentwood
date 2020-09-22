@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use Validator;
-
-use App\FileUpload;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+
+use App\Models\FileUpload;
 use App\Http\Requests\FileUploadValidation;
 
 class FileUploadsController extends Controller

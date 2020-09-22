@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-use App\Blog;
+use App\Models\Blog;
 
 class BlogValidation extends FormRequest
 {

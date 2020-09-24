@@ -6,22 +6,24 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\EmbedCode;
-use App\Page;
-use App\User;
-use App\ContentElement;
+use App\Models\EmbedCode;
+use App\Models\Page;
+use App\Models\User;
+use App\Models\ContentElement;
 use Illuminate\Support\Arr;
 
 class EmbedCodeTest extends TestCase
 {
+    use WithFaker;
 
     /** @test **/
     public function an_embed_code_content_element_can_be_created()
     {
-        $input = factory(ContentElement::class)->states('embed-code')->raw();
+        $input = ContentElement::factory()->for(EmbedCode::factory(), 'content')->raw();
+        $input['id'] = 0;
         $input['type'] = 'embed-code';
-        $input['content'] = factory(EmbedCode::class)->raw();
-        $page = factory(Page::class)->create();
+        $input['content'] = EmbedCode::factory()->raw();
+        $page = Page::factory()->create();
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -33,7 +35,7 @@ class EmbedCodeTest extends TestCase
         $this->json('POST', route('content-elements.store'), [])
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.store'), [])
              ->assertStatus(422)
@@ -69,22 +71,28 @@ class EmbedCodeTest extends TestCase
              ]);
 
         $embed_code = EmbedCode::all()->last();
+        $this->assertNotNull($embed_code->code);
         $this->assertEquals(Arr::get($input, 'content.code'), $embed_code->code);
     }
 
     /** @test **/
     public function a_embed_code_can_be_updated()
     {
-        $embed_code = factory(EmbedCode::class)->create();
-        $content_element = $embed_code->contentElement;
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
+        $content_element = ContentElement::factory()->for(EmbedCode::factory(), 'content')->create([
+            'version_id' => $page->draft_version_id,
+        ]);
+        $content_element->pages()->detach();
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+        $embed_code = $content_element->content;
+        $this->assertInstanceOf(EmbedCode::class, $embed_code);
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
              ->assertStatus(422)
@@ -113,7 +121,7 @@ class EmbedCodeTest extends TestCase
              ]);
 
         $input = $content_element->toArray();
-        $embed_code_input = factory(EmbedCode::class)->raw();
+        $embed_code_input = EmbedCode::factory()->raw();
         $input['content']['code'] = Arr::get($embed_code_input, 'code');
 
         $input['pivot'] = [
@@ -133,6 +141,7 @@ class EmbedCodeTest extends TestCase
 
         $content_element->refresh();
         $embed_code->refresh();
+        $this->assertNotNull($embed_code->code);
         $this->assertEquals(Arr::get($input, 'content.code'), $embed_code->code);
     }
 }

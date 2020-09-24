@@ -6,20 +6,20 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Page;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-
-use App\ContentElement;
-use App\User;
-use App\TextBlock;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
-use App\FileUpload;
-use App\Photo;
-use App\Version;
-
 use Illuminate\Support\Facades\Event;
+
+use App\Models\Page;
+use App\Models\ContentElement;
+use App\Models\User;
+use App\Models\TextBlock;
+use App\Models\FileUpload;
+use App\Models\Photo;
+use App\Models\Version;
+
 use App\Events\PagePublished;
 use App\Events\PageSaved;
 
@@ -36,8 +36,9 @@ class PageTest extends TestCase
 
     protected function getModel()
     {
-        return factory(Page::class)->create();
+        return Page::factory()->create();
     }
+
     protected function getClassname()
     {
         return 'page';
@@ -46,7 +47,7 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_be_created()
     {
-        $input = factory(Page::class)->raw();
+        $input = Page::factory()->raw();
 
         $this->postJson(route('pages.store'), [])
             ->assertStatus(401);
@@ -79,8 +80,8 @@ class PageTest extends TestCase
     /** @test **/
     public function the_page_tree_can_be_loaded()
     {
-        $first_level_page = factory(Page::class)->create();
-        $second_level_page = factory(Page::class)->states('secondLevel')->create([
+        $first_level_page = Page::factory()->create();
+        $second_level_page = Page::factory()->secondLevel()->create([
             'parent_page_id' => $first_level_page->id,
         ]);
 
@@ -110,8 +111,8 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_be_updated()
     {
-        $page = factory(Page::class)->create();
-        $input = factory(Page::class)->raw();
+        $page = Page::factory()->create();
+        $input = Page::factory()->raw();
 
         $this->postJson(route('pages.update', ['id' => $page->id]), [])
             ->assertStatus(401);
@@ -144,8 +145,8 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_be_hidden()
     {
-        $page = factory(Page::class)->create();
-        $input = factory(Page::class)->raw([
+        $page = Page::factory()->create();
+        $input = Page::factory()->raw([
             'unlisted' => true,
         ]);
 
@@ -163,7 +164,7 @@ class PageTest extends TestCase
 
         $this->assertEquals(1, $page->unlisted);
 
-        $input = factory(Page::class)->raw([
+        $input = Page::factory()->raw([
             'unlisted' => false,
         ]);
 
@@ -227,9 +228,9 @@ class PageTest extends TestCase
     /** @test **/
     public function a_published_page_can_be_updated()
     {
-        $page = factory(Page::class)->states('published')->create();
+        $page = Page::factory()->published()->create();
 
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory());
         $content_element->version_id = $page->published_version_id;
         $content_element->save();
         $content_element->refresh();
@@ -245,7 +246,7 @@ class PageTest extends TestCase
         $this->signInAdmin();
 
         $input = $content_element->toArray();
-        $input['content'] = factory(TextBlock::class)->raw();
+        $input['content'] = TextBlock::factory()->raw();
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
              ->assertSuccessful();
@@ -276,7 +277,7 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_returns_a_404_if_it_has_not_been_published()
     {
-        $page = factory(Page::class)->states('unpublished')->create();
+        $page = Page::factory()->unpublished()->create();
 
         $this->get($page->full_slug)
             ->assertStatus(404);
@@ -315,8 +316,8 @@ class PageTest extends TestCase
         $bg_file = UploadedFile::fake()->image($bg_file_name);
         $bg_file_upload = (new FileUpload)->saveFile($bg_file, 'photos', true);
 
-        $page = factory(Page::class)->create();
-        $input = factory(Page::class)->raw();
+        $page = Page::factory()->create();
+        $input = Page::factory()->raw();
         $input['footer_fg_file_upload'] = $fg_file_upload;
         $input['footer_bg_file_upload'] = $bg_file_upload;
         $input['footer_color'] = $this->faker->hexcolor;
@@ -353,10 +354,10 @@ class PageTest extends TestCase
     /** @test **/
     public function a_user_without_update_permisson_cannot_save_a_page()
     {
-        $page = factory(Page::class)->create();
-        $user = factory(User::class)->create();
+        $page = Page::factory()->create();
+        $user = User::factory()->create();
 
-        $input = factory(Page::class)->raw();
+        $input = Page::factory()->raw();
 
         $this->postJson(route('pages.update', ['id' => $page->id]), $input)
              ->assertStatus(401);
@@ -378,25 +379,25 @@ class PageTest extends TestCase
     /** @test **/
     public function sorting_a_page_below_reorders_pages()
     {
-        $parent_page = factory(Page::class)->create();
-        $page = factory(Page::class)->create([
+        $parent_page = Page::factory()->create();
+        $page = Page::factory()->create([
             'parent_page_id' => $parent_page->id,
             'sort_order' => 2
         ]);
 
         $this->assertInstanceOf(Page::class, $parent_page);
 
-        $page_above = factory(Page::class)->create([
+        $page_above = Page::factory()->create([
             'parent_page_id' => $parent_page->id,
             'sort_order' => 1,
         ]);
 
-        $page_below = factory(Page::class)->create([
+        $page_below = Page::factory()->create([
             'parent_page_id' => $parent_page->id,
             'sort_order' => 3,
         ]);
 
-        $page_last = factory(Page::class)->create([
+        $page_last = Page::factory()->create([
             'parent_page_id' => $parent_page->id,
             'sort_order' => 4,
         ]);
@@ -435,25 +436,25 @@ class PageTest extends TestCase
     /** @test **/
     public function sorting_a_page_above_reorders_pages()
     {
-        $parent_page = factory(Page::class)->create();
-        $page = factory(Page::class)->create([
+        $parent_page = Page::factory()->create();
+        $page = Page::factory()->create([
             'parent_page_id' => $parent_page->id,
             'sort_order' => 2
         ]);
 
         $this->assertInstanceOf(Page::class, $parent_page);
 
-        $page_above = factory(Page::class)->create([
+        $page_above = Page::factory()->create([
             'parent_page_id' => $parent_page->id,
             'sort_order' => 1,
         ]);
 
-        $page_below = factory(Page::class)->create([
+        $page_below = Page::factory()->create([
             'parent_page_id' => $parent_page->id,
             'sort_order' => 3,
         ]);
 
-        $page_last = factory(Page::class)->create([
+        $page_last = Page::factory()->create([
             'parent_page_id' => $parent_page->id,
             'sort_order' => 4,
         ]);
@@ -487,29 +488,29 @@ class PageTest extends TestCase
     /** @test **/
     public function sorting_a_page_into_a_new_parent_sorts_the_old_parent_pages()
     {
-        $parent_old = factory(Page::class)->create();
-        $parent_new = factory(Page::class)->create();
-        $page = factory(Page::class)->create([
+        $parent_old = Page::factory()->create();
+        $parent_new = Page::factory()->create();
+        $page = Page::factory()->create([
             'parent_page_id' => $parent_old->id,
             'sort_order' => 2
         ]);
 
-        $old_page1 = factory(Page::class)->create([
+        $old_page1 = Page::factory()->create([
             'parent_page_id' => $parent_old->id,
             'sort_order' => 1
         ]);
 
-        $old_page2 = factory(Page::class)->create([
+        $old_page2 = Page::factory()->create([
             'parent_page_id' => $parent_old->id,
             'sort_order' => 3
         ]);
 
-        $new_page1 = factory(Page::class)->create([
+        $new_page1 = Page::factory()->create([
             'parent_page_id' => $parent_new->id,
             'sort_order' => 1
         ]);
 
-        $new_page2 = factory(Page::class)->create([
+        $new_page2 = Page::factory()->create([
             'parent_page_id' => $parent_new->id,
             'sort_order' => 2
         ]);
@@ -581,8 +582,8 @@ class PageTest extends TestCase
         $this->signInAdmin();
         session()->put('editing', true);
 
-        $text_block = factory(TextBlock::class)->create();
-        $content_element = $text_block->contentElement;
+        $content_element = $this->createContentElement(TextBlock::factory());
+        $text_block = $content_element->content;
         $page = $content_element->pages->first();
 
         $this->assertInstanceOf(Page::class, $page);
@@ -624,7 +625,7 @@ class PageTest extends TestCase
     /** @test **/
     public function individual_content_elements_can_be_published()
     {
-        $content_element1 = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $content_element1 = $this->createContentElement(TextBlock::factory());
         $text_block = $content_element1->content;
         $page = $content_element1->pages->first();
         $content_element1->version_id = $page->getDraftVersion()->id;
@@ -634,7 +635,7 @@ class PageTest extends TestCase
         $this->assertInstanceOf(Page::class, $page);
         $this->assertInstanceOf(ContentElement::class, $content_element1);
 
-        $content_element2 = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $content_element2 = $this->createContentElement(TextBlock::factory());
         $text_block2 = $content_element2->content;
 
         $content_element2->pages()->detach();
@@ -664,7 +665,7 @@ class PageTest extends TestCase
             'expandable' => false,
         ];
         $input = $content_element1->toArray();
-        $text_block_content = factory(TextBlock::class)->raw();
+        $text_block_content = TextBlock::factory()->raw();
         $input['content'] = $text_block_content;
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element1->id]), $input)
@@ -688,7 +689,7 @@ class PageTest extends TestCase
         ];
         $input = $content_element2->toArray();
         $input['publish_at'] = now()->subMinutes(5);
-        $text_block_content2 = factory(TextBlock::class)->raw();
+        $text_block_content2 = TextBlock::factory()->raw();
         $input['content'] = $text_block_content2;
 
         $this->withoutExceptionHandling();
@@ -723,7 +724,7 @@ class PageTest extends TestCase
     /** @test **/
     public function loading_a_pages_content_elements_includes_the_contentable_property()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory());
         $page = $content_element->pages->first();
 
         $this->assertInstanceOf(Page::class, $page);

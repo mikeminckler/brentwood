@@ -4,10 +4,11 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
-
-use App\User;
-use App\Role;
 use Illuminate\Support\Arr;
+
+use App\Models\User;
+use App\Models\Role;
+
 use Laravel\Socialite;
 
 class UserTest extends TestCase
@@ -17,8 +18,8 @@ class UserTest extends TestCase
     /** @test **/
     public function a_user_can_have_many_roles()
     {
-        $user = factory(User::class)->create();
-        $role = factory(Role::class)->create();
+        $user = User::factory()->create();
+        $role = Role::factory()->create();
 
         $user->roles()->attach($role);
 
@@ -32,8 +33,8 @@ class UserTest extends TestCase
     /** @test **/
     public function a_user_can_add_a_role()
     {
-        $user = factory(User::class)->create();
-        $role = factory(Role::class)->create();
+        $user = User::factory()->create();
+        $role = Role::factory()->create();
 
         $user->addRole($role);
 
@@ -45,8 +46,8 @@ class UserTest extends TestCase
     /** @test **/
     public function a_user_can_remove_a_role()
     {
-        $user = factory(User::class)->create();
-        $role = factory(Role::class)->create();
+        $user = User::factory()->create();
+        $role = Role::factory()->create();
 
         $user->addRole($role);
 
@@ -62,8 +63,8 @@ class UserTest extends TestCase
     /** @test **/
     public function a_user_can_add_role_by_name()
     {
-        $user = factory(User::class)->create();
-        $role = factory(Role::class)->create();
+        $user = User::factory()->create();
+        $role = Role::factory()->create();
 
         $user->addRole($role->name);
 
@@ -75,8 +76,8 @@ class UserTest extends TestCase
     /** @test **/
     public function a_user_can_check_if_they_have_a_role()
     {
-        $user = factory(User::class)->create();
-        $role = factory(Role::class)->create();
+        $user = User::factory()->create();
+        $role = Role::factory()->create();
 
         $this->assertFalse($user->hasRole($role));
         // check by name
@@ -92,33 +93,31 @@ class UserTest extends TestCase
         $this->assertTrue($user->hasRole($role->name));
         // check by id
         $this->assertTrue($user->hasRole($role->id));
-
     }
 
     /** @test **/
     public function a_role_can_be_found_by_name_with_periods_in_the_title()
     {
-        $role = factory(Role::class)->create([
+        $role = Role::factory()->create([
             'name' => 'foo.bar',
         ]);
 
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $user->addRole($role);
         $user->refresh();
 
         $this->assertTrue($user->hasRole($role->name));
-
     }
 
 
     /** @test **/
     public function an_admin_user_has_all_roles()
     {
-        $role = factory(Role::class)->create();
+        $role = Role::factory()->create();
         $admin_role = Role::where('name', 'admin')->first();
         $this->assertInstanceOf(Role::class, $admin_role);
 
-        $admin_user = User::whereHas('roles', function($query) {
+        $admin_user = User::whereHas('roles', function ($query) {
             $query->where('name', 'admin');
         })->first();
 
@@ -165,6 +164,5 @@ class UserTest extends TestCase
         $this->assertEquals($google_data->getEmail(), $user->email);
         $this->assertEquals($google_data->getName(), $user->name);
         $this->assertEquals($google_data->getAvatar(), $user->avatar);
-
     }
 }

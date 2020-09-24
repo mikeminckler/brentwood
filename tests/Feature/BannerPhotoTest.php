@@ -33,6 +33,7 @@ class BannerPhotoTest extends TestCase
         $photo_input['file_upload'] = $file_upload;
 
         $input = ContentElement::factory()->raw();
+        $input['id'] = 0;
         $input['type'] = 'banner-photo';
         $input['content'] = BannerPhoto::factory()->raw();
         $input['content']['photos'] = [$photo_input];

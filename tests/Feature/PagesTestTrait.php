@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Str;
-use App\User;
+use App\Models\User;
 
 use Illuminate\Support\Facades\Event;
 use App\Events\PageSaved;
@@ -24,7 +24,7 @@ trait PagesTestTrait
         $this->json('POST', route(Str::plural($this->getClassname()).'.unlist', ['id' => $page->id]))
             ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
         $this->json('POST', route(Str::plural($this->getClassname()).'.unlist', ['id' => $page->id]))

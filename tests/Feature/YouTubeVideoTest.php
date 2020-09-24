@@ -8,14 +8,15 @@ use Tests\TestCase;
 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
-use App\YoutubeVideo;
-use App\ContentElement;
-use App\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use App\FileUpload;
-use App\Photo;
-use App\Page;
+
+use App\Models\YoutubeVideo;
+use App\Models\ContentElement;
+use App\Models\User;
+use App\Models\FileUpload;
+use App\Models\Photo;
+use App\Models\Page;
 
 class YoutubeVideoTest extends TestCase
 {
@@ -23,11 +24,11 @@ class YoutubeVideoTest extends TestCase
     /** @test **/
     public function a_youtube_video_content_element_can_be_created()
     {
-
-        $input = factory(ContentElement::class)->states('youtube-video')->raw();
+        $input = $this->createContentElement(YoutubeVideo::factory())->toArray();
+        $input['id'] = 0;
         $input['type'] = 'youtube-video';
-        $input['content'] = factory(YoutubeVideo::class)->states('text')->raw();
-        $page = factory(Page::class)->create();
+        $input['content'] = YoutubeVideo::factory()->text()->raw();
+        $page = Page::factory()->create();
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -39,7 +40,7 @@ class YoutubeVideoTest extends TestCase
         $this->json('POST', route('content-elements.store'), [])
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.store'), [])
              ->assertStatus(422)
@@ -81,22 +82,21 @@ class YoutubeVideoTest extends TestCase
         $this->assertEquals(Arr::get($input, 'content.full_width'), $youtube_video->full_width);
         $this->assertEquals(Arr::get($input, 'content.header'), $youtube_video->header);
         $this->assertEquals(Arr::get($input, 'content.body'), $youtube_video->body);
-
     }
 
     /** @test **/
     public function a_youtube_video_can_be_updated()
     {
-        $youtube_video = factory(YoutubeVideo::class)->create();
-        $content_element = $youtube_video->contentElement;
-        $page = factory(Page::class)->create();
+        $content_element = $this->createContentElement(YoutubeVideo::factory());
+        $youtube_video = $content_element->content;
+        $page = $content_element->pages->first();
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
              ->assertStatus(422)
@@ -125,7 +125,7 @@ class YoutubeVideoTest extends TestCase
              ]);
 
         $input = $content_element->toArray();
-        $youtube_video_input = factory(YoutubeVideo::class)->raw();
+        $youtube_video_input = YoutubeVideo::factory()->raw();
         $input['content']['video_id'] = Arr::get($youtube_video_input, 'video_id');
         $input['content']['title'] = Arr::get($youtube_video_input, 'title');
         $input['pivot'] = [
@@ -154,23 +154,23 @@ class YoutubeVideoTest extends TestCase
     public function a_banner_image_can_be_saved_for_a_youtube_video()
     {
         $this->signInAdmin();
-        $youtube_video = factory(YoutubeVideo::class)->create();
-        $content_element = $youtube_video->contentElement;
+        $content_element = $this->createContentElement(YoutubeVideo::factory());
+        $youtube_video = $content_element->content;
 
         Storage::fake();
         $file_name = Str::lower(Str::random().'.jpg');
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $photo_input = factory(Photo::class)->raw();
+        $photo_input = Photo::factory()->raw();
         $photo_input['file_upload'] = $file_upload;
 
         $input = $content_element->toArray();
-        $youtube_video_input = factory(YoutubeVideo::class)->raw();
+        $youtube_video_input = YoutubeVideo::factory()->raw();
         $input['content']['video_id'] = Arr::get($youtube_video_input, 'video_id');
         $input['content']['title'] = Arr::get($youtube_video_input, 'title');
         $input['content']['photos'] = [$photo_input];
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -194,7 +194,7 @@ class YoutubeVideoTest extends TestCase
         $this->assertEquals(Arr::get($input, 'content.title'), $youtube_video->title);
         $this->assertEquals(1, $youtube_video->photos->count());
 
-        $this->assertTrue($youtube_video->photos->contains(function($p) use($file_name) {
+        $this->assertTrue($youtube_video->photos->contains(function ($p) use ($file_name) {
             return $p->fileUpload->name === $file_name;
         }));
 
@@ -214,14 +214,14 @@ class YoutubeVideoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $photo_input = factory(Photo::class)->raw();
+        $photo_input = Photo::factory()->raw();
         $photo_input['file_upload'] = $file_upload;
 
         $input = $content_element->toArray();
-        $youtube_video_input = factory(YoutubeVideo::class)->raw();
+        $youtube_video_input = YoutubeVideo::factory()->raw();
         $input['content']['video_id'] = Arr::get($youtube_video_input, 'video_id');
         $input['content']['photos'] = [$photo_input];
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -242,5 +242,4 @@ class YoutubeVideoTest extends TestCase
         $youtube_video->refresh();
         $this->assertEquals(1, $youtube_video->photos->count());
     }
-
 }

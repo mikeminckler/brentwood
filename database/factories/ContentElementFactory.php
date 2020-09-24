@@ -31,6 +31,7 @@ class ContentElementFactory extends Factory
         ];
     }
 
+    /*
     public function page()
     {
         return $this->state([
@@ -44,4 +45,5 @@ class ContentElementFactory extends Factory
             'version_id' => Version::factory()->for(Blog::factory(), 'versionable')->create(),
         ]);
     }
+     */
 }

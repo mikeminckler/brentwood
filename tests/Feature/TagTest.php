@@ -6,8 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Tag;
-use App\User;
+use App\Models\Tag;
+use App\Models\User;
 
 class TagTest extends TestCase
 {
@@ -15,12 +15,12 @@ class TagTest extends TestCase
     /** @test **/
     public function tags_can_be_search_for_autocomplete()
     {
-        $tag = factory(Tag::class)->create();
+        $tag = Tag::factory()->create();
 
         $this->json('POST', route('tags.search'), [])
             ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('tags.search'), [])
             ->assertStatus(403);

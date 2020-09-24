@@ -3,21 +3,19 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Arr;
-
-use App\Version;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
-
 use Illuminate\Support\Facades\Event;
+use Carbon\Carbon;
+
 use App\Events\PageSaved;
 use App\Events\BlogSaved;
 
-use App\Page;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
-
-use App\ContentElement;
-use App\User;
-use App\TextBlock;
+use App\Models\Page;
+use App\Models\Version;
+use App\Models\ContentElement;
+use App\Models\User;
+use App\Models\TextBlock;
 
 trait VersioningTestTrait
 {
@@ -27,7 +25,7 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_can_be_published()
     {
-        $content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $page = $content_element->{Str::plural($this->getClassname())}()->first();
 
         $content_element->version_id = $page->getDraftVersion()->id;
@@ -39,7 +37,7 @@ trait VersioningTestTrait
         $this->json('POST', route(Str::plural($this->getClassname()).'.publish', ['id' => $page->id]))
             ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
         $this->json('POST', route(Str::plural($this->getClassname()).'.publish', ['id' => $page->id]))
@@ -69,8 +67,7 @@ trait VersioningTestTrait
         $this->signInAdmin();
         session()->put('editing', true);
 
-
-        $content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $text_block = $content_element->content;
         $old_text = $text_block->body;
 
@@ -95,10 +92,10 @@ trait VersioningTestTrait
 
         $this->assertEquals($page->published_version_id, $content_element->version_id);
 
-        $new_text_block = factory(TextBlock::class)->raw();
+        $new_text_block = TextBlock::factory()->raw();
         $new_text = Arr::get($new_text_block, 'body');
         $this->assertNotNull($new_text);
-        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input = $this->createContentElement(TextBlock::factory())->toArray();
         $input['type'] = 'text-block';
         $input['content'] = $new_text_block;
         $input['content']['id'] = $content->id;
@@ -137,7 +134,7 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_with_more_than_one_version_displays_the_latest_published_at_date()
     {
-        $content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $page = $content_element->{Str::plural($this->getClassname())}()->first();
 
         $page->publish();
@@ -156,15 +153,15 @@ trait VersioningTestTrait
 
         $this->assertInstanceOf(Carbon::class, $published_at);
 
-        $input = factory(Page::class)->raw();
+        $input = Page::factory()->raw();
 
         $this->signInAdmin();
 
         $content = $content_element->content;
-        $new_text_block = factory(TextBlock::class)->raw();
+        $new_text_block = TextBlock::factory()->raw();
         $new_text = Arr::get($new_text_block, 'body');
         $this->assertNotNull($new_text);
-        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input = $this->createContentElement(TextBlock::factory())->toArray();
         $input['type'] = 'text-block';
         $input['content'] = $new_text_block;
         $input['content']['id'] = $content->id;

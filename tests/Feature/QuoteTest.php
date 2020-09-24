@@ -6,16 +6,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Quote;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
-use App\Photo;
-use App\FileUpload;
-use App\User;
-use App\Page;
-use App\ContentElement;
+
+use App\Models\Quote;
+use App\Models\Photo;
+use App\Models\FileUpload;
+use App\Models\User;
+use App\Models\Page;
+use App\Models\ContentElement;
 
 class QuoteTest extends TestCase
 {
@@ -23,20 +24,20 @@ class QuoteTest extends TestCase
     /** @test **/
     public function a_quote_content_element_can_be_created()
     {
-
         Storage::fake();
         $file_name = Str::random().'.jpg';
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $photo_input = factory(Photo::class)->raw();
+        $photo_input = Photo::factory()->raw();
         $photo_input['file_upload'] = $file_upload;
 
-        $input = factory(ContentElement::class)->states('quote')->raw();
+        $input = $this->createContentElement(Quote::factory())->toArray();
+        $input['id'] = 0;
         $input['type'] = 'quote';
-        $input['content'] = factory(Quote::class)->raw();
+        $input['content'] = Quote::factory()->raw();
         $input['content']['photos'] = [$photo_input];
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
 
         $input['pivot'] = [
             'contentable_id' => $page->id,
@@ -49,7 +50,7 @@ class QuoteTest extends TestCase
         $this->json('POST', route('content-elements.store'), [])
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.store'), [])
              ->assertStatus(422)
@@ -101,16 +102,16 @@ class QuoteTest extends TestCase
     /** @test **/
     public function a_quote_can_be_updated()
     {
-        $quote = factory(Quote::class)->create();
-        $content_element = $quote->contentElement;
-        $page = factory(Page::class)->create();
+        $content_element = $this->createContentElement(Quote::factory());
+        $quote = $content_element->content;
+        $page = $content_element->pages->first();
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
              ->assertStatus(422)
@@ -139,7 +140,7 @@ class QuoteTest extends TestCase
              ]);
 
         $input = $content_element->toArray();
-        $quote_input = factory(Quote::class)->raw();
+        $quote_input = Quote::factory()->raw();
         $input['content']['body'] = Arr::get($quote_input, 'body');
         $input['content']['author_name'] = Arr::get($quote_input, 'author_name');
         $input['content']['author_details'] = Arr::get($quote_input, 'author_details');

@@ -133,7 +133,7 @@ class Page extends Model
     public static function publishScheduledContent()
     {
         $pages = Version::whereNull('published_at')
-            ->whereHasMorph('versionable', ['App\Page', 'App\Blog'], function ($query) {
+            ->whereHasMorph('versionable', ['App\Models\Page', 'App\Models\Blog'], function ($query) {
                 $query->where(function ($query) {
                     $query->whereNotNull('publish_at')
                           ->where('publish_at', '<', now());

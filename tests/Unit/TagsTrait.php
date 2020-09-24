@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Tag;
+use App\Models\Tag;
 
 trait TagsTrait
 {
@@ -13,7 +13,7 @@ trait TagsTrait
     public function an_object_can_have_many_tags()
     {
         $object = $this->getModel();
-        $tag = factory(Tag::class)->create();
+        $tag = Tag::factory()->create();
 
         $object->tags()->attach($tag);
 
@@ -28,7 +28,7 @@ trait TagsTrait
     public function a_tag_can_be_added_to_an_object()
     {
         $object = $this->getModel();
-        $tag = factory(Tag::class)->create();
+        $tag = Tag::factory()->create();
 
         $object->addTag($tag);
         $object->refresh();

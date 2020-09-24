@@ -6,7 +6,7 @@ use Tests\TestCase;
 
 use Tests\Unit\PageLinkTestTrait;
 
-use App\BannerPhoto;
+use App\Models\BannerPhoto;
 
 class BannerPhotoTest extends TestCase
 {
@@ -14,7 +14,7 @@ class BannerPhotoTest extends TestCase
 
     protected function getModel()
     {
-        return factory(BannerPhoto::class)->create();
+        return $this->createContentElement(BannerPhoto::factory())->content;
     }
 
     protected function getLinkFields()

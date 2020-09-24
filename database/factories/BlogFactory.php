@@ -34,7 +34,7 @@ class BlogFactory extends Factory
     public function published()
     {
         return $this->state([
-            'published_version_id' => Version::factory()->published(),
+            'published_version_id' => Version::factory()->published()->for(Blog::factory(), 'versionable'),
         ]);
     }
 

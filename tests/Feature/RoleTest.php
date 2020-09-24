@@ -6,9 +6,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\Role;
-use App\User;
 use Illuminate\Support\Arr;
+
+use App\Models\Role;
+use App\Models\User;
 
 class RoleTest extends TestCase
 {
@@ -16,7 +17,6 @@ class RoleTest extends TestCase
     /** @test **/
     public function roles_can_be_searched()
     {
-
         $role = Role::where('id', '!=', 1)->get()->random();
 
         $input = [
@@ -27,7 +27,7 @@ class RoleTest extends TestCase
         $this->json('POST', route('roles.search'), $input)
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('roles.search'), $input)
             ->assertStatus(403);
@@ -44,12 +44,12 @@ class RoleTest extends TestCase
     /** @test **/
     public function a_role_can_be_created()
     {
-        $input = factory(Role::class)->raw();
+        $input = Role::factory()->raw();
 
         $this->json('POST', route('roles.store'), [])
              ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('roles.store'), [])
              ->assertStatus(403);
@@ -78,9 +78,9 @@ class RoleTest extends TestCase
     /** @test **/
     public function a_role_can_be_edited()
     {
-        $role = factory(Role::class)->create();
-        $user = factory(User::class)->create();
-        $input = factory(Role::class)->raw();
+        $role = Role::factory()->create();
+        $user = User::factory()->create();
+        $input = Role::factory()->raw();
         $input['users'] = [
             $user->toArray(),
         ];
@@ -88,7 +88,7 @@ class RoleTest extends TestCase
         $this->json('POST', route('roles.update', ['id' => $role->id]), [])
              ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('roles.update', ['id' => $role->id]), [])
              ->assertStatus(403);
@@ -120,23 +120,22 @@ class RoleTest extends TestCase
     public function the_roles_index_can_be_loaded()
     {
         $role = Role::all()->random();
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $user->addRole($role);
 
-        $this->get( route('roles.index'))
+        $this->get(route('roles.index'))
              ->assertRedirect('/login');
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
-        $this->get( route('roles.index'))
+        $this->get(route('roles.index'))
              ->assertRedirect('/');
 
         $this->signInAdmin();
 
-        $this->get( route('roles.index'))
+        $this->get(route('roles.index'))
              ->assertSuccessful();
-
     }
 
     /*
@@ -176,7 +175,7 @@ class RoleTest extends TestCase
     /** @test **/
     public function a_roles_user_is_removed_if_it_is_not_included_in_the_save_input()
     {
-        $user = factory(User::class)->create();   
+        $user = User::factory()->create();
         $role = Role::all()->random();
 
         $user->addRole($role);
@@ -184,7 +183,7 @@ class RoleTest extends TestCase
 
         $this->assertTrue($user->hasRole($role));
 
-        $input = factory(Role::class)->raw();
+        $input = Role::factory()->raw();
         $input['users'] = [];
 
         $this->signInAdmin();
@@ -200,5 +199,4 @@ class RoleTest extends TestCase
         $role->refresh();
         $this->assertFalse($role->users->contains('id', $user->id));
     }
-
 }

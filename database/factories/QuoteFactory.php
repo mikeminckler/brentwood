@@ -23,7 +23,9 @@ class QuoteFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'body' => $this->faker->paragraph,
+            'author_name' => $this->faker->name,
+            'author_details' => $this->faker->sentence,
         ];
     }
 }

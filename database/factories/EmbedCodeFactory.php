@@ -23,7 +23,7 @@ class EmbedCodeFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'code' => $this->faker->paragraph,
         ];
     }
 }

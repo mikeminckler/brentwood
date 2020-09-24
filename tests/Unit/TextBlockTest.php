@@ -4,20 +4,20 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 
-use App\TextBlock;
 use Illuminate\Support\Arr;
 
-use App\ContentElement;
+use App\Models\TextBlock;
+use App\Models\ContentElement;
+
 use Tests\Unit\PageLinkTestTrait;
 
 class TextBlockTest extends TestCase
 {
-
     use PageLinkTestTrait;
 
     protected function getModel()
     {
-        return factory(TextBlock::class)->create();
+        return $this->createContentElement(TextBlock::factory())->content;
     }
 
     protected function getLinkFields()
@@ -30,7 +30,7 @@ class TextBlockTest extends TestCase
     /** @test **/
     public function a_text_block_can_be_created()
     {
-        $input = factory(TextBlock::class)->raw();
+        $input = TextBlock::factory()->raw();
 
         $text_block = (new TextBlock)->saveContent(null, $input);
 
@@ -42,8 +42,7 @@ class TextBlockTest extends TestCase
     /** @test **/
     public function a_text_block_has_a_content_element()
     {
-        $text_block = factory(TextBlock::class)->create();
+        $text_block = $this->createContentElement(TextBlock::factory())->content;
         $this->assertInstanceOf(ContentElement::class, $text_block->contentElement);
     }
-
 }

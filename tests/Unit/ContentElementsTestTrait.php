@@ -4,14 +4,13 @@ namespace Tests\Unit;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-
 use Illuminate\Support\Collection;
 
-use App\ContentElement;
-use App\TextBlock;
-use App\Page;
-use App\User;
-use App\Role;
+use App\Models\ContentElement;
+use App\Models\TextBlock;
+use App\Models\Page;
+use App\Models\User;
+use App\Models\Role;
 
 trait ContentElementsTestTrait
 {
@@ -21,7 +20,7 @@ trait ContentElementsTestTrait
     /** @test **/
     public function a_page_can_have_many_content_elements()
     {
-        $content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $page = $content_element->{Str::plural($this->getClassname())}->first();
 
         $page->refresh();
@@ -34,9 +33,10 @@ trait ContentElementsTestTrait
     public function a_page_can_save_its_content_elements()
     {
         $page = $this->getModel();
-        $content_element_input = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->raw();
+        $content_element_input = $this->createContentElement(TextBlock::factory(), $this->getModel())->toArray();
+        $content_element_input['id'] = '0';
         $content_element_input['type'] = 'text-block';
-        $content_element_input['content'] = factory(TextBlock::class)->raw();
+        $content_element_input['content'] = TextBlock::factory()->raw();
         $content_element_input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -61,16 +61,16 @@ trait ContentElementsTestTrait
     public function a_page_can_get_its_content_elements()
     {
         // this checks for the proper grouping of content elements by UUID
-        $page = factory(get_class($this->getModel()))->states('published')->create();
-
-        $published_content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create([
-            'version_id' => $page->published_version_id,
+        $page = get_class($this->getModel())::factory()->published()->create();
+        
+        $published_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
+            'version_id' => $page->draft_version_id,
         ]);
 
         $published_content_element->{Str::plural($this->getClassname())}()->detach();
         $published_content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
 
-        $unpublished_content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create([
+        $unpublished_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'version_id' => $page->draft_version_id,
         ]);
 
@@ -87,7 +87,7 @@ trait ContentElementsTestTrait
     /** @test **/
     public function a_page_can_get_its_published_content_elements()
     {
-        $content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $this->assertEquals(1, $content_element->{Str::plural($this->getClassname())}()->count());
         $page = $content_element->{Str::plural($this->getClassname())}()->first();
         $content_element->version_id = $page->getDraftVersion()->id;
@@ -104,13 +104,13 @@ trait ContentElementsTestTrait
         $this->assertNotNull($content_element->published_at);
         $this->assertTrue($page->published_content_elements->contains('id', $content_element->id));
 
-        $unlisted_content_element = factory(ContentElement::class)->states($this->getClassname(), 'unlisted', 'text-block')->create([
+        $unlisted_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'version_id' => $page->published_version_id,
         ]);
 
         $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
 
-        $unpublished_content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create([
+        $unpublished_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'version_id' => $page->draft_version_id,
         ]);
 
@@ -130,7 +130,7 @@ trait ContentElementsTestTrait
     {
         $this->signInAdmin();
         session()->put('editing', true);
-        $content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $this->assertEquals(1, $content_element->{Str::plural($this->getClassname())}()->count());
         $page = $content_element->{Str::plural($this->getClassname())}()->first();
         $content_element->version_id = $page->getDraftVersion()->id;
@@ -151,13 +151,13 @@ trait ContentElementsTestTrait
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->preview_content_elements->contains('id', $content_element->id));
 
-        $unlisted_content_element = factory(ContentElement::class)->states($this->getClassname(), 'unlisted', 'text-block')->create([
+        $unlisted_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'version_id' => $page->published_version_id,
         ]);
 
         $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
 
-        $unpublished_content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create([
+        $unpublished_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'version_id' => $page->draft_version_id,
         ]);
 
@@ -195,7 +195,7 @@ trait ContentElementsTestTrait
     public function a_page_has_many_page_accesses()
     {
         $page = $this->getModel();
-        $role = factory(Role::class)->create();
+        $role = Role::factory()->create();
 
         $page->createPageAccess($role);
 
@@ -206,7 +206,7 @@ trait ContentElementsTestTrait
     public function a_page_can_grant_access_to_a_role()
     {
         $page = $this->getModel();
-        $role = factory(Role::class)->create();
+        $role = Role::factory()->create();
 
         $page->createPageAccess($role);
 
@@ -217,7 +217,7 @@ trait ContentElementsTestTrait
     public function a_page_can_grant_access_to_a_user()
     {
         $page = $this->getModel();
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
 
         $page->createPageAccess($user);
 
@@ -232,12 +232,12 @@ trait ContentElementsTestTrait
         $this->assertNotNull($page->editable);
         $this->assertFalse($page->editable);
 
-        $user1 = factory(User::class)->create();
+        $user1 = User::factory()->create();
         $this->signIn($user1);
 
         $this->assertFalse($page->editable);
 
-        $role = factory(Role::class)->create();
+        $role = Role::factory()->create();
         $page->createPageAccess($role);
         $user1->addRole($role);
 
@@ -250,7 +250,7 @@ trait ContentElementsTestTrait
         session()->put('editing', true);
         $this->assertTrue($page->editable);
 
-        $user2 = factory(User::class)->create();
+        $user2 = User::factory()->create();
         $this->signIn($user2);
 
         $this->assertFalse($page->editable);

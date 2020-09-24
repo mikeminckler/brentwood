@@ -4,20 +4,20 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 
-use App\PhotoBlock;
-use App\Photo;
-use App\ContentElement;
+use App\Models\PhotoBlock;
+use App\Models\Photo;
+use App\Models\ContentElement;
+use App\Models\Page;
 
 use Tests\Unit\PageLinkTestTrait;
 
 class PhotoBlockTest extends TestCase
 {
-
     use PageLinkTestTrait;
 
     protected function getModel()
     {
-        return factory(PhotoBlock::class)->create();
+        return $this->createContentElement(PhotoBlock::factory())->content;
     }
 
     protected function getLinkFields()
@@ -30,7 +30,7 @@ class PhotoBlockTest extends TestCase
     /** @test **/
     public function a_photo_block_has_many_photos()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo = Photo::factory()->for(PhotoBlock::factory(), 'content')->create();
         $photo_block = $photo->content;
         $this->assertInstanceOf(PhotoBlock::class, $photo_block);
         $this->assertInstanceOf(Photo::class, $photo_block->photos->first());
@@ -40,9 +40,12 @@ class PhotoBlockTest extends TestCase
     /** @test **/
     public function a_photo_block_belongs_to_a_content_element()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();
-        $photo_block = $photo->content;
+        $page = Page::factory()->create();
+        $content_element = ContentElement::factory()->for(PhotoBlock::factory()->has(Photo::factory()), 'content')->create([
+            'version_id' => $page->draft_version_id,
+        ]);
+        $photo_block = $content_element->content;
+        $this->assertInstanceOf(PhotoBlock::class, $photo_block);
         $this->assertInstanceOf(ContentElement::class, $photo_block->contentElement);
     }
-
 }

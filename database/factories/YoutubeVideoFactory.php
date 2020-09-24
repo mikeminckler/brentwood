@@ -23,7 +23,17 @@ class YoutubeVideoFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'video_id' => '1tW0Zj3YoJ4',
+            'title' => $this->faker->sentence,
+            'full_width' => false,
         ];
+    }
+
+    public function text()
+    {
+        return $this->state([
+            'header' => $this->faker->sentence,
+            'body' => $this->faker->paragraph,
+        ]);
     }
 }

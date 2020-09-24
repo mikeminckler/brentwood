@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\User;
+use App\Models\User;
 
 class SessionTest extends TestCase
 {
@@ -17,7 +17,7 @@ class SessionTest extends TestCase
         $this->postJson(route('editing-toggle'))
              ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
         $this->post(route('editing-toggle'))
@@ -42,6 +42,5 @@ class SessionTest extends TestCase
              ]);
 
         $this->assertFalse(session()->has('editing'));
-
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Models\ContentElement;
+
 trait ContentElementTrait
 {
     abstract public function saveContent();

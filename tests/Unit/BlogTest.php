@@ -10,7 +10,7 @@ use Tests\Unit\ContentElementsTestTrait;
 use Tests\Unit\VersioningTestTrait;
 use Tests\Unit\TagsTrait;
 
-use App\Blog;
+use App\Models\Blog;
 use Illuminate\Support\Str;
 
 class BlogTest extends TestCase
@@ -23,7 +23,7 @@ class BlogTest extends TestCase
 
     protected function getModel()
     {
-        return factory(Blog::class)->create();
+        return Blog::factory()->create();
     }
 
     protected function getClassname()
@@ -34,7 +34,7 @@ class BlogTest extends TestCase
     /** @test **/
     public function a_blog_has_a_full_slug_attribute()
     {
-        $blog = factory(Blog::class)->create([
+        $blog = Blog::factory()->create([
             'name' => 'Jimmy Page',
         ]);
 
@@ -44,7 +44,7 @@ class BlogTest extends TestCase
     /** @test **/
     public function a_blog_can_be_found_by_its_full_slug()
     {
-        $blog = factory(Blog::class)->create([
+        $blog = Blog::factory()->create([
             'name' => $this->faker->firstName,
         ]);
 
@@ -60,7 +60,7 @@ class BlogTest extends TestCase
     public function a_blog_has_a_slug_attribute()
     {
         $name = $this->faker->firstName;
-        $blog = factory(Blog::class)->create([
+        $blog = Blog::factory()->create([
             'name' => $name,
         ]);
 

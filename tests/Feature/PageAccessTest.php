@@ -6,10 +6,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\User;
-use App\Page;
-use App\Role;
-use App\PageAccess;
+use App\Models\User;
+use App\Models\Page;
+use App\Models\Role;
+use App\Models\PageAccess;
 
 class PageAccessTest extends TestCase
 {
@@ -20,7 +20,7 @@ class PageAccessTest extends TestCase
         $this->get(route('page-accesses.index'))
              ->assertRedirect(route('login'));
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
         $this->get(route('page-accesses.index'))
@@ -35,13 +35,13 @@ class PageAccessTest extends TestCase
     /** @test **/
     public function page_access_can_be_created_for_a_user()
     {
-        $user = factory(User::class)->create();
-        $page = factory(Page::class)->create();
+        $user = User::factory()->create();
+        $page = Page::factory()->create();
 
         $this->json('POST', route('page-accesses.store'), [])
             ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('page-accesses.store'), [])
             ->assertStatus(403);
@@ -79,8 +79,8 @@ class PageAccessTest extends TestCase
     public function page_access_can_be_created_for_a_role()
     {
         $this->withoutExceptionHandling();
-        $role = factory(Role::class)->create();
-        $page = factory(Page::class)->create();
+        $role = Role::factory()->create();
+        $page = Page::factory()->create();
 
         $this->signInAdmin();
 
@@ -103,8 +103,8 @@ class PageAccessTest extends TestCase
     /** @test **/
     public function a_pages_page_accesses_can_be_loaded()
     {
-        $page = factory(Page::class)->create();
-        $role = factory(Role::class)->create();
+        $page = Page::factory()->create();
+        $role = Role::factory()->create();
 
         $page->createPageAccess($role);
 
@@ -121,7 +121,7 @@ class PageAccessTest extends TestCase
         $this->json('GET', route('page-accesses.page', ['id' => $page->id]))
             ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('GET', route('page-accesses.page', ['id' => $page->id]))
             ->assertStatus(403);
@@ -140,8 +140,8 @@ class PageAccessTest extends TestCase
     /** @test **/
     public function page_access_can_be_removed()
     {
-        $page = factory(Page::class)->create();
-        $role = factory(Role::class)->create();
+        $page = Page::factory()->create();
+        $role = Role::factory()->create();
 
         $page->createPageAccess($role);
 
@@ -157,7 +157,7 @@ class PageAccessTest extends TestCase
         $this->json('POST', route('page-accesses.destroy', ['id' => $page_access->id]))
             ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('page-accesses.destroy', ['id' => $page_access->id]))
             ->assertStatus(403);

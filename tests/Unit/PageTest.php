@@ -4,24 +4,24 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
-
-use App\Page;
-use App\ContentElement;
-use App\TextBlock;
-use App\Version;
-use App\Menu;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
-use App\FileUpload;
-use Illuminate\Support\Str;
-use App\Role;
-use App\User;
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
-
 use Illuminate\Support\Facades\Event;
+use Carbon\Carbon;
+
+use App\Models\Page;
+use App\Models\ContentElement;
+use App\Models\TextBlock;
+use App\Models\Version;
+use App\Models\Menu;
+use App\Models\FileUpload;
+use App\Models\Role;
+use App\Models\User;
+
 use App\Events\PageDraftCreated;
 
 use Tests\Unit\AppendAttributesTestTrait;
@@ -39,7 +39,7 @@ class PageTest extends TestCase
 
     protected function getModel()
     {
-        return factory(Page::class)->create();
+        return Page::factory()->create();
     }
 
     protected function getClassname()
@@ -50,8 +50,8 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_has_a_parent()
     {
-        $first_level_page = factory(Page::class)->create();
-        $second_level_page = factory(Page::class)->states('secondLevel')->create([
+        $first_level_page = Page::factory()->create();
+        $second_level_page = Page::factory()->secondLevel()->create([
             'parent_page_id' => $first_level_page->id,
         ]);
 
@@ -66,8 +66,8 @@ class PageTest extends TestCase
     /** @test **/
     public function the_page_tree_can_be_created()
     {
-        $first_level_page = factory(Page::class)->create();
-        $second_level_page = factory(Page::class)->states('secondLevel')->create([
+        $first_level_page = Page::factory()->create();
+        $second_level_page = Page::factory()->secondLevel()->create([
             'parent_page_id' => $first_level_page->id,
         ]);
 
@@ -82,7 +82,7 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_has_a_default_slug_attribute()
     {
-        $page = factory(Page::class)->create([
+        $page = Page::factory()->create([
             'name' => 'Foo Bar Baz',
         ]);
 
@@ -93,11 +93,11 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_has_a_full_slug_attribute()
     {
-        $page = factory(Page::class)->states('secondLevel')->create([
+        $page = Page::factory()->secondLevel()->create([
             'name' => 'Jimmy Page',
-            'parent_page_id' => factory(Page::class)->create([
+            'parent_page_id' => Page::factory()->create([
                 'name' => 'Led Zeppelin',
-                'parent_page_id' => factory(Page::class)->create([
+                'parent_page_id' => Page::factory()->create([
                     'name' => 'Rock N Roll',
                 ]),
             ]),
@@ -110,11 +110,11 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_be_found_by_its_full_slug()
     {
-        $page = factory(Page::class)->states('secondLevel')->create([
+        $page = Page::factory()->secondLevel()->create([
             'name' => $this->faker->firstName,
-            'parent_page_id' => factory(Page::class)->create([
+            'parent_page_id' => Page::factory()->create([
                 'name' => $this->faker->firstName,
-                'parent_page_id' => factory(Page::class)->create([
+                'parent_page_id' => Page::factory()->create([
                     'name' => $this->faker->firstName,
                 ]),
             ]),
@@ -132,7 +132,7 @@ class PageTest extends TestCase
     public function a_page_can_return_its_slug()
     {
         $slug = $this->faker->name;
-        $page = factory(Page::class)->states('slug')->create([
+        $page = Page::factory()->slug()->create([
             'slug' => $slug,
         ]);
 
@@ -142,14 +142,14 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_be_hidden_from_the_menu()
     {
-        $page = factory(Page::class)->states('unlisted')->create();
+        $page = Page::factory()->unlisted()->create();
         $this->assertEquals(1, $page->unlisted);
     }
 
     /** @test **/
     public function if_session_editing_preview_content_elements_are_appended()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory());
         $this->assertEquals(1, $content_element->pages()->count());
         $page = $content_element->pages->first();
         $content_element->version_id = $page->getDraftVersion()->id;
@@ -179,7 +179,7 @@ class PageTest extends TestCase
         $home_page->footer_color = $footer_color;
         $home_page->save();
 
-        $page = factory(Page::class)->create([
+        $page = Page::factory()->create([
             'parent_page_id' => $home_page->id,
         ]);
 
@@ -195,7 +195,7 @@ class PageTest extends TestCase
         $bg_file_upload2 = (new FileUpload)->saveFile($bg_file2, 'photos', true);
         $footer_color2 = $this->faker->hexcolor;
         
-        $sub_page = factory(Page::class)->create([
+        $sub_page = Page::factory()->create([
             'parent_page_id' => $page->id,
         ]);
 
@@ -223,7 +223,7 @@ class PageTest extends TestCase
         $fg_file = UploadedFile::fake()->image($fg_file_name);
         $fg_file_upload = (new FileUpload)->saveFile($fg_file, 'photos', true);
 
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
         $page->footer_fg_file_upload_id = $fg_file_upload->id;
         $page->save();
 
@@ -241,7 +241,7 @@ class PageTest extends TestCase
         $bg_file = UploadedFile::fake()->image($bg_file_name);
         $bg_file_upload = (new FileUpload)->saveFile($bg_file, 'photos', true);
 
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
         $page->footer_bg_file_upload_id = $bg_file_upload->id;
         $page->save();
 
@@ -254,8 +254,8 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_has_a_sub_menu()
     {
-        $page = factory(Page::class)->create();
-        $sub_page = factory(Page::class)->create([
+        $page = Page::factory()->create();
+        $sub_page = Page::factory()->create([
             'parent_page_id' => $page->id,
         ]);
 
@@ -266,11 +266,11 @@ class PageTest extends TestCase
     /** @test **/
     public function a_page_can_recursively_append_attributes()
     {
-        $page1 = factory(Page::class)->create();
-        $page2 = factory(Page::class)->create([
+        $page1 = Page::factory()->create();
+        $page2 = Page::factory()->create([
             'parent_page_id' => $page1->id,
         ]);
-        $page3 = factory(Page::class)->create([
+        $page3 = Page::factory()->create([
             'parent_page_id' => $page2->id,
         ]);
 
@@ -293,7 +293,7 @@ class PageTest extends TestCase
     {
         $unsanitized_name = 'FOOBAR, baz, "Foo"';
 
-        $page = factory(Page::class)->create([
+        $page = Page::factory()->create([
             'name' => $unsanitized_name,
         ]);
 

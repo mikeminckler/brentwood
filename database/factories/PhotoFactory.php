@@ -6,6 +6,8 @@ use App\Models\Photo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+use App\Models\Page;
+
 class PhotoFactory extends Factory
 {
     /**

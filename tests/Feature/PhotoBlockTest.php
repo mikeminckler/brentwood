@@ -8,20 +8,18 @@ use Tests\TestCase;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
-
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
     
-use App\PhotoBlock;
-use App\Photo;
-use App\FileUpload;
-use App\User;
-use App\Page;
-use App\ContentElement;
+use App\Models\PhotoBlock;
+use App\Models\Photo;
+use App\Models\FileUpload;
+use App\Models\User;
+use App\Models\Page;
+use App\Models\ContentElement;
 
 class PhotoBlockTest extends TestCase
 {
-
     use WithFaker;
 
     /** @test **/
@@ -32,12 +30,13 @@ class PhotoBlockTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $photo_input = factory(Photo::class)->raw();
+        $photo_input = Photo::factory()->raw();
         $photo_input['file_upload'] = $file_upload;
 
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
 
-        $input = factory(ContentElement::class)->states('page', 'photo-block')->raw();
+        $input = ContentElement::factory()->for(PhotoBlock::factory(), 'content')->raw();
+        $input['id'] = 0;
         $input['type'] = 'photo-block';
 
         $input['content'] = [
@@ -95,7 +94,7 @@ class PhotoBlockTest extends TestCase
         $this->assertEquals(Arr::get($input, 'content.text_span'), $photo_block->text_span);
         $this->assertEquals(Arr::get($input, 'content.text_style'), $photo_block->text_style);
 
-        $this->assertTrue($photo_block->photos->contains(function($p) use($file_name) {
+        $this->assertTrue($photo_block->photos->contains(function ($p) use ($file_name) {
             return $p->fileUpload->name === $file_name;
         }));
 
@@ -114,9 +113,9 @@ class PhotoBlockTest extends TestCase
     /** @test **/
     public function updating_a_photo_block()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();
-        $photo_block = $photo->content;
-        $content_element = $photo_block->contentElement;
+        $content_element = $this->createContentElement(PhotoBlock::factory()->has(Photo::factory(), 'photos'));
+        $photo_block = $content_element->content;
+        $photo = $photo_block->photos()->first();
         $page = $content_element->pages->first();
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
@@ -124,10 +123,20 @@ class PhotoBlockTest extends TestCase
         $this->assertInstanceOf(Photo::class, $photo);
         $this->assertInstanceOf(Page::class, $page);
 
-        $input = factory(ContentElement::class)->raw();
+        $input = ContentElement::factory()->raw();
         $input['type'] = 'photo-block';
-        $input['content'] = factory(PhotoBlock::class)->raw();
-        $input['content']['photos'] = [factory(Photo::class)->states('photo-block')->create(['content_id' => $photo_block->id])];
+        $input['content'] = PhotoBlock::factory()->raw();
+
+        $new_photo = Photo::factory()
+                        ->for(PhotoBlock::factory(), 'content')
+                        ->has(FileUpload::factory()->jpg(), 'fileUpload')
+                        ->create([
+                            'content_id' => $photo_block->id
+                        ]);
+
+        $this->assertInstanceOf(FileUpload::class, $new_photo->fileUpload);
+
+        $input['content']['photos'] = [$new_photo->toArray()];
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -138,8 +147,9 @@ class PhotoBlockTest extends TestCase
 
         $this->signInAdmin();
 
+        $this->withoutExceptionHandling();
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
-             //->assertSuccessful()
+            ->assertSuccessful()
             ->assertJsonFragment([
                 'success' => 'Photo Block Saved',
             ]);
@@ -149,9 +159,9 @@ class PhotoBlockTest extends TestCase
 
         $content_element_page = $content_element->pages->first();
         $this->assertEquals($page->id, $content_element_page->id);
-        $this->assertEquals( Arr::get($input, 'pivot.sort_order'), $content_element_page->pivot->sort_order);
-        $this->assertEquals( Arr::get($input, 'pivot.unlisted'), $content_element_page->pivot->unlisted);
-        $this->assertEquals( Arr::get($input, 'pivot.expandable'), $content_element_page->pivot->expandable);
+        $this->assertEquals(Arr::get($input, 'pivot.sort_order'), $content_element_page->pivot->sort_order);
+        $this->assertEquals(Arr::get($input, 'pivot.unlisted'), $content_element_page->pivot->unlisted);
+        $this->assertEquals(Arr::get($input, 'pivot.expandable'), $content_element_page->pivot->expandable);
 
         $this->assertEquals(Arr::get($input, 'content.columns'), $photo_block->columns);
         $this->assertEquals(Arr::get($input, 'content.height'), $photo_block->height);
@@ -162,24 +172,22 @@ class PhotoBlockTest extends TestCase
         $this->assertEquals(Arr::get($input, 'content.text_order'), $photo_block->text_order);
         $this->assertEquals(Arr::get($input, 'content.text_span'), $photo_block->text_span);
         $this->assertEquals(Arr::get($input, 'content.text_style'), $photo_block->text_style);
-
     }
 
     /** @test **/
     public function saving_a_photo_with_the_same_name_doesnt_create_a_new_photo()
     {
-        
         Storage::fake();
         $file_name = Str::random().'.jpg';
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $photo_input = factory(Photo::class)->raw();
+        $photo_input = Photo::factory()->raw();
         $photo_input['file_upload'] = $file_upload;
 
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
 
-        $input = factory(ContentElement::class)->states('page', 'photo-block')->raw();
+        $input = $this->createContentElement(PhotoBlock::factory())->toArray();
         $input['type'] = 'photo-block';
 
         $input['content'] = [

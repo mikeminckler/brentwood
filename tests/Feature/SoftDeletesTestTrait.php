@@ -4,11 +4,10 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Str;
 
-use App\User;
+use App\Models\User;
 
 trait SoftDeletesTestTrait
 {
-
     abstract protected function getModel();
 
     /** @test **/
@@ -22,7 +21,7 @@ trait SoftDeletesTestTrait
         $this->json('POST', route($resource.'.remove', ['id' => $model->id]))
             ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route($resource.'.remove', ['id' => $model->id]))
             ->assertStatus(403);
@@ -52,7 +51,7 @@ trait SoftDeletesTestTrait
         $this->json('POST', route($resource.'.restore', ['id' => $model->id]))
             ->assertStatus(401);
 
-        $this->signIn(factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
         $this->json('POST', route($resource.'.restore', ['id' => $model->id]))

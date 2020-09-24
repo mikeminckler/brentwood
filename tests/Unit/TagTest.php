@@ -4,11 +4,11 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
-
-use App\Tag;
-use App\Blog;
-use App\Page;
 use Illuminate\Support\Str;
+
+use App\Models\Tag;
+use App\Models\Blog;
+use App\Models\Page;
 
 class TagTest extends TestCase
 {
@@ -17,8 +17,8 @@ class TagTest extends TestCase
     /** @test **/
     public function a_tag_has_many_blogs()
     {
-        $tag = factory(Tag::class)->create();
-        $blog = factory(Blog::class)->create();
+        $tag = Tag::factory()->create();
+        $blog = Blog::factory()->create();
 
         $tag->blogs()->attach($blog);
 
@@ -32,8 +32,8 @@ class TagTest extends TestCase
     /** @test **/
     public function a_tag_has_many_pages()
     {
-        $tag = factory(Tag::class)->create();
-        $page = factory(Page::class)->create();
+        $tag = Tag::factory()->create();
+        $page = Page::factory()->create();
 
         $tag->pages()->attach($page);
 

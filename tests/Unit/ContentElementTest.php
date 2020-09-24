@@ -5,12 +5,13 @@ namespace Tests\Unit;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\ContentElement;
-use App\TextBlock;
-use App\Page;
-use App\Version;
 use Illuminate\Support\Arr;
-use App\Blog;
+
+use App\Models\ContentElement;
+use App\Models\TextBlock;
+use App\Models\Page;
+use App\Models\Version;
+use App\Models\Blog;
 
 class ContentElementTest extends TestCase
 {
@@ -19,9 +20,8 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function a_content_element_can_be_created()
     {
-
-        $page = factory(Page::class)->create();
-        $text_block = factory(TextBlock::class)->raw();
+        $page = Page::factory()->create();
+        $text_block = TextBlock::factory()->raw();
         $input = [
             'id' => 0,
             'type' => 'text-block',
@@ -50,49 +50,48 @@ class ContentElementTest extends TestCase
         $this->assertNotNull($content_element->content_id);
         $this->assertEquals(Arr::get($text_block, 'header'), $content_element->content->header);
         $this->assertEquals(Arr::get($text_block, 'body'), $content_element->content->body);
-
     }
 
     /** @test **/
     public function a_content_element_belongs_to_a_version()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory());
         $this->assertInstanceOf(Version::class, $content_element->version);
     }
 
     /** @test **/
     public function a_content_element_belongs_to_many_pages()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), Page::factory()->create());
         $this->assertInstanceOf(Page::class, $content_element->pages->first());
     }
 
     /** @test **/
     public function a_content_element_belongs_to_many_blogs()
     {
-        $content_element = factory(ContentElement::class)->states('text-block', 'blog')->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), Blog::factory()->create());
         $this->assertInstanceOf(Blog::class, $content_element->blogs->first());
     }
 
     /** @test **/
     public function a_content_element_can_have_a_text_block()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory());
         $this->assertInstanceOf(TextBlock::class, $content_element->content);
     }
 
     /** @test **/
     public function a_content_element_has_a_content_type()
     {
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory());
         $this->assertEquals('text-block', $content_element->type);
     }
 
     /** @test **/
     public function a_new_content_element_is_created_if_the_one_updated_has_been_published()
     {
-        $page = factory(Page::class)->states('published')->create();
-        $content_element = factory(ContentElement::class)->states('page', 'text-block')->create();
+        $page = Page::factory()->published()->create();
+        $content_element = $this->createContentElement(TextBlock::factory());
         $content_element->version_id = $page->published_version_id;
         $content_element->save();
         $content_element->refresh();
@@ -105,9 +104,9 @@ class ContentElementTest extends TestCase
 
         $this->assertNotNull($content_element->published_at);
 
-        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input = ContentElement::factory()->for(TextBlock::factory(), 'content')->raw();
         $input['type'] = 'text-block';
-        $input['content'] = factory(TextBlock::class)->raw();
+        $input['content'] = TextBlock::factory()->raw();
         $input['content']['id'] = $content->id;
         $input['pivot'] = [
             'contentable_id' => $page->id,
@@ -130,8 +129,8 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function a_content_element_can_get_its_previous_version()
     {
-        $page = factory(Page::class)->states('published')->create();
-        $content_element1 = factory(ContentElement::class)->states('text-block')->create();
+        $page = Page::factory()->published()->create();
+        $content_element1 = $this->createContentElement(TextBlock::factory());
         $content_element1->version_id = $page->published_version_id;
         $content_element1->save();
         $content_element1->refresh();
@@ -141,7 +140,7 @@ class ContentElementTest extends TestCase
 
         $this->assertNotNull($content_element1->published_at);
 
-        $content_element2 = factory(ContentElement::class)->states('text-block')->create([
+        $content_element2 = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'uuid' => $content_element1->uuid,
             'version_id' => $page->draft_version_id,
         ]);
@@ -157,15 +156,15 @@ class ContentElementTest extends TestCase
     /** @test **/
     public function saving_publish_at_persits_the_correct_value()
     {
-        $content_element = factory(ContentElement::class)->states('text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory());
         $content = $content_element->content;
 
-        $page = factory(Page::class)->states('published')->create();
+        $page = Page::factory()->published()->create();
         $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
 
-        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input = ContentElement::factory()->for(TextBlock::factory(), 'content')->raw();
         $input['type'] = 'text-block';
-        $input['content'] = factory(TextBlock::class)->raw();
+        $input['content'] = TextBlock::factory()->raw();
         $input['content']['id'] = $content->id;
         $input['publish_at'] = '2020-08-23T12:00:00.000000Z';
 
@@ -183,6 +182,5 @@ class ContentElementTest extends TestCase
 
         $content_element_array = $content_element->toArray();
         $this->assertEquals('2020-08-23T12:00:00.000000Z', Arr::get($content_element_array, 'publish_at'));
-
     }
 }

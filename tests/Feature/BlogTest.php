@@ -12,6 +12,7 @@ use App\Models\Blog;
 use App\Models\User;
 use App\Models\ContentElement;
 use App\Models\TextBlock;
+use App\Models\Version;
 
 use Tests\Feature\SoftDeletesTestTrait;
 use Tests\Feature\VersioningTestTrait;
@@ -26,8 +27,9 @@ class BlogTest extends TestCase
 
     protected function getModel()
     {
-        return factory(Blog::class)->create();
+        return Blog::factory()->create();
     }
+
     protected function getClassname()
     {
         return 'blog';
@@ -114,10 +116,11 @@ class BlogTest extends TestCase
     public function blogs_can_be_loaded_for_pagination()
     {
         $content_element = ContentElement::factory()
-                                ->blog()
                                 ->hasAttached(Blog::factory(), ['sort_order' => 1, 'unlisted' => 0, 'expandable' => 0])
                                 ->for(TextBlock::factory(), 'content')
-                                ->create();
+                                ->create([
+                                    'version_id' => Version::factory()->for(Blog::factory(), 'versionable'),
+                                ]);
 
         $blog = $content_element->blogs->first();
         $this->assertInstanceOf(Blog::class, $blog);

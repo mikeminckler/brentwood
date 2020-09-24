@@ -4,18 +4,17 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 
-use App\Photo;
-use App\YoutubeVideo;
+use App\Models\Photo;
+use App\Models\YoutubeVideo;
 use Tests\Unit\PageLinkTestTrait;
 
 class YoutubeVideoTest extends TestCase
 {
-
     use PageLinkTestTrait;
 
     protected function getModel()
     {
-        return factory(YoutubeVideo::class)->create();
+        return $this->createContentElement(YoutubeVideo::factory())->content;
     }
 
     protected function getLinkFields()
@@ -29,7 +28,7 @@ class YoutubeVideoTest extends TestCase
     /** @test **/
     public function a_youtube_video_has_a_banner_image()
     {
-        $photo = factory(Photo::class)->states('youtube-video')->create();
+        $photo = Photo::factory()->for(YoutubeVideo::factory(), 'content')->create();
         $youtube_video = $photo->content;
         $this->assertInstanceOf(YoutubeVideo::class, $youtube_video);
         $this->assertInstanceOf(Photo::class, $youtube_video->photos->first());

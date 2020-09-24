@@ -5,28 +5,43 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
-
-use App\Photo;
-use App\PhotoBlock;
-use App\FileUpload;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+
+use App\Models\Photo;
+use App\Models\PhotoBlock;
+use App\Models\FileUpload;
+use App\Models\TextBlock;
+use App\Models\Page;
+use App\Utilities\PageLink;
+
 use Tests\Unit\PageLinkTestTrait;
-use App\TextBlock;
-use App\Page;
-use App\PageLink;
 
 class PhotoTest extends TestCase
 {
+    protected function createPhoto()
+    {
+        Storage::fake();
+        $file_name = Str::random().'jpg';
+        $file = UploadedFile::fake()->image($file_name);
+        $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
+
+        $input = Photo::factory()->stat()->link()->raw();
+        $input['file_upload'] = $file_upload;
+
+        $photo_block = PhotoBlock::factory()->create();
+        $photo = (new Photo)->savePhoto(null, $input, $photo_block);
+        $this->assertInstanceOf(Photo::class, $photo);
+        return $photo;
+    }
 
     /** @test **/
     public function a_photo_has_a_file_upload()
     {
         cache()->flush();
-        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo = $this->createPhoto();
         $this->assertInstanceOf(FileUpload::class, $photo->fileUpload);
     }
 
@@ -38,10 +53,10 @@ class PhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $input = factory(Photo::class)->states('stat', 'link')->raw();
+        $input = Photo::factory()->stat()->link()->raw();
         $input['file_upload'] = $file_upload;
 
-        $photo_block = factory(PhotoBlock::class)->create();
+        $photo_block = PhotoBlock::factory()->create();
         $photo = (new Photo)->savePhoto(null, $input, $photo_block);
         $this->assertInstanceOf(Photo::class, $photo);
 
@@ -58,21 +73,24 @@ class PhotoTest extends TestCase
         $this->assertEquals(Arr::get($input, 'stat_number'), $photo->stat_number);
         $this->assertEquals(Arr::get($input, 'stat_name'), $photo->stat_name);
         $this->assertEquals(PageLink::convertLink(Arr::get($input, 'link')), $photo->link);
-
     }
 
     /** @test **/
     public function a_photo_belongs_to_a_content_item()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();   
+        $photo = Photo::factory()->for(PhotoBlock::factory(), 'content')->create();
         $this->assertInstanceOf(PhotoBlock::class, $photo->content);
     }
 
     /** @test **/
     public function a_photo_can_have_a_small()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo = $this->createPhoto();
         $small = $photo->small;
+        $this->assertNotNull($photo->small);
+        $this->assertInstanceOf(FileUpload::class, $photo->fileUpload);
+        $photo->refresh();
+        $this->assertNotEquals('/public/images/default.png', $photo->small);
         $this->assertTrue(strpos($photo->small, $photo->fileUpload->filename) > 0);
         Storage::disk('public')->assertExists($small);
     }
@@ -80,7 +98,7 @@ class PhotoTest extends TestCase
     /** @test **/
     public function a_photo_small_can_be_removed()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo = $this->createPhoto();
         $small = $photo->small;
         Storage::disk('public')->assertExists($small);
         $photo->removeSmall();
@@ -90,7 +108,7 @@ class PhotoTest extends TestCase
     /** @test **/
     public function a_photo_can_have_a_medium_image()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo = $this->createPhoto();
         $medium = $photo->medium;
         $this->assertTrue(strpos($photo->medium, $photo->fileUpload->filename) > 0);
         Storage::disk('public')->assertExists($medium);
@@ -99,7 +117,7 @@ class PhotoTest extends TestCase
     /** @test **/
     public function a_photos_medium_image_can_be_removed()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo = $this->createPhoto();
         $medium = $photo->medium;
         Storage::disk('public')->assertExists($medium);
         $photo->removeMedium();
@@ -109,7 +127,7 @@ class PhotoTest extends TestCase
     /** @test **/
     public function a_photo_can_have_a_large_image()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo = $this->createPhoto();
         $large = $photo->large;
         $this->assertTrue(strpos($photo->large, $photo->fileUpload->filename) > 0);
         Storage::disk('public')->assertExists($large);
@@ -118,7 +136,7 @@ class PhotoTest extends TestCase
     /** @test **/
     public function a_photos_large_image_can_be_removed()
     {
-        $photo = factory(Photo::class)->states('photo-block')->create();
+        $photo = $this->createPhoto();
         $large = $photo->large;
         Storage::disk('public')->assertExists($large);
         $photo->removeLarge();
@@ -134,10 +152,10 @@ class PhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $input = factory(Photo::class)->raw();
+        $input = Photo::factory()->raw();
         $input['file_upload'] = $file_upload;
 
-        $photo_block = factory(PhotoBlock::class)->create();
+        $photo_block = PhotoBlock::factory()->create();
         $photo = (new Photo)->savePhoto(null, $input, $photo_block);
         $this->assertInstanceOf(Photo::class, $photo);
 
@@ -164,14 +182,14 @@ class PhotoTest extends TestCase
     /** @test **/
     public function a_photo_link_is_converted_to_a_slug()
     {
-        $text_block = factory(TextBlock::class)->create();
-        $content_element = $text_block->contentElement;
+        $content_element = $this->createContentElement(TextBlock::factory());
+        $text_block = $content_element->content;
         $page = $content_element->pages()->first();
 
         $link = $page->id.'#c-'.$content_element->uuid;
 
         $this->assertInstanceOf(Page::class, $page);
-        $photo = factory(Photo::class)->states('photo-block')->create([
+        $photo = Photo::factory()->for(PhotoBlock::factory(), 'content')->create([
             'link' => $link,
         ]);
 

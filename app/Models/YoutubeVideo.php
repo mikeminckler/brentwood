@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
 
-use App\Models\PhotosTrait;
-use App\Models\ContentElementTrait;
-
+use App\Traits\PhotosTrait;
+use App\Traits\ContentElementTrait;
 use App\Utilities\PageLink;
 
 class YoutubeVideo extends Model

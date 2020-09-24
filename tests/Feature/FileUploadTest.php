@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase; 
+use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-use App\User;
-use App\FileUpload;
+use App\Models\User;
+use App\Models\FileUpload;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,7 +17,7 @@ class FileUploadsTest extends TestCase
     public function a_file_can_be_uploaded()
     {
         $this->withoutExceptionHandling();
-        Storage::fake(); 
+        Storage::fake();
         $file = UploadedFile::fake()->image('logo.png');
 
         $this->signInAdmin();
@@ -38,8 +38,8 @@ class FileUploadsTest extends TestCase
     /** @test **/
     public function removing_a_file_upload()
     {
-        $user = factory(User::class)->create();
-        $file_upload = factory(FileUpload::class)->create();
+        $user = User::factory()->create();
+        $file_upload = FileUpload::factory()->create();
         $user->fileUploads()->save($file_upload);
 
         $this->withoutExceptionHandling();
@@ -198,7 +198,7 @@ class FileUploadsTest extends TestCase
     public function a_file_upload_name_has_illegal_characters_removed()
     {
         $this->withoutExceptionHandling();
-        Storage::fake(); 
+        Storage::fake();
         $file = UploadedFile::fake()->image('!@#$%^&*()foobar"[];<>\'.png');
 
         $this->signInAdmin();

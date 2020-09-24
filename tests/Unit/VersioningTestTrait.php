@@ -4,16 +4,18 @@ namespace Tests\Unit;
 
 use Illuminate\Support\Arr;
 
-use App\Version;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
-use App\Events\PageDraftCreated;
-use App\Events\BlogDraftCreated;
-use App\Page;
 use Illuminate\Support\Str;
 
-use App\ContentElement;
-use App\User;
+use App\Events\PageDraftCreated;
+use App\Events\BlogDraftCreated;
+
+use App\Models\Version;
+use App\Models\Page;
+use App\Models\User;
+use App\Models\ContentElement;
+use App\Models\TextBlock;
 
 trait VersioningTestTrait
 {
@@ -23,7 +25,7 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_can_get_its_draft_version()
     {
-        $page = factory(get_class($this->getModel()))->create();
+        $page = $this->getModel();
 
         $this->assertInstanceOf(get_class($this->getModel()), $page);
         $draft_version = $page->getDraftVersion();
@@ -33,7 +35,9 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_has_a_published_version()
     {
-        $page = factory(get_class($this->getModel()))->states('published')->create();
+        $page = $this->getModel();
+        $page->publish();
+        $page->refresh();
         $this->assertNotNull($page->published_version_id);
         $this->assertNotNull($page->publishedVersion);
         $this->assertInstanceOf(Version::class, $page->publishedVersion);
@@ -42,7 +46,7 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_can_be_published()
     {
-        $page = factory(get_class($this->getModel()))->create();
+        $page = $this->getModel();
         $page->publish();
         $this->assertNotNull($page->published_version_id);
         $this->assertNotNull($page->publishedVersion);
@@ -54,8 +58,11 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_has_many_versions()
     {
-        $page = factory(get_class($this->getModel()))->create();
-        $version = factory(Version::class)->states($this->getClassname())->create();
+        $page = $this->getModel();
+        $version = Version::factory()->create([
+            'versionable_type' => get_class($page),
+            'versionable_id' => $page->id,
+        ]);
         $version->versionable_id = $page->id;
         $version->save();
         $page->refresh();
@@ -65,14 +72,14 @@ trait VersioningTestTrait
     /** @test **/
     public function if_a_page_doesnt_have_a_draft_version_one_is_created()
     {
-        $page = factory(get_class($this->getModel()))->create();
+        $page = $this->getModel();
         $this->assertInstanceOf(Version::class, $page->getDraftVersion());
     }
 
     /** @test **/
     public function a_page_has_a_draft_version_id_attribute()
     {
-        $page = factory(get_class($this->getModel()))->create();
+        $page = $this->getModel();
         $this->assertNotNull($page->draft_version_id);
         $this->assertEquals($page->getDraftVersion()->id, $page->draft_version_id);
     }
@@ -80,7 +87,8 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_can_be_published_in_the_future()
     {
-        $page = factory(get_class($this->getModel()))->states('unpublished')->create([
+        $class_name = get_class($this->getModel());
+        $page = (new $class_name)::factory()->unpublished()->create([
             'publish_at' => now()->addMinutes(1),
         ]);
 
@@ -105,7 +113,8 @@ trait VersioningTestTrait
     /** @test **/
     public function creating_a_new_version_broadcasts_an_event()
     {
-        $page = factory(get_class($this->getModel()))->states('published')->create();
+        $page = $this->getModel();
+        $page->publish();
 
         Event::fake();
 
@@ -125,7 +134,7 @@ trait VersioningTestTrait
     /** @test **/
     public function a_page_has_a_can_be_published_attribute()
     {
-        $content_element = factory(ContentElement::class)->states($this->getClassname(), 'text-block')->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $page = $content_element->{Str::plural($this->getClassname())}()->first();
         $content_element->version_id = $page->draft_version_id;
         $content_element->save();
@@ -134,7 +143,7 @@ trait VersioningTestTrait
         $page->refresh();
 
         $this->assertFalse($page->can_be_published);
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $this->signIn($user);
         $this->assertFalse($page->can_be_published);
 
@@ -147,12 +156,13 @@ trait VersioningTestTrait
         $page->refresh();
         $this->assertFalse($page->can_be_published);
 
-        $content_element = factory(ContentElement::class)->states('text-block')->create([
+        $content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'version_id' => $page->draft_version_id,
         ]);
 
         $content_element->{Str::plural($this->getClassname())}()->detach();
         $content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
+
         $content_element->version_id = $page->draft_version_id;
         $content_element->save();
         

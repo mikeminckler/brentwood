@@ -6,16 +6,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use Illuminate\Support\Arr;
-use App\ContentElement;
-use App\User;
-use App\TextBlock;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
-use App\FileUpload;
-use App\Photo;
-use App\Page;
+use Illuminate\Support\Arr;
+
+use App\Models\ContentElement;
+use App\Models\User;
+use App\Models\TextBlock;
+use App\Models\FileUpload;
+use App\Models\Photo;
+use App\Models\Page;
 
 class TextBlockTest extends TestCase
 {
@@ -23,10 +24,11 @@ class TextBlockTest extends TestCase
     /** @test **/
     public function a_text_block_content_element_can_be_created()
     {
-        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input = $this->createContentElement(TextBlock::factory())->toArray();
+        $input['id'] = 0;
         $input['type'] = 'text-block';
-        $input['content'] = factory(TextBlock::class)->states('stat')->raw();
-        $page = factory(Page::class)->create();
+        $input['content'] = TextBlock::factory()->stat()->raw();
+        $page = Page::factory()->create();
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -38,7 +40,7 @@ class TextBlockTest extends TestCase
         $this->json('POST', route('content-elements.store'), [])
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.store'), [])
              ->assertStatus(422)
@@ -101,15 +103,15 @@ class TextBlockTest extends TestCase
     /** @test **/
     public function a_text_block_can_be_updated()
     {
-        $text_block = factory(TextBlock::class)->create();
-        $content_element = $text_block->contentElement;
-        $page = factory(Page::class)->create();
+        $content_element = $this->createContentElement(TextBlock::factory());
+        $text_block = $content_element->content;
+        $page = $content_element->pages->first();
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), [])
              ->assertStatus(422)
@@ -138,7 +140,7 @@ class TextBlockTest extends TestCase
              ]);
 
         $input = $content_element->toArray();
-        $text_block_input = factory(TextBlock::class)->raw();
+        $text_block_input = TextBlock::factory()->raw();
         $input['content']['header'] = Arr::get($text_block_input, 'header');
         $input['content']['body'] = Arr::get($text_block_input, 'body');
         $input['content']['style'] = Arr::get($text_block_input, 'style');
@@ -174,20 +176,19 @@ class TextBlockTest extends TestCase
     /** @test **/
     public function a_text_block_can_save_a_photo()
     {
-        
         Storage::fake();
         $file_name = Str::random().'.jpg';
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $photo_input = factory(Photo::class)->raw();
+        $photo_input = Photo::factory()->raw();
         $photo_input['file_upload'] = $file_upload;
 
-        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input = $this->createContentElement(TextBlock::factory())->toArray();
         $input['type'] = 'text-block';
-        $input['content'] = factory(TextBlock::class)->raw();
+        $input['content'] = TextBlock::factory()->raw();
         $input['content']['photos'] = [$photo_input];
-        $page = factory(Page::class)->create();
+        $page = Page::factory()->create();
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -222,10 +223,10 @@ class TextBlockTest extends TestCase
     /** @test **/
     public function a_text_block_content_element_can_be_after_another_text_block()
     {
-        $input = factory(ContentElement::class)->states('text-block')->raw();
+        $input = $this->createContentElement(TextBlock::factory())->toArray();
         $input['type'] = 'text-block';
-        $input['content'] = factory(TextBlock::class)->raw();
-        $page = factory(Page::class)->create();
+        $input['content'] = TextBlock::factory()->raw();
+        $page = Page::factory()->create();
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -265,6 +266,5 @@ class TextBlockTest extends TestCase
                 'unlisted' => 1,
                 'expandable' => 1,
              ]);
-
     }
 }

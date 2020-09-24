@@ -6,9 +6,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-use App\User;
-use App\Role;
 use Illuminate\Support\Arr;
+
+use App\Models\User;
+use App\Models\Role;
 
 class UserTest extends TestCase
 {
@@ -16,18 +17,18 @@ class UserTest extends TestCase
     /** @test **/
     public function the_users_index_can_be_loaded()
     {
-        $this->get( route('users.index'))
+        $this->get(route('users.index'))
             ->assertStatus(302);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
-        $this->get( route('users.index'))
+        $this->get(route('users.index'))
             ->assertRedirect('/');
 
         $this->signInAdmin();
 
-        $this->get( route('users.index'))
+        $this->get(route('users.index'))
             ->assertSuccessful();
     }
 
@@ -37,14 +38,14 @@ class UserTest extends TestCase
         $this->json('GET', route('users.load'))
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('GET', route('users.load'))
             ->assertStatus(403);
 
         $this->signInAdmin();
 
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $role = Role::all()->random();
         $user->addRole($role);
 
@@ -54,16 +55,14 @@ class UserTest extends TestCase
                 'name' => $user->name,
                 'name' => $role->name,
              ]);
-
     }
 
     /** @test **/
     public function a_user_can_be_save_with_their_roles()
     {
-
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $role = Role::all()->random();
-        $input = factory(User::class)->raw();
+        $input = User::factory()->raw();
         $input['roles'] = [$role];
 
         $this->assertFalse($user->hasRole($role));
@@ -71,7 +70,7 @@ class UserTest extends TestCase
         $this->json('POST', route('users.update', ['id' => $user->id]), $input)
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->json('POST', route('users.update', ['id' => $user->id]), $input)
             ->assertStatus(403);
@@ -94,15 +93,15 @@ class UserTest extends TestCase
 
         $user->refresh();
 
-        $this->assertEquals( Arr::get($input, 'name'), $user->name);
-        $this->assertEquals( Arr::get($input, 'email'), $user->email);
+        $this->assertEquals(Arr::get($input, 'name'), $user->name);
+        $this->assertEquals(Arr::get($input, 'email'), $user->email);
         $this->assertTrue($user->hasRole($role));
     }
 
     /** @test **/
     public function a_users_role_is_removed_if_it_is_not_included_in_the_save_input()
     {
-        $user = factory(User::class)->create();   
+        $user = User::factory()->create();
         $role = Role::all()->random();
 
         $user->addRole($role);
@@ -110,7 +109,7 @@ class UserTest extends TestCase
 
         $this->assertTrue($user->hasRole($role));
 
-        $input = factory(User::class)->raw();
+        $input = User::factory()->raw();
         $input['roles'] = [];
 
         $this->signInAdmin();
@@ -130,8 +129,7 @@ class UserTest extends TestCase
     /** @test **/
     public function users_can_be_searched()
     {
-        
-        $user = factory(User::class)->create();
+        $user = User::factory()->create();
         $input = [
             'autocomplete' => true,
             'terms' => $user->name,
@@ -140,7 +138,7 @@ class UserTest extends TestCase
         $this->json('POST', route('users.search'), $input)
             ->assertStatus(401);
 
-        $this->signIn( factory(User::class)->create());
+        $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
         $this->json('POST', route('users.search'), $input)
@@ -155,6 +153,5 @@ class UserTest extends TestCase
                  'name' => $user->name,
                  'selected' => false,
              ]);
-
     }
 }

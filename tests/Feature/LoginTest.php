@@ -17,24 +17,4 @@ class LoginTest extends TestCase
         $this->get('/login')
          ->assertRedirect();
     }
-
-    /*
-    public function if_an_editor_logs_in_editing_is_set_in_the_session()
-    {
-        $user = factory(User::class)->create([
-            'password' => bcrypt('password'),
-        ]); 
-        $user->addRole('editor');
-        $user->refresh();
-
-        $this->assertTrue($user->hasRole('editor'));
-
-        $this->post( route('login'), ['email' => $user->email, 'password' => 'password'])
-             ->assertRedirect();
-
-        $this->assertTrue(auth()->check());
-
-        $this->assertTrue(session()->get('editing'));
-    }
-     */
 }

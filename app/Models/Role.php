@@ -18,18 +18,6 @@ class Role extends Model
 
     protected $appends = ['search_label'];
 
-    public function getSearchLabelAttribute()
-    {
-        return $this->name;
-    }
-
-    public function getSearchFieldsAttribute()
-    {
-        return [
-            'name',
-        ];
-    }
-
     public function saveRole($id = null, $input)
     {
         if ($id) {

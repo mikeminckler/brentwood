@@ -1,6 +1,6 @@
 <template>
 
-    <div class="autocomplete relative" :class="{'mb-4' : !noMargin}" :dusk="'autocomplete-' + dusk">
+    <div class="form autocomplete relative" :class="{'mb-4' : !noMargin}" :dusk="'autocomplete-' + dusk">
 
         <div class="flex items-end">
             <div class="flex-1">
@@ -63,7 +63,7 @@
             </transition-group>
         </div>
 
-        <div class="mt-2 rounded overflow-hidden" v-if="multiple">
+        <div class="mt-2 rounded overflow-hidden" :class="flex ? 'flex' : ''" v-if="multiple">
 
             <component v-if="model"
                  :is="model"
@@ -71,8 +71,7 @@
                  :key="item.id + '-' + index"
                  v-bind="childProps(item)"
                  @remove="$emit('remove', $event)"
-                 remove="true"
-                 class="bg-white odd:bg-gray-100"
+                 :remove="true"
              ></component>
 
             <div v-if="!model" class="">
@@ -99,6 +98,7 @@
 
         components: {
             'remove': () => import(/* webpackChunkName: "remove" */ '@/Components/Remove'),
+            'tag': () => import(/* webpackChunkName: "tag" */ '@/Models/Tag.vue'),
         },
 
         mixins: [],
@@ -116,10 +116,12 @@
             'hideLabel',
             'noMargin',
             'add',
+            'addUrl',
             'keepResults',
             'recent',
             'dusk',
             'label',
+            'flex',
         ],
 
         data() {
@@ -227,7 +229,7 @@
                             if (this.add) {
                                 this.results.push({
                                     id: 0,
-                                    search_label: 'Add New ' + this.$lodash.startCase(this.model),
+                                    search_label: this.addUrl ? 'Add ' + this.terms : 'Add New ' + this.$lodash.startCase(this.model),
                                     add: true,
                                     selected: false,
                                 });
@@ -389,6 +391,25 @@
                     }
                 }
 
+            },
+
+            addModel: function() {
+
+                if (this.addUrl) {
+
+                    let input = {
+                        'name': this.terms,
+                    };
+                    
+                    this.$http.post(this.addUrl, input).then( response => {
+                        this.select( response.data[this.model] );
+                    }, error => {
+                        this.processErrors(error.response);
+                    });
+
+                } else {
+                    this.modalItem = 'form-' + this.model;
+                }
             },
 
             remove: function() {

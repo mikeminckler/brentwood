@@ -4,14 +4,17 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\UploadedFile;
 
 use App\Models\Blog;
 use App\Models\FileUpload;
 use App\Models\ContentElement;
+use App\Models\TextBlock;
+use App\Models\Tag;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\UploadedFile;
 use Carbon\Carbon;
 
 class BlogsSeeder extends Seeder
@@ -23,7 +26,7 @@ class BlogsSeeder extends Seeder
      */
     public function run()
     {
-        Blog::truncate();
+        //Blog::truncate();
 
         $blogs = collect(DB::connection('www_brentwood')->select(
             "
@@ -32,7 +35,7 @@ class BlogsSeeder extends Seeder
             "
         ));
 
-        $blogs = $blogs->sortBy('datetime')->take(5);
+        $blogs = $blogs->sortBy('datetime');
 
         $this->command->getOutput()->progressStart($blogs->count());
         
@@ -57,118 +60,130 @@ class BlogsSeeder extends Seeder
             ])->valid()) {
                 //$this->command->info('CREATED: '.$data->title);
 
-                $blog = (new Blog)->savePage(null, $input);
+                $blog_check = Blog::where('name', $data->title)
+                    ->whereHas('contentElements', function ($query) use ($data) {
+                        $query->whereHasMorph('content', [TextBlock::class], function ($query) use ($data) {
+                            $query->where('body', $data->bodytext);
+                        });
+                    })
+                    ->first();
 
-                if ($data->image) {
-                    $images = collect();
-                    if (Str::contains($data->image, ',')) {
-                        $data_images = collect(explode(',', $data->image));
-                    } else {
-                        $data_images = collect($data->image);
+                if (!$blog_check) {
+                    $blog = (new Blog)->savePage(null, $input);
+
+                    if ($data->image) {
+                        $images = collect();
+                        if (Str::contains($data->image, ',')) {
+                            $data_images = collect(explode(',', $data->image));
+                        } else {
+                            $data_images = collect($data->image);
+                        }
+
+                        foreach ($data_images as $data_index => $data_image) {
+                            $url = 'https://www.brentwood.bc.ca/uploads/pics/'.$data_image;
+                            $images->push($url);
+                        }
+
+                        $this->createImage($blog, $images, $banner ? $sort_order : 1);
+
+                        if ($banner) {
+                            $sort_order++;
+                        } else {
+                            $banner = true;
+                        }
                     }
 
-                    foreach ($data_images as $data_index => $data_image) {
-                        $url = 'https://www.brentwood.bc.ca/uploads/pics/'.$data_image;
-                        $images->push($url);
+                    if ($data->bodytext) {
+                        if ($data->title) {
+                            $title_used = true;
+                        }
+
+                        $this->createTextBlock($blog, null, $data->bodytext, $paragraph ? $sort_order : 2);
+
+                        if ($paragraph) {
+                            $sort_order++;
+                        } else {
+                            $paragraph = true;
+                        }
                     }
 
-                    $this->createImage($blog, $images, $banner ? $sort_order : 1);
-
-                    if ($banner) {
-                        $sort_order++;
-                    } else {
-                        $banner = true;
-                    }
-                }
-
-                if ($data->bodytext) {
-                    if ($data->title) {
-                        $title_used = true;
-                    }
-
-                    $this->createTextBlock($blog, null, $data->bodytext, $paragraph ? $sort_order : 2);
-
-                    if ($paragraph) {
-                        $sort_order++;
-                    } else {
-                        $paragraph = true;
-                    }
-                }
-
-                if ($data->tx_rgnewsce_ce) {
-                    //$this->command->info('EXTENDED: '.$data->tx_rgnewsce_ce);
-                    foreach (explode(',', $data->tx_rgnewsce_ce) as $tt_content_uid) {
-                        $tt_content_images = collect(DB::connection('www_brentwood')->select(
-                            "SELECT * FROM sys_file_reference
+                    if ($data->tx_rgnewsce_ce) {
+                        //$this->command->info('EXTENDED: '.$data->tx_rgnewsce_ce);
+                        foreach (explode(',', $data->tx_rgnewsce_ce) as $tt_content_uid) {
+                            $tt_content_images = collect(DB::connection('www_brentwood')->select(
+                                "SELECT * FROM sys_file_reference
                             WHERE uid_foreign = ".$tt_content_uid."
                             AND fieldname = 'image'"
-                        ));
+                            ));
 
-                        if ($tt_content_images->count()) {
-                            $images = collect();
-                            foreach ($tt_content_images as $tt_image) {
-                                $image = collect(DB::connection('www_brentwood')->select(
-                                    "SELECT * FROM sys_file WHERE uid = ".$tt_image->uid_local
-                                ))->first();
+                            if ($tt_content_images->count()) {
+                                $images = collect();
+                                foreach ($tt_content_images as $tt_image) {
+                                    $image = collect(DB::connection('www_brentwood')->select(
+                                        "SELECT * FROM sys_file WHERE uid = ".$tt_image->uid_local
+                                    ))->first();
 
-                                $url = 'https://www.brentwood.bc.ca/fileadmin'.$image->identifier;
-                                $images->push($url);
+                                    $url = 'https://www.brentwood.bc.ca/fileadmin'.$image->identifier;
+                                    $images->push($url);
+                                }
+
+                                $this->createImage($blog, $images, $banner ? $sort_order : 1);
+                                if ($banner) {
+                                    $sort_order++;
+                                } else {
+                                    $banner = true;
+                                }
                             }
 
-                            $this->createImage($blog, $images, $banner ? $sort_order : 1);
-                            if ($banner) {
-                                $sort_order++;
-                            } else {
-                                $banner = true;
-                            }
-                        }
-
-                        $tt_content = collect(DB::connection('www_brentwood')->select(
-                            "SELECT * 
+                            $tt_content = collect(DB::connection('www_brentwood')->select(
+                                "SELECT * 
                              FROM tt_content
                              WHERE uid = ".$tt_content_uid
-                        ))->first();
+                            ))->first();
 
-                        if ($tt_content) {
-                            $this->createTextBlock($blog, $title_used ? $tt_content->header : null, $tt_content->bodytext, $paragraph ? $sort_order : 2);
-                            $title_used = true;
-                            if ($paragraph) {
-                                $sort_order++;
+                            if ($tt_content) {
+                                $this->createTextBlock($blog, $title_used ? $tt_content->header : null, $tt_content->bodytext, $paragraph ? $sort_order : 2);
+                                $title_used = true;
+                                if ($paragraph) {
+                                    $sort_order++;
+                                } else {
+                                    $paragraph = true;
+                                }
                             } else {
-                                $paragraph = true;
+                                //$this->command->error('NOT FOUND EXTENDED TT_CONTENT: '.$tt_content_uid);
                             }
-                        } else {
-                            //$this->command->error('NOT FOUND EXTENDED TT_CONTENT: '.$tt_content_uid);
                         }
                     }
-                }
 
 
-                $tags = collect(DB::connection('www_brentwood')->select(
-                    "SELECT *
+                    $tags = collect(DB::connection('www_brentwood')->select(
+                        "SELECT *
                     FROM tt_news_cat_mm
                     WHERE uid_local = ".$data->uid
-                ));
+                    ));
 
-                if ($tags->count()) {
-                    foreach ($tags as $tag_data) {
-                        $tag = collect(DB::connection('www_brentwood')->select(
-                            "SELECT *
+                    if ($tags->count()) {
+                        foreach ($tags as $tag_data) {
+                            $tag = collect(DB::connection('www_brentwood')->select(
+                                "SELECT *
                             FROM tt_news_cat
                             WHERE uid = ".$tag_data->uid_foreign
-                        ))->first();
+                            ))->first();
 
-                        if ($tag) {
-                            $blog->addTag($tag->title);
+                            if ($tag) {
+                                if (Tag::where('name', $tag->title)->first()) {
+                                    $blog->addTag($tag->title);
+                                }
+                            }
                         }
                     }
-                }
 
-                $blog->publish();
-                $blog->refresh();
-                $version = $blog->publishedVersion;
-                $version->published_at = Carbon::parse($data->datetime);
-                $version->save();
+                    $blog->publish();
+                    $blog->refresh();
+                    $version = $blog->publishedVersion;
+                    $version->published_at = Carbon::parse($data->datetime);
+                    $version->save();
+                }
             }
         }
 

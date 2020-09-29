@@ -58,6 +58,7 @@ class Blog extends Model
         $blog->save();
 
         $blog->saveContentElements($input);
+        $blog->saveTags($input);
 
         cache()->tags([cache_name($blog)])->flush();
 

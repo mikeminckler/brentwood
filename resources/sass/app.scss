@@ -371,6 +371,10 @@ div.cell {
     }
 }
 
+.tag {
+    @apply mr-4 px-2 py-1 rounded-lg bg-gray-200 border border-gray-300 flex items-center;
+}
+
 /* CONTENT */
 
 .text-block {

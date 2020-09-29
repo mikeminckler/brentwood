@@ -11,34 +11,15 @@ use Illuminate\Support\Arr;
 use App\Models\Role;
 use App\Models\User;
 
+use Tests\Feature\SearchTestTrait;
+
 class RoleTest extends TestCase
 {
+    use SearchTestTrait;
 
-    /** @test **/
-    public function roles_can_be_searched()
+    protected function getClassname()
     {
-        $role = Role::where('id', '!=', 1)->get()->random();
-
-        $input = [
-            'autocomplete' => true,
-            'terms' => $role->name,
-        ];
-
-        $this->json('POST', route('roles.search'), $input)
-            ->assertStatus(401);
-
-        $this->signIn(User::factory()->create());
-
-        $this->json('POST', route('roles.search'), $input)
-            ->assertStatus(403);
-
-        $this->signInAdmin();
-
-        $this->json('POST', route('roles.search'), $input)
-             ->assertSuccessful()
-             ->assertJsonFragment([
-                'name' => $role->name,
-             ]);
+        return 'role';
     }
 
     /** @test **/

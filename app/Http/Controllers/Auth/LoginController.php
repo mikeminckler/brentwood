@@ -80,6 +80,6 @@ class LoginController extends Controller
         if ($user->hasRole('editor')) {
             session()->put('editing', true);
         }
-        return redirect('/');
+        return redirect()->intended('/');
     }
 }

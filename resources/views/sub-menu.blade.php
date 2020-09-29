@@ -37,7 +37,7 @@
                 <div class="flex-2 flex justify-center">
                     <div class="text-block flex items-center">
                         @foreach ($page->tags as $tag)
-                            <a href="/tags/{{ $tag->id }}" class="mr-4 px-2 py-1 rounded-lg bg-gray-200 border border-gray-300">{{ $tag->name }}</a>
+                            <a href="/tags/{{ $tag->id }}" class="tag">{{ $tag->name }}</a>
                         @endforeach
                     </div>
                 </div>

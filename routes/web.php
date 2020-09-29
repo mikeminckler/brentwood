@@ -84,6 +84,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/blogs/{id}/reveal', [BlogsController::class, 'reveal'])->name('blogs.reveal')->where('id', '\d+');
 
     Route::post('/tags/search', [TagsController::class, 'search'])->name('tags.search');
+    Route::post('/tags/create', [TagsController::class, 'store'])->name('tags.store');
 });
 
 Route::get('/blogs/{page}', [BlogsController::class, 'load'])->name('blogs.load')->where('page', '.*');

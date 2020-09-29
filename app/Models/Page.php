@@ -90,6 +90,7 @@ class Page extends Model
         $page->save();
 
         $page->saveContentElements($input);
+        $page->saveTags($input);
 
         cache()->tags([cache_name($page)])->flush();
 

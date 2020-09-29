@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Arr;
 use App\Models\Tag;
 
 trait TagsTrait
@@ -20,5 +21,18 @@ trait TagsTrait
         if (!$this->tags->contains('id', $tag->id)) {
             $this->tags()->attach($tag);
         }
+    }
+
+    public function saveTags($input)
+    {
+        $this->tags()->detach();
+
+        if (is_array(Arr::get($input, 'tags'))) {
+            foreach (Arr::get($input, 'tags') as $tag_data) {
+                $this->addTag($tag_data);
+            }
+        }
+
+        return $this;
     }
 }

@@ -37,11 +37,6 @@ class PageTest extends TestCase
     use VersioningTestTrait;
     use TagsTrait;
 
-    protected function getModel()
-    {
-        return Page::factory()->create();
-    }
-
     protected function getClassname()
     {
         return 'page';

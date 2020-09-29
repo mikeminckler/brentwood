@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relative w-full z-20 flex items-center justify-center" v-if="editing && page">
+    <div class="relative w-full z-9 flex items-center justify-center" v-if="editing && page">
 
         <div class="fixed top-0 right-0" v-if="isPreview"></div>
 
@@ -156,6 +156,7 @@
             const savePageEvent = event => {
                 this.savePage();
             };
+
             this.$eventer.$on('save-page', savePageEvent);
 
             this.$once('hook:destroyed', () => {
@@ -245,6 +246,7 @@
                 let input = {
                     name: this.page.name,
                     author: this.page.author,
+                    tags: this.page.tags,
                     parent_page_id: this.page.parent_page_id,
                     hide: this.page.hide ? true : false,
                     sort_order: this.page.sort_order,

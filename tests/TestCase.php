@@ -49,4 +49,21 @@ abstract class TestCase extends BaseTestCase
         $content_element->{$relationship}()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
         return $content_element;
     }
+
+    protected function getFactory()
+    {
+        $class_name = $this->getClassString();
+        return (new $class_name)::factory();
+    }
+
+    protected function getModel()
+    {
+        $class_name = $this->getClassString();
+        return (new $class_name)::factory()->create();
+    }
+
+    protected function getClassString()
+    {
+        return 'App\\Models\\'.Str::title($this->getClassname());
+    }
 }

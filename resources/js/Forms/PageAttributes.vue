@@ -17,7 +17,7 @@
             />
         </div>
 
-        <form-tags></form-tags>
+        <form-tags :tags="page.tags" @change="$eventer.$emit('save-page')"></form-tags>
 
     </div>
 
@@ -26,11 +26,32 @@
 <script>
     export default {
 
+        data() {
+            return {
+                saved: false,
+            }
+        },
+
+        components: {
+            'form-tags': () => import(/* webpackChunkName: "form-tags" */ '@/Forms/Tags.vue'),
+        },
+
         computed: {
             page() {
                 return this.$store.state.page;
             }
         },
 
+        watch: {
+
+            'page.tags': function() {
+                if (!this.saved) {
+                    this.$eventer.$emit('save-page');
+                    this.saved = true;
+                }
+            },
+
+        },
+        
     }
 </script>

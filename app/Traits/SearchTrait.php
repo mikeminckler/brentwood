@@ -4,10 +4,21 @@ namespace App\Traits;
 
 use Illuminate\Support\Str;
 
+//use App\Utilities\Paginate;
+
 trait SearchTrait
 {
-    abstract public function getSearchLabelAttribute();
-    abstract public function getSearchFieldsAttribute();
+    public function getSearchLabelAttribute()
+    {
+        return $this->name;
+    }
+
+    public function getSearchFieldsAttribute()
+    {
+        return [
+            'name',
+        ];
+    }
 
     public function search($terms = null, $append = true)
     {

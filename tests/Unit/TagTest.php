@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 use App\Models\Tag;
 use App\Models\Blog;
@@ -58,6 +59,17 @@ class TagTest extends TestCase
         $this->assertEquals($tag->id, (new Tag)->findOrCreateTag($name)->id);
 
         $this->assertEquals($tag->id, (new Tag)->findOrCreateTag($tag->id)->id);
+    }
+
+    /** @test **/
+    public function tag_can_be_found_or_created_from_an_array()
+    {
+        $tag_data = Tag::factory()->create()->toArray();
+
+        $tag = (new Tag)->findOrCreateTag($tag_data);
+
+        $this->assertInstanceOf(Tag::class, $tag);
+        $this->assertEquals(Arr::get($tag_data, 'name'), $tag->name);
     }
 
     /** @test **/

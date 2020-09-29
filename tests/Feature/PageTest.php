@@ -576,26 +576,6 @@ class PageTest extends TestCase
      */
 
 
-    /** @test **/
-    public function a_page_can_be_loaded_via_ajax()
-    {
-        $this->signInAdmin();
-        session()->put('editing', true);
-
-        $content_element = $this->createContentElement(TextBlock::factory());
-        $text_block = $content_element->content;
-        $page = $content_element->pages->first();
-
-        $this->assertInstanceOf(Page::class, $page);
-
-        $this->withoutExceptionHandling();
-        $this->json('GET', route('pages.load', ['page' => $page->full_slug]))
-            ->assertSuccessful()
-            ->assertSessionHas('editing')
-            ->assertJsonFragment([
-                'body' => $text_block->body,
-            ]);
-    }
 
     /** @test **/
     public function the_home_page_can_be_saved()

@@ -81,13 +81,14 @@
         props: ['contentElement', 'first', 'contentElementIndex'],
 
         components: {
-            'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement'),
-            'text-block': () => import(/* webpackChunkName: "text-block" */ '@/Forms/TextBlock'),
-            'photo-block': () => import(/* webpackChunkName: "photo-block" */ '@/Forms/PhotoBlock'),
-            'quote': () => import(/* webpackChunkName: "quote" */ '@/Forms/Quote'),
-            'youtube-video': () => import(/* webpackChunkName: "youtube-video" */ '@/Forms/YoutubeVideo'),
-            'embed-code': () => import(/* webpackChunkName: "embed-code" */ '@/Forms/EmbedCode'),
-            'banner-photo': () => import(/* webpackChunkName: "banner-photo" */ '@/Forms/BannerPhoto'),
+            'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement.vue'),
+            'text-block': () => import(/* webpackChunkName: "text-block" */ '@/Forms/TextBlock.vue'),
+            'photo-block': () => import(/* webpackChunkName: "photo-block" */ '@/Forms/PhotoBlock.vue'),
+            'quote': () => import(/* webpackChunkName: "quote" */ '@/Forms/Quote.vue'),
+            'youtube-video': () => import(/* webpackChunkName: "youtube-video" */ '@/Forms/YoutubeVideo.vue'),
+            'embed-code': () => import(/* webpackChunkName: "embed-code" */ '@/Forms/EmbedCode.vue'),
+            'banner-photo': () => import(/* webpackChunkName: "banner-photo" */ '@/Forms/BannerPhoto.vue'),
+            'blog-list': () => import(/* webpackChunkName: "blog-list" */ '@/Forms/BlogList.vue'),
             'date-time-picker': () => import(/* webpackChunkName: "date-time-picker" */ '@/Components/DateTimePicker.vue'),
         },
 

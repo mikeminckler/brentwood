@@ -17,7 +17,7 @@
             />
         </div>
 
-        <form-tags :tags="page.tags" @change="$eventer.$emit('save-page')"></form-tags>
+        <form-tags v-model="page.tags"></form-tags>
 
     </div>
 

@@ -6,8 +6,8 @@ use App\Models\Tag;
 
 trait TagsTrait
 {
-    abstract protected function getModel();
-    //abstract protected function getClassname();
+    //abstract protected function getModel();
+    abstract protected function getClassname();
 
     /** @test **/
     public function an_object_can_have_many_tags()

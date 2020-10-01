@@ -58,6 +58,7 @@
 
                 let input = {
                     name: 'Untitled Blog',
+                    author: this.$store.state.user ? this.$store.state.user.name : '',
                     unlisted: false,
                     sort_order: 1,
                     content_elements: [],

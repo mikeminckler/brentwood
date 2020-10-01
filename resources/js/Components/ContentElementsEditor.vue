@@ -243,6 +243,21 @@
 
             },
 
+            addBlogList: function(sortOrder) {
+
+                let contentElement = this.newContentElement(sortOrder);
+
+                contentElement.type = 'blog-list';
+                contentElement.content = {
+                    id: 0,
+                    header: '',
+                    tags: [],
+                };
+
+                this.saveNewContentElement(contentElement);
+
+            },
+
         },
 
     }

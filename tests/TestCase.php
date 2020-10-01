@@ -64,6 +64,6 @@ abstract class TestCase extends BaseTestCase
 
     protected function getClassString()
     {
-        return 'App\\Models\\'.Str::title($this->getClassname());
+        return 'App\\Models\\'.Str::studly($this->getClassname());
     }
 }

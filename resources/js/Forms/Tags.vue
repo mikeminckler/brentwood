@@ -24,7 +24,7 @@
 <script>
     export default {
 
-        props: ['tags'],
+        props: ['value'],
 
         components: {
             'autocomplete': () => import(/* webpackChunkName: "autocomplete" */ '@/Components/Autocomplete'),
@@ -32,7 +32,7 @@
 
         data() {
             return {
-            
+                tags: [],
             }
         },
 
@@ -40,9 +40,18 @@
         },
 
         watch: {
+            value() {
+                this.tags = this.value;
+            },
+            tags() {
+                this.$emit('input', this.tags);
+            }
         },
 
         mounted() {
+            if (this.value) {
+                this.tags = this.value;
+            }
         },
 
         methods: {

@@ -227,12 +227,17 @@
                             }
 
                             if (this.add) {
-                                this.results.push({
-                                    id: 0,
-                                    search_label: this.addUrl ? 'Add ' + this.terms : 'Add New ' + this.$lodash.startCase(this.model),
-                                    add: true,
-                                    selected: false,
-                                });
+
+                                if (!this.$lodash.find(this.results, result => {
+                                    return result.search_label === this.terms;
+                                })) {
+                                    this.results.push({
+                                        id: 0,
+                                        search_label: this.addUrl ? 'Add ' + this.terms : 'Add New ' + this.$lodash.startCase(this.model),
+                                        add: true,
+                                        selected: false,
+                                    });
+                                }
                             }
                         }, error => {
                             //this.processErrors(error.response);

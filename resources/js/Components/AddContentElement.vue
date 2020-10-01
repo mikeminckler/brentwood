@@ -43,6 +43,11 @@
                     <div class="pr-2 text-lg leading-none"><i class="fas fa-code"></i></div>
                     <div class="whitespace-no-wrap">HTML</div>
                 </div>
+
+                <div class="relative z-2 button mx-2 mb-2 items-center" @click="add('addBlogList')">
+                    <div class="pr-2 text-lg leading-none"><i class="fas fa-blog"></i></div>
+                    <div class="whitespace-no-wrap">Blog Listing</div>
+                </div>
             </div>
         </transition>
 

@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\ContentElement;
 use App\Models\TextBlock;
 use App\Models\Version;
+use App\Models\Tag;
 
 use Tests\Feature\SoftDeletesTestTrait;
 use Tests\Feature\VersioningTestTrait;
@@ -141,5 +142,79 @@ class BlogTest extends TestCase
              ->assertJsonFragment([
                 'body' => $content_element->content->body,
              ]);
+    }
+
+    /** @test **/
+    public function a_list_of_blogs_can_be_loaded()
+    {
+        $blog = Blog::factory()->create();
+        $blog->publish();
+        $blog->refresh();
+        $blog_unlisted = Blog::factory()->unlisted()->create();
+        $blog_unpublished = Blog::factory()->unpublished()->create();
+
+        $this->assertNotNull($blog->published_version_id);
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('blogs.index'), [])
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'name' => $blog->name,
+            ])
+            ->assertJsonMissing([
+                'name' => $blog_unlisted->name,
+                'name' => $blog_unpublished->name,
+            ]);
+    }
+
+    /** @test **/
+    public function blog_listings_can_be_fitlered_by_tags()
+    {
+        $blog1 = Blog::factory()->create();
+        $tag1 = Tag::factory()->create();
+        $blog1->addTag($tag1);
+        $blog1->publish();
+        $blog1->refresh();
+
+        $blog2 = Blog::factory()->create();
+        $tag2 = Tag::factory()->create();
+        $blog2->addTag($tag2);
+        $blog2->publish();
+        $blog2->refresh();
+
+        $blog3 = Blog::factory()->create();
+        $tag3 = Tag::factory()->create();
+        $blog3->addTag($tag3);
+        $blog3->publish();
+        $blog3->refresh();
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('blogs.index'), [])
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'name' => $blog1->name,
+                'name' => $blog2->name,
+                'name' => $blog3->name,
+            ]);
+
+        $this->json('POST', route('blogs.index'), ['tags' => [$tag1]])
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'name' => $blog1->name,
+            ])
+            ->assertJsonMissing([
+                'name' => $blog2->name,
+                'name' => $blog3->name,
+            ]);
+
+        $this->json('POST', route('blogs.index'), ['tags' => [$tag1, $tag2]])
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'name' => $blog1->name,
+                'name' => $blog2->name,
+            ])
+            ->assertJsonMissing([
+                'name' => $blog3->name,
+            ]);
     }
 }

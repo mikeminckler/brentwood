@@ -3,7 +3,7 @@
     <div class="">
 
         <div class="grid" :class="'grid-' + (grid ? grid : resource)">
-            <component :is="resource + '-list'"
+            <component :is="resource + '-row'"
                  v-for="(item, index) in $lodash.values(paginator.data)"
                  :key="resource + '-' + item.id"
                  @selected="$emit('selected', $event)"
@@ -64,7 +64,7 @@
         ],
 
         components: {
-            'blogs-list': () => import(/* webpackChunkName: "blogs-list" */ '@/Models/BlogsList.vue'),
+            'blogs-row': () => import(/* webpackChunkName: "blogs-row" */ '@/Models/BlogsRow.vue'),
         },
 
         data() {

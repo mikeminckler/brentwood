@@ -18,8 +18,16 @@ use App\Models\User;
 use App\Models\Page;
 use App\Models\ContentElement;
 
+use Tests\Feature\ContentElementsTestTrait;
+
 class BannerPhotoTest extends TestCase
 {
+    use ContentElementsTestTrait;
+
+    protected function getClassname()
+    {
+        return 'banner-photo';
+    }
 
     /** @test **/
     public function a_banner_photo_content_element_can_be_created()

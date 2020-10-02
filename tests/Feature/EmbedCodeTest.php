@@ -12,9 +12,17 @@ use App\Models\User;
 use App\Models\ContentElement;
 use Illuminate\Support\Arr;
 
+use Tests\Feature\ContentElementsTestTrait;
+
 class EmbedCodeTest extends TestCase
 {
     use WithFaker;
+    use ContentElementsTestTrait;
+
+    protected function getClassname()
+    {
+        return 'embed-code';
+    }
 
     /** @test **/
     public function an_embed_code_content_element_can_be_created()

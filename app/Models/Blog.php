@@ -16,6 +16,8 @@ use App\Traits\VersioningTrait;
 use App\Traits\SlugTrait;
 use App\Traits\TagsTrait;
 
+use App\Models\Tag;
+
 class Blog extends Model
 {
     use HasFactory;
@@ -70,5 +72,38 @@ class Blog extends Model
     public function getFullSlugAttribute()
     {
         return 'blogs/'.$this->getSlug();
+    }
+
+    public static function getBlogs($tags = null)
+    {
+        if (session()->has('editing')) {
+            $blogs = Blog::orderBy('id', 'desc')->with('versions')->get();
+        } else {
+            $blogs = Blog::whereNotNull('published_version_id')
+                    ->orderBy('id', 'desc')
+                    ->get()
+                    ->filter(function ($blog) {
+                        return $blog->unlisted ? false : true;
+                    });
+        }
+
+        if ($tags) {
+            if ($tags instanceof Tag) {
+                $tags = collect([$tags]);
+            }
+
+            if ($tags->count()) {
+                $blogs = $blogs->filter(function ($blog) use ($tags) {
+                    foreach ($tags as $tag) {
+                        if ($blog->tags->contains('id', $tag->id)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }
+        }
+
+        return $blogs;
     }
 }

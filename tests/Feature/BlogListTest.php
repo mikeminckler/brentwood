@@ -7,6 +7,8 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
 
+use Tests\Feature\ContentElementsTestTrait;
+
 use App\Models\BlogList;
 use App\Models\User;
 use App\Models\Page;
@@ -14,6 +16,12 @@ use App\Models\Tag;
 
 class BlogListTest extends TestCase
 {
+    use ContentElementsTestTrait;
+
+    protected function getClassname()
+    {
+        return 'blog-list';
+    }
 
     /** @test **/
     public function a_blog_list_can_be_created()

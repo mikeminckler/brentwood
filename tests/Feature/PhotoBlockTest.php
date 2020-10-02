@@ -18,9 +18,17 @@ use App\Models\User;
 use App\Models\Page;
 use App\Models\ContentElement;
 
+use Tests\Feature\ContentElementsTestTrait;
+
 class PhotoBlockTest extends TestCase
 {
     use WithFaker;
+    use ContentElementsTestTrait;
+
+    protected function getClassname()
+    {
+        return 'photo-block';
+    }
 
     /** @test **/
     public function saving_a_photo_block()

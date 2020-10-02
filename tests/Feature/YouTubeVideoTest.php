@@ -18,8 +18,16 @@ use App\Models\FileUpload;
 use App\Models\Photo;
 use App\Models\Page;
 
+use Tests\Feature\ContentElementsTestTrait;
+
 class YoutubeVideoTest extends TestCase
 {
+    use ContentElementsTestTrait;
+
+    protected function getClassname()
+    {
+        return 'youtube-video';
+    }
 
     /** @test **/
     public function a_youtube_video_content_element_can_be_created()

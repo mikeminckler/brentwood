@@ -18,8 +18,16 @@ use App\Models\User;
 use App\Models\Page;
 use App\Models\ContentElement;
 
+use Tests\Feature\ContentElementsTestTrait;
+
 class QuoteTest extends TestCase
 {
+    use ContentElementsTestTrait;
+
+    protected function getClassname()
+    {
+        return 'quote';
+    }
 
     /** @test **/
     public function a_quote_content_element_can_be_created()

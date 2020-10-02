@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Str;
 
 use Tests\Unit\AppendAttributesTestTrait;
 use Tests\Unit\ContentElementsTestTrait;
@@ -11,7 +12,7 @@ use Tests\Unit\VersioningTestTrait;
 use Tests\Unit\TagsTrait;
 
 use App\Models\Blog;
-use Illuminate\Support\Str;
+use App\Models\Tag;
 
 class BlogTest extends TestCase
 {
@@ -66,5 +67,42 @@ class BlogTest extends TestCase
 
         $this->assertNotNull($blog->getSlug());
         $this->assertEquals(Str::kebab($name), $blog->getSlug());
+    }
+
+    /** @test **/
+    public function blogs_can_be_got()
+    {
+        $blog = Blog::factory()->create();
+        $blog->publish();
+
+        $blogs = Blog::getBlogs();
+
+        $this->assertTrue($blogs->contains('id', $blog->id));
+    }
+
+    /** @test **/
+    public function blogs_get_can_be_filtered_by_tags()
+    {
+        $blog1 = Blog::factory()->create();
+        $blog2 = Blog::factory()->create();
+
+        $tag = Tag::factory()->create();
+
+        $blog1->addTag($tag);
+
+        $blog1->publish();
+        $blog2->publish();
+
+        $blogs = Blog::getBlogs();
+        $this->assertTrue($blogs->contains('id', $blog1->id));
+        $this->assertTrue($blogs->contains('id', $blog2->id));
+
+        $blogs = Blog::getBlogs($tag);
+        $this->assertTrue($blogs->contains('id', $blog1->id));
+        $this->assertFalse($blogs->contains('id', $blog2->id));
+
+        $blogs = Blog::getBlogs(collect([$tag]));
+        $this->assertTrue($blogs->contains('id', $blog1->id));
+        $this->assertFalse($blogs->contains('id', $blog2->id));
     }
 }

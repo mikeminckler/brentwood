@@ -6,16 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
+use App\Utilities\Paginate;
+
 use App\Traits\ContentElementTrait;
 use App\Traits\TagsTrait;
+use App\Traits\AppendAttributesTrait;
 
 class BlogList extends Model
 {
     use HasFactory;
     use ContentElementTrait;
     use TagsTrait;
+    use AppendAttributesTrait;
 
     protected $with = ['tags'];
+    protected $appends = ['blogs'];
 
     public function saveContent($id = null, $input)
     {
@@ -32,5 +37,10 @@ class BlogList extends Model
 
         cache()->tags([cache_name($blog_list)])->flush();
         return $blog_list;
+    }
+
+    public function getBlogsAttribute()
+    {
+        return Paginate::create(Blog::getBlogs($this->tags));
     }
 }

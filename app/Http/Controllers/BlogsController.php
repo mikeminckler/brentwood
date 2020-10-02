@@ -46,40 +46,11 @@ class BlogsController extends Controller
         }
 
         if (request()->expectsJson()) {
-            if (!auth()->user()) {
-                $blogs = Blog::whereNotNull('published_version_id')
-                    ->orderBy('id', 'desc')
-                    ->get()
-                    ->filter(function ($blog) {
-                        return $blog->unlisted ? false : true;
-                    });
-            } elseif (session()->has('editing')) {
-                $blogs = Blog::orderBy('id', 'desc')->with('versions')->get();
-            } else {
-                $blogs = Blog::whereNotNull('published_version_id')
-                    ->orderBy('id', 'desc')
-                    ->get()
-                    ->filter(function ($blog) {
-                        return $blog->unlisted ? false : true;
-                    });
-            }
+            $tags = collect();
+            $tag_ids = collect(Arr::get(requestInput(), 'tags'))->pluck('id')->toArray();
+            $tags = Tag::whereIn('id', $tag_ids)->get();
 
-            if (requestInput('tags')) {
-                $tags = collect();
-                $tag_ids = collect(Arr::get(requestInput(), 'tags'))->pluck('id')->toArray();
-                $tags = Tag::whereIn('id', $tag_ids)->get();
-
-                if ($tags->count()) {
-                    $blogs = $blogs->filter(function ($blog) use ($tags) {
-                        foreach ($tags as $tag) {
-                            if ($blog->tags->contains('id', $tag->id)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-                }
-            }
+            $blogs = Blog::getBlogs($tags);
 
             return Paginate::create($blogs);
         } else {

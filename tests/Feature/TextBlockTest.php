@@ -18,8 +18,16 @@ use App\Models\FileUpload;
 use App\Models\Photo;
 use App\Models\Page;
 
+use Tests\Feature\ContentElementsTestTrait;
+
 class TextBlockTest extends TestCase
 {
+    use ContentElementsTestTrait;
+
+    protected function getClassname()
+    {
+        return 'text-block';
+    }
 
     /** @test **/
     public function a_text_block_content_element_can_be_created()

@@ -30,6 +30,8 @@ class Blog extends Model
 
     protected $dates = ['publish_at'];
 
+    protected $with = ['tags'];
+
     public $append_attributes = [
         'editable',
         'full_slug',
@@ -86,6 +88,8 @@ class Blog extends Model
                         return $blog->unlisted ? false : true;
                     });
         }
+
+        //$blogs->load('tags');
 
         if ($tags) {
             if ($tags instanceof Tag) {

@@ -112,7 +112,7 @@ li {
 }
 
 table {
-    @apply w-full m-4 bg-wash;
+    @apply w-full m-4 bg-white bg-opacity-75;
 }
 
 tr {
@@ -440,6 +440,39 @@ div.cell {
     }
 }
 
+
+/* BLOG PREVIEW */
+
+.blog-preview {
+
+    @apply text-gray-700;
+
+    .first-content-element.content-element-photo-block {
+        > div {
+            max-height: 0px;
+        }
+
+        img {
+            @apply opacity-0;
+        }
+    }
+
+    .content-element-text-block {
+        @apply relative z-3;
+    }
+
+    div.blog-header {
+        @apply z-4;
+    }
+
+    div.blog-tags {
+        @apply hidden;
+    }
+
+    div:empty {
+        
+    }
+}
 
 /* EDITOR */
 

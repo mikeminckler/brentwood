@@ -1,7 +1,7 @@
 <template>
 
     <transition name="fade">
-        <div v-if="src" class="fixed top-0 left-0 w-screen h-screen z-30 p-8 bg-wash"
+        <div v-if="src" class="fixed top-0 left-0 w-screen h-screen z-30 p-8 bg-white bg-opacity-75"
             @click="src = null"
         >
 

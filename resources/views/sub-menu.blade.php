@@ -14,35 +14,37 @@
     @endif
 
     @if ($page->type === 'blog')
-        <div class="w-full md:flex relative">
-            <div class="flex-1"></div>
-            <div class="flex-2 flex justify-center">
-                <div class="text-block flex justify-between items-center">
-                    <h1>{{ $page->name }}</h1>
-                </div>
-            </div>
-        </div>
-        <div class="w-full md:flex relative">
-            <div class="flex-1"></div>
-            <div class="flex-2 flex justify-center">
-                <div class="text-block flex justify-between items-center py-1">
-                    <div class="italic">{{ $page->author }}</div>
-                    <div class="">{{ $page->published_at->format('F j, Y g:ia') }}</div>
-                </div>
-            </div>
-        </div>
-        @if ($page->tags) 
-            <div class="w-full md:flex relative mt-2 -mb-2">
+        <div class="blog-header relative w-full">
+            <div class="w-full md:flex relative blog-title">
                 <div class="flex-1"></div>
                 <div class="flex-2 flex justify-center">
-                    <div class="text-block flex items-center">
-                        @foreach ($page->tags as $tag)
-                            <a href="/tags/{{ $tag->id }}" class="tag">{{ $tag->name }}</a>
-                        @endforeach
+                    <div class="text-block flex justify-between items-center">
+                        <h1>{{ $page->name }}</h1>
                     </div>
                 </div>
             </div>
-        @endif
+            <div class="w-full md:flex relative blog-author">
+                <div class="flex-1"></div>
+                <div class="flex-2 flex justify-center">
+                    <div class="text-block flex justify-between items-center py-1">
+                        <div class="italic">{{ $page->author }}</div>
+                        <div class="">{{ $page->published_at->format('F j, Y g:ia') }}</div>
+                    </div>
+                </div>
+            </div>
+            @if ($page->tags) 
+                <div class="w-full md:flex relative mt-2 -mb-2 blog-tags">
+                    <div class="flex-1"></div>
+                    <div class="flex-2 flex justify-center">
+                        <div class="text-block flex items-center">
+                            @foreach ($page->tags as $tag)
+                                <a href="/tags/{{ $tag->id }}" class="tag">{{ $tag->name }}</a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
     @endif
 
 @endif

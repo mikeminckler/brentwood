@@ -8,7 +8,7 @@
                 <div class="" v-if="page ? ( page.id > 1 ? true : false ) : false">
                     
                     <transition name="slide-down">
-                        <div class="absolute flex justify-center items-center w-full h-full bg-wash z-3" v-if="saving">
+                        <div class="absolute flex justify-center items-center w-full h-full bg-white bg-opacity-75 z-3" v-if="saving">
                             <div class="">
                                 <div class="flex text-green-600 bg-gray-100 px-4 py-2 border border-green-200 shadow">
                                     <div class="spin"><i class="fas fa-sync-alt"></i></div>

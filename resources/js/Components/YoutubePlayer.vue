@@ -21,11 +21,11 @@
             <transition name="fade">
                 <div class="photo z-3 fill" v-if="banner && !hideBanner">
 
-                    <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-4 border-wash hover-wash"
+                    <div class="absolute z-3 w-full h-full flex items-center justify-center cursor-pointer border-b-4 border-white border-opacity-75"
                          @click="$eventer.$emit('play-video', uuid)"
                         >
                         <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700">
-                            <div class="flex items-center px-4 py-2 bg-wash font-thin mb-4" 
+                            <div class="flex items-center px-4 py-2 bg-white bg-opacity-75 font-thin mb-4" 
                                 v-if="content.title && !$store.state.editing"
                               >
                                 {{ content.title }}

@@ -51,6 +51,10 @@ trait PagesControllerTrait
         $page = $this->loadPageAttributes($page);
 
         if (request()->wantsJson()) {
+            if (request('render')) {
+                return response()->json(['html' => view('content', compact('page', 'content_elements'))->render() ]);
+            }
+
             return response()->json([
                 'page' => $page,
                 'content_elements' => $content_elements,

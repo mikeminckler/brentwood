@@ -57,6 +57,7 @@ const app = new Vue({
     store,
 
     components: {
+        'blog-preview': () => import(/* webpackChunkName: "blog-preview" */ '@/Components/BlogPreview.vue'),
         'blogs-index': () => import(/* webpackChunkName: "blogs-index" */ '@/Components/BlogsIndex.vue'),
         'clock': () => import(/* webpackChunkName: "clock" */ '@/Components/Clock.vue'),
         'content-elements-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/ContentElementsEditor'),

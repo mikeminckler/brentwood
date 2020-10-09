@@ -1,5 +1,5 @@
 @if ($photo->link)
-    <a class="absolute w-full h-full hover-wash" href="{{ $photo->link }}">
+    <a class="absolute w-full h-full" href="{{ $photo->link }}">
 @endif
 
 <picture class="photo {{ $photo->fill ? 'fill' : 'fit' }} {{ $photo->link ? 'cursor-pointer' : 'cursor-zoom-in' }}" 

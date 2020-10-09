@@ -15,7 +15,7 @@
 
             <div class="mt-4">
                 @foreach ($content->blogs->items() as $blog)
-                    <div class=""><a class="" href="{{ $blog->full_slug }}">{{ $blog->name }}</a></div>
+                    <div class="mb-2"><a class="" @mouseenter="$eventer.$emit('blog-preview', {{ json_encode($blog) }})" href="{{ $blog->full_slug }}">{{ $blog->name }}</a></div>
                 @endforeach
             </div>
 
@@ -55,9 +55,9 @@
             <div class="flex-1 flex flex-col">
 
                 <div class="flex-1 overflow-hidden mt-4">
-                    <div class="h-0 overflow-visible">
+                    <blog-preview>
                         @include ('content', ['page' => $content->blogs->first(), 'content_elements' => $content->blogs->first()->content_elements]);
-                    </div>
+                    </blog-preview>
                 </div>
 
                 <div class="my-2 flex justify-end">

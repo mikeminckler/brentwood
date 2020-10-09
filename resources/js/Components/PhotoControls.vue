@@ -40,7 +40,7 @@
             <input type="text" placeholder="caption" v-model="photo.description" style="text-shadow: 1px 1px 0px #000000" />
         </div>
 
-        <div class="flex items-center bg-translucent pb-2 pt-1">
+        <div class="flex items-center bg-gray-400 bg-opacity-75 pb-2 pt-1">
             <div class="flex flex-1 px-2 items-center">
                 <div class="cursor-pointer" @click="photo.fill = !photo.fill" v-if="fill">
                     <div v-if="photo.fill"><i class="fas fa-expand"></i></div>

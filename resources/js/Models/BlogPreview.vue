@@ -11,7 +11,7 @@
                 </div>
             </div>
 
-            <div class="my-2">Read More...</div>
+            <div class="my-2 link">Read More...</div>
         </div>
 
     </div>

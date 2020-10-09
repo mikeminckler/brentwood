@@ -22,7 +22,7 @@
                 <form-tags v-model="content.tags"></form-tags>
 
                 <div class="mt-4">
-                    <div class="" v-for="blog in blogs"><div class="link" @click="selectedBlog = blog">{{ blog.name }}</div></div>
+                    <div class="mb-2" v-for="blog in blogs"><div class="link" @click="selectedBlog = blog">{{ blog.name }}</div></div>
                 </div>
 
                 <div class="flex justify-center items-center w-full" v-if="paginator.prev_page_url || paginator.next_page_url">

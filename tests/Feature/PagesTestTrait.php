@@ -199,4 +199,16 @@ trait PagesTestTrait
 
         $this->assertEquals(0, $page->tags->count());
     }
+
+    /** @test **/
+    public function a_page_can_be_rendered()
+    {
+        $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
+        $text_block = $content_element->content;
+        $page = $content_element->{Str::plural($this->getClassname())}->first();
+        $page->publish();
+
+        $this->json('GET', route('pages.load', ['page' => $page->full_slug, 'render' => 'true']))
+            ->assertSuccessful();
+    }
 }

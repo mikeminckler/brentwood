@@ -84,7 +84,7 @@ class BlogsSeeder extends Seeder
                             $images->push($url);
                         }
 
-                        $this->createImage($blog, $images, $banner ? $sort_order : 1);
+                        $this->createPhotoBlock($blog, $images, $banner ? $sort_order : 1, $banner);
 
                         if ($banner) {
                             $sort_order++;
@@ -127,7 +127,8 @@ class BlogsSeeder extends Seeder
                                     $images->push($url);
                                 }
 
-                                $this->createImage($blog, $images, $banner ? $sort_order : 1);
+                                $this->createPhotoBlock($blog, $images, $banner ? $sort_order : 1, $banner);
+
                                 if ($banner) {
                                     $sort_order++;
                                 } else {
@@ -210,7 +211,7 @@ class BlogsSeeder extends Seeder
         ]);
     }
 
-    protected function createImage($blog, $urls, $sort_order)
+    protected function createPhotoBlock($blog, $urls, $sort_order, $banner)
     {
         $photos = collect();
 
@@ -235,11 +236,22 @@ class BlogsSeeder extends Seeder
                 'offsetX' => 50,
                 'offsetY' => 50,
                 'sort_order' => $index + 1,
-                'span' => 1,
+                'span' => $urls->count() === 1 && $banner ? 2 : 1,
                 'stat_name' => null,
                 'stat_number' => null,
             ];
             $photos->push($photo);
+        }
+
+        if ($urls->count() === 4) {
+            // 2 x 2 grid
+            $columns = 2;
+        } elseif ($urls->count() >= 3) {
+            $columns = 3;
+        } elseif ($urls->count() === 1 && $banner) {
+            $columns = 3;
+        } else {
+            $columns = $urls->count();
         }
 
         $image = (new ContentElement)->saveContentElement(null, [
@@ -247,13 +259,13 @@ class BlogsSeeder extends Seeder
             'content' => [
                 'id' => 0,
                 'body' => '',
-                'columns' => $urls->count() === 4 ? 2 : ($urls->count() > 2 ? 3 : $urls->count()),
+                'columns' => $columns,
                 'header' => '',
-                'height' => 50,
+                'height' => !$banner ? 50 : ($urls->count() === 1 ? 100 : 75),
                 'id' => 0,
                 'padding' => 0,
                 'photos' => $photos,
-                'show_text' => 0,
+                'show_text' => $urls->count() === 1 && $banner ? true : false,
                 'text_order' => 1,
                 'text_span' => 1,
                 'text_style' => '',

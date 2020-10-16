@@ -112,6 +112,15 @@
             }
         },
 
+        computed: {
+            pivot() {
+                return {
+                    contentable_id: this.$store.state.page.id,
+                    contentable_type: this.$store.state.page.type,
+                };
+            },
+        },
+
         watch: {
             contentElement: {
                 handler: function(oldValue, newValue) {
@@ -170,7 +179,12 @@
                 var answer = confirm('Are you sure you want to delete this content element?');
                 if (answer == true) {
 
-                    this.$http.post('/content-elements/' + this.contentElement.id + '/remove', {remove_all: true, page_id: this.$store.state.page.id}).then( response => {
+                    let input = {
+                        removal_all: true,
+                        pivot: this.pivot,
+                    }
+
+                    this.$http.post('/content-elements/' + this.contentElement.id + '/remove', input).then( response => {
                         this.$emit('remove');
                         this.processSuccess(response);
                     }, error => {
@@ -185,7 +199,11 @@
                 var answer = confirm('Are you sure you want to restore to the current version?');
                 if (answer == true) {
 
-                    this.$http.post('/content-elements/' + this.contentElement.id + '/remove', {page_id: this.$store.state.page.id}).then( response => {
+                    let input = {
+                        pivot: this.pivot,
+                    }
+
+                    this.$http.post('/content-elements/' + this.contentElement.id + '/remove', input).then( response => {
                         this.preventWatcher = true;
                         if (response.data.content_element) {
                             this.$emit('update', response.data.content_element);

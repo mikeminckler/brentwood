@@ -25,12 +25,13 @@ class ContentElementsController extends Controller
     public function load($id)
     {
         Validator::make(request()->all(), [
-            'page_id' => 'required|exists:pages,id',
+            'pivot.contentable_id' => 'required|integer',
+            'pivot.contentable_type' => 'required|string',
         ])->validate();
 
-        $content_element = ContentElement::findOrFail($id);
-        $page = Page::findOrFail(request('page_id'));
-        $content_element = $page->contentElements()->where('content_element_id', $content_element->id)->first();
+        //$content_element = ContentElement::findOrFail($id);
+        $contentable = ContentElement::findContentable(requestInput());
+        $content_element = $contentable->contentElements()->where('content_element_id', $id)->first();
 
         if (!auth()->user()->can('view', $content_element)) {
             if (request()->expectsJson()) {
@@ -59,11 +60,13 @@ class ContentElementsController extends Controller
     public function remove($id)
     {
         Validator::make(request()->all(), [
-            'page_id' => 'required|exists:pages,id',
+            'pivot.contentable_id' => 'required|integer',
+            'pivot.contentable_type' => 'required|string',
         ])->validate();
 
         $content_element = ContentElement::findOrFail($id);
-        $page = Page::findOrFail(requestInput('page_id'));
+
+        $contentable = ContentElement::findContentable(requestInput());
 
         if (!auth()->check()) {
             return abort(401);
@@ -76,7 +79,7 @@ class ContentElementsController extends Controller
             return redirect('/')->with(['error' => 'You do not have permission to remove that item']);
         }
 
-        broadcast(new ContentElementRemoved($content_element, $page));
+        broadcast(new ContentElementRemoved($content_element, $contentable));
 
         if (requestInput('remove_all')) {
             ContentElement::where('uuid', $content_element->uuid)->delete();

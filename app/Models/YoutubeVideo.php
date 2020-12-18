@@ -19,7 +19,7 @@ class YoutubeVideo extends Model
     protected $with = ['photos'];
     protected $appends = ['banner'];
 
-    public function saveContent($id = null, $input)
+    public function saveContent(array $input, $id = null)
     {
         if ($id >= 1) {
             $youtube_video = YoutubeVideo::findOrFail($id);

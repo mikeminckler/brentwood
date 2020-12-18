@@ -12,7 +12,7 @@ trait PagesControllerTrait
     use SoftDeletesControllerTrait;
 
     abstract protected function getValidation();
-    abstract protected function findPage();
+    abstract protected function findPage($page);
 
     private function loadPageAttributes($page)
     {
@@ -85,7 +85,7 @@ trait PagesControllerTrait
             }
         }
 
-        $page = ($this->getModel())->savePage($id, requestInput());
+        $page = ($this->getModel())->savePage(requestInput(), $id);
 
         $page = $this->loadPageAttributes($page);
 

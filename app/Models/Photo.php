@@ -26,7 +26,7 @@ class Photo extends Model
     protected $with = ['fileUpload'];
     protected $appends = ['small', 'medium', 'large'];
 
-    public function savePhoto($id = null, $input, $content = null)
+    public function savePhoto(array $input, $id = null, $content = null)
     {
         if (!$input) {
             return null;

@@ -19,7 +19,7 @@ class PhotosController extends Controller
 
     public function store(PhotoValidation $request, $id)
     {
-        $photo = (new Photo)->savePhoto($id, requestInput());
+        $photo = (new Photo)->savePhoto(requestInput(), $id);
 
         return response()->json([
             'success' => 'Photo Saved',

@@ -19,7 +19,7 @@ class TextBlock extends Model
 
     protected $with = ['photos'];
 
-    public function saveContent($id = null, $input)
+    public function saveContent(array $input, $id = null)
     {
         if ($id >= 1) {
             $text_block = TextBlock::findOrFail($id);

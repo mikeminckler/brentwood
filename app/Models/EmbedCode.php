@@ -14,7 +14,7 @@ class EmbedCode extends Model
     use HasFactory;
     use ContentElementTrait;
 
-    public function saveContent($id = null, $input)
+    public function saveContent(array $input, $id = null)
     {
         if ($id >= 1) {
             $embed_code = EmbedCode::findOrFail($id);

@@ -52,7 +52,7 @@ class Tag extends Model
         return $tag;
     }
 
-    public function saveTag($id = null, $input)
+    public function saveTag(array $input, $id = null)
     {
         if ($id) {
             $tag = Tag::findOrFail($id);

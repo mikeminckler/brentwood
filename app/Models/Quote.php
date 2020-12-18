@@ -18,7 +18,7 @@ class Quote extends Model
 
     protected $with = ['photos'];
 
-    public function saveContent($id = null, $input)
+    public function saveContent(array $input, $id = null)
     {
         if ($id >= 1) {
             $quote = Quote::findOrFail($id);

@@ -35,7 +35,7 @@ class ContentElementTest extends TestCase
             ],
         ];
 
-        $content_element = (new ContentElement)->saveContentElement(null, $input);
+        $content_element = (new ContentElement)->saveContentElement($input, null);
 
         $this->assertInstanceOf(ContentElement::class, $content_element);
 
@@ -116,7 +116,7 @@ class ContentElementTest extends TestCase
             'expandable' => false,
         ];
 
-        $saved_content_element = (new ContentElement)->saveContentElement($content_element->id, $input);
+        $saved_content_element = (new ContentElement)->saveContentElement($input, $content_element->id);
 
         $this->assertNotEquals($content_element->id, $saved_content_element->id);
         $this->assertNotEquals($content->id, $saved_content_element->content->id);
@@ -176,7 +176,7 @@ class ContentElementTest extends TestCase
             'expandable' => false,
         ];
 
-        (new ContentElement)->saveContentElement($content_element->id, $input);
+        (new ContentElement)->saveContentElement($input, $content_element->id);
 
         $content_element->refresh();
 

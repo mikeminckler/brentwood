@@ -48,7 +48,7 @@ class ContentElementsController extends Controller
     public function store(ContentElementValidation $request, $id = null)
     {
         $contentable = ContentElement::findContentable(requestInput());
-        $content_element = (new ContentElement)->saveContentElement($id, requestInput());
+        $content_element = (new ContentElement)->saveContentElement(requestInput(), $id);
         $content_element = $contentable->contentElements()->where('content_element_id', $content_element->id)->first();
 
         return response()->json([

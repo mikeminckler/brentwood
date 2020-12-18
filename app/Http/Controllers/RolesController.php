@@ -33,7 +33,7 @@ class RolesController extends Controller
             }
         }
 
-        $role = (new Role)->saveRole($id, requestInput());
+        $role = (new Role)->saveRole(requestInput(), $id);
 
         return response()->json([
             'success' => $role->name.' Saved',

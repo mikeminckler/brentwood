@@ -67,11 +67,11 @@ trait VersioningTrait
         if ($draft_version) {
             return $draft_version;
         } else {
-            $version = (new Version)->saveVersion(null, [
+            $version = (new Version)->saveVersion([
                 'name' => $this->versions()->count() + 1,
                 'versionable_type' => get_class($this),
                 'versionable_id' => $this->id,
-            ]);
+            ], null);
 
             $event_class = '\\App\\Events\\'.class_basename($this).'DraftCreated';
             broadcast(new $event_class($this->load('versions')));

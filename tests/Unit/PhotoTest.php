@@ -32,7 +32,7 @@ class PhotoTest extends TestCase
         $input['file_upload'] = $file_upload;
 
         $photo_block = PhotoBlock::factory()->create();
-        $photo = (new Photo)->savePhoto(null, $input, $photo_block);
+        $photo = (new Photo)->savePhoto($input, null, $photo_block);
         $this->assertInstanceOf(Photo::class, $photo);
         return $photo;
     }
@@ -57,7 +57,7 @@ class PhotoTest extends TestCase
         $input['file_upload'] = $file_upload;
 
         $photo_block = PhotoBlock::factory()->create();
-        $photo = (new Photo)->savePhoto(null, $input, $photo_block);
+        $photo = (new Photo)->savePhoto($input, null, $photo_block);
         $this->assertInstanceOf(Photo::class, $photo);
 
         $this->assertEquals($photo_block->id, $photo->content->id);
@@ -156,7 +156,7 @@ class PhotoTest extends TestCase
         $input['file_upload'] = $file_upload;
 
         $photo_block = PhotoBlock::factory()->create();
-        $photo = (new Photo)->savePhoto(null, $input, $photo_block);
+        $photo = (new Photo)->savePhoto($input, null, $photo_block);
         $this->assertInstanceOf(Photo::class, $photo);
 
         $this->assertTrue(Str::contains($photo->small, $file_name));
@@ -169,7 +169,7 @@ class PhotoTest extends TestCase
 
         $input['file_upload'] = $file_upload2;
 
-        $photo = (new Photo)->savePhoto($photo->id, $input, $photo_block);
+        $photo = (new Photo)->savePhoto($input, $photo->id, $photo_block);
 
         $photo->refresh();
 

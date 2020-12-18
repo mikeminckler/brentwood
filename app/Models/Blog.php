@@ -47,7 +47,7 @@ class Blog extends Model
         'unlisted' => 'boolean',
     ];
 
-    public function savePage($id = null, $input)
+    public function savePage(array $input, $id = null)
     {
         if ($id) {
             $blog = Blog::findOrFail($id);

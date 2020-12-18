@@ -13,7 +13,7 @@ class Version extends Model
 
     protected $dates = ['published_at'];
 
-    public function saveVersion($id = null, $input)
+    public function saveVersion(array $input, $id = null)
     {
         if ($id) {
             $version = Version::findOrFail($id);

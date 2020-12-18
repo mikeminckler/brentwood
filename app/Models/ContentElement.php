@@ -26,7 +26,7 @@ class ContentElement extends Model
     protected $appends = ['type', 'published_at'];
     protected $dates = ['publish_at'];
 
-    public function saveContentElement($id = null, $input)
+    public function saveContentElement(array $input, $id = null)
     {
         $contentable = self::findContentable($input);
 
@@ -59,7 +59,7 @@ class ContentElement extends Model
         }
 
         $content_class = 'App\\Models\\'.Str::studly(Arr::get($input, 'type'));
-        $content = (new $content_class)->saveContent($new_version ? null : Arr::get($input, 'content.id'), Arr::get($input, 'content'));
+        $content = (new $content_class)->saveContent(Arr::get($input, 'content'), $new_version ? null : Arr::get($input, 'content.id'));
 
         $content_element->content_id = $content->id;
         $content_element->content_type = get_class($content);

@@ -40,7 +40,7 @@ class UsersController extends Controller
                 return redirect()->route('home')->with(['error' => 'You do not have permission to udpate that user']);
             }
         }
-        $user = (new User)->saveUser($id, requestInput());
+        $user = (new User)->saveUser(requestInput(), $id);
 
         return response()->json([
             'success' => $user->name.' Saved',

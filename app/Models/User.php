@@ -69,7 +69,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function saveUser($id = null, $input)
+    public function saveUser(array $input, $id = null)
     {
         if ($id) {
             $user = User::findOrFail($id);

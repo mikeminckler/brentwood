@@ -55,7 +55,7 @@ class Page extends Model
         'published_at',
     ];
 
-    public function savePage($id = null, $input)
+    public function savePage(array $input, $id = null)
     {
         $home_page = false;
         if ($id) {

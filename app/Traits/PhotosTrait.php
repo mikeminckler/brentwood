@@ -16,7 +16,7 @@ trait PhotosTrait
     {
         if (Arr::get($input, 'photos')) {
             foreach (Arr::get($input, 'photos') as $photo_data) {
-                $photo = (new Photo)->savePhoto(Arr::get($photo_data, 'id'), $photo_data, $this);
+                $photo = (new Photo)->savePhoto($photo_data, Arr::get($photo_data, 'id'), $this);
             }
         }
     }
@@ -35,7 +35,7 @@ trait PhotosTrait
                     $this->photos()->delete();
                 }
             }
-            return (new Photo)->savePhoto($photo_id, $photo_data, $this);
+            return (new Photo)->savePhoto($photo_data, $photo_id, $this);
         }
     }
 }

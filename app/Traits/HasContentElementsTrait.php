@@ -30,7 +30,7 @@ trait HasContentElementsTrait
     {
         if (Arr::get($input, 'content_elements')) {
             foreach (Arr::get($input, 'content_elements') as $content_element) {
-                $content_element = (new ContentElement)->saveContentElement(Arr::get($content_element, 'id'), $content_element);
+                $content_element = (new ContentElement)->saveContentElement($content_element, Arr::get($content_element, 'id'));
             }
         }
 

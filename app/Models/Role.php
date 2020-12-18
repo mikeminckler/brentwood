@@ -18,7 +18,7 @@ class Role extends Model
 
     protected $appends = ['search_label'];
 
-    public function saveRole($id = null, $input)
+    public function saveRole(array $input, $id = null)
     {
         if ($id) {
             $role = Role::findOrFail($id);

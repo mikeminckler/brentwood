@@ -6,7 +6,7 @@ use App\Models\ContentElement;
 
 trait ContentElementTrait
 {
-    abstract public function saveContent();
+    abstract public function saveContent(array $input, $id = null);
 
     public function contentElement()
     {

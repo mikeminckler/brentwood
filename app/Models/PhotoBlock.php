@@ -22,7 +22,7 @@ class PhotoBlock extends Model
 
     protected $with = ['photos'];
 
-    public function saveContent($id = null, $input)
+    public function saveContent(array $input, $id = null)
     {
         if ($id >= 1) {
             $photo_block = PhotoBlock::findOrFail($id);

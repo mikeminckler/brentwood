@@ -69,7 +69,7 @@ class BlogsSeeder extends Seeder
                     ->first();
 
                 if (!$blog_check) {
-                    $blog = (new Blog)->savePage(null, $input);
+                    $blog = (new Blog)->savePage($input, null);
 
                     if ($data->image) {
                         $images = collect();
@@ -193,7 +193,7 @@ class BlogsSeeder extends Seeder
 
     protected function createTextBlock($blog, $title = null, $bodytext, $sort_order)
     {
-        $text_block = (new ContentElement)->saveContentElement(null, [
+        $text_block = (new ContentElement)->saveContentElement([
             'type' => 'text-block',
             'content' => [
                 'id' => 0,
@@ -208,7 +208,7 @@ class BlogsSeeder extends Seeder
                 'sort_order' => $sort_order,
                 'unlisted' => 0,
             ],
-        ]);
+        ], null);
     }
 
     protected function createPhotoBlock($blog, $urls, $sort_order, $banner)
@@ -254,7 +254,7 @@ class BlogsSeeder extends Seeder
             $columns = $urls->count();
         }
 
-        $image = (new ContentElement)->saveContentElement(null, [
+        $image = (new ContentElement)->saveContentElement([
             'type' => 'photo-block',
             'content' => [
                 'id' => 0,
@@ -277,6 +277,6 @@ class BlogsSeeder extends Seeder
                 'sort_order' => $sort_order,
                 'unlisted' => 0,
             ],
-        ]);
+        ], null);
     }
 }

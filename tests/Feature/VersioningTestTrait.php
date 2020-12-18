@@ -108,7 +108,7 @@ trait VersioningTestTrait
             'expandable' => false,
         ];
 
-        $saved_content_element = (new ContentElement)->saveContentElement($content_element->id, $input);
+        $saved_content_element = (new ContentElement)->saveContentElement($input, $content_element->id);
 
         $this->assertNotEquals($page->getDraftVersion()->id, $page->publishedVersion->id);
         $this->assertNotEquals($content_element->id, $saved_content_element->id);
@@ -174,7 +174,7 @@ trait VersioningTestTrait
             'expandable' => false,
         ];
 
-        $saved_content_element = (new ContentElement)->saveContentElement($content_element->id, $input);
+        $saved_content_element = (new ContentElement)->saveContentElement($input, $content_element->id);
 
         $page->refresh();
 

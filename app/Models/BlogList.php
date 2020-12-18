@@ -22,7 +22,7 @@ class BlogList extends Model
     protected $with = ['tags'];
     protected $appends = ['blogs'];
 
-    public function saveContent($id = null, $input)
+    public function saveContent(array $input, $id = null)
     {
         if ($id >= 1) {
             $blog_list = BlogList::findOrFail($id);

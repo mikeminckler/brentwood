@@ -38,7 +38,7 @@ class TagsController extends Controller
             }
         }
 
-        $tag = (new Tag)->saveTag($id, requestInput());
+        $tag = (new Tag)->saveTag(requestInput(), $id);
 
         return response()->json([
             'success' => $tag->name.' Saved',

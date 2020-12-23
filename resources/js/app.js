@@ -78,6 +78,16 @@ const app = new Vue({
 
     mounted() {
 
+        window.onpopstate = event => {
+
+            let pathname = document.location.pathname;
+            if (pathname !== '/') {
+                pathname = pathname.substr(1);
+            }
+            let url = pathname + document.location.search;
+            this.$eventer.$emit('load-page', url);
+        };
+
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -86,6 +96,8 @@ const app = new Vue({
         window.onYouTubeIframeAPIReady = function() {
             app.$store.dispatch('setYoutubeReady');
         }
+
+        this.$store.dispatch('setLocale', document.querySelector('meta[name="locale"]').content);
 
         this.$store.dispatch('setWsState', this.$echo.connector.pusher.connection.state);
         this.$echo.connector.pusher.connection.bind('state_change', states => {

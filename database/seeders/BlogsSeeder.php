@@ -98,7 +98,7 @@ class BlogsSeeder extends Seeder
                             $title_used = true;
                         }
 
-                        $this->createTextBlock($blog, null, $data->bodytext, $paragraph ? $sort_order : 2);
+                        $this->createTextBlock($blog, $data->bodytext, $paragraph ? $sort_order : 2, null);
 
                         if ($paragraph) {
                             $sort_order++;
@@ -143,7 +143,7 @@ class BlogsSeeder extends Seeder
                             ))->first();
 
                             if ($tt_content) {
-                                $this->createTextBlock($blog, $title_used ? $tt_content->header : null, $tt_content->bodytext, $paragraph ? $sort_order : 2);
+                                $this->createTextBlock($blog, $tt_content->bodytext, $paragraph ? $sort_order : 2, $title_used ? $tt_content->header : null);
                                 $title_used = true;
                                 if ($paragraph) {
                                     $sort_order++;
@@ -191,7 +191,7 @@ class BlogsSeeder extends Seeder
         $this->command->getOutput()->progressFinish();
     }
 
-    protected function createTextBlock($blog, $title = null, $bodytext, $sort_order)
+    protected function createTextBlock($blog, $bodytext, $sort_order, $title = null)
     {
         $text_block = (new ContentElement)->saveContentElement([
             'type' => 'text-block',

@@ -8,6 +8,7 @@ const store = new Vuex.Store({
         user: {},
         wsState: '',
         editing: false,
+        editorMounted: false,
         showMenu: false,
         feedback: [],
         saving: [],
@@ -28,6 +29,7 @@ const store = new Vuex.Store({
         youtubeReady: false,
         dragging: false,
         pageLoading: false,
+        locale: 'en',
     },
 
     mutations: {
@@ -42,6 +44,10 @@ const store = new Vuex.Store({
 
         setEditing(state, editing) {
             state.editing = editing;
+        },
+
+        editorMounted(state, isMounted) {
+            state.editorMounted = isMounted;
         },
 
         toggleMenu(state, showMenu) {
@@ -118,6 +124,10 @@ const store = new Vuex.Store({
         setPageLoading (state, loading) {
             state.pageLoading = loading;
         },
+
+        setLocale(state, locale) {
+            state.locale = locale;
+        },
     },
 
     actions: {
@@ -132,6 +142,10 @@ const store = new Vuex.Store({
 
         setEditing({ commit, state }, editing) {
             commit('setEditing', editing);
+        },
+
+        editorMounted({ commit, state }, isMounted) {
+            commit('editorMounted', isMounted);
         },
 
         toggleMenu({ commit, state }) {
@@ -226,6 +240,10 @@ const store = new Vuex.Store({
         setPageLoading({ commit, state }, loading) {
             //console.log('PAGE LOADING: ' + loading);
             commit('setPageLoading', loading);
+        },
+
+        setLocale({ commit, state }, locale) {
+            commit('setLocale', locale);
         },
 
     }

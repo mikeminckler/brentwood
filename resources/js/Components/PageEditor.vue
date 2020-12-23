@@ -23,7 +23,7 @@
             <div class="flex items-center flex-1">
                 <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
                 <div class="">
-                    <checkbox-input v-model="page.hide" @change="savePage()" label="Unlisted"></checkbox-input> 
+                    <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> 
                 </div>
             </div>
 
@@ -149,6 +149,8 @@
              * will be reactive
              */
 
+            this.$store.dispatch('editorMounted', true);
+
             if (this.currentPage) {
                 this.$store.dispatch('setPage', this.currentPage);
             }
@@ -156,11 +158,17 @@
             const savePageEvent = event => {
                 this.savePage();
             };
-
             this.$eventer.$on('save-page', savePageEvent);
+
+            // load page from history state and side menu link
+            const loadPageEvent = slug => {
+                this.loadPage(slug);
+            };
+            this.$eventer.$on('load-page', loadPageEvent);
 
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('save-page', savePageEvent);
+                this.$eventer.$off('load-page', loadPageEvent);
                 this.$echo.leave('role.2');
             });
 
@@ -188,13 +196,34 @@
                 });
         },
 
+        unmounted() {
+            this.$store.dispatch('editorMounted', false);
+        },
+
         methods: {
 
-            loadPage: function() {
+            loadPage: function(slug) {
                 this.$store.dispatch('setPageLoading', true);
 
-                this.$http.get(this.page.full_slug).then( response => {
+                if (!slug) {
+                    slug = this.page.full_slug;
+                } else if (this.$lodash.isObject(slug)) {
+                    slug = slug.full_slug;
+                }
+
+                this.$http.get(slug).then( response => {
                     this.$store.dispatch('setPage', response.data.page);
+
+                    let pathname = document.location.pathname;
+                    if (pathname !== '/') {
+                        pathname = pathname.substr(1);
+                    }
+                    let url = pathname + document.location.search;
+
+                    if (response.data.page.full_slug !== url) {
+                        console.log('PUSH: ' + response.data.page.full_slug);
+                        window.history.pushState(null, response.data.page.name, response.data.page.full_slug);
+                    }
 
                     this.$nextTick(() => {
                         this.$store.dispatch('setPageLoading', false);
@@ -209,7 +238,7 @@
                 let input = {
                     name: 'Untitled Page',
                     parent_page_id: this.page.id,
-                    hide: false,
+                    unlisted: false,
                     sort_order: this.page.pages.length + 1,
                     content_elements: [],
                 }
@@ -227,7 +256,7 @@
                 let input = {
                     name: 'Untitled Page',
                     parent_page_id: this.page.parent_page_id,
-                    hide: false,
+                    unlisted: false,
                     sort_order: this.page.sort_order + 1,
                     content_elements: [],
                 }
@@ -248,7 +277,7 @@
                     author: this.page.author,
                     tags: this.page.tags,
                     parent_page_id: this.page.parent_page_id,
-                    hide: this.page.hide ? true : false,
+                    unlisted: this.page.unlisted ? true : false,
                     sort_order: this.page.sort_order,
                     content_elements: this.page.content_elements,
                     footer_fg_file_upload: this.page.footer_fg_file_upload,
@@ -270,6 +299,18 @@
                     this.$nextTick(() => {
                         this.$store.dispatch('setPageLoading', false);
                     });
+
+                    let pathname = document.location.pathname;
+                    if (pathname !== '/') {
+                        pathname = pathname.substr(1);
+                    }
+                    let url = pathname + document.location.search;
+
+                    if (response.data.page.full_slug !== url) {
+                        console.log('REPLACE: ' + response.data.page.full_slug);
+                        window.history.replaceState(null, response.data.page.name, response.data.page.full_slug);
+                    }
+
                 }, error => {
                     this.processErrors(error.response);
                     this.$store.dispatch('completeSaving', 'page');
@@ -293,7 +334,7 @@
 
                     this.$http.post('/' + this.resource + '/' + this.page.id + '/publish').then( response => {
                         //location.reload();
-                        console.log('SET PAGE AFTER PUBLISH');
+                        //console.log('SET PAGE AFTER PUBLISH');
                         this.$store.dispatch('setPage', response.data.page);
                         this.processSuccess(response);
 

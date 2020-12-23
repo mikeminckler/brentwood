@@ -180,7 +180,7 @@
                 if (answer == true) {
 
                     let input = {
-                        removal_all: true,
+                        remove_all: true,
                         pivot: this.pivot,
                     }
 

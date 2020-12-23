@@ -276,7 +276,7 @@ trait PagesTestTrait
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), $input)
             ->assertSuccessful()
             ->assertJsonFragment([
-                'success' => 'Text Block Removed',
+                'success' => 'Text Block Version Removed',
                 'id' => $published_content_element->id,
                 'uuid' => $content_element->uuid,
             ]);
@@ -337,7 +337,7 @@ trait PagesTestTrait
              ->assertStatus(422)
              ->assertJsonValidationErrors(['pivot.contentable_id', 'pivot.contentable_type']);
 
-        $input = ['remove_all' => true];
+        $input = ['remove_all' => 'true'];
         $input['pivot'] = [
             'contentable_id' => $page->id,
             'contentable_type' => get_class($page),
@@ -353,11 +353,15 @@ trait PagesTestTrait
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), $input)
             ->assertSuccessful()
             ->assertJsonFragment([
-                'success' => 'Text Block Removed',
+                'success' => 'Text Block Removed From Page',
             ]);
+
+        $page->refresh();
 
         $this->assertEquals(0, ContentElement::where('id', $content_element->id)->get()->count());
         $this->assertEquals(0, ContentElement::where('id', $published_content_element->id)->get()->count());
+
+        $this->assertFalse($page->content_elements->contains('id', $content_element->id));
     }
 
     /** @test **/

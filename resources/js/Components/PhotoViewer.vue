@@ -6,7 +6,7 @@
         >
 
             <div class="relative flex items-center justify-center h-full">
-                <div class="relative shadow" @click.stop="">
+                <div class="relative shadow bg-white" @click.stop="">
                     <div class="text-lg hover:text-gray-800 absolute top-0 right-0 -mt-2 -mr-2 z-5 bg-gray-100 shadow rounded-full p-1 cursor-pointer flex items-center justify-center" 
                         @click="src = null"
                     ><i class="fas fa-times-circle"></i></div>

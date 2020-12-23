@@ -112,7 +112,7 @@ li {
 }
 
 table {
-    @apply w-full m-4 bg-white bg-opacity-75;
+    @apply w-full p-4 my-4;
 }
 
 tr {
@@ -277,7 +277,7 @@ input[type=range]:hover {
 }
 
 button, .button {
-    @apply inline-flex bg-primary text-white font-bold px-4 py-1 cursor-pointer whitespace-no-wrap;
+    @apply inline-flex bg-primary text-white font-bold px-4 py-1 mx-2 cursor-pointer whitespace-no-wrap;
 }
 
 .button-icon {
@@ -409,7 +409,7 @@ div.cell {
 }
 
 .stat-numbers {
-    @apply text-8xl;
+    @apply text-10xl;
 }
 
 .text-shadow {
@@ -430,7 +430,7 @@ div.cell {
 
 @media (min-width: 768px) {
     .stat-number {
-        @apply text-6xl;
+        @apply text-8xl;
     }
     .stat-name {
         @apply text-2xl;

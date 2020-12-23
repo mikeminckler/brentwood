@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="locale" content="{{ Illuminate\Support\Facades\App::currentLocale() }}">
     <base href="{{ url('/') }}">
 
     <script src="{{ mix('/js/app.js') }}" defer></script>
@@ -159,7 +160,7 @@
                 <footer-editor></footer-editor>
             @endif
 
-            <div id="footer" class="relative flex justify-center" style="min-height: 600px" :class="$store.state.editing ? 'px-12' : ''">
+            <div id="footer" class="relative flex justify-center" style="min-height: 700px" :class="$store.state.editing ? 'px-12' : ''">
 
                 <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
                 <div class="absolute w-full h-full overflow-hidden">
@@ -178,7 +179,13 @@
                         </div>
                 
                         <div class="flex-2 relative z-2">
+
+                            <div class="text-2xl mb-8 font-oswald font-light leading-tight flex justify-center">
+                                <div>Where Students <span class="border-b-2 border-primary">Choose</span> To Be</div>
+                            </div>
+
                             <div class="flex flex-col md:flex-row items-center justify-center">
+
                                 <div class="">
                                     <clock></clock>
                                     <a href="tel:2507435521">250.743.5521</a><br/>
@@ -192,8 +199,9 @@
                                         <a href="https://www.linkedin.com/school/brentwood-college-school" target="__blank" class="pr-4"><i class="fab fa-linkedin"></i></a>
                                     </div>
                                 </div>
-                                <div class="flex py-8 md:px-8">
-                                    <a href="/contact-us" class="button md:ml-4 md:my-4 whitespace-no-wrap text-sm md:text-base">Contact Us</a>
+                                <div class="flex md:flex-col py-2 md:py-8 px-8 w-full md:w-auto">
+                                    <a href="/apply-now" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
+                                    <a href="/contact-us" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Contact Us</a>
                                 </div>
                             </div>
                         </div>

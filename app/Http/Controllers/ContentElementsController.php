@@ -84,14 +84,14 @@ class ContentElementsController extends Controller
         if (requestInput('remove_all')) {
             ContentElement::where('uuid', $content_element->uuid)->delete();
             return response()->json([
-                'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Removed',
+                'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Removed From Page',
             ]);
         } else {
             $previous_content_element = $content_element->getPreviousVersion();
             $content_element->delete();
 
             return response()->json([
-                'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Removed',
+                'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Version Removed',
                 'content_element' => $previous_content_element,
             ]);
         }

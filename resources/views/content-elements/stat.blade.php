@@ -1,4 +1,4 @@
-<div class="absolute flex flex-col items-center justify-center w-full h-full z-3 pointer-events-none {{ $photo ? 'text-white text-shadow' : 'text-gray-500' }}"
+<div class="absolute bottom-0 flex flex-col justify-center w-full z-3 p-8 pointer-events-none {{ $photo ? 'text-white text-shadow' : 'text-gray-500' }} {{ $photo ? ( $photo->span > 1 ? 'items-end h-full' : 'items-center' ) : '' }}"
 
 @if (!$link && $photo)
     @click="$eventer.$emit('view-photo', '{{ $photo->large }}')"

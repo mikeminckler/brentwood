@@ -399,6 +399,10 @@ div.cell {
 .stat-number {
     @apply font-oswald font-normal text-6xl leading-none whitespace-no-wrap;
 
+    > .stat-numbers {
+        @apply text-9xl;
+    }
+
     > .stat-symbol:first-child {
         @apply -ml-8;
     }
@@ -408,9 +412,6 @@ div.cell {
     }
 }
 
-.stat-numbers {
-    @apply text-10xl;
-}
 
 .text-shadow {
     text-shadow: 1px 1px 0px #000000; 
@@ -430,7 +431,11 @@ div.cell {
 
 @media (min-width: 768px) {
     .stat-number {
-        @apply text-8xl;
+        @apply text-5xl;
+
+        > .stat-numbers {
+            @apply text-6xl;
+        }
     }
     .stat-name {
         @apply text-2xl;

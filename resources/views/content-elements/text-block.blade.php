@@ -17,7 +17,7 @@
 
 <div class="w-full md:flex relative z-3 {{ $content->full_width ? 'bg-white' : ($content->photos->count() && $content->style ? 'text-style-'.$content->style : '') }}">
     @if (!$content->full_width)
-        <div class="flex-1 relative {{ $content->photos->count() || ($content->stat_number && $content->stat_name) ? 'w-1/2 pb-50p float-right z-3 m-2 mt-8 md:m-0 md:w-auto md:pb-0 md:float-none' : '' }} {{ $content->header ? ( $content->style ? 'md:-mt-20' : 'md:-mt-12' ) : '' }}">
+        <div class="flex-1 relative {{ $content->photos->count() || ($content->stat_number && $content->stat_name) ? 'pb-50p z-3 md:m-0 md:pb-0' : '' }} {{ $content->header ? ( $content->style ? 'md:-mt-20' : 'md:-mt-12' ) : '' }}">
 
             @if ($content->stat_number && $content->stat_name && !$content->photos->count())
                 @include ('content-elements.stat', ['number' => $content->stat_number, 'name' => $content->stat_name, 'photo' => null, 'link' => null ])

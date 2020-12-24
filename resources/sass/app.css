@@ -277,7 +277,7 @@ input[type=range]:hover {
 }
 
 button, .button {
-    @apply inline-flex bg-primary text-white font-bold px-4 py-1 mx-2 cursor-pointer whitespace-no-wrap;
+    @apply inline-flex bg-primary text-white font-bold px-4 py-1 mx-2 cursor-pointer whitespace-nowrap;
 }
 
 .button-icon {
@@ -301,7 +301,7 @@ button, .button {
 }
 
 .warning {
-    @apply text-orange-600;
+    @apply text-yellow-600;
 }
 
 .caret {
@@ -397,7 +397,7 @@ div.cell {
 
 
 .stat-number {
-    @apply font-oswald font-normal text-6xl leading-none whitespace-no-wrap;
+    @apply font-oswald font-normal text-6xl leading-none whitespace-nowrap;
 
     > .stat-numbers {
         @apply text-9xl;

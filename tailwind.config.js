@@ -1,6 +1,12 @@
 const { colors } = require('tailwindcss/defaultTheme');
   
 module.exports = {
+  purge: [
+    './resources/**/*.scss',
+    './resources/**/*.vue',
+    './resources/**/*.js',
+    './resources/**/*.php',
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -63,5 +69,6 @@ module.exports = {
   plugins: [],
   future: {
     removeDeprecatedGapUtilities: true,
+    purgeLayersByDefault: true,
   },
 }

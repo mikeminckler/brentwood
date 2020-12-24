@@ -16,6 +16,7 @@ mix.js('resources/js/app.js', 'public/js')
     .vue()
     .options( {
         processCssUrls: false,
+        postCss: [ require('tailwindcss') ],
     })
     .alias({
         '@': path.join(__dirname, 'resources/js')
@@ -28,9 +29,7 @@ mix.js('resources/js/app.js', 'public/js')
     });
     //.extract()
 
-mix.postCss('resources/sass/app.css', 'public/css', [
-    require("tailwindcss")
-]);
+mix.sass('resources/sass/app.scss', 'public/css');
 
 if (mix.inProduction()) {
   mix.version();

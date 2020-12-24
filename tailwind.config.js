@@ -1,4 +1,4 @@
-const { colors } = require('tailwindcss/defaultTheme');
+const colors = require('tailwindcss/colors');
   
 module.exports = {
   purge: [
@@ -12,11 +12,6 @@ module.exports = {
       fontFamily: {
         'roboto': ['Roboto'],
         'oswald': ['Oswald'],
-      },
-      fontSize: {
-        '7xl': '5rem',
-        '8xl': '6rem',
-        '9xl': '7rem',
       },
       colors: {
         'primary': '#c8272c',

@@ -142,7 +142,7 @@
 
             <div class="items-center flex-1 flex flex-col relative" 
                 :class="$store.state.editing ? 'px-12' : ''"
-                style="background-image: linear-gradient(180deg, rgba(247,250,252,1) 75%, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1));"> 
+                style="background-image: linear-gradient(180deg, rgba(243, 244, 246 ,1) 75%, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1));"> 
 
                 <div class="flex flex-1 flex-col w-full max-w-6xl relative">
 

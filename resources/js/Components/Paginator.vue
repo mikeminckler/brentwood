@@ -94,7 +94,7 @@
         computed: {
             getString() {
                 let ascending = !this.descending ? true : '';
-                return '?paginate=true&page=' + this.page + '&count=' + this.count + '&sort=' + this.sort + '&ascending=' + ascending;
+                return '?paginate=true&paginate_page=' + this.page + '&paginate_count=' + this.count + '&sort=' + this.sort + '&ascending=' + ascending;
             },
 
             pages: function() {

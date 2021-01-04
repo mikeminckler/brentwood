@@ -105,4 +105,36 @@ class BlogTest extends TestCase
         $this->assertTrue($blogs->contains('id', $blog1->id));
         $this->assertFalse($blogs->contains('id', $blog2->id));
     }
+
+    /** @test **/
+    public function a_blog_can_find_the_next_oldest_and_prev_oldest_blogs()
+    {
+        $blog = Blog::factory()->create();
+        $prev_blog = Blog::factory()->create();
+        $next_blog = Blog::factory()->create();
+
+        $blog->publish();
+        $prev_blog->publish();
+        $next_blog->publish();
+
+        $blog->publishedVersion->published_at = now()->addMinutes(60);
+        $blog->publishedVersion->save();
+
+        $prev_blog->publishedVersion->published_at = now()->addMinutes(30);
+        $prev_blog->publishedVersion->save();
+
+        $next_blog->publishedVersion->published_at = now()->addMinutes(90);
+        $next_blog->publishedVersion->save();
+
+        $blog->refresh();
+
+        $this->assertTrue($next_blog->published_at > $blog->published_at);
+        $this->assertTrue($next_blog->published_at > $prev_blog->published_at);
+        $this->assertTrue($prev_blog->published_at < $blog->published_at);
+        $this->assertTrue($prev_blog->published_at < $next_blog->published_at);
+
+        $this->assertEquals($next_blog->id, $blog->next_blog->id);
+        $this->assertEquals($prev_blog->id, $blog->previous_blog->id);
+
+    }
 }

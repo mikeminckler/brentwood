@@ -18,7 +18,7 @@ trait TagsTrait
             $tag = (new Tag)->findOrCreateTag($tag);
         }
 
-        if (!$this->tags->contains('id', $tag->id)) {
+        if (!$this->tags()->get()->contains('id', $tag->id)) {
             $this->tags()->attach($tag);
         }
     }

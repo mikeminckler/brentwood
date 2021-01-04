@@ -632,7 +632,7 @@ trait PagesTestTrait
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), $input)
             ->assertSuccessful()
             ->assertJsonFragment([
-                'success' => 'Text Block Removed',
+                'success' => 'Text Block Version Removed',
                 //'uuid' => $content_element->uuid,
             ]);
 

@@ -136,6 +136,7 @@ class BlogTest extends TestCase
             ->assertStatus(403);
 
         $this->signInAdmin();
+        session()->put('editing', true);
 
         $this->json('GET', route('blogs.index'))
              ->assertSuccessful()

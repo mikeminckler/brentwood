@@ -41,6 +41,8 @@ class Blog extends Model
         'type',
         'resource',
         'published_at',
+        'next_blog',
+        'previous_blog',
     ];
 
     protected $casts = [
@@ -109,5 +111,33 @@ class Blog extends Model
         }
 
         return $blogs;
+    }
+
+    public function getNextBlogAttribute() 
+    {
+        if (!$this->published_at) {
+            return null;
+        }
+        return Blog::whereHas('publishedVersion', function($query) {
+            $query->where('published_at', '>', $this->published_at);
+        })
+        ->get()
+        ->sortByDesc(function($blog) {
+            return $blog->published_at;
+        })->first();
+    }
+
+    public function getPreviousBlogAttribute() 
+    {
+        if (!$this->published_at) {
+            return null;
+        }
+        return Blog::whereHas('publishedVersion', function($query) {
+            $query->where('published_at', '<', $this->published_at);
+        })
+        ->get()
+        ->sortByDesc(function($blog) {
+            return $blog->published_at;
+        })->first();
     }
 }

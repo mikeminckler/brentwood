@@ -117,13 +117,16 @@ class BlogTest extends TestCase
         $prev_blog->publish();
         $next_blog->publish();
 
-        $blog->publishedVersion->published_at = now()->addMinutes(60);
-        $blog->publishedVersion->save();
+        $time = $this->faker->numberBetween(1000,10000);
 
-        $prev_blog->publishedVersion->published_at = now()->addMinutes(30);
+        $prev_blog->publishedVersion->published_at = now()->addSeconds($time);
         $prev_blog->publishedVersion->save();
 
-        $next_blog->publishedVersion->published_at = now()->addMinutes(90);
+        $blog->publishedVersion->published_at = now()->addSeconds($time + 1);
+        $blog->publishedVersion->save();
+
+
+        $next_blog->publishedVersion->published_at = now()->addSeconds($time + 2);
         $next_blog->publishedVersion->save();
 
         $blog->refresh();
@@ -137,4 +140,5 @@ class BlogTest extends TestCase
         $this->assertEquals($prev_blog->id, $blog->previous_blog->id);
 
     }
+
 }

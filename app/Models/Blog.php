@@ -122,7 +122,7 @@ class Blog extends Model
             $query->where('published_at', '>', $this->published_at);
         })
         ->get()
-        ->sortByDesc(function($blog) {
+        ->sortBy(function($blog) {
             return $blog->published_at;
         })->first();
     }

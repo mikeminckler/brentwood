@@ -21,7 +21,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1 flex flex-col items-center justify-center w-full" v-if="!photo">
+                <div class="flex-1 flex flex-col items-center justify-center w-full bg-gray-200" v-if="!photo">
                     <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
                         <div class="">Upload A Photo</div>
                     </div>

@@ -1,22 +1,21 @@
 <template>
 
-    <div class="relative mt-8" 
+    <div class="relative mt-8 form-content-element"
          :class="contentElement.pivot.unlisted ? 'bg-gray-200 opacity-75' : ''" 
         v-if="contentElement.id >= 1"
     >
 
-        <add-content-element v-if="contentElementIndex === 0" :sort-order="contentElement.pivot.sort_order"></add-content-element>
-
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
+            <div class="content-element-icons" @click="showAdd = !showAdd" title="Add Content Element After"><i class="fas fa-file-medical"></i></div>
             <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!contentElement.published_at"><i class="fas fa-clock"></i></div>
-            <div class="content-element-icons" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
-            <div class="content-element-icons" @click="$emit('sortDown')" title="Move Down"><i class="fas fa-arrow-alt-circle-down"></i></div>
+            <div class="content-element-icons" v-if="contentElementIndex !== 0" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
+            <div class="content-element-icons" v-if="!last" @click="$emit('sortDown')" title="Move Down"><i class="fas fa-arrow-alt-circle-down"></i></div>
             <div class="content-element-icons" @click="contentElement.pivot.unlisted = 0" v-if="contentElement.pivot.unlisted" title="Hide Content"><i class="fas fa-eye"></i></div>
             <div class="content-element-icons" @click="contentElement.pivot.unlisted = 1" v-if="!contentElement.pivot.unlisted" title="Show Content"><i class="fas fa-eye-slash"></i></div>
             <div class="content-element-icons text-gray-800" @click="contentElement.pivot.expandable = 0" v-if="contentElement.pivot.expandable" title="Disable Expandable"><i class="fas fa-angle-double-down"></i></div>
             <div class="content-element-icons text-gray-400" @click="contentElement.pivot.expandable = 1" v-if="!contentElement.pivot.expandable" title="Make Expandable"><i class="fas fa-angle-double-down"></i></div>
             <div class="content-element-icons" title="Versioning/History?"><i class="fas fa-exchange-alt"></i></div>
-            <div class="remove-icon" title="Remove Content" @click="removeContentElement()"><i class="fas fa-times"></i></div>
+            <div class="content-element-icons hover:text-primary" title="Remove Content" @click="removeContentElement()"><i class="fas fa-trash-alt"></i></div>
         </div>
 
         <div class="relative flex justify-end">
@@ -65,6 +64,10 @@
             </div>
         </expander>
 
+        <transition name="add-content">
+            <add-content-element v-if="showAdd && !last" :sort-order="contentElement.pivot.sort_order" @selected="showAdd = false"></add-content-element>
+        </transition>
+
     </div>
 
 </template>
@@ -78,7 +81,7 @@
 
         mixins: [Feedback, ContentElements],
 
-        props: ['contentElement', 'first', 'contentElementIndex'],
+        props: ['contentElement', 'first', 'contentElementIndex', 'last'],
 
         components: {
             'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement.vue'),
@@ -97,6 +100,7 @@
                 showPublishAt: false,
                 changed: false,
                 preventWatcher: false,
+                showAdd: false,
                 saveContent: _.debounce( function() {
                     // refer to the mixin for saving of the content element
                     if (!this.preventWatcher && !this.isSaving) {
@@ -263,5 +267,25 @@
     animation: saving-icon var(--transition-time) reverse;
 }
 
+@keyframes add-content {
+    0% {
+        max-height: 0;
+        opacity: 0;
+        @apply my-0;
+    }
+    100%   {
+        max-height: 65px;
+        opacity: 1;
+        @apply my-4;
+    }
+}
+
+.add-content-enter-active {
+    animation: add-content calc(var(--transition-time) * 2) ease-out;
+}
+
+.add-content-leave-active {
+    animation: add-content calc(var(--transition-time) * 2) reverse;
+}
 
 </style>

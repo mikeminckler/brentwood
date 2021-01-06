@@ -79,7 +79,12 @@ class BlogTest extends TestCase
 
         $blog = Blog::all()->last();
 
+        $this->assertNotNull($blog->name);
+        $this->assertNotNull($blog->title);
+        $this->assertNotNull($blog->author);
+
         $this->assertEquals(Arr::get($input, 'name'), $blog->name);
+        $this->assertEquals(Arr::get($input, 'title'), $blog->title);
         $this->assertEquals(Arr::get($input, 'author'), $blog->author);
     }
 

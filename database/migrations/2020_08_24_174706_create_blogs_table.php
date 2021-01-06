@@ -17,6 +17,7 @@ class CreateBlogsTable extends Migration
             $table->id();
 
             $table->string('name')->index();
+            $table->string('title')->nullable();
             $table->string('slug')->nullable();
             $table->unsignedBigInteger('published_version_id')->nullable();
             $table->boolean('unlisted')->default(false);

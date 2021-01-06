@@ -33,7 +33,7 @@
             tag="div" 
             class="relative grid" 
             :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'gap-y-2' : 'gap-2' ) : '']" 
-            style="min-height: 100px"
+            style="min-height: 300px"
         >
 
             <div class="flex items-center justify-center bg-gray-200" key="no-photos" v-if="photosCount === 0">

@@ -35,6 +35,7 @@ class BlogValidation extends FormRequest
     {
         return [
             'name' => 'required|string',
+            'title' => 'string|nullable',
             'unlisted' => 'boolean',
         ];
     }

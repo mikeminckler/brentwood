@@ -68,6 +68,7 @@ class Page extends Model
         }
 
         $page->name = Arr::get($input, 'name');
+        $page->title = Arr::get($input, 'title');
         if (!$home_page) {
             $page->slug = Arr::get($input, 'slug');
         }

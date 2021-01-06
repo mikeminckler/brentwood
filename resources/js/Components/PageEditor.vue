@@ -22,9 +22,8 @@
 
             <div class="flex items-center flex-1">
                 <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
-                <div class="">
-                    <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> 
-                </div>
+                <div class="form ml-4"><input type="text" v-model="page.title" @enter="savePage" @focus="$event.target.select()" @change="savePage()" placeholder="Meta Title"/></div>
+                <div class=""> <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> </div>
             </div>
 
             <div class="cursor-pointer flex" @click="showPageVersions = !showPageVersions" v-if="activeVersion">
@@ -274,6 +273,7 @@
 
                 let input = {
                     name: this.page.name,
+                    title: this.page.title,
                     author: this.page.author,
                     tags: this.page.tags,
                     parent_page_id: this.page.parent_page_id,

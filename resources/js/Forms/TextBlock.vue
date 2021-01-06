@@ -41,7 +41,13 @@
                 ></photo-controls>
 
                 <div class="photo z-2" :class="photo.fill ? 'fill' : 'fit'" v-if="photo">
-                    <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'">
+                    <img :src="photo.large" :style="'object-position: ' + photo.offsetX + '% ' + photo.offsetY + '%;'" v-if="photo.large" />
+                    <div class="flex items-center justify-center bg-gray-200 h-full relative z-3" v-if="!photo.large">
+                        <div class="flex bg-gray-100 text-green-500 px-2 py-1">
+                            <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                            <div class="ml-1">Processing Image</div>
+                        </div>
+                    </div>
                 </div>
 
             </div>

@@ -182,8 +182,16 @@ iframe {
     @apply absolute bottom-0 z-3 w-full text-lg;
 }
 
+.form-content-element:not(.content-elements-enter-active, .content-elements-leave-active) {
+    min-height: 325px;
+}
+
 .content-element-icons {
-    @apply cursor-pointer px-2 py-1 mb-2 flex items-center justify-center;
+    @apply cursor-pointer px-2 py-1 mb-2 flex items-center justify-center border-transparent border h-8 w-8 rounded;
+}
+
+.content-element-icons:hover {
+    @apply bg-white border-gray-300 text-gray-600;
 }
 
 .remove-icon {

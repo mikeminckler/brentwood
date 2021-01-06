@@ -72,7 +72,13 @@ class PageTest extends TestCase
 
         $page = Page::all()->last();
 
+        $this->assertNotNull($page->name);
+        $this->assertNotNull($page->title);
+        $this->assertNotNull($page->parent_page_id);
+        $this->assertNotNull($page->sort_order);
+
         $this->assertEquals(Arr::get($input, 'name'), $page->name);
+        $this->assertEquals(Arr::get($input, 'title'), $page->title);
         $this->assertEquals(Arr::get($input, 'parent_page_id'), $page->parent_page_id);
         $this->assertEquals(Arr::get($input, 'sort_order'), $page->sort_order);
     }

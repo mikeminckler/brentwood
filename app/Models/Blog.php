@@ -41,8 +41,6 @@ class Blog extends Model
         'type',
         'resource',
         'published_at',
-        'next_blog',
-        'previous_blog',
     ];
 
     protected $casts = [
@@ -58,6 +56,7 @@ class Blog extends Model
         }
 
         $blog->name = Arr::get($input, 'name');
+        $blog->title = Arr::get($input, 'title');
         $blog->author = Arr::get($input, 'author');
         $blog->unlisted = Arr::get($input, 'unlisted') == true ? true : false;
         $blog->publish_at = Arr::get($input, 'publish_at');

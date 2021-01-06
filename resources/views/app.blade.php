@@ -7,9 +7,22 @@
     <meta name="locale" content="{{ Illuminate\Support\Facades\App::currentLocale() }}">
     <base href="{{ url('/') }}">
 
+    <title>{{ (isset($page) ? ($page->title ?? $page->name).' - ' : '').env('APP_NAME') }}</title>
+
     <script src="{{ mix('/js/app.js') }}" defer></script>
     <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
     <script src="https://kit.fontawesome.com/da9050191e.js" crossorigin="anonymous"></script>
+
+    @if (!session()->get('editing') && !request('preview'))
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GOOGLE_ANALYTICS_ID') }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ env('GOOGLE_ANALYTICS_ID') }}');
+        </script>
+    @endif
+
 </head>
 
 <body class="antialiased relative h-full flex flex-col" style="min-height: 100vh">

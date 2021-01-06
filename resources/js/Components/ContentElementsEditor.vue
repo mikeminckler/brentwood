@@ -13,13 +13,13 @@
                 @remove="removeContentElement(contentElement)"
                 @update="updateContentElement(contentElement, $event)"
                 :first="isFirst(contentElement)"
+                :last="index + 1 === contentElements.length"
                 :content-element-index="index"
             >
             </form-content-element>
         </transition-group>
 
         <add-content-element 
-            :always-show="true" 
             :sort-order="contentElements.length"
         ></add-content-element>
 
@@ -70,7 +70,7 @@
             addContentElement: function(data) {
 
                 this.$lodash.each(this.contentElements, ce => {
-                    if (ce.pivot.sort_order >= data.sortOrder) {
+                    if (ce.pivot.sort_order > data.sortOrder) {
                         ce.pivot.sort_order++;
                     }
                 });
@@ -272,7 +272,7 @@
     }
     100% {
         opacity: 1;
-        max-height: 250px;
+        max-height: 325px;
     }
 }
 

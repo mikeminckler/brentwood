@@ -26,6 +26,7 @@ class BlogFactory extends Factory
     {
         return [
             'name' => $this->faker->firstName.$this->faker->randomNumber(3),
+            'title' => $this->faker->lastName,
             'author' => $this->faker->firstName.' '.$this->faker->lastName,
             'unlisted' => 0,
         ];

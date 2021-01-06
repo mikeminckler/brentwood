@@ -36,6 +36,7 @@ class PageValidation extends FormRequest
         if ($id === 1) {
             return [
                 'name' => 'required|string',
+                'title' => 'string|nullable',
                 'unlisted' => 'boolean',
                 'sort_order' => 'required|integer',
                 'parent_page_id' => [
@@ -51,6 +52,7 @@ class PageValidation extends FormRequest
         } else {
             return [
                 'name' => 'required|string',
+                'title' => 'string|nullable',
                 'unlisted' => 'boolean',
                 'sort_order' => 'required|integer',
                 'parent_page_id' => [

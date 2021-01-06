@@ -62,7 +62,7 @@
                             <nav class="flex-2 relative flex md:block">
 
                                 <div class="flex w-full items-center justify-end mr-4">
-                                    <a href="/apply-now" class="button md:hidden mr-4 whitespace-no-wrap text-sm">Apply Now</a>
+                                    <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button md:hidden mr-4 whitespace-no-wrap text-sm">Apply Now</a>
                                     <div class="md:hidden text-white bg-primary px-2 text-lg cursor-pointer" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
                                 </div>
 
@@ -109,8 +109,8 @@
 
                                             <div class="flex items-center mb-2 md:mb-0">
                                         
-                                                <a href="/apply-now" class="button hidden md:block mr-4 my-4 whitespace-no-wrap text-base">Apply Now</a>
-                                                <a href="/search" class="hidden md:block text-xl text-gray-500 cursor-pointer mr-4"><i class="fas fa-search"></i></a>
+                                                <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button hidden md:block mr-4 my-4 whitespace-no-wrap text-base">Apply Now</a>
+                                                <a href="#" class="hidden md:block text-xl text-gray-500 cursor-pointer mr-4"><i class="fas fa-search"></i></a>
 
                                                 @auth
                                                     @if (auth()->user()->hasRole('editor'))
@@ -213,8 +213,8 @@
                                     </div>
                                 </div>
                                 <div class="flex md:flex-col py-2 md:py-8 px-8 w-full md:w-auto">
-                                    <a href="/apply-now" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
-                                    <a href="/contact-us" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Contact Us</a>
+                                    <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
+                                    <a href="https://www.brentwood.bc.ca/inquiry" target="_blank" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Contact Us</a>
                                 </div>
                             </div>
                         </div>

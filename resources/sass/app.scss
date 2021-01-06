@@ -434,27 +434,26 @@ div.cell {
 }
 
 .stat-name {
-    @apply font-oswald text-3xl;
+    @apply font-oswald text-3xl text-center;
 }
 
 /*
 @media (min-width: 768px) {
     .stat-number {
-        @apply text-5xl;
+        @apply text-4xl;
 
         > .stat-numbers {
-            @apply text-7xl;
+            @apply text-5xl;
         }
     }
     .stat-name {
-        @apply text-2xl;
+        @apply text-xl;
     }
     .stat-symbol {
-        @apply text-5xl;
+        @apply text-3xl;
     }
 }
 */
-
 
 /* BLOG PREVIEW */
 

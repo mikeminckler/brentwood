@@ -92,6 +92,7 @@ class PhotoTest extends TestCase
         $photo->refresh();
         $this->assertNotEquals('/public/images/default.png', $photo->small);
         $this->assertTrue(strpos($photo->small, $photo->fileUpload->filename) > 0);
+        $this->assertTrue(Str::endsWith($small, '.jpg'));
         Storage::disk('public')->assertExists($small);
     }
 
@@ -111,6 +112,7 @@ class PhotoTest extends TestCase
         $photo = $this->createPhoto();
         $medium = $photo->medium;
         $this->assertTrue(strpos($photo->medium, $photo->fileUpload->filename) > 0);
+        $this->assertTrue(Str::endsWith($medium, '.jpg'));
         Storage::disk('public')->assertExists($medium);
     }
 
@@ -130,6 +132,7 @@ class PhotoTest extends TestCase
         $photo = $this->createPhoto();
         $large = $photo->large;
         $this->assertTrue(strpos($photo->large, $photo->fileUpload->filename) > 0);
+        $this->assertTrue(Str::endsWith($large, '.jpg'));
         Storage::disk('public')->assertExists($large);
     }
 

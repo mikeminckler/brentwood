@@ -2,7 +2,7 @@
     <a class="absolute w-full h-full" href="{{ $photo->link }}">
 @endif
 
-<picture class="photo {{ $photo->fill ? 'fill' : 'fit' }} {{ $photo->link ? 'cursor-pointer' : 'cursor-zoom-in' }}" 
+<picture class="photo {{ $photo->fill ? 'fill' : 'fit' }} {{ $photo->link ? 'cursor-pointer' : 'md:cursor-zoom-in' }}" 
 
 @if (!$photo->link)
     @click="$eventer.$emit('view-photo', '{{ $photo->large }}')"

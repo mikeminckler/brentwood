@@ -175,6 +175,8 @@
 
             <div id="footer" class="relative flex justify-center" style="min-height: 700px" :class="$store.state.editing ? 'px-12' : ''">
 
+                <div class="md:hidden h-full w-full absolute z-3 bg-white bg-opacity-75"></div>
+
                 <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
                 <div class="absolute w-full h-full overflow-hidden">
                     <img src="{{ isset($page) ? ( $page->footer_fg_image ? $page->footer_fg_image : '/images/footer_fg.png' ) : '/images/footer_fg.png' }}" class="w-full h-full object-cover z-2 absolute" />
@@ -182,20 +184,21 @@
                 </div>
                 <div class="relative w-full max-w-6xl">
 
-                    <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-1"></div>
+                    <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-4 md:z-1"></div>
                     
-                    <div class="flex items-center pt-8 md:pt-16">
-                        <div class="hidden md:flex flex-1 justify-center relative z-2">
+                    <div class="md:flex items-center py-8 md:pt-16 relative z-4">
+                        <div class="flex flex-col flex-1 justify-center items-center relative">
                             <div class="p-8">
                                 <img src="images/logo.svg" class="h-12" />
                             </div>
-                        </div>
-                
-                        <div class="flex-2 relative z-2">
 
                             <div class="text-2xl mb-8 font-oswald font-light leading-tight flex justify-center">
                                 <div>Where Students <span class="border-b-2 border-primary">Choose</span> To Be</div>
                             </div>
+
+                        </div>
+                
+                        <div class="flex-2 relative z-2">
 
                             <div class="flex flex-col md:flex-row items-center justify-center">
 
@@ -212,7 +215,7 @@
                                         <a href="https://www.linkedin.com/school/brentwood-college-school" target="__blank" class="pr-4"><i class="fab fa-linkedin"></i></a>
                                     </div>
                                 </div>
-                                <div class="flex md:flex-col py-2 md:py-8 px-8 w-full md:w-auto">
+                                <div class="flex md:flex-col py-2 md:py-8 px-12 md:px-8 w-full md:w-auto">
                                     <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
                                     <a href="https://www.brentwood.bc.ca/inquiry" target="_blank" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Contact Us</a>
                                 </div>

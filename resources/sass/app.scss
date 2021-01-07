@@ -403,7 +403,15 @@ div.cell {
     background-color: #607384;
 }
 
+.text-shadow {
+    text-shadow: 1px 1px 0px #000000; 
+}
 
+.drop-shadow {
+    box-shadow: 1px 1px 0px #000000;
+}
+
+/*
 .stat-number {
     @apply font-oswald font-normal text-6xl leading-none whitespace-nowrap;
 
@@ -418,15 +426,6 @@ div.cell {
     > .stat-symbol:last-child {
         @apply -mr-8;
     }
-}
-
-
-.text-shadow {
-    text-shadow: 1px 1px 0px #000000; 
-}
-
-.drop-shadow {
-    box-shadow: 1px 1px 0px #000000;
 }
 
 .stat-symbol {

@@ -81,7 +81,7 @@
 
                                 <div class="flex w-full items-center justify-end mr-4">
                                     <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button md:hidden mr-4 whitespace-no-wrap text-sm">Apply Now</a>
-                                    <div class="md:hidden text-white bg-primary px-2 text-lg cursor-pointer" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
+                                    <div class="hidden text-white bg-primary px-2 text-lg cursor-pointer" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
                                 </div>
 
                                 <div class="absolute md:relative w-screen md:w-auto top-0 mt-12 md:mt-0 right-0 md:right-auto md:h-auto md:flex z-5 md:overflow-visible overflow-hidden"

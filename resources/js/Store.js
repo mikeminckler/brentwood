@@ -24,6 +24,8 @@ const store = new Vuex.Store({
             sort_order: 0,
             content_elements: [],
             type: null,
+            footer_fg_photo: {},
+            footer_bg_photo: {},
         },
         pageTree: {},
         youtubeReady: false,
@@ -77,6 +79,8 @@ const store = new Vuex.Store({
                 sort_order: 0,
                 content_elements: [],
                 publish_at: '',
+                footer_fg_photo: {},
+                footer_bg_photo: {},
             };
         },
 

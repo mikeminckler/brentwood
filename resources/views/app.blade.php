@@ -187,20 +187,51 @@
 
             </div>
 
-            @if (optional($page ?? '')->editable && !request('preview'))
-                <footer-editor></footer-editor>
-            @endif
 
             <div id="footer" class="relative flex justify-center" style="min-height: 700px" :class="$store.state.editing ? 'px-12' : ''">
 
-                <div class="md:hidden h-full w-full absolute z-3 bg-white bg-opacity-75"></div>
+                @if (optional($page ?? '')->editable && !request('preview'))
+                    <footer-editor></footer-editor>
+                @else
 
-                <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
-                <div class="absolute w-full h-full overflow-hidden">
-                    <img src="{{ isset($page) ? ( $page->footer_fg_image ? $page->footer_fg_image : '/images/footer_fg.png' ) : '/images/footer_fg.png' }}" class="w-full h-full object-cover z-2 absolute" />
-                    <img src="{{ isset($page) ? ( $page->footer_bg_image ? $page->footer_bg_image : '/images/footer_bg.png' ) : '/images/footer_bg.png' }}" class="w-full h-full object-cover" />
-                </div>
-                <div class="relative w-full max-w-6xl">
+                    @if (isset($page))
+                        <div class="md:hidden h-full w-full absolute z-3 bg-white bg-opacity-75"></div>
+
+                        <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
+                        <div class="absolute w-full h-full overflow-hidden">
+
+                            @if ($page->footerFgPhoto)
+                                <picture class="w-full h-full z-2 absolute">
+                                    <source media="(min-width: 900px)" srcset="{{ $page->footerFgPhoto->large }}.webp" type="image/webp" >
+                                    <source media="(min-width: 400px)" srcset="{{ $page->footerFgPhoto->medium }}.webp" type="image/webp" >
+                                    <source srcset="{{ $page->footerFgPhoto->small }}.webp" type="image/webp" >
+                                    <img class="w-full h-full object-cover"
+                                        srcset="{{ $page->footerFgPhoto->small }} 400w, {{ $page->footerFgPhoto->medium }} 900w, {{ $page->footerFgPhoto->large }} 1152w"
+                                        src="{{ $page->footerFgPhoto->large }}"
+                                        type="image/{{ optional($page->footerFgPhoto->fileUpload)->extension }}"
+                                        alt="{{ $page->alt }}" >
+                                </picture>
+                            @endif
+
+                            @if ($page->footerBgPhoto)
+                                <picture class="w-full h-full">
+                                    <source media="(min-width: 900px)" srcset="{{ $page->footerBgPhoto->large }}.webp" type="image/webp" >
+                                    <source media="(min-width: 400px)" srcset="{{ $page->footerBgPhoto->medium }}.webp" type="image/webp" >
+                                    <source srcset="{{ $page->footerBgPhoto->small }}.webp" type="image/webp" >
+                                    <img class="w-full h-full object-cover" 
+                                        srcset="{{ $page->footerBgPhoto->small }} 400w, {{ $page->footerBgPhoto->medium }} 900w, {{ $page->footerBgPhoto->large }} 1152w"
+                                        src="{{ $page->footerBgPhoto->large }}"
+                                        type="image/{{ optional($page->footerBgPhoto->fileUpload)->extension }}"
+                                        alt="{{ $page->alt }}" >
+                                </picture>
+                            @endif
+
+                        </div>
+                    @endif
+
+                @endif
+
+                <div class="relative w-full max-w-6xl {{ isset($page) ? $page->footer_text_color : '' }}">
 
                     <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-4 md:z-1"></div>
                     

@@ -324,8 +324,16 @@ class PageTest extends TestCase
 
         $page = Page::factory()->create();
         $input = Page::factory()->raw();
-        $input['footer_fg_file_upload'] = $fg_file_upload;
-        $input['footer_bg_file_upload'] = $bg_file_upload;
+
+        $fg_photo_input = Photo::factory()->raw();
+        $fg_photo_input['file_upload'] = $fg_file_upload;
+
+        $bg_photo_input = Photo::factory()->raw();
+        $bg_photo_input['file_upload'] = $bg_file_upload;
+
+        $input['footer_fg_photo'] = $fg_photo_input;
+        $input['footer_bg_photo'] = $bg_photo_input;
+
         $input['footer_color'] = $this->faker->hexcolor;
 
         $this->signInAdmin();
@@ -344,17 +352,18 @@ class PageTest extends TestCase
         $this->assertEquals(Arr::get($input, 'parent_page_id'), $page->parent_page_id);
         $this->assertEquals(Arr::get($input, 'sort_order'), $page->sort_order);
         $this->assertEquals(Arr::get($input, 'footer_color'), $page->footer_color);
-        $this->assertEquals(Arr::get($input, 'footer_fg_file_upload.id'), $page->footer_fg_file_upload_id);
-        $this->assertEquals(Arr::get($input, 'footer_bg_file_upload.id'), $page->footer_bg_file_upload_id);
 
-        $fg_photo = $page->footerFgFileUpload;
-        $bg_photo = $page->footerBgFileUpload;
+        $this->assertNotNull(Arr::get($input, 'footer_fg_photo.file_upload.id'));
+        $this->assertNotNull(Arr::get($input, 'footer_bg_photo.file_upload.id'));
 
-        $this->assertInstanceOf(FileUpload::class, $fg_photo);
-        $this->assertInstanceOf(FileUpload::class, $bg_photo);
+        $this->assertEquals(Arr::get($input, 'footer_fg_photo.file_upload.id'), $page->getFooterFgPhoto()->fileUpload->id);
+        $this->assertEquals(Arr::get($input, 'footer_bg_photo.file_upload.id'), $page->getFooterBgPhoto()->fileUpload->id);
 
-        $this->assertEquals($fg_photo->id, $fg_file_upload->id);
-        $this->assertEquals($bg_photo->id, $bg_file_upload->id);
+        $page_fg_photo = $page->getFooterFgPhoto();
+        $page_bg_photo = $page->getFooterBgPhoto();
+
+        $this->assertInstanceOf(Photo::class, $page_fg_photo);
+        $this->assertInstanceOf(Photo::class, $page_bg_photo);
     }
 
     /** @test **/
@@ -588,9 +597,9 @@ class PageTest extends TestCase
     {
         $input = [
             "content_elements" => [],
-            "footer_bg_file_upload" => null,
+            "footer_bg_photo" => null,
             "footer_color" => null,
-            "footer_fg_file_upload" => null,
+            "footer_fg_photo" => null,
             "name" => "d",
             "parent_page_id" => 0,
             "sort_order" => 0,

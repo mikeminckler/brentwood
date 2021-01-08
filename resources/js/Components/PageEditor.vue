@@ -240,6 +240,8 @@
                     unlisted: false,
                     sort_order: this.page.pages.length + 1,
                     content_elements: [],
+                    footer_fg_photo: {},
+                    footer_bg_photo: {},
                 }
 
                 this.$http.post('/' + this.resource + '/create', input).then( response => {
@@ -258,6 +260,8 @@
                     unlisted: false,
                     sort_order: this.page.sort_order + 1,
                     content_elements: [],
+                    footer_fg_photo: {},
+                    footer_bg_photo: {},
                 }
 
                 this.$http.post('/' + this.resource + '/create', input).then( response => {
@@ -280,8 +284,8 @@
                     unlisted: this.page.unlisted ? true : false,
                     sort_order: this.page.sort_order,
                     content_elements: this.page.content_elements,
-                    footer_fg_file_upload: this.page.footer_fg_file_upload,
-                    footer_bg_file_upload: this.page.footer_bg_file_upload,
+                    footer_fg_photo: this.page.footer_fg_photo,
+                    footer_bg_photo: this.page.footer_bg_photo,
                     footer_color: this.page.footer_color,
                     publish_at: this.page.publish_at,
                 };

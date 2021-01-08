@@ -46,7 +46,7 @@ export default {
                 //upload.large = null;
 
                 if (!this.$lodash.find(this.photos, function(u) {
-                    return u.file_upload.id == upload.id;
+                    return u.file_upload.id === upload.id;
                 })) {
 
                     let newPhoto = {

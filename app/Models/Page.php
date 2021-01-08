@@ -35,7 +35,7 @@ class Page extends Model
 
     protected $dates = ['publish_at'];
 
-    protected $with = ['pages'];
+    protected $with = ['pages', 'footerFgPhoto', 'footerBgPhoto'];
     
     protected $casts = [
         'unlisted' => 'boolean',
@@ -47,8 +47,6 @@ class Page extends Model
         'can_be_published',
         'content_elements',
         'preview_content_elements',
-        'footer_fg_image',
-        'footer_bg_image',
         'sub_menu',
         'type',
         'resource',
@@ -85,8 +83,17 @@ class Page extends Model
         $page->sort_order = Arr::get($input, 'sort_order');
         $page->unlisted = Arr::get($input, 'unlisted') == true ? true : false;
         $page->footer_color = Arr::get($input, 'footer_color');
-        $page->footer_fg_file_upload_id = Arr::get($input, 'footer_fg_file_upload.id');
-        $page->footer_bg_file_upload_id = Arr::get($input, 'footer_bg_file_upload.id');
+
+        if (Arr::get($input, 'footer_fg_photo')) {
+            $footer_fg_photo = (new Photo)->savePhoto(Arr::get($input, 'footer_fg_photo'), $page->footer_fg_photo_id, $page);
+            $page->footer_fg_photo_id = $footer_fg_photo->id;
+        }
+
+        if (Arr::get($input, 'footer_bg_photo')) {
+            $footer_bg_photo = (new Photo)->savePhoto(Arr::get($input, 'footer_bg_photo'), $page->footer_bg_photo_id, $page);
+            $page->footer_bg_photo_id = $footer_bg_photo->id;
+        }
+
         $page->publish_at = Arr::get($input, 'publish_at');
         $page->save();
 
@@ -98,6 +105,11 @@ class Page extends Model
         broadcast(new PageSaved($page))->toOthers();
 
         return $page;
+    }
+
+    public function photos()
+    {
+        return $this->morphMany(Photo::class, 'content');
     }
 
     public function parentPage()
@@ -154,36 +166,38 @@ class Page extends Model
             });
     }
 
-    public function footerFgFileUpload()
+    public function footerFgPhoto()
     {
-        return $this->belongsTo(FileUpload::class, 'footer_fg_file_upload_id');
+        return $this->belongsTo(Photo::class, 'footer_fg_photo_id');
     }
 
-    public function footerBgFileUpload()
+    public function footerBgPhoto()
     {
-        return $this->belongsTo(FileUpload::class, 'footer_bg_file_upload_id');
+        return $this->belongsTo(Photo::class, 'footer_bg_photo_id');
     }
 
-    public function getFooterFgAttribute()
+    public function getFooterFgPhoto() 
     {
-        if ($this->footerFgFileUpload) {
-            return $this->footerFgFileUpload;
+        $value = $this->footerFgPhoto;   
+        if ($value) {
+            return $value;
         } else {
             if ($this->parent_page_id > 0) {
-                return Page::find($this->parent_page_id)->footer_fg;
+                return Page::find($this->parent_page_id)->getFooterFgPhoto();
             } else {
                 return null;
             }
         }
     }
 
-    public function getFooterBgAttribute()
+    public function getFooterBgPhoto() 
     {
-        if ($this->footerBgFileUpload) {
-            return $this->footerBgFileUpload;
+        $value = $this->footerBgPhoto;   
+        if ($value) {
+            return $value;
         } else {
             if ($this->parent_page_id > 0) {
-                return Page::find($this->parent_page_id)->footer_bg;
+                return Page::find($this->parent_page_id)->getFooterBgPhoto();
             } else {
                 return null;
             }
@@ -203,50 +217,16 @@ class Page extends Model
         }
     }
 
-    public function getFooterFgImageAttribute()
+    public function getFooterTextColorAttribute() 
     {
-        return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-footer-fg-image', function () {
-            if ($this->footer_fg) {
-                if (Storage::disk('public')->exists('/photos/footers/fg-'.$this->footer_fg->name)) {
-                    return '/photos/footers/fg-'.$this->footer_fg->name;
-                } else {
-                    return $this->createImage($this->footer_fg, 'fg');
-                }
-            }
-        });
-    }
-
-    public function getFooterBgImageAttribute()
-    {
-        return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-footer-bg-image', function () {
-            if ($this->footer_bg) {
-                if (Storage::disk('public')->exists('/photos/footers/bg-'.$this->footer_bg->name)) {
-                    return '/photos/footers/bg-'.$this->footer_bg->name;
-                } else {
-                    return $this->createImage($this->footer_bg, 'bg');
-                }
-            }
-        });
-    }
-
-    public function createImage($file_upload, $prefix)
-    {
-        //\Log::info('CREATE '.$prefix.'-'.$file_upload->storage_filename);
-        if (!Storage::exists($file_upload->storage_filename)) {
+        if (!Str::contains($this->footer_color, ',')) {
             return null;
         }
-        $file = Storage::get($file_upload->storage_filename);
-        $image = Image::make($file)
-            ->resize(2000, 2000, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
-        //})->encode('png');
-
-        $file_name = '/photos/footers/'.$prefix.'-'.$file_upload->name;
-        Storage::disk('public')->put($file_name, $image->stream());
-        cache()->tags([cache_name($this)])->flush();
-        return $file_name;
+        $number_total = round(collect(explode(',', $this->footer_color))->sum() / 3);
+        if ($number_total < 75) {
+            return 'text-gray-200';
+        }
+        return null;
     }
 
     public function getSubMenuAttribute()

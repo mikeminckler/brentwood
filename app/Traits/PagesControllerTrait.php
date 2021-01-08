@@ -16,11 +16,13 @@ trait PagesControllerTrait
 
     private function loadPageAttributes($page)
     {
-        $page->appendAttributes();
 
         if (session()->has('editing')) {
+            $page->refresh();
             $page->load('versions', 'tags');
         }
+
+        $page->appendAttributes();
 
         return $page;
     }

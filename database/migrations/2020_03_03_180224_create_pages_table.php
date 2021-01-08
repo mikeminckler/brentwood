@@ -23,8 +23,8 @@ class CreatePagesTable extends Migration
             $table->integer('sort_order');
             $table->boolean('unlisted')->default(false);
             $table->string('footer_color')->nullable();
-            $table->unsignedBigInteger('footer_fg_file_upload_id')->nullable();
-            $table->unsignedBigInteger('footer_bg_file_upload_id')->nullable();
+            $table->unsignedBigInteger('footer_fg_photo_id')->nullable();
+            $table->unsignedBigInteger('footer_bg_photo_id')->nullable();
             $table->dateTime('publish_at')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -194,40 +194,52 @@
                     <footer-editor></footer-editor>
                 @else
 
-                    @if (isset($page))
                         <div class="md:hidden h-full w-full absolute z-3 bg-white bg-opacity-75"></div>
 
                         <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
+
                         <div class="absolute w-full h-full overflow-hidden">
 
-                            @if ($page->footerFgPhoto)
-                                <picture class="w-full h-full z-2 absolute">
-                                    <source media="(min-width: 900px)" srcset="{{ $page->footerFgPhoto->large }}.webp" type="image/webp" >
-                                    <source media="(min-width: 400px)" srcset="{{ $page->footerFgPhoto->medium }}.webp" type="image/webp" >
-                                    <source srcset="{{ $page->footerFgPhoto->small }}.webp" type="image/webp" >
-                                    <img class="w-full h-full object-cover"
-                                        srcset="{{ $page->footerFgPhoto->small }} 400w, {{ $page->footerFgPhoto->medium }} 900w, {{ $page->footerFgPhoto->large }} 1152w"
-                                        src="{{ $page->footerFgPhoto->large }}"
-                                        type="image/{{ optional($page->footerFgPhoto->fileUpload)->extension }}"
-                                        alt="{{ $page->alt }}" >
-                                </picture>
-                            @endif
+                        @php 
 
-                            @if ($page->footerBgPhoto)
-                                <picture class="w-full h-full">
-                                    <source media="(min-width: 900px)" srcset="{{ $page->footerBgPhoto->large }}.webp" type="image/webp" >
-                                    <source media="(min-width: 400px)" srcset="{{ $page->footerBgPhoto->medium }}.webp" type="image/webp" >
-                                    <source srcset="{{ $page->footerBgPhoto->small }}.webp" type="image/webp" >
-                                    <img class="w-full h-full object-cover" 
-                                        srcset="{{ $page->footerBgPhoto->small }} 400w, {{ $page->footerBgPhoto->medium }} 900w, {{ $page->footerBgPhoto->large }} 1152w"
-                                        src="{{ $page->footerBgPhoto->large }}"
-                                        type="image/{{ optional($page->footerBgPhoto->fileUpload)->extension }}"
-                                        alt="{{ $page->alt }}" >
-                                </picture>
-                            @endif
+                            if (isset($page)) {
+                                $footerFgPhoto = $page->getFooterFgPhoto();
+                                $footerBgPhoto = $page->getFooterBgPhoto();
+                            } else {
+                                $home_page = App\Models\Page::find(1);
+                                $footerFgPhoto = $home_page->footerFgPhoto;
+                                $footerBgPhoto = $home_page->footerBgPhoto;
+                            }
+
+                        @endphp
+
+                        @if ($footerFgPhoto)
+                            <picture class="w-full h-full z-2 absolute">
+                                <source media="(min-width: 900px)" srcset="{{ $footerFgPhoto->large }}.webp" type="image/webp" >
+                                <source media="(min-width: 400px)" srcset="{{ $footerFgPhoto->medium }}.webp" type="image/webp" >
+                                <source srcset="{{ $footerFgPhoto->small }}.webp" type="image/webp" >
+                                <img class="w-full h-full object-cover"
+                                    srcset="{{ $footerFgPhoto->small }} 400w, {{ $footerFgPhoto->medium }} 900w, {{ $footerFgPhoto->large }} 1152w"
+                                    src="{{ $footerFgPhoto->large }}"
+                                    type="image/{{ optional($footerFgPhoto->fileUpload)->extension }}"
+                                    alt="Brentwood College School Footer Foreground" >
+                            </picture>
+                        @endif
+
+                        @if ($footerBgPhoto)
+                            <picture class="w-full h-full">
+                                <source media="(min-width: 900px)" srcset="{{ $footerBgPhoto->large }}.webp" type="image/webp" >
+                                <source media="(min-width: 400px)" srcset="{{ $footerBgPhoto->medium }}.webp" type="image/webp" >
+                                <source srcset="{{ $footerBgPhoto->small }}.webp" type="image/webp" >
+                                <img class="w-full h-full object-cover" 
+                                    srcset="{{ $footerBgPhoto->small }} 400w, {{ $footerBgPhoto->medium }} 900w, {{ $footerBgPhoto->large }} 1152w"
+                                    src="{{ $footerBgPhoto->large }}"
+                                    type="image/{{ optional($footerBgPhoto->fileUpload)->extension }}"
+                                    alt="Brentwood College School Footer Background" >
+                            </picture>
+                        @endif
 
                         </div>
-                    @endif
 
                 @endif
 

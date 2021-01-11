@@ -267,12 +267,20 @@ input[type=range]:hover {
 
 .form {
 
+    & div.input-label {
+        @apply my-1;
+
+        > label {
+            @apply cursor-pointer;
+        }
+    }
+
     & div.input {
         @apply mb-4;
     }
 
     & input { 
-        @apply border border-gray-300 bg-gray-100 px-4 py-2 w-full;
+        @apply border border-gray-200 bg-white px-4 py-2 w-full;
     }
 
     & input.icon { 

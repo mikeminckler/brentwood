@@ -65,6 +65,7 @@ const app = new Vue({
         'editing-button': () => import(/* webpackChunkName: "editing-button" */ '@/Components/EditingButton'),
         'footer-editor': () => import(/* webpackChunkName: "footer-editor" */ '@/Components/FooterEditor'),
         'feedback': () => import(/* webpackChunkName: "feedback" */ '@/Components/Feedback'),
+        'inquiry': () => import(/* webpackChunkName: "feedback" */ '@/Components/Inquiry'),
         'page-access': () => import(/* webpackChunkName: "page-access" */ '@/Components/PageAccess'),
         'page-editor': () => import(/* webpackChunkName: "page-editor" */ '@/Components/PageEditor'),
         'page-tree': () => import(/* webpackChunkName: "page-tree" */ '@/Components/PageTree'),

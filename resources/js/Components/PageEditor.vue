@@ -311,7 +311,7 @@
                     let url = pathname + document.location.search;
 
                     if (response.data.page.full_slug !== url) {
-                        console.log('REPLACE: ' + response.data.page.full_slug);
+                        //console.log('REPLACE: ' + response.data.page.full_slug);
                         window.history.replaceState(null, response.data.page.name, response.data.page.full_slug);
                     }
 
@@ -337,14 +337,13 @@
                     this.$store.dispatch('setPageLoading', true);
 
                     this.$http.post('/' + this.resource + '/' + this.page.id + '/publish').then( response => {
-                        //location.reload();
+                        location.reload();
                         //console.log('SET PAGE AFTER PUBLISH');
-                        this.$store.dispatch('setPage', response.data.page);
-                        this.processSuccess(response);
-
-                        this.$nextTick(() => {
-                            this.$store.dispatch('setPageLoading', false);
-                        });
+                        //this.$store.dispatch('setPage', response.data.page);
+                        //this.processSuccess(response);
+                        //this.$nextTick(() => {
+                        //    this.$store.dispatch('setPageLoading', false);
+                        //});
                     }, error => {
                         this.processErrors(error.response);
                     });

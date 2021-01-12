@@ -25,6 +25,10 @@ class Photo extends Model
 
     protected $with = ['fileUpload'];
     protected $appends = ['small', 'medium', 'large'];
+    protected $casts = [
+        'offsetX' => 'string',
+        'offsetY' => 'string',
+    ];
 
     public function savePhoto(array $input, $id = null, $content = null)
     {

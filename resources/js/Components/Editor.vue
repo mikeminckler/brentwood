@@ -184,7 +184,7 @@
                         //this.json = getJSON()
                         this.html = getHTML();
                         this.changed = true;
-                    }, 250),
+                    }, 10),
                     onBlur: ({ event, state, view }) => {
                         this.$emit('blur');
                         if (this.changed) {

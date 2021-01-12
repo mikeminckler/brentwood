@@ -20,16 +20,17 @@
 
         <div class="relative flex justify-end">
             <transition name="saving-icon">
-                <div class="flex bg-gray-100 absolute text-green-500 px-2 py-1 z-3" 
-                    v-if="$store.state.saving.find( save => save === contentElement.id)" 
+                <div class="absolute z-6 flex text-green-600 bg-gray-100 px-4 py-2 border border-green-200 shadow" 
+                    v-if="showSaving" 
                     key="saving"
                 >
                     <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                    <div class="ml-2">SAVING</div>
                 </div>
             </transition>
 
             <transition name="draft">
-                <div class="absolute flex items-center z-3" v-if="!contentElement.published_at">
+                <div class="absolute flex items-center z-5" v-if="!contentElement.published_at">
                     <div class="flex items-center bg-yellow-100 pl-2 border border-yellow-300">
                         <div class="font-bold relative">DRAFT</div>
                         <div class="remove-icon ml-2" @click="removeDraft()"><i class="fas fa-times"></i></div>
@@ -98,20 +99,18 @@
         data() {
             return {
                 showPublishAt: false,
-                changed: false,
-                preventWatcher: false,
                 showAdd: false,
+                showSaving: false,
+                changedFields: [],
                 saveContent: _.debounce( function() {
-                    // refer to the mixin for saving of the content element
-                    if (!this.preventWatcher && !this.isSaving) {
-                        this.$nextTick(() => {
-                            //console.log('SAVE CE: ' + this.contentElement.id);
-                            this.saveContentElement();
-                        });
-                    } else {
-                        //console.log('WATCHER PREVENTED');
-                        this.preventWatcher = false;
+                    if (this.filteredChangedFields.length) {
+                        //console.log('CE: ' + this.contentElement.id);
+                        //console.log(this.filteredChangedFields);
+                        this.saveContentElement();
                     }
+                }, 1000),
+                setShowSaving: _.debounce( function() {
+                    this.showSaving = this.isSaving;
                 }, 500),
             }
         },
@@ -123,56 +122,109 @@
                     contentable_type: this.$store.state.page.type,
                 };
             },
+            contentElementClone() {
+                return this.$lodash.cloneDeep(this.contentElement);
+            },
+            filteredChangedFields() {
+                let ignore = [
+                    'published_at',
+                    'updated_at',
+                    'created_at',
+                    'id',
+                    'content_id',
+                    'version_id',
+                    'content_element_id',
+                ];
+                return this.changedFields.filter( f => {
+                    return ignore.indexOf(f) < 0;
+                });
+            }
         },
 
         watch: {
-            contentElement: {
-                handler: function(val, oldVal) {
-
-                    //console.log(this.findDifferentProperties(oldValue, newValue));
-
-                    // this gets tripped when the content is first loaded
-                    // so we ignore the first watcher hit
-                    if (!this.pageLoading) {
-                        //console.log('WATCHER: ' + this.contentElement.id);
-                        this.changed = true;
+            contentElementClone: {
+                handler: function(newObject, oldObject) {
+                    this.findDifferentProperties(newObject, oldObject);
+                    // we need to put this here as its the main watcher
+                    // we can't rely on watching the array as it only tracks the keys not the values
+                    // the debouncer will take care of it's excessive firing
+                    if (!this.preventChanges) {
                         this.saveContent();
                     }
                 },
                 deep: true,
             },
+
+            isSaving() {
+                if (this.isSaving) {
+                    this.showSaving = true;
+                } else {
+                    this.setShowSaving();
+                }
+            },
+
         },
 
         mounted() {
 
             const listener = data => {
                 if (data === this.contentElement.uuid) {
+                    //console.log('SAVE CONTENT LISTENER');
                     this.saveContent();
                 }
             };
+
             this.$eventer.$on('save-content', listener);
+
+            this.$echo.private('role.2')
+                .listen('ContentElementSaved', data => {
+                    if (this.contentElement.id === data.content_element.id) {
+                        //console.log('LOAD FROM EVENT: ' + this.contentElement.id);
+                        this.loadContentElement();
+                    }
+                });
 
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('save-content', listener);
                 this.$echo.leave('role.2');
             });
 
-            this.$echo.private('role.2')
-                .listen('ContentElementSaved', data => {
-                    if (this.contentElement.id === data.content_element.id) {
-                        //console.log('LOAD CE: ' + this.contentElement.id);
-                        this.preventWatcher = true;
-                        this.loadContentElement();
-                    }
-                })
-
         },
 
         methods: {
 
+            findDifferentProperties: function(newObject, oldObject) {
+                 return this.changes(newObject, oldObject);
+            },
+
+            changes: function(newObject, oldObject) {
+
+                return this.$lodash.transform(newObject, (result, value, key) => {
+                    if (!this.$lodash.isEqual(value, oldObject[key])) {
+
+                        let resultKey;
+
+                        if (this.$lodash.isObject(value) && this.$lodash.isObject(oldObject[key])) {
+                            if (key !== 'version') {
+                                resultKey = this.changes(value, oldObject[key]);
+                            }
+                        } else {
+                            resultKey = value;
+                            //console.log(key + '::' + value);
+                            //console.log(typeof value);
+                            if (!this.$lodash.includes(this.changedFields, key) && !this.preventChanges) {
+                                this.changedFields.push(key);
+                            }
+                        }
+
+                        result[key] = resultKey;
+                    }
+                });
+                
+            },
+
             loadContentElement: function() {
 
-                this.changed = false;
                 this.$http.post('/content-elements/' + this.contentElement.id + '/load', {page_id: this.$store.state.page.id}).then( response => {
                     this.$emit('update', response.data.content_element);
                 }, error => {
@@ -211,7 +263,6 @@
                     }
 
                     this.$http.post('/content-elements/' + this.contentElement.id + '/remove', input).then( response => {
-                        this.preventWatcher = true;
                         if (response.data.content_element) {
                             this.$emit('update', response.data.content_element);
                         } else {
@@ -224,10 +275,6 @@
 
                 }
             },
-
-            findDifferentProperties: function(oldObject, newObject) {
-
-            }
 
         },
 
@@ -258,11 +305,9 @@
 @keyframes saving-icon {
     0% {
         opacity: 0;
-        max-width: 0;
     }
     100%   {
         opacity: 1;
-        max-width: 32px;
     }
 }
 

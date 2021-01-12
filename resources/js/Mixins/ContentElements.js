@@ -1,11 +1,14 @@
 export default {
 
+    data() {
+        return {
+            preventChanges: false,
+        }
+    },
+
     computed: {
         isSaving() {
-            return this.$store.state.saving.find(save => save === this.contentElement.Id) ? true : false;
-        },
-        pageLoading() {
-            return this.$store.state.pageLoading;
+            return this.$store.state.saving.find( save => save === this.contentElement.id);
         },
     },
   
@@ -17,32 +20,27 @@ export default {
                 contentElement = this.contentElement;
             }
 
+            this.changedFields = [];
+            //console.log('CHANGED FIELDS CLEARED');
+
             let savingId = contentElement.id;
 
             if (!this.$store.state.saving.find(save => save === contentElement.id)) {
 
                 let url = '/content-elements/' + ( contentElement.id >= 1 ? contentElement.id : 'create');
 
-                this.$store.dispatch('startSaving', contentElement.id);
+                this.$store.dispatch('startSaving', savingId);
 
-                this.changed = false;
+                //console.log('SAVING CE: ' + savingId);
 
                 this.$http.post(url, contentElement).then( response => {
+
+                    //console.log('SAVING COMPLETE CE: ' + savingId);
 
                     this.$store.dispatch('completeSaving', savingId);
 
                     if (add) {
                         this.$store.dispatch('addContentElement', response.data.content_element);
-                        this.$nextTick(() => {
-
-                            let newContent = document.getElementById('c-' + response.data.content_element.uuid);
-                            if (newContent) {
-                                let elementRect = newContent.getBoundingClientRect();
-                                let middle = newContent.offsetTop - 100;
-                                //window.scrollTo(0, middle);
-                            }
-
-                        });
                     } else {
                         this.updateContentElement(contentElement, response.data.content_element);
                     }
@@ -57,14 +55,18 @@ export default {
         },
 
         updateContentElement: function(oldContentElement, newContentElement) {
-            if (!this.changed) {
-                this.preventWatcher = true;
-                this.$lodash.mergeWith(oldContentElement, newContentElement, this.compareValues);
-            } else {
-            }
-        },
+            this.preventChanges = true;
+            //console.log('PREVENT ON');
+            //console.log('MERGING: ' + oldContentElement.id);
+            //console.log(newContentElement);
+            this.$lodash.mergeWith(oldContentElement, newContentElement);
+            //this.changedFields = [];
 
-        compareValues: function(oldValue, newValue, field) {
+            this.$nextTick(() => {
+                this.preventChanges = false;
+                //console.log('PREVENT OFF');
+            });
+
         },
 
     },

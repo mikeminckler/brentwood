@@ -9,11 +9,9 @@
                     
                     <transition name="slide-down">
                         <div class="absolute flex justify-center items-center w-full h-full bg-white bg-opacity-75 z-3" v-if="saving">
-                            <div class="">
-                                <div class="flex text-green-600 bg-gray-100 px-4 py-2 border border-green-200 shadow">
-                                    <div class="spin"><i class="fas fa-sync-alt"></i></div>
-                                    <div class="ml-2">Saving</div>
-                                </div>
+                            <div class="flex text-green-600 bg-gray-100 px-4 py-2 border border-green-200 shadow">
+                                <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                                <div class="ml-2">Saving</div>
                             </div>
                         </div>
                     </transition>

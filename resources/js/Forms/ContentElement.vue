@@ -127,7 +127,10 @@
 
         watch: {
             contentElement: {
-                handler: function(oldValue, newValue) {
+                handler: function(val, oldVal) {
+
+                    //console.log(this.findDifferentProperties(oldValue, newValue));
+
                     // this gets tripped when the content is first loaded
                     // so we ignore the first watcher hit
                     if (!this.pageLoading) {
@@ -136,7 +139,7 @@
                         this.saveContent();
                     }
                 },
-                deep: true
+                deep: true,
             },
         },
 
@@ -220,6 +223,10 @@
                     });
 
                 }
+            },
+
+            findDifferentProperties: function(oldObject, newObject) {
+
             }
 
         },

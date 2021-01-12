@@ -1,20 +1,19 @@
 <template>
 
-    <div class="">
-
+    <div class="" v-if="show">
         <div class="md:flex">
 
             <div class="flex-1"></div>
             <div class="flex-2">
 
-                <div class="flex items-center justify-center">
+                <div class="flex items-center justify-center w-full">
                     <div class="form my-4 max-w-sm bg-gray-100 border border-gray-200 px-8 py-4 rounded-lg overflow-hidden">
 
                         <transition-group :name="transitionDirection" tag="div" class="relative mt-8 first:mt-0">
 
                             <div class="" key="step1" v-if="currentStep === 1">
                                 <div class="input-label"><label for="name">Contact Name</label></div>
-                                <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="John Smith" /></div>
+                                <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
 
                                 <div class="input-label"><label for="email">Contact Email</label></div>
                                 <div class="input"><input type="text" id="email" v-model="form.email" class="" placeholder="example@example.ca" /></div>
@@ -27,7 +26,7 @@
 
                                 <div class="mt-4">
                                     <div class="input-label">Start Year</div>
-                                    <div class="flex items-center">
+                                    <div class="flex items-center flex-wrap">
                                         <div v-for="year in years"
                                              :key="'year-' + year"
                                              class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
@@ -51,9 +50,32 @@
                                     </div>
                                 </div>
 
+                                <div class="mt-4">
+                                    <div class="">Student Type</div>
+
+                                    <div class="flex items-center flex-wrap w-full">
+                                        <div v-for="type in types"
+                                             :key="'type-' + type"
+                                             class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
+                                            :class="type === form.student_type ? 'bg-primary text-white font-bold' : 'bg-gray-200 hover:bg-white'" 
+                                             @click="form.student_type = type"
+                                             >{{ type }}</div>
+                                    </div>
+                                </div>
+
                             </div>
 
-                            <div class="" key="step2" v-if="currentStep === 4">
+                            <div class="" key="step3" v-if="currentStep === 3">
+                                <div class="">The applicant is most interested in</div>
+
+                                <div class="">
+
+                                    <div class="" v-for="category in categories">{{ category }}</div>
+
+                                </div>
+                            </div>
+
+                            <div class="" key="step4" v-if="currentStep === 4">
                                 <div class="mt-4">
                                     <div class="text-gray-500 text-sm">Contact Name</div>
                                     <div class="">{{ form.name }}</div>
@@ -116,16 +138,21 @@
         data() {
             return {
 
+                url: '',
                 transitionDirection: 'inquiry-form-forward',
                 currentStep: 1,
                 steps: [1,2,3,4],
+                types: ['Boarding', 'Day'],
+
+                categories: [],
 
                 form: {
-                    name: 'Mike Minckler',
-                    email: 'mike@gmail.com',
-                    phone: '250701741',
+                    name: '',
+                    email: '',
+                    phone: '',
                     target_grade: '',
                     target_year: '',
+                    student_type: '',
                     gender: '',
                 },
 
@@ -134,6 +161,10 @@
         },
 
         computed: {
+
+            show() {
+                return this.$store.state.page.name === 'Inquiry';
+            },
 
             years() {
                 let years = [];
@@ -171,18 +202,19 @@
             formIsValid() {
                 let valid = true;
 
-                this.steps.forEach(step => {
+                let steps = this.steps.slice(0, this.steps.length - 1);
+
+                steps.forEach(step => {
                     if (!this.validateStep(step)) {
                         valid = false;
                     }
                 });
+
+                return valid;
             }
         },
 
         watch: {
-        },
-
-        mounted() {
         },
 
         methods: {
@@ -198,7 +230,15 @@
                 }
 
                 if (step === 2) {
-                    return this.form.target_year && this.form.target_grade;
+                    return this.form.target_year && this.form.target_grade && this.form.student_type;
+                }
+
+                if (step === 3) {
+                    return true;
+                }
+
+                if (step === 4) {
+                    return this.formIsValid;
                 }
 
             },

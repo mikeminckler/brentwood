@@ -60,7 +60,7 @@
             <div class="absolute z-1 w-full h-full" :style="backgroundColor"></div>
             <div class="absolute w-full h-full">
 
-                <picture class="w-full h-full z-2 absolute" v-if="page.footer_fg_photo">
+                <picture class="w-full h-full z-2 absolute" v-if="page.footer_fg_photo ? page.footer_fg_photo.large ? true : false : false">
                     <source media="(min-width: 900px)" :srcset="page.footer_fg_photo.large + '.webp'" type="image/webp" >
                     <source media="(min-width: 400px)" srcset="page.footer_fg_photo.medium + '.webp'" type="image/webp" >
                     <source :srcset="page.footer_fg_photo.small + '.webp'" type="image/webp" >
@@ -70,7 +70,7 @@
                          :type="'image/' + page.footer_fg_photo.file_upload.extension">
                 </picture>
 
-                <picture class="w-full h-full" v-if="page.footer_bg_photo">
+                <picture class="w-full h-full" v-if="page.footer_bg_photo ? page.footer_bg_photo.large ? true : false : false">
                     <source media="(min-width: 900px)" :srcset="page.footer_bg_photo.large + '.webp'" type="image/webp" >
                     <source media="(min-width: 400px)" srcset="page.footer_bg_photo.medium + '.webp'" type="image/webp" >
                     <source :srcset="page.footer_bg_photo.small + '.webp'" type="image/webp" >
@@ -100,8 +100,8 @@
 
         data() {
             return {
-                fgUpload: {},
-                bgUpload: {},
+                fgUpload: null,
+                bgUpload: null,
             }
         },
 

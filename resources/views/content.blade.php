@@ -36,6 +36,8 @@
         @endif
     @endauth
 
+    <inquiry></inquiry>
+
     @if ($page->type === 'blog')
         <div class="blog-footer relative w-full">
             <div class="w-full md:flex relative">
@@ -66,3 +68,4 @@
             </div>
         </div>
     @endif
+

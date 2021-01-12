@@ -220,7 +220,7 @@
                     let url = pathname + document.location.search;
 
                     if (response.data.page.full_slug !== url) {
-                        console.log('PUSH: ' + response.data.page.full_slug);
+                        //console.log('PUSH: ' + response.data.page.full_slug);
                         window.history.pushState(null, response.data.page.name, response.data.page.full_slug);
                     }
 

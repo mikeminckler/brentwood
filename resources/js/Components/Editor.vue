@@ -78,7 +78,7 @@
 
                             <page-tree max-height="300px;" 
                                 :emit-event="true" 
-                                @selected="setLinkUrl(commands.link, $event)" 
+                                @selected="createLinkFromPageTree(commands.link, $event)" 
                                 :show-content-elements="true" 
                                 :expanded="false"
                             ></page-tree>
@@ -291,7 +291,19 @@
                     target: this.linkNewWindow ? '__blank' : null, 
                     class: this.linkClasses,
                 })
-                this.hideLinkMenu()
+                this.hideLinkMenu();
+            },
+
+            createLinkFromPageTree: function(command, data) {
+
+                let url = data.page.id;
+
+                if (data.contentElement) {
+                    url += '#c-' + data.contentElement.uuid;
+                }
+
+                this.setLinkUrl(command, url);
+
             },
 
             showImagePrompt(command) {

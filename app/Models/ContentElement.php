@@ -59,7 +59,7 @@ class ContentElement extends Model
         }
 
         $content_class = 'App\\Models\\'.Str::studly(Arr::get($input, 'type'));
-        $content = (new $content_class)->saveContent(Arr::get($input, 'content'), $new_version ? null : Arr::get($input, 'content.id'));
+        $content = (new $content_class)->saveContent(Arr::get($input, 'content'), $new_version ? null : Arr::get($input, 'content.id'), $new_version ? true : null);
 
         $content_element->content_id = $content->id;
         $content_element->content_type = get_class($content);

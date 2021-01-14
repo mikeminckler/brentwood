@@ -289,4 +289,43 @@ class PhotoBlockTest extends TestCase
         $photo_block->refresh();
         $this->assertEquals(1, $photo_block->photos->count());
     }
+
+    /** @test **/
+    public function saving_a_new_version_of_a_photo_block_keeps_the_photo_relations_for_the_old_version()
+    {
+        $content_element = $this->createContentElement(PhotoBlock::factory()->has(Photo::factory()->has(FileUpload::factory()->jpg()), 'photos'));
+        $photo_block = $content_element->content;
+        $photo = $photo_block->photos()->first();
+        $page = $content_element->pages->first();
+
+        $page->publish();
+
+        $content_element->refresh();
+        $this->assertNotNull($content_element->published_at);
+
+        $input = $content_element->toArray();
+        $input['type'] = 'photo-block';
+        $input['content']['header'] = Str::random();
+
+        $input['pivot'] = [
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
+            'page_id' => $page->id,
+            'sort_order' => 1,
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+
+        $this->signInAdmin();
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             //->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Photo Block Saved',
+             ]);
+
+        $photo_block->refresh();
+
+        $this->assertEquals(1, $photo_block->photos()->count());
+    }
 }

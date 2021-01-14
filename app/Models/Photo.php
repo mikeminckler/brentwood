@@ -30,7 +30,7 @@ class Photo extends Model
         'offsetY' => 'string',
     ];
 
-    public function savePhoto(array $input, $id = null, $content = null)
+    public function savePhoto(array $input, $id = null, $content = null, $duplicate = null)
     {
         if (!$input) {
             return null;
@@ -46,7 +46,13 @@ class Photo extends Model
         }
 
         if ($id >= 1) {
-            $photo = Photo::findOrFail($id);
+
+            if ($duplicate) {
+                $photo = new Photo;
+            } else {
+                $photo = Photo::findOrFail($id);
+            }
+
             if (!$content) {
                 $content = $photo->content;
             }

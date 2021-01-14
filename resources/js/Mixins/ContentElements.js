@@ -31,7 +31,7 @@ export default {
 
                 this.$store.dispatch('startSaving', savingId);
 
-                //console.log('SAVING CE: ' + savingId);
+                console.log('SAVING CE: ' + savingId);
 
                 this.$http.post(url, contentElement).then( response => {
 

@@ -36,6 +36,10 @@ class PagesController extends Controller
         $page = Page::findOrFail(1);
         $page->appendRecursive(['full_slug', 'editable', 'can_be_published']);
 
+        if (requestInput('preview')) {
+            $page->appendRecursive(['preview_content_elements']);
+        }
+
         return response()->json([
             'home_page' => $page,
         ]);

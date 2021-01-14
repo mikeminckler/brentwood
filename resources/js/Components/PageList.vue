@@ -44,7 +44,7 @@
                  v-for="contentElement in page.preview_content_elements"
                  :key="contentElement.uuid"
                  style="max-height: 100px;"
-                 @click="$emit('selected', page.id + '#c-' + contentElement.uuid)"
+                 @click="$emit('selected', {page: page, contentElement: contentElement})"
             >
                 <div class="absolute right-0 top-0 z-4 bg-gray-100 text-sm px-1">{{ contentElement.type }}</div>
                 <div class="relative">
@@ -124,7 +124,7 @@
 
             selectPage: function() {
                 if (this.emitEvent) {
-                    this.$emit('selected', this.page.id);
+                    this.$emit('selected', {page: this.page});
                 } else {
                     if (this.$store.state.editorMounted) {
                         this.$eventer.$emit('load-page', this.page);

@@ -23,6 +23,17 @@
             :sort-order="contentElements.length"
         ></add-content-element>
 
+        <div class="" v-if="showPageTree">
+
+            <page-tree
+                :emit-event="true" 
+                @selected="saveInstance($event)" 
+                :show-content-elements="true" 
+                :expanded="false"
+            ></page-tree>
+            
+        </div>
+
     </div>
 
 </template>
@@ -39,6 +50,14 @@
         components: {
             'form-content-element': () => import(/* webpackChunkName: "form-content-element" */ '@/Forms/ContentElement.vue'),
             'add-content-element': () => import(/* webpackChunkName: "add-content-element" */ '@/Components/AddContentElement.vue'),
+            'page-tree': () => import(/* webpackChunkName: "page-tree" */ '@/Components/PageTree.vue'),
+        },
+
+        data() {
+            return {
+                showPageTree: false,
+                sortOrder: 1,
+            }
         },
 
         computed: {
@@ -75,7 +94,8 @@
                     }
                 });
 
-                this[data.type](data.sortOrder);
+                this.sortOrder = data.sortOrder;
+                this[data.type]();
             },
 
             isFirst: function(contentElement) {
@@ -125,13 +145,13 @@
                 this.contentElements.splice( index, 1);
             },
 
-            newContentElement: function(sortOrder) {
+            newContentElement: function() {
                 return {
                     id: '0.' + this.contentElements.length,
                     pivot: {
                         contentable_id: this.$store.state.page.id,
                         contentable_type: this.$store.state.page.type,
-                        sort_order: sortOrder,
+                        sort_order: this.sortOrder,
                         unlisted: 0,
                         expandable: 0,
                     }
@@ -144,9 +164,9 @@
 
             // Content Types
 
-            addTextBlock: function(sortOrder) {
+            addTextBlock: function() {
 
-                let contentElement = this.newContentElement(sortOrder);
+                let contentElement = this.newContentElement();
 
                 contentElement.type = 'text-block';
                 contentElement.content = {
@@ -160,9 +180,9 @@
 
             },
 
-            addPhotoBlock: function(sortOrder) {
+            addPhotoBlock: function() {
                 
-                let contentElement = this.newContentElement(sortOrder);
+                let contentElement = this.newContentElement();
 
                 contentElement.type = 'photo-block';
                 contentElement.content = {
@@ -182,9 +202,9 @@
                 this.saveNewContentElement(contentElement);
             },
 
-            addQuote: function(sortOrder) {
+            addQuote: function() {
 
-                let contentElement = this.newContentElement(sortOrder);
+                let contentElement = this.newContentElement();
 
                 contentElement.type = 'quote';
                 contentElement.content = {
@@ -199,24 +219,24 @@
 
             },
 
-            addYoutubeVideo: function(sortOrder) {
+            addYoutubeVideo: function() {
 
-                let contentElement = this.newContentElement(sortOrder);
+                let contentElement = this.newContentElement();
 
                 contentElement.type = 'youtube-video';
                 contentElement.content = {
                     id: 0,
                     video_id: '',
-                    full_width: sortOrder === 1 ? true : false,
+                    full_width: this.sortOrder === 1 ? true : false,
                 };
 
                 this.saveNewContentElement(contentElement);
 
             },
 
-            addEmbedCode: function(sortOrder) {
+            addEmbedCode: function() {
 
-                let contentElement = this.newContentElement(sortOrder);
+                let contentElement = this.newContentElement();
 
                 contentElement.type = 'embed-code';
                 contentElement.content = {
@@ -228,9 +248,9 @@
 
             },
 
-            addBannerPhoto: function(sortOrder) {
+            addBannerPhoto: function() {
 
-                let contentElement = this.newContentElement(sortOrder);
+                let contentElement = this.newContentElement();
 
                 contentElement.type = 'banner-photo';
                 contentElement.content = {
@@ -243,9 +263,9 @@
 
             },
 
-            addBlogList: function(sortOrder) {
+            addBlogList: function() {
 
-                let contentElement = this.newContentElement(sortOrder);
+                let contentElement = this.newContentElement();
 
                 contentElement.type = 'blog-list';
                 contentElement.content = {
@@ -257,6 +277,21 @@
                 this.saveNewContentElement(contentElement);
 
             },
+
+            addInstance: function() {
+                this.showPageTree = !this.showPageTree;
+            },
+
+            saveInstance: function(linkData) {
+                if (linkData.contentElement) {
+                    this.showPageTree = false;
+
+                    let contentElement = this.$lodash.cloneDeep(linkData.contentElement);
+                    console.log('CLONE: ' + contentElement.id);
+                    contentElement.pivot = this.newContentElement().pivot;
+                    this.saveContentElement(contentElement, true);
+                }
+            }
 
         },
 

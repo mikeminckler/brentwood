@@ -22,7 +22,7 @@ class PhotoBlock extends Model
 
     protected $with = ['photos'];
 
-    public function saveContent(array $input, $id = null)
+    public function saveContent(array $input, $id = null, $duplicate = null)
     {
         if ($id >= 1) {
             $photo_block = PhotoBlock::findOrFail($id);
@@ -42,7 +42,7 @@ class PhotoBlock extends Model
 
         $photo_block->save();
 
-        $photo_block->savePhotos($input);
+        $photo_block->savePhotos($input, $duplicate);
 
         cache()->tags([cache_name($photo_block)])->flush();
         return $photo_block;

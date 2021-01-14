@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 
 use App\Events\PageSaved;
@@ -639,6 +640,70 @@ trait PagesTestTrait
         Event::assertDispatched(function (ContentElementRemoved $event) use ($content_element, $page) {
             return $event->content_element->id === $content_element->id && $event->page->id === $page->id;
         });
+    }
+
+    /** @test **/
+    public function a_content_element_can_be_instanced_onto_another_page()
+    {
+        $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
+        $page = $content_element->{Str::plural($this->getClassname())}->first();
+        $this->assertInstanceOf(get_class($this->getModel()), $page);
+
+        $new_page = $this->getModel();
+
+        $this->assertEquals(0, $new_page->contentElements()->count());
+
+        $this->signInAdmin();
+
+        $content_element['pivot'] = [
+            'contentable_id' => $new_page->id,
+            'contentable_type' => get_class($new_page),
+            'sort_order' => 1,
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+
+        $input = $content_element->toArray();
+
+        $this->assertEquals($new_page->id, Arr::get($input, 'pivot.contentable_id'));
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $new_page->refresh();
+        $page->refresh();
+
+        $this->assertEquals(1, $page->contentElements()->count());
+        $this->assertEquals(1, $new_page->contentElements()->count());
+        $this->assertTrue($page->contentElements()->get()->contains('id', $content_element->id));
+        $this->assertTrue($new_page->contentElements()->get()->contains('id', $content_element->id));
+
+        $input['content'] = TextBlock::factory()->raw();
+
+        // Update the content
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $page->refresh();
+        $new_page->refresh();
+
+        $this->assertEquals(1, $page->contentElements()->count());
+        $this->assertEquals(1, $new_page->contentElements()->count());
+        $this->assertTrue($page->contentElements()->get()->contains('id', $content_element->id));
+        $this->assertTrue($new_page->contentElements()->get()->contains('id', $content_element->id));
+
+        // Make sure the changes show up on both pages
+
+        $this->assertEquals(Arr::get($input, 'content.body'), $page->contentElements()->first()->content->body);
+        $this->assertEquals(Arr::get($input, 'content.body'), $new_page->contentElements()->first()->content->body);
+
     }
 
     /** @test **/

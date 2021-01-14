@@ -105,7 +105,7 @@
                 saveContent: _.debounce( function() {
                     if (this.filteredChangedFields.length) {
                         //console.log('CE: ' + this.contentElement.id);
-                        //console.log(this.filteredChangedFields);
+                        console.log(this.filteredChangedFields);
                         this.saveContentElement();
                     }
                 }, 1000),
@@ -178,8 +178,8 @@
 
             this.$echo.private('role.2')
                 .listen('ContentElementSaved', data => {
-                    if (this.contentElement.id === data.content_element.id) {
-                        //console.log('LOAD FROM EVENT: ' + this.contentElement.id);
+                    if (this.contentElement.uuid === data.content_element.uuid) {
+                        console.log('LOAD FROM EVENT: ' + this.contentElement.uuid);
                         this.loadContentElement();
                     }
                 });
@@ -210,7 +210,7 @@
                             }
                         } else {
                             resultKey = value;
-                            //console.log(key + '::' + value);
+                            console.log(key + '::' + value);
                             //console.log(typeof value);
                             if (!this.$lodash.includes(this.changedFields, key) && !this.preventChanges) {
                                 this.changedFields.push(key);
@@ -225,8 +225,20 @@
 
             loadContentElement: function() {
 
-                this.$http.post('/content-elements/' + this.contentElement.id + '/load', {page_id: this.$store.state.page.id}).then( response => {
+                let input = {
+                    pivot: {
+                        contentable_id: this.$store.state.page.id,
+                        contentable_type: this.$store.state.page.type,
+                    }
+                };
+
+                this.$http.post('/content-elements/' + this.contentElement.id + '/load', input).then( response => {
+                    this.preventChanges = true;
                     this.$emit('update', response.data.content_element);
+                    this.$nextTick(() => {
+                        this.changedFields = [];
+                        this.preventChanges = false;
+                    });
                 }, error => {
                     this.processErrors(error.response);
                 });

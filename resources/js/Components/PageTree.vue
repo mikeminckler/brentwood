@@ -87,7 +87,13 @@
 
                 this.$store.dispatch('setPageLoading', true);
 
-                this.$http.get('/pages').then( response => {
+                let url = '/pages';
+
+                if (this.showContentElements) {
+                    url = '/pages?preview=true';
+                }
+
+                this.$http.get(url).then( response => {
                     this.$store.dispatch('setPageTree', response.data.home_page);
 
                     this.$nextTick(() => {

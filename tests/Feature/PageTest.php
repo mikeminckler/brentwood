@@ -101,6 +101,23 @@ class PageTest extends TestCase
     }
 
     /** @test **/
+    public function the_page_tree_preview_can_be_loaded()
+    {
+        $first_level_page = Page::factory()->create();
+        $second_level_page = Page::factory()->secondLevel()->create([
+            'parent_page_id' => $first_level_page->id,
+        ]);
+
+        $this->withoutExceptionHandling();
+        $this->json('GET', route('pages.index', ['preview' => 'true']))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'name' => $first_level_page->name,
+                'name' => $second_level_page->name,
+             ]);
+    }
+
+    /** @test **/
     public function the_home_page_can_be_loaded()
     {
         $home_page = Page::find(1);

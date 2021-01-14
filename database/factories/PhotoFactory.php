@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 use App\Models\Page;
+use App\Models\FileUpload;
 
 class PhotoFactory extends Factory
 {
@@ -25,6 +26,7 @@ class PhotoFactory extends Factory
     public function definition()
     {
         return [
+            'file_upload_id' => FileUpload::factory()->jpg(),
             'name' => $this->faker->name,
             'description' => $this->faker->sentence,
             'alt' => $this->faker->sentence(5),

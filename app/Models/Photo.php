@@ -88,6 +88,17 @@ class Photo extends Model
             $name = $file_upload->name;
         }
 
+        if ($photo->fileUpload) {
+            if ($photo->fileUpload->id !== $file_upload->id) {
+                $photo->fileUpload()->delete();
+                $photo->removeSmall();
+                $photo->removeMedium();
+                $photo->removeLarge();
+            }
+        }
+
+        $photo->file_upload_id = $file_upload->id;
+
         $photo->name = $name;
         $photo->description = Arr::get($input, 'description');
         $photo->alt = Arr::get($input, 'alt');
@@ -103,17 +114,6 @@ class Photo extends Model
 
         $photo->save();
 
-        if ($photo->fileUpload) {
-            if ($photo->fileUpload->id !== $file_upload->id) {
-                $photo->fileUpload()->delete();
-                $photo->removeSmall();
-                $photo->removeMedium();
-                $photo->removeLarge();
-            }
-        }
-
-        $photo->fileUpload()->save($file_upload);
-
         cache()->tags([cache_name($photo)])->flush();
 
         $photo->refresh();
@@ -127,7 +127,7 @@ class Photo extends Model
 
     public function fileUpload()
     {
-        return $this->morphOne(FileUpload::class, 'fileable');
+        return $this->belongsTo(FileUpload::class);
     }
 
     public function createImage($size, $name)

@@ -23,8 +23,8 @@ class CreateFileUploadsTable extends Migration
             $table->string('mime');
             $table->string('size');
 
-            $table->integer('fileable_id')->unsigned()->nullable();
-            $table->string('fileable_type')->nullable();
+            //$table->integer('fileable_id')->unsigned()->nullable();
+            //$table->string('fileable_type')->nullable();
 
             $table->softDeletes();
             $table->timestamps();

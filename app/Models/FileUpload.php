@@ -56,9 +56,9 @@ class FileUpload extends Model
         return $file_upload;
     }
 
-    public function fileable()
+    public function photos()
     {
-        return $this->morphTo();
+        return $this->hasMany(Photo::class);
     }
 
     // we use this for validation

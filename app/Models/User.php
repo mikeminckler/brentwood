@@ -159,11 +159,6 @@ class User extends Authenticatable
         return $this->roles->contains('id', $role->id);
     }
 
-    public function fileUploads()
-    {
-        return $this->morphMany(FileUpload::class, 'fileable');
-    }
-
     public static function createOrUpdateFromGoogle(SocialiteUser $data)
     {
         $validator = Validator::make([

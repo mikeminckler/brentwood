@@ -38,15 +38,12 @@ class FileUploadsTest extends TestCase
     /** @test **/
     public function removing_a_file_upload()
     {
-        $user = User::factory()->create();
         $file_upload = FileUpload::factory()->create();
-        $user->fileUploads()->save($file_upload);
-
         $this->withoutExceptionHandling();
         $this->assertInstanceOf(FileUpload::class, $file_upload);
         Storage::assertExists($file_upload->storage_filename);
 
-        $this->signIn($user);
+        $this->signInAdmin();
 
         $this->json('POST', route('file-uploads.destroy', ['id' => $file_upload->id]))
             ->assertOK()

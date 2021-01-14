@@ -34,6 +34,8 @@ class PhotoTest extends TestCase
         $photo_block = PhotoBlock::factory()->create();
         $photo = (new Photo)->savePhoto($input, null, $photo_block);
         $this->assertInstanceOf(Photo::class, $photo);
+        $this->assertInstanceOf(FileUpload::class, $photo->fileUpload);
+        $this->assertTrue(Storage::exists($photo->fileUpload->storage_filename));
         return $photo;
     }
 
@@ -221,5 +223,32 @@ class PhotoTest extends TestCase
 
         $this->assertEquals($photo->fileUpload->id, $new_photo->fileUpload->id);
         $this->assertNotEquals($photo->id, $new_photo->id);
+    }
+
+    /** @test **/
+    public function two_photos_can_share_a_file_upload()
+    {
+        Storage::fake();
+        $file_name = Str::random().'jpg';
+        $file = UploadedFile::fake()->image($file_name);
+        $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
+
+        $input = Photo::factory()->stat()->link()->raw();
+        $input['file_upload'] = $file_upload;
+
+        $photo_block = PhotoBlock::factory()->create();
+        $photo = (new Photo)->savePhoto($input, null, $photo_block);
+        $photo2 = (new Photo)->savePhoto($input, $photo->id, $photo_block, true);
+
+        $this->assertInstanceOf(Photo::class, $photo);
+        $this->assertInstanceOf(Photo::class, $photo2);
+
+        $photo->refresh();
+        $photo2->refresh();
+
+        $this->assertNotEquals($photo->id, $photo2->id);
+        $this->assertNotNull($photo->fileUpload);
+        $this->assertNotNull($photo2->fileUpload);
+        $this->assertEquals($photo->fileUpload->id, $photo2->fileUpload->id);
     }
 }

@@ -28,8 +28,11 @@ class PhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $input = Photo::factory()->stat()->link()->raw();
-        $input['file_upload'] = $file_upload;
+        $input = Photo::factory()->stat()->link()->raw([
+            'file_upload_id' => $file_upload->id,
+        ]);
+
+        $this->assertTrue(Storage::exists($file_upload->storage_filename));
 
         $photo_block = PhotoBlock::factory()->create();
         $photo = (new Photo)->savePhoto($input, null, $photo_block);
@@ -55,8 +58,9 @@ class PhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $input = Photo::factory()->stat()->link()->raw();
-        $input['file_upload'] = $file_upload;
+        $input = Photo::factory()->stat()->link()->raw([
+            'file_upload_id' => $file_upload->id,
+        ]);
 
         $photo_block = PhotoBlock::factory()->create();
         $photo = (new Photo)->savePhoto($input, null, $photo_block);
@@ -80,7 +84,9 @@ class PhotoTest extends TestCase
     /** @test **/
     public function a_photo_belongs_to_a_content_item()
     {
-        $photo = Photo::factory()->for(PhotoBlock::factory(), 'content')->create();
+        $photo = Photo::factory()->for(PhotoBlock::factory(), 'content')->create([
+            'file_upload_id' => FileUpload::factory()->jpg(),
+        ]);
         $this->assertInstanceOf(PhotoBlock::class, $photo->content);
     }
 
@@ -157,8 +163,9 @@ class PhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $input = Photo::factory()->raw();
-        $input['file_upload'] = $file_upload;
+        $input = Photo::factory()->raw([
+            'file_upload_id' => $file_upload->id,
+        ]);
 
         $photo_block = PhotoBlock::factory()->create();
         $photo = (new Photo)->savePhoto($input, null, $photo_block);
@@ -172,7 +179,7 @@ class PhotoTest extends TestCase
         $file2 = UploadedFile::fake()->image($file_name2);
         $file_upload2 = (new FileUpload)->saveFile($file2, 'photos', true);
 
-        $input['file_upload'] = $file_upload2;
+        $input['file_upload_id'] = $file_upload2->id;
 
         $photo = (new Photo)->savePhoto($input, $photo->id, $photo_block);
 
@@ -196,6 +203,7 @@ class PhotoTest extends TestCase
         $this->assertInstanceOf(Page::class, $page);
         $photo = Photo::factory()->for(PhotoBlock::factory(), 'content')->create([
             'link' => $link,
+            'file_upload_id' => FileUpload::factory()->jpg(),
         ]);
 
         $this->assertNotNull($photo->link);
@@ -211,8 +219,9 @@ class PhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $input = Photo::factory()->stat()->link()->raw();
-        $input['file_upload'] = $file_upload;
+        $input = Photo::factory()->raw([
+            'file_upload_id' => $file_upload->id,
+        ]);
 
         $photo_block = PhotoBlock::factory()->create();
         $photo = (new Photo)->savePhoto($input, null, $photo_block);
@@ -233,8 +242,9 @@ class PhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $input = Photo::factory()->stat()->link()->raw();
-        $input['file_upload'] = $file_upload;
+        $input = Photo::factory()->stat()->link()->raw([
+            'file_upload_id' => $file_upload->id,
+        ]);
 
         $photo_block = PhotoBlock::factory()->create();
         $photo = (new Photo)->savePhoto($input, null, $photo_block);

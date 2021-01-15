@@ -30,7 +30,7 @@ class PhotoValidation extends FormRequest
     public function rules()
     {
         return [
-            'file_upload.id' => 'required|exists:file_uploads,id',
+            'file_upload_id' => 'required|exists:file_uploads,id',
             'name' => 'max:255',
             'alt' => 'max:255',
             'sort_order' => 'required|integer',

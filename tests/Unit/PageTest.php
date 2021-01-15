@@ -167,7 +167,7 @@ class PageTest extends TestCase
         $fg_file = UploadedFile::fake()->image($fg_file_name);
         $fg_file_upload = (new FileUpload)->saveFile($fg_file, 'photos', true);
         $input = Photo::factory()->raw();
-        $input['file_upload'] = $fg_file_upload;
+        $input['file_upload_id'] = $fg_file_upload->id;
         $photo = (new Photo)->savePhoto($input, null, $page);
 
         $this->assertInstanceOf(Photo::class, $photo);
@@ -191,7 +191,7 @@ class PageTest extends TestCase
         $bg_file = UploadedFile::fake()->image($bg_file_name);
         $bg_file_upload = (new FileUpload)->saveFile($bg_file, 'photos', true);
         $input = Photo::factory()->raw();
-        $input['file_upload'] = $bg_file_upload;
+        $input['file_upload_id'] = $bg_file_upload->id;
         $photo = (new Photo)->savePhoto($input, null, $page);
 
         $this->assertInstanceOf(Photo::class, $photo);
@@ -220,11 +220,11 @@ class PageTest extends TestCase
         $home_page = Page::find(1);
 
         $input = Photo::factory()->raw();
-        $input['file_upload'] = $fg_file_upload;
+        $input['file_upload_id'] = $fg_file_upload->id;
         $fg_photo = (new Photo)->savePhoto($input, null, $home_page);
 
         $input = Photo::factory()->raw();
-        $input['file_upload'] = $bg_file_upload;
+        $input['file_upload_id'] = $bg_file_upload->id;
         $bg_photo = (new Photo)->savePhoto($input, null, $home_page);
 
         $home_page->footer_fg_photo_id = $fg_photo->id;
@@ -255,11 +255,11 @@ class PageTest extends TestCase
         ]);
 
         $input = Photo::factory()->raw();
-        $input['file_upload'] = $fg_file_upload2;
+        $input['file_upload_id'] = $fg_file_upload2->id;
         $fg_photo2 = (new Photo)->savePhoto($input, null, $sub_page);
 
         $input = Photo::factory()->raw();
-        $input['file_upload'] = $bg_file_upload2;
+        $input['file_upload_id'] = $bg_file_upload2->id;
         $bg_photo2 = (new Photo)->savePhoto($input, null, $sub_page);
 
         $this->assertEquals($fg_file_upload->id, $sub_page->getFooterFgPhoto()->fileUpload->id);

@@ -37,9 +37,10 @@ class BannerPhotoTest extends TestCase
         $file = UploadedFile::fake()->image($file_name);
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
-        $photo_input = Photo::factory()->raw();
-        $photo_input['file_upload'] = $file_upload;
-
+        $photo_input = Photo::factory()->raw([
+            'file_upload_id' => $file_upload->id,
+        ]);
+    
         $input = ContentElement::factory()->raw();
         $input['id'] = 0;
         $input['type'] = 'banner-photo';

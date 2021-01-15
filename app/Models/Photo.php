@@ -40,6 +40,7 @@ class Photo extends Model
         if ($validation->fails()) {
             // TODO we should throw a 422 here probably
             if (!env('production')) {
+                //dd($validation->errors()->all());
                 throw ValidationException::withMessages($validation->errors()->all());
             }
             return null;
@@ -80,7 +81,7 @@ class Photo extends Model
         $photo->content_id = $content->id;
         $photo->content_type = get_class($content);
 
-        $file_upload = FileUpload::findOrFail(Arr::get($input, 'file_upload.id'));
+        $file_upload = FileUpload::findOrFail(Arr::get($input, 'file_upload_id'));
 
         if (Arr::get($input, 'name')) {
             $name = Arr::get($input, 'name');

@@ -14,7 +14,7 @@ class FileUploadTest extends TestCase
     /** @test **/
     public function a_file_upload_can_have_many_photos()
     {
-        $photo1 = Photo::factory()->for(PhotoBlock::factory(), 'content')->create();
+        $photo1 = Photo::factory()->for(FileUpload::factory()->jpg())->for(PhotoBlock::factory(), 'content')->create();
         $photo_block = $photo1->content;
         $file_upload = $photo1->fileUpload;
         $this->assertInstanceOf(FileUpload::class, $file_upload);

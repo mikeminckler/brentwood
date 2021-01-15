@@ -171,7 +171,7 @@ class YoutubeVideoTest extends TestCase
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
         $photo_input = Photo::factory()->raw();
-        $photo_input['file_upload'] = $file_upload;
+        $photo_input['file_upload_id'] = $file_upload->id;
 
         $input = $content_element->toArray();
         $youtube_video_input = YoutubeVideo::factory()->raw();
@@ -223,7 +223,7 @@ class YoutubeVideoTest extends TestCase
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
         $photo_input = Photo::factory()->raw();
-        $photo_input['file_upload'] = $file_upload;
+        $photo_input['file_upload_id'] = $file_upload->id;
 
         $input = $content_element->toArray();
         $youtube_video_input = YoutubeVideo::factory()->raw();

@@ -27,7 +27,7 @@ class PhotoTest extends TestCase
     {
         return Photo::factory()
                     ->for(PhotoBlock::factory(), 'content')
-                    ->has(FileUpload::factory()->jpg(), 'fileUpload')
+                    ->for(FileUpload::factory()->jpg(), 'fileUpload')
                     ->create();
     }
 
@@ -36,7 +36,7 @@ class PhotoTest extends TestCase
     {
         $page = Page::factory()->create();
         $content_element = ContentElement::factory()
-                                ->for(PhotoBlock::factory()->has(Photo::factory()->has(FileUpload::factory()->jpg(), 'fileUpload')), 'content')
+                                ->for(PhotoBlock::factory()->has(Photo::factory()->for(FileUpload::factory()->jpg(), 'fileUpload')), 'content')
                                 ->create([
                                     'version_id' => $page->draft_version_id,
                                 ]);
@@ -52,7 +52,7 @@ class PhotoTest extends TestCase
         $file_upload = (new FileUpload)->saveFile($file, 'photos', true);
 
         $input = Photo::factory()->raw();
-        $input['file_upload'] = $file_upload;
+        $input['file_upload_id'] = $file_upload->id;
 
         $this->json('POST', route('photos.update', ['id' => $photo->id]), $input)
             ->assertStatus(401);
@@ -67,7 +67,7 @@ class PhotoTest extends TestCase
         $this->json('POST', route('photos.update', ['id' => $photo->id]), [])
             ->assertStatus(422)
             ->assertJsonValidationErrors([
-                'file_upload.id',
+                'file_upload_id',
                 'sort_order',
                 'span',
                 'offsetX',
@@ -81,12 +81,12 @@ class PhotoTest extends TestCase
                 'success' => 'Photo Saved',
                 'id' => $photo->id,
                 'name' => Arr::get($input, 'name'),
-                'id' => Arr::get($input, 'file_upload.id'),
+                'id' => Arr::get($input, 'file_upload_id'),
              ]);
 
         $photo->refresh();
 
-        $this->assertEquals(Arr::get($input, 'file_upload.id'), $photo->fileUpload->id);
+        $this->assertEquals(Arr::get($input, 'file_upload_id'), $photo->fileUpload->id);
         $this->assertEquals(Arr::get($input, 'name'), $photo->name);
         $this->assertEquals(Arr::get($input, 'alt'), $photo->alt);
         $this->assertEquals(Arr::get($input, 'sort_order'), $photo->sort_order);

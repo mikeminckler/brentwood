@@ -343,10 +343,10 @@ class PageTest extends TestCase
         $input = Page::factory()->raw();
 
         $fg_photo_input = Photo::factory()->raw();
-        $fg_photo_input['file_upload'] = $fg_file_upload;
+        $fg_photo_input['file_upload_id'] = $fg_file_upload->id;
 
         $bg_photo_input = Photo::factory()->raw();
-        $bg_photo_input['file_upload'] = $bg_file_upload;
+        $bg_photo_input['file_upload_id'] = $bg_file_upload->id;
 
         $input['footer_fg_photo'] = $fg_photo_input;
         $input['footer_bg_photo'] = $bg_photo_input;
@@ -370,11 +370,11 @@ class PageTest extends TestCase
         $this->assertEquals(Arr::get($input, 'sort_order'), $page->sort_order);
         $this->assertEquals(Arr::get($input, 'footer_color'), $page->footer_color);
 
-        $this->assertNotNull(Arr::get($input, 'footer_fg_photo.file_upload.id'));
-        $this->assertNotNull(Arr::get($input, 'footer_bg_photo.file_upload.id'));
+        $this->assertNotNull(Arr::get($input, 'footer_fg_photo.file_upload_id'));
+        $this->assertNotNull(Arr::get($input, 'footer_bg_photo.file_upload_id'));
 
-        $this->assertEquals(Arr::get($input, 'footer_fg_photo.file_upload.id'), $page->getFooterFgPhoto()->fileUpload->id);
-        $this->assertEquals(Arr::get($input, 'footer_bg_photo.file_upload.id'), $page->getFooterBgPhoto()->fileUpload->id);
+        $this->assertEquals(Arr::get($input, 'footer_fg_photo.file_upload_id'), $page->getFooterFgPhoto()->fileUpload->id);
+        $this->assertEquals(Arr::get($input, 'footer_bg_photo.file_upload_id'), $page->getFooterBgPhoto()->fileUpload->id);
 
         $page_fg_photo = $page->getFooterFgPhoto();
         $page_bg_photo = $page->getFooterBgPhoto();

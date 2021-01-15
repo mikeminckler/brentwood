@@ -219,7 +219,6 @@
                 }
             },
 
-
             removeFile: function(file, index) {
 
                 if (file.id >= 1) {

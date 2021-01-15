@@ -183,4 +183,5 @@ class ContentElementTest extends TestCase
         $content_element_array = $content_element->toArray();
         $this->assertEquals('2020-08-23T12:00:00.000000Z', Arr::get($content_element_array, 'publish_at'));
     }
+
 }

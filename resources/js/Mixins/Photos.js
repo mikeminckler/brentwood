@@ -49,6 +49,8 @@ export default {
                     return u.file_upload.id === upload.id;
                 })) {
 
+                    //console.log(upload);
+
                     let newPhoto = {
                         id: '0.' + this.photos.length,
                         name: '',
@@ -64,6 +66,7 @@ export default {
                         link: null,
                         large: null,
                         file_upload: upload,
+                        file_upload_id: upload.id,
                     }
 
                     this.photos.push(newPhoto);

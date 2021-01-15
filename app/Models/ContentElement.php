@@ -35,7 +35,7 @@ class ContentElement extends Model
             $content_element = ContentElement::findOrFail($id);
             $uuid = $content_element->uuid;
 
-            if (!$content_element->published_at) {
+            if (!$content_element->published_at || Arr::get($input, 'instance')) {
                 $new_version = false;
             } else {
                 $content_elements = ContentElement::where('uuid', $uuid)

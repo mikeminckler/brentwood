@@ -134,6 +134,9 @@
                     'content_id',
                     'version_id',
                     'content_element_id',
+                    'small',
+                    'medium',
+                    'large',
                 ];
                 return this.changedFields.filter( f => {
                     return ignore.indexOf(f) < 0;

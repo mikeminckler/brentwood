@@ -100,6 +100,7 @@
             'quote': () => import(/* webpackChunkName: "quote" */ '@/Forms/Quote'),
             'youtube-video': () => import(/* webpackChunkName: "youtube-video" */ '@/Forms/YoutubeVideo'),
             'embed-code': () => import(/* webpackChunkName: "embed-code" */ '@/Forms/EmbedCode'),
+            'banner-photo': () => import(/* webpackChunkName: "banner-photo" */ '@/Forms/BannerPhoto'),
         },
 
         data() {

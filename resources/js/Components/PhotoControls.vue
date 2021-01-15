@@ -111,6 +111,7 @@
             
             updatePhoto: function() {
                 this.photo.file_upload = this.uploads;
+                this.photo.file_upload_id = this.uploads.id;
                 this.photo.name = this.uploads.name;
                 this.photo.large = this.uploads.large;
             },

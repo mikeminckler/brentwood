@@ -286,9 +286,10 @@
                 if (linkData.contentElement) {
                     this.showPageTree = false;
 
-                    let contentElement = this.$lodash.cloneDeep(linkData.contentElement);
                     console.log('CLONE: ' + contentElement.id);
+                    let contentElement = this.$lodash.cloneDeep(linkData.contentElement);
                     contentElement.pivot = this.newContentElement().pivot;
+                    contentElement.instance = true;
                     this.saveContentElement(contentElement, true);
                 }
             }

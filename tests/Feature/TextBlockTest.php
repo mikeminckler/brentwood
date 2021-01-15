@@ -22,6 +22,7 @@ use Tests\Feature\ContentElementsTestTrait;
 
 class TextBlockTest extends TestCase
 {
+    use WithFaker;
     use ContentElementsTestTrait;
 
     protected function getClassname()
@@ -274,5 +275,67 @@ class TextBlockTest extends TestCase
                 'unlisted' => 1,
                 'expandable' => 1,
              ]);
+    }
+
+    /** @test **/
+    public function an_instanced_content_element_pushes_its_updates_to_other_pages()
+    {
+        $content_element = $this->createContentElement(TextBlock::factory());
+        $text_block = $content_element->content;
+        $this->assertInstanceOf(TextBlock::class, $text_block);
+
+        $page = $content_element->pages->first();
+        $page->publish();
+
+        $content_element->refresh();
+        $this->assertNotNull($content_element->published_at);
+
+        $page2 = Page::factory()->create();
+
+        $this->signInAdmin();
+
+        $input = $content_element->toArray();
+        $input['instance'] = 'true';
+        $input['pivot'] = [
+            'contentable_id' => $page2->id,
+            'contentable_type' => get_class($page2),
+            'sort_order' => 1,
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $content_element->refresh();
+        $text_block->refresh();
+
+        $page->refresh();
+        $page2->refresh();
+
+        $this->assertEquals(1, $page->contentElements()->count());
+        $this->assertEquals(1, $page2->contentElements()->count());
+
+        $this->assertEquals($content_element->id, $page->contentElements()->first()->id);
+        $page2_ce = $page2->contentElements()->first();
+
+        $this->assertEquals($page->contentElements()->first()->uuid, $page2->contentElements()->first()->uuid);
+
+        $body = $this->faker->sentence;
+
+        $input['content']['body'] = $body;
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $page2_ce->refresh();
+
+        $this->assertEquals($body, $page2_ce->content->body);
+
     }
 }

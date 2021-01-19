@@ -7,7 +7,7 @@
 
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
             <div class="content-element-icons" @click="showAdd = !showAdd" title="Add Content Element After"><i class="fas fa-file-medical"></i></div>
-            <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!contentElement.published_at"><i class="fas fa-clock"></i></div>
+            <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!isPublished"><i class="fas fa-clock"></i></div>
             <div class="content-element-icons" v-if="contentElementIndex !== 0" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
             <div class="content-element-icons" v-if="!last" @click="$emit('sortDown')" title="Move Down"><i class="fas fa-arrow-alt-circle-down"></i></div>
             <div class="content-element-icons" @click="contentElement.pivot.unlisted = 0" v-if="contentElement.pivot.unlisted" title="Hide Content"><i class="fas fa-eye"></i></div>
@@ -30,7 +30,7 @@
             </transition>
 
             <transition name="draft">
-                <div class="absolute flex items-center z-5" v-if="!contentElement.published_at">
+                <div class="absolute flex items-center z-5" v-if="!isPublished">
                     <div class="flex items-center bg-yellow-100 pl-2 border border-yellow-300">
                         <div class="font-bold relative">DRAFT</div>
                         <div class="remove-icon ml-2" @click="removeDraft()"><i class="fas fa-times"></i></div>
@@ -116,6 +116,9 @@
         },
 
         computed: {
+            page() {
+                return this.$store.state.page;
+            },
             pivot() {
                 return {
                     contentable_id: this.$store.state.page.id,
@@ -141,6 +144,12 @@
                 return this.changedFields.filter( f => {
                     return ignore.indexOf(f) < 0;
                 });
+            },
+            isPublished() {
+                let pivot = this.$lodash.find(this.contentElement.contentables, contentable => {
+                    return contentable.contentable_id === this.page.id && contentable.contentable_type === this.page.full_type;
+                });
+                return pivot.version.published_at ? true : false;
             }
         },
 

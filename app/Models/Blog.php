@@ -39,6 +39,7 @@ class Blog extends Model
         'content_elements',
         'preview_content_elements',
         'type',
+        'full_type',
         'resource',
         'published_at',
     ];

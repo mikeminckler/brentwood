@@ -23,7 +23,7 @@ class ContentElement extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $with = ['content'];
+    protected $with = ['content', 'contentables', 'contentables.version'];
     protected $appends = ['type'];
     protected $dates = ['publish_at'];
 

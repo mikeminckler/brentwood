@@ -48,6 +48,7 @@ class Page extends Model
         'content_elements',
         'preview_content_elements',
         'sub_menu',
+        'full_type',
         'type',
         'resource',
         'published_at',

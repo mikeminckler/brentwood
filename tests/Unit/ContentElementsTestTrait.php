@@ -30,6 +30,14 @@ trait ContentElementsTestTrait
     }
 
     /** @test **/
+    public function a_page_has_a_full_type_attribute()
+    {
+        $page = $this->getModel();   
+        $this->assertNotNull($page->full_type);
+        $this->assertEquals(get_class($page), $page->full_type);
+    }
+
+    /** @test **/
     public function a_page_can_save_its_content_elements()
     {
         $page = $this->getModel();

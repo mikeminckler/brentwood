@@ -118,7 +118,10 @@
             },
             hasDraft() {
                 return this.$lodash.filter(this.page.content_elements, content_element => {
-                    return content_element.version.published_at ? false : true;
+                    let pivot = this.$lodash.find(content_element.contentables, contentable => {
+                        return contentable.contentable_id === this.page.id && contentable.contentable_type === this.page.full_type;
+                    });
+                    return pivot.version.published_at ? false : true;
                 }).length ? true : false;
             },
             activeVersion() {

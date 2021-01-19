@@ -22,6 +22,11 @@ trait HasContentElementsTrait
         return Str::kebab(class_basename($this));
     }
 
+    public function getFullTypeAttribute()
+    {
+        return get_class($this);
+    }
+
     public function getResourceAttribute()
     {
         return Str::kebab(Str::plural(class_basename($this)));

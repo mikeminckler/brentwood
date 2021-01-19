@@ -17,7 +17,7 @@
             />
         </div>
 
-        <form-tags v-model="page.tags"></form-tags>
+        <form-tags v-model="tags"></form-tags>
 
     </div>
 
@@ -28,7 +28,7 @@
 
         data() {
             return {
-                saved: false,
+                tags: [],
             }
         },
 
@@ -39,16 +39,40 @@
         computed: {
             page() {
                 return this.$store.state.page;
-            }
+            },
+        },
+
+        mounted() {
+            this.setTags();
         },
 
         watch: {
-
             'page.tags': function() {
-                if (!this.saved) {
+                this.setTags();
+            },
+
+            tags: function() {
+
+                let pageTagIds = this.$lodash.map(this.page.tags, t => {
+                    return t.id;
+                });
+
+                let tagIds = this.$lodash.map(this.tags, t => {
+                    return t.id;
+                });
+
+                if (!this.$lodash.isEqual(pageTagIds, tagIds)) {
+                    this.page.tags = this.tags;
                     this.$eventer.$emit('save-page');
-                    this.saved = true;
                 }
+
+            }
+        },
+
+        methods: {
+
+            setTags: function() {
+                this.tags = this.$lodash.cloneDeep(this.page.tags);
             },
 
         },

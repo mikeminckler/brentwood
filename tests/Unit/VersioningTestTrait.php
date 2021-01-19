@@ -136,9 +136,7 @@ trait VersioningTestTrait
     {
         $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $page = $content_element->{Str::plural($this->getClassname())}()->first();
-        $content_element->version_id = $page->draft_version_id;
-        $content_element->save();
-        $content_element->refresh();
+        //$content_element->version_id = $page->draft_version_id;
 
         $page->refresh();
 
@@ -156,14 +154,11 @@ trait VersioningTestTrait
         $page->refresh();
         $this->assertFalse($page->can_be_published);
 
-        $content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
+        $content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create();
 
         $content_element->{Str::plural($this->getClassname())}()->detach();
-        $content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
+        $content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false, 'version_id' => $page->draft_version_id]);
 
-        $content_element->version_id = $page->draft_version_id;
         $content_element->save();
         
         $page->refresh();

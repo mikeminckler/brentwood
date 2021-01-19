@@ -16,12 +16,10 @@ class PagePreviewTest extends TestCase
         $content_element = $this->createContentElement(TextBlock::factory());
         $this->assertEquals(1, $content_element->pages()->count());
         $page = $content_element->pages->first();
-        $content_element->version_id = $page->getDraftVersion()->id;
-        $content_element->save();
 
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->content_elements->contains('id', $content_element->id));
-        $this->assertEquals($page->getDraftVersion()->id, $content_element->version_id);
+        $this->assertEquals($page->getDraftVersion()->id, $content_element->getPageVersion($page)->id);
 
         $this->signInAdmin();
 

@@ -17,6 +17,7 @@ class CreateContentablesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('content_element_id');
             $table->morphs('contentable');
+            $table->unsignedBigInteger('version_id');
 
             $table->integer('sort_order');
             $table->boolean('unlisted');

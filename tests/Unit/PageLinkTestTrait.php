@@ -63,12 +63,12 @@ trait PageLinkTestTrait
         $this->assertInstanceOf(ContentElement::class, $content_element);
         $page = Page::factory()->create();
         $this->assertNotNull($page->full_slug);
-        $page->contentElements()->attach($content_element, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+        $page->contentElements()->attach($content_element, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false, 'version_id' => $page->getDraftVersion()->id]);
 
         $content2 = $this->getModel();
         $content_element2 = $content2->contentElement;
         $content_element2->pages()->detach();
-        $page->contentElements()->attach($content_element2, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+        $page->contentElements()->attach($content_element2, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false, 'version_id' => $page->getDraftVersion()->id]);
 
         foreach ($this->getLinkFields() as $link_field) {
             $body = '<p>'.$this->faker->sentence.' <a class="button float-right" href="'.$page->id.'#c-'.$content_element->uuid.'" target="__blank" rel="noopener noreferrer nofollow">'.$page->name.'</a></p>';
@@ -106,12 +106,12 @@ trait PageLinkTestTrait
         $this->assertInstanceOf(ContentElement::class, $content_element1);
         $page = Page::factory()->create();
         $this->assertNotNull($page->full_slug);
-        $page->contentElements()->attach($content_element1, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+        $page->contentElements()->attach($content_element1, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false, 'version_id' => $page->getDraftVersion()->id]);
 
         $content2 = $this->getModel();
         $content_element2 = $content2->contentElement;
         $content_element2->pages()->detach();
-        $page->contentElements()->attach($content_element2, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+        $page->contentElements()->attach($content_element2, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false, 'version_id' => $page->getDraftVersion()->id]);
 
         $page->refresh();
 

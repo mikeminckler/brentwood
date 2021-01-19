@@ -26,6 +26,7 @@ const store = new Vuex.Store({
             type: null,
             footer_fg_photo: {},
             footer_bg_photo: {},
+            tags: [],
         },
         pageTree: {},
         youtubeReady: false,
@@ -167,6 +168,7 @@ const store = new Vuex.Store({
 
         setPage({ commit, state }, page) {
             if (page.type) {
+                console.log('SETTING PAGE IN VUEX');
                 commit('setPage', page);
             }
         },

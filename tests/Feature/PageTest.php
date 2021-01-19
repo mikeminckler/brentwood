@@ -251,12 +251,13 @@ class PageTest extends TestCase
     /** @test **/
     public function a_published_page_can_be_updated()
     {
-        $page = Page::factory()->published()->create();
+        $page = Page::factory()->create();
+        $page->publish();
 
-        $content_element = $this->createContentElement(TextBlock::factory());
-        $content_element->version_id = $page->published_version_id;
-        $content_element->save();
-        $content_element->refresh();
+        $this->assertNotNull($page->publishedVersion->published_at);
+        $content_element = $this->createContentElement(TextBlock::factory(), $page, $page->publishedVersion);
+        $this->assertEquals($page->published_version_id, $content_element->getPageVersion($page)->id);
+        $this->assertNotNull($content_element->getPageVersion($page)->published_at);
 
         $content_element['pivot'] = [
             'contentable_id' => $page->id,
@@ -268,6 +269,7 @@ class PageTest extends TestCase
 
         $this->signInAdmin();
 
+
         $input = $content_element->toArray();
         $input['content'] = TextBlock::factory()->raw();
 
@@ -277,11 +279,11 @@ class PageTest extends TestCase
         $new_content_element = ContentElement::all()->last();
 
         $this->assertNotEquals($content_element->id, $new_content_element->id);
-        $this->assertEquals($page->getDraftVersion()->id, $new_content_element->version_id);
+        $this->assertEquals($page->getDraftVersion()->id, $new_content_element->getPageVersion($page)->id);
 
         $this->assertEquals(Arr::get($input, 'header'), $new_content_element->header);
         $this->assertEquals(Arr::get($input, 'body'), $new_content_element->body);
-        $this->assertEquals($page->getDraftVersion()->id, $new_content_element->version_id);
+        $this->assertEquals($page->getDraftVersion()->id, $new_content_element->getPageVersion($page)->id);
 
         $this->json('POST', route('pages.publish', ['id' => $page->id]))
              ->assertSuccessful()
@@ -293,7 +295,7 @@ class PageTest extends TestCase
         $content_element->refresh();
 
         $this->assertNotNull($page->published_version_id);
-        $this->assertEquals($page->published_version_id, $new_content_element->version_id);
+        $this->assertEquals($page->published_version_id, $new_content_element->getPageVersion($page)->id);
     }
 
 
@@ -640,9 +642,6 @@ class PageTest extends TestCase
         $content_element1 = $this->createContentElement(TextBlock::factory());
         $text_block = $content_element1->content;
         $page = $content_element1->pages->first();
-        $content_element1->version_id = $page->getDraftVersion()->id;
-        $content_element1->save();
-        $content_element1->refresh();
         
         $this->assertInstanceOf(Page::class, $page);
         $this->assertInstanceOf(ContentElement::class, $content_element1);
@@ -656,11 +655,8 @@ class PageTest extends TestCase
             'sort_order' => 2,
             'unlisted' => false,
             'expandable' => false,
+            'version_id' => $page->getDraftVersion()->id,
         ]);
-
-        $content_element2->version_id = $page->getDraftVersion()->id;
-        $content_element2->save();
-        $content_element2->refresh();
 
         $this->assertEquals(2, $page->contentElements->count());
 
@@ -687,10 +683,10 @@ class PageTest extends TestCase
              ]);
 
         $content_element1->refresh();
-        $content_element1_version_id = $content_element1->version->id;
+        $content_element1_version_id = $content_element1->getPageVersion($page)->id;
         $page->refresh();
 
-        $this->assertEquals($page->getDraftVersion()->id, $content_element1->version->id);
+        $this->assertEquals($page->getDraftVersion()->id, $content_element1->getPageVersion($page)->id);
 
         $content_element2['pivot'] = [
             'contentable_id' => $page->id,
@@ -714,7 +710,7 @@ class PageTest extends TestCase
         $content_element2->refresh();
         $this->assertNotNull($content_element2->publish_at);
         $this->assertTrue($content_element2->publish_at->isPast());
-        $this->assertEquals($page->draft_version_id, $content_element2->version->id);
+        $this->assertEquals($page->draft_version_id, $content_element2->getPageVersion($page)->id);
 
         // publish command
         // find pages where the page needs to be publish OR the content elements need to be published
@@ -727,9 +723,9 @@ class PageTest extends TestCase
         $page->refresh();
         $content_element1->refresh();
 
-        $this->assertNotEquals($content_element1_version_id, $content_element1->version->id);
-        $this->assertEquals($page->getDraftVersion()->id, $content_element1->version->id);
-        $this->assertEquals($page->publishedVersion->id, $content_element2->version->id);
+        $this->assertNotEquals($content_element1_version_id, $content_element1->getPageVersion($page)->id);
+        $this->assertEquals($page->getDraftVersion()->id, $content_element1->getPageVersion($page)->id);
+        $this->assertEquals($page->publishedVersion->id, $content_element2->getPageVersion($page)->id);
     }
 
 
@@ -747,7 +743,52 @@ class PageTest extends TestCase
             ->assertSuccessful()
             ->assertJsonFragment([
                 'contentable_id' => $page->id,
-                'contentable_type' => 'page',
+                'contentable_type' => get_class($page),
             ]);
+    }
+
+    /** @test **/
+    public function a_page_doesnt_create_a_new_version_after_publishing()
+    {
+        $this->signInAdmin();
+
+        $content_element = $this->createContentElement(TextBlock::factory());
+        $page = $content_element->pages->first();
+
+        $this->assertInstanceOf(Page::class, $page);
+
+        $this->assertNull($content_element->published_at);
+        $uuid = $content_element->uuid;
+
+        $this->assertEquals(1, ContentElement::where('uuid', $uuid)->count());
+        $this->assertEquals(1, $page->contentElements()->count());
+
+        $this->json('POST', route('pages.publish', ['id' => $page->id]))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Page Published',
+             ]);
+
+        $page->refresh();
+        $content_element->refresh();
+
+        $this->assertEquals(1, $page->versions()->count());
+
+        $version = $page->versions()->first();
+
+        $this->assertInstanceOf(Version::class, $version);
+
+        $this->assertEquals($version->id, $content_element->getPageVersion($page)->id);
+
+        $this->json('GET', $page->full_slug)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'version_id' => $version->id,
+             ]);
+
+        $page->refresh();
+        $this->assertEquals(1, ContentElement::where('uuid', $uuid)->count());
+        $this->assertEquals(1, $page->contentElements()->count());
+
     }
 }

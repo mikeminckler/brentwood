@@ -286,7 +286,7 @@
                 if (linkData.contentElement) {
                     this.showPageTree = false;
 
-                    console.log('CLONE: ' + contentElement.id);
+                    console.log('CLONE: ' + linkData.contentElement.id);
                     let contentElement = this.$lodash.cloneDeep(linkData.contentElement);
                     contentElement.pivot = this.newContentElement().pivot;
                     contentElement.instance = true;

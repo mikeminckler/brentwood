@@ -23,18 +23,19 @@ trait VersioningTrait
 
     public function publish()
     {
+
         $publish_at_content_elements = $this->contentElements()
                                             ->where('publish_at', '<', now())
-                                            ->whereHas('version', function ($query) {
-                                                $query->whereNull('published_at');
-                                            })
-                                            ->get();
+                                            ->get()
+                                            ->filter( function($content_element) {
+                                                return Version::find($content_element->pivot->version_id)->published_at ? false : true;
+                                            });
 
         $new_draft_content_elements = $this->contentElements()
-                                        ->whereHas('version', function ($query) {
-                                            $query->whereNull('published_at');
-                                        })
                                         ->get()
+                                        ->filter( function($content_element) {
+                                            return Version::find($content_element->pivot->version_id)->published_at ? false : true;
+                                        })
                                         ->filter(function ($content_element) use ($publish_at_content_elements) {
                                             return !$publish_at_content_elements->contains('id', $content_element->id);
                                         });
@@ -49,8 +50,12 @@ trait VersioningTrait
 
         if ($publish_at_content_elements->count()) {
             foreach ($new_draft_content_elements as $new_draft_content_element) {
-                $new_draft_content_element->version_id = $this->getDraftVersion()->id;
-                $new_draft_content_element->save();
+                $contentable = $new_draft_content_element->contentables()
+                                                          ->where('contentable_id', $this->id)
+                                                          ->where('contentable_type', get_class($this))
+                                                          ->first();
+                $contentable->version_id = $this->getDraftVersion()->id;
+                $contentable->save();
             }
         }
 
@@ -100,7 +105,7 @@ trait VersioningTrait
         }
 
         return $this->content_elements->filter(function ($content_element) {
-            return $content_element->published_at ? false : true;
+            return Version::find($content_element->pivot->version_id)->published_at ? false : true;
         })->count() ? true : false;
     }
 }

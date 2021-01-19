@@ -63,19 +63,15 @@ trait ContentElementsTestTrait
         // this checks for the proper grouping of content elements by UUID
         $page = get_class($this->getModel())::factory()->published()->create();
         
-        $published_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
+        $published_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create();
 
         $published_content_element->{Str::plural($this->getClassname())}()->detach();
-        $published_content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+        $published_content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false, 'version_id' => $page->draft_version_id]);
 
-        $unpublished_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
+        $unpublished_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create();
 
         $unpublished_content_element->{Str::plural($this->getClassname())}()->detach();
-        $unpublished_content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+        $unpublished_content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false, 'version_id' => $page->draft_version_id]);
 
         $page->refresh();
         $this->assertNotNull($page->content_elements);
@@ -90,31 +86,26 @@ trait ContentElementsTestTrait
         $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $this->assertEquals(1, $content_element->{Str::plural($this->getClassname())}()->count());
         $page = $content_element->{Str::plural($this->getClassname())}()->first();
-        $content_element->version_id = $page->getDraftVersion()->id;
         $content_element->save();
 
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->content_elements->contains('id', $content_element->id));
-        $this->assertEquals($page->getDraftVersion()->id, $content_element->version_id);
+        $this->assertEquals($page->getDraftVersion()->id, $content_element->contentables->first()->version->id);
 
         $page->publish();
         $page->refresh();
 
         $content_element->refresh();
-        $this->assertNotNull($content_element->published_at);
+        $this->assertNotNull($content_element->contentables->first()->version->published_at);
         $this->assertTrue($page->published_content_elements->contains('id', $content_element->id));
 
-        $unlisted_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
-            'version_id' => $page->published_version_id,
-        ]);
+        $unlisted_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create();
 
-        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
+        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false, 'version_id' => $page->published_version_id]);
 
-        $unpublished_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
+        $unpublished_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create();
 
-        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false, 'expandable' => false,]);
+        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false, 'expandable' => false, 'version_id' => $page->draft_version_id]);
 
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->contentElements->contains('id', $unpublished_content_element->id));
@@ -133,35 +124,30 @@ trait ContentElementsTestTrait
         $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $this->assertEquals(1, $content_element->{Str::plural($this->getClassname())}()->count());
         $page = $content_element->{Str::plural($this->getClassname())}()->first();
-        $content_element->version_id = $page->getDraftVersion()->id;
         $content_element->save();
 
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->content_elements->contains('id', $content_element->id));
-        $this->assertEquals($page->getDraftVersion()->id, $content_element->version_id);
+        $this->assertEquals($page->getDraftVersion()->id, $content_element->contentables->first()->version->id);
         $this->assertEquals(0, $page->pivot->unlisted);
 
         $page->publish();
         $page->refresh();
         $content_element->refresh();
 
-        $this->assertNotNull($content_element->published_at);
+        $this->assertNotNull($content_element->contentables->first()->version->published_at);
         $this->assertEquals(1, $page->contentElements->count());
         $this->assertTrue(session()->get('editing'));
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->preview_content_elements->contains('id', $content_element->id));
 
-        $unlisted_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
-            'version_id' => $page->published_version_id,
-        ]);
+        $unlisted_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create();
 
-        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false]);
+        $page->contentElements()->attach($unlisted_content_element, ['sort_order' => 1, 'unlisted' => true, 'expandable' => false, 'version_id' => $page->published_version_id]);
 
-        $unpublished_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
+        $unpublished_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create();
 
-        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false, 'expandable' => false]);
+        $page->contentElements()->attach($unpublished_content_element, ['sort_order' => 2, 'unlisted' => false, 'expandable' => false, 'version_id' => $page->draft_version_id]);
 
         $this->assertTrue($page->contentElements->contains('id', $content_element->id));
         $this->assertTrue($page->contentElements->contains('id', $unpublished_content_element->id));

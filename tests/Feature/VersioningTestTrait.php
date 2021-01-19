@@ -28,10 +28,6 @@ trait VersioningTestTrait
         $content_element = $this->createContentElement(TextBlock::factory(), $this->getModel());
         $page = $content_element->{Str::plural($this->getClassname())}()->first();
 
-        $content_element->version_id = $page->getDraftVersion()->id;
-        $content_element->save();
-        $content_element->refresh();
-
         $this->assertNull($page->published_at);
 
         $this->json('POST', route(Str::plural($this->getClassname()).'.publish', ['id' => $page->id]))
@@ -58,7 +54,7 @@ trait VersioningTestTrait
         $content_element->refresh();
 
         $this->assertNotNull($page->published_version_id);
-        $this->assertEquals($page->published_version_id, $content_element->version_id);
+        $this->assertEquals($page->published_version_id, $content_element->contentables()->first()->version_id);
     }
 
     /** @test **/
@@ -79,18 +75,14 @@ trait VersioningTestTrait
 
         $this->assertInstanceOf(Version::class, $draft_version);
 
-        $content_element->version_id = $draft_version->id;
-        $content_element->save();
-        $content_element->refresh();
-
-        $this->assertEquals($page->draft_version_id, $content_element->version_id);
+        $this->assertEquals($page->draft_version_id, $content_element->getPageVersion($page)->id);
 
         $page->publish();
         $page->refresh();
         $content_element->refresh();
         $content = $content_element->content;
 
-        $this->assertEquals($page->published_version_id, $content_element->version_id);
+        $this->assertEquals($page->published_version_id, $content_element->getPageVersion($page)->id);
 
         $new_text_block = TextBlock::factory()->raw();
         $new_text = Arr::get($new_text_block, 'body');
@@ -114,7 +106,8 @@ trait VersioningTestTrait
         $this->assertNotEquals($content_element->id, $saved_content_element->id);
         $this->assertNotEquals($content->id, $saved_content_element->content->id);
 
-        $this->assertEquals($page->getDraftVersion()->id, $saved_content_element->version_id);
+        $this->withoutExceptionHandling();
+        $this->assertEquals($page->getDraftVersion()->id, $saved_content_element->getPageVersion($page)->id);
         $page->publish();
 
         $page->refresh();

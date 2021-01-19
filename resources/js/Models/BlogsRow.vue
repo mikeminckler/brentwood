@@ -58,8 +58,6 @@
                 var answer = confirm('Are you sure you want to PUBLISH this blog?');
                 if (answer === true) {
 
-                    this.$store.dispatch('setPageLoading', true);
-
                     this.$http.post('/blogs/' + this.blog.id + '/publish').then( response => {
                         location.reload();
                     }, error => {

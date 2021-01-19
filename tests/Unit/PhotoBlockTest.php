@@ -41,10 +41,7 @@ class PhotoBlockTest extends TestCase
     /** @test **/
     public function a_photo_block_belongs_to_a_content_element()
     {
-        $page = Page::factory()->create();
-        $content_element = ContentElement::factory()->for(PhotoBlock::factory()->has(Photo::factory()->for(FileUpload::factory()->jpg())), 'content')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
+        $content_element = ContentElement::factory()->for(PhotoBlock::factory()->has(Photo::factory()->for(FileUpload::factory()->jpg())), 'content')->create();
         $photo_block = $content_element->content;
         $this->assertInstanceOf(PhotoBlock::class, $photo_block);
         $this->assertInstanceOf(ContentElement::class, $photo_block->contentElement);
@@ -53,10 +50,7 @@ class PhotoBlockTest extends TestCase
     /** @test **/
     public function a_photo_block_can_be_duplicated()
     {
-        $page = Page::factory()->create();
-        $content_element = ContentElement::factory()->for(PhotoBlock::factory()->has(Photo::factory()->for(FileUpload::factory()->jpg())), 'content')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
+        $content_element = ContentElement::factory()->for(PhotoBlock::factory()->has(Photo::factory()->for(FileUpload::factory()->jpg())), 'content')->create();
         $this->assertEquals(1, $content_element->content->photos->count());
         $photo_block = $content_element->content;
 

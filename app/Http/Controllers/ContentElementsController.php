@@ -87,7 +87,7 @@ class ContentElementsController extends Controller
                 'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Removed From Page',
             ]);
         } else {
-            $previous_content_element = $content_element->getPreviousVersion();
+            $previous_content_element = $content_element->getPreviousVersion($contentable);
             $content_element->delete();
 
             return response()->json([

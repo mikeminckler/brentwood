@@ -19,7 +19,7 @@ trait PagesControllerTrait
 
         if (session()->has('editing')) {
             $page->refresh();
-            $page->load('versions', 'tags');
+            $page->load('versions');
         }
 
         $page->appendAttributes();

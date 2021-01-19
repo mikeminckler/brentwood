@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 
 use App\Models\Page;
 use App\Models\Version;
+use App\Models\Contentable;
 use App\Models\TextBlock;
 
 use App\Events\ContentElementSaved;
@@ -22,8 +23,8 @@ class ContentElement extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $with = ['content', 'version'];
-    protected $appends = ['type', 'published_at'];
+    protected $with = ['content'];
+    protected $appends = ['type'];
     protected $dates = ['publish_at'];
 
     public function saveContentElement(array $input, $id = null)
@@ -35,15 +36,31 @@ class ContentElement extends Model
             $content_element = ContentElement::findOrFail($id);
             $uuid = $content_element->uuid;
 
-            if (!$content_element->published_at || Arr::get($input, 'instance')) {
+            $pivot = $content_element->contentables()
+                                    ->where('contentable_id', $contentable->id)
+                                    ->where('contentable_type', get_class($contentable))
+                                    ->first();
+            $is_published = false;
+
+            if ($pivot) {
+                $is_published = $pivot->version->published_at ? true : false;
+            } 
+
+            if (!$is_published || Arr::get($input, 'instance')) {
                 $new_version = false;
             } else {
+
                 $content_elements = ContentElement::where('uuid', $uuid)
+                    ->whereHas('contentables', function($query) use($contentable) {
+                        $query->where('contentable_id', $contentable->id)
+                              ->where('contentable_type', get_class($contentable))
+                                ->whereHas('version', function($query) {
+                                    $query->whereNull('published_at');
+                                });
+                    })
                     ->get()
-                    ->filter(function ($content_element) {
-                        return $content_element->published_at ? false : true;
-                    })->sortByDesc(function ($content_element) {
-                        return $content_element->version->id;
+                    ->sortByDesc(function ($content_element) use($contentable) {
+                        return $content_element->getPageVersion($contentable)->id;
                     });
 
                 if ($content_elements->count()) {
@@ -64,7 +81,7 @@ class ContentElement extends Model
         $content_element->content_id = $content->id;
         $content_element->content_type = get_class($content);
 
-        $content_element->version_id = $contentable->getDraftVersion()->id;
+        //$content_element->version_id = $contentable->getDraftVersion()->id;
         $content_element->publish_at = Arr::get($input, 'publish_at');
 
         $content_element->save();
@@ -73,12 +90,14 @@ class ContentElement extends Model
 
         if (!$contentable->contentElements()->get()->contains('id', $content_element->id)) {
             $contentable->contentElements()->attach($content_element, [
+                'version_id' => $contentable->getDraftVersion()->id,
                 'sort_order' => Arr::get($input, 'pivot.sort_order'),
                 'unlisted' => Arr::get($input, 'pivot.unlisted'),
                 'expandable' => Arr::get($input, 'pivot.expandable'),
             ]);
         } else {
             $contentable->contentElements()->updateExistingPivot($content_element, [
+                'version_id' => $contentable->getDraftVersion()->id,
                 'sort_order' => Arr::get($input, 'pivot.sort_order'),
                 'unlisted' => Arr::get($input, 'pivot.unlisted'),
                 'expandable' => Arr::get($input, 'pivot.expandable'),
@@ -124,14 +143,19 @@ class ContentElement extends Model
         return (new $class_name)->findOrFail(Arr::get($input, 'pivot.contentable_id'));
     }
 
+    public function contentables()
+    {
+        return $this->hasMany(Contentable::class);
+    }
+
     public function pages()
     {
-        return $this->morphedByMany(Page::class, 'contentable')->withPivot('sort_order', 'unlisted', 'expandable');
+        return $this->morphedByMany(Page::class, 'contentable')->withPivot('sort_order', 'unlisted', 'expandable', 'version_id');
     }
 
     public function blogs()
     {
-        return $this->morphedByMany(Blog::class, 'contentable')->withPivot('sort_order', 'unlisted', 'expandable');
+        return $this->morphedByMany(Blog::class, 'contentable')->withPivot('sort_order', 'unlisted', 'expandable', 'version_id');
     }
 
     public function content()
@@ -139,9 +163,9 @@ class ContentElement extends Model
         return $this->morphTo();
     }
 
-    public function version()
+    public function versions()
     {
-        return $this->belongsTo(Version::class);
+        return $this->belongsToMany(Version::class, 'contentables');
     }
 
     public function getTypeAttribute()
@@ -149,23 +173,44 @@ class ContentElement extends Model
         return Str::kebab(class_basename($this->content));
     }
 
-    public function getPublishedAtAttribute()
+    public function getPreviousVersion($page, $version = null)
     {
-        return $this->version->published_at;
-    }
+        if (!$version) {
+            $version = $page->getDraftVersion();
+        }
 
-    public function getPreviousVersion()
-    {
         return ContentElement::where('uuid', $this->uuid)
-            ->where('version_id', '<', $this->version_id)
+            ->whereHas('contentables', function($query) use($page, $version) {
+                $query->where('contentable_id', $page->id)
+                    ->where('contentable_type', get_class($page))
+                    ->where('version_id', '<', $version->id);
+            })
             ->get()
-            ->sortByDesc(function ($content_element) {
-                return $content_element->version_id;
+            ->sortByDesc(function ($content_element) use($page) {
+                return $content_element->contentables()
+                    ->where('contentable_id', $page->id)
+                    ->where('contentable_type', get_class($page))
+                    ->first()
+                    ->version->id;
             })->first();
     }
 
     public function isType($type)
     {
         return $this->type === $type;
+    }
+
+    public function getPageVersion($contentable) 
+    {
+        $contentables = $this->contentables()
+                    ->where('contentable_id', $contentable->id)
+                    ->where('contentable_type', get_class($contentable))
+                    ->get();
+
+        if ($contentables->count() === 1) {
+            return $contentables->first()->version;
+        } else {
+            throw Exception('More than one contentable found');
+        }
     }
 }

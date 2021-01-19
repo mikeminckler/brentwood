@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 
 use App\Models\User;
 use App\Models\Page;
+use App\Models\Version;
 use App\Models\ContentElement;
 
 abstract class TestCase extends BaseTestCase
@@ -33,20 +34,23 @@ abstract class TestCase extends BaseTestCase
         return $this->signIn($user);
     }
 
-    protected function createContentElement(Factory $factory, $page = null)
+    protected function createContentElement(Factory $factory, $page = null, Version $version = null)
     {
         if (!$page) {
             $page = Page::factory()->create();
         }
 
-        $content_element = ContentElement::factory()->for($factory, 'content')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
+        $content_element = ContentElement::factory()->for($factory, 'content')->create();
 
         $relationship = Str::plural($page->type);
 
         $content_element->{$relationship}()->detach();
-        $content_element->{$relationship}()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+        $content_element->{$relationship}()->attach($page, [
+            'version_id' => $version ? $version->id : $page->draft_version_id,
+            'sort_order' => 1, 
+            'unlisted' => false, 
+            'expandable' => false
+        ]);
         return $content_element;
     }
 

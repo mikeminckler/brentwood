@@ -37,11 +37,9 @@ class PhotoTest extends TestCase
         $page = Page::factory()->create();
         $content_element = ContentElement::factory()
                                 ->for(PhotoBlock::factory()->has(Photo::factory()->for(FileUpload::factory()->jpg(), 'fileUpload')), 'content')
-                                ->create([
-                                    'version_id' => $page->draft_version_id,
-                                ]);
+                                ->create();
         $content_element->pages()->detach();
-        $content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false]);
+        $content_element->pages()->attach($page, ['sort_order' => 1, 'unlisted' => false, 'expandable' => false, 'version_id' => $page->draft_version_id]);
         $photo_block = $content_element->content;
         $photo = $photo_block->photos->first();
         $this->assertInstanceOf(Photo::class, $photo);

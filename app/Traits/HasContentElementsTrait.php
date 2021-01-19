@@ -8,12 +8,13 @@ use Illuminate\Support\Str;
 
 use App\Models\PageAccess;
 use App\Models\ContentElement;
+use App\Models\Version;
 
 trait HasContentElementsTrait
 {
     public function contentElements()
     {
-        return $this->morphToMany(ContentElement::class, 'contentable')->withPivot('sort_order', 'unlisted', 'expandable');
+        return $this->morphToMany(ContentElement::class, 'contentable')->withPivot('sort_order', 'unlisted', 'expandable', 'version_id');
     }
 
     public function getTypeAttribute()
@@ -43,7 +44,7 @@ trait HasContentElementsTrait
         
         if ($version_id > 0) {
             return $this->contentElements()
-                ->where('version_id', '<=', $version_id)
+                ->wherePivot('version_id', '<=', $version_id)
                 ->get();
         } else {
             return $this->contentElements()->get();
@@ -57,7 +58,7 @@ trait HasContentElementsTrait
                          ->groupBy('uuid')
                          ->map(function ($uuid) {
                              return $uuid->sortByDesc(function ($content_element) {
-                                 return $content_element->version_id;
+                                 return $content_element->pivot->version_id;
                              })->first();
                          })
                          ->sortBy(function ($content_element) {
@@ -65,7 +66,8 @@ trait HasContentElementsTrait
                          })
                          ->values();
 
-        return $this->addContentableAttributes($content_elements);
+        return $content_elements;
+        //return $this->addContentableAttributes($content_elements);
         //});
     }
 
@@ -75,10 +77,10 @@ trait HasContentElementsTrait
                      ->groupBy('uuid')
                      ->map(function ($uuid) {
                          return $uuid->filter(function ($content_element) {
-                             return $content_element->published_at ? true : false;
+                             return Version::find($content_element->pivot->version_id)->published_at ? true : false;
                          })
                         ->sortByDesc(function ($content_element) {
-                            return $content_element->version_id;
+                            return $content_element->pivot->version_id;
                         })->first();
                      })
                      ->filter()
@@ -89,7 +91,8 @@ trait HasContentElementsTrait
                          return $content_element->pivot->sort_order;
                      })->values();
 
-        return $this->addContentableAttributes($content_elements);
+        return $content_elements;
+        //return $this->addContentableAttributes($content_elements);
     }
 
     public function getPreviewContentElementsAttribute()
@@ -101,7 +104,7 @@ trait HasContentElementsTrait
                      ->groupBy('uuid')
                      ->map(function ($uuid) {
                          return $uuid->sortByDesc(function ($content_element) {
-                             return $content_element->version_id;
+                             return $content_element->pivot->version_id;
                          })->first();
                      })
                      ->filter(function ($content_element) {
@@ -111,9 +114,13 @@ trait HasContentElementsTrait
                          return $content_element->pivot->sort_order;
                      })->values();
 
-        return $this->addContentableAttributes($content_elements);
+        return $content_elements;
+        //return $this->addContentableAttributes($content_elements);
     }
 
+    /*
+     * We were using this to add attributes for the front end but the attributes
+     * are already available in the pivot 
     protected function addContentableAttributes(Collection $content_elements)
     {
         return $content_elements->map(function ($content_element) {
@@ -122,6 +129,7 @@ trait HasContentElementsTrait
             return $content_element;
         });
     }
+     */
 
     public function getEditableAttribute()
     {

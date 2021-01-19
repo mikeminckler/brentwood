@@ -83,7 +83,7 @@ class TextBlockTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
-                'versionable_id' => $page->id,
+                'contentable_id' => $page->id,
                 'sort_order' => 1,
                 'unlisted' => 0,
                 'expandable' => 0,
@@ -251,7 +251,7 @@ class TextBlockTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
-                'versionable_id' => $page->id,
+                'contentable_id' => $page->id,
                 'sort_order' => 1,
                 'unlisted' => 0,
                 'expandable' => 0,
@@ -270,7 +270,7 @@ class TextBlockTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Text Block Saved',
-                'versionable_id' => $page->id,
+                'contentable_id' => $page->id,
                 'sort_order' => 2,
                 'unlisted' => 1,
                 'expandable' => 1,
@@ -280,6 +280,7 @@ class TextBlockTest extends TestCase
     /** @test **/
     public function an_instanced_content_element_pushes_its_updates_to_other_pages()
     {
+        // Create a content element on a page and publish the page
         $content_element = $this->createContentElement(TextBlock::factory());
         $text_block = $content_element->content;
         $this->assertInstanceOf(TextBlock::class, $text_block);
@@ -288,8 +289,9 @@ class TextBlockTest extends TestCase
         $page->publish();
 
         $content_element->refresh();
-        $this->assertNotNull($content_element->published_at);
+        $this->assertNotNull($content_element->getPageVersion($page)->published_at);
 
+        // create a second page and instance the content element on the new page
         $page2 = Page::factory()->create();
 
         $this->signInAdmin();
@@ -324,6 +326,9 @@ class TextBlockTest extends TestCase
 
         $this->assertEquals($page->contentElements()->first()->uuid, $page2->contentElements()->first()->uuid);
 
+        $this->assertNotNull($page->contentElements()->first()->getPageVersion($page)->published_at);
+
+        // update the content element and make sure the changes are in both locations
         $body = $this->faker->sentence;
 
         $input['content']['body'] = $body;
@@ -336,6 +341,5 @@ class TextBlockTest extends TestCase
         $page2_ce->refresh();
 
         $this->assertEquals($body, $page2_ce->content->body);
-
     }
 }

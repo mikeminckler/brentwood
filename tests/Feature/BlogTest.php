@@ -121,14 +121,9 @@ class BlogTest extends TestCase
     /** @test **/
     public function blogs_can_be_loaded_for_pagination()
     {
-        $content_element = ContentElement::factory()
-                                ->hasAttached(Blog::factory(), ['sort_order' => 1, 'unlisted' => 0, 'expandable' => 0])
-                                ->for(TextBlock::factory(), 'content')
-                                ->create([
-                                    'version_id' => Version::factory()->for(Blog::factory(), 'versionable'),
-                                ]);
+        $blog = Blog::factory()->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $blog);
 
-        $blog = $content_element->blogs->first();
         $this->assertInstanceOf(Blog::class, $blog);
         $this->assertTrue($blog->contentElements()->get()->contains('id', $content_element->id));
 

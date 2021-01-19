@@ -18,7 +18,7 @@ class ContentElementTest extends TestCase
     use WithFaker;
 
     /** @test **/
-    public function a_content_element_can_be_created()
+    public function a_content_element_can_be_created_from_the_saveContentElement_function()
     {
         $page = Page::factory()->create();
         $text_block = TextBlock::factory()->raw();
@@ -53,10 +53,11 @@ class ContentElementTest extends TestCase
     }
 
     /** @test **/
-    public function a_content_element_belongs_to_a_version()
+    public function a_content_element_has_many_versions()
     {
         $content_element = $this->createContentElement(TextBlock::factory());
-        $this->assertInstanceOf(Version::class, $content_element->version);
+        $this->assertEquals(1, $content_element->versions()->count());
+        $this->assertInstanceOf(Version::class, $content_element->versions->first());
     }
 
     /** @test **/
@@ -91,18 +92,13 @@ class ContentElementTest extends TestCase
     public function a_new_content_element_is_created_if_the_one_updated_has_been_published()
     {
         $page = Page::factory()->published()->create();
-        $content_element = $this->createContentElement(TextBlock::factory());
-        $content_element->version_id = $page->published_version_id;
-        $content_element->save();
-        $content_element->refresh();
-
-        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+        $content_element = $this->createContentElement(TextBlock::factory(), $page, $page->publishedVersion);
 
         $content = $content_element->content;
 
         $this->assertNotEquals($page->getDraftVersion()->id, $page->publishedVersion->id);
 
-        $this->assertNotNull($content_element->published_at);
+        $this->assertNotNull($content_element->contentables->first()->version->published_at);
 
         $input = ContentElement::factory()->for(TextBlock::factory(), 'content')->raw();
         $input['type'] = 'text-block';
@@ -121,8 +117,10 @@ class ContentElementTest extends TestCase
         $this->assertNotEquals($content_element->id, $saved_content_element->id);
         $this->assertNotEquals($content->id, $saved_content_element->content->id);
 
+        $this->assertEquals(1, $content_element->contentables->count());
+
         $page->refresh();
-        $this->assertEquals($page->getDraftVersion()->id, $saved_content_element->version_id);
+        $this->assertEquals($page->getDraftVersion()->id, $saved_content_element->contentables()->first()->version->id);
     }
 
 
@@ -130,26 +128,19 @@ class ContentElementTest extends TestCase
     public function a_content_element_can_get_its_previous_version()
     {
         $page = Page::factory()->published()->create();
-        $content_element1 = $this->createContentElement(TextBlock::factory());
-        $content_element1->version_id = $page->published_version_id;
-        $content_element1->save();
-        $content_element1->refresh();
+        $content_element1 = $this->createContentElement(TextBlock::factory(), $page, $page->publishedVersion);
 
-        $content_element1->pages()->detach();
-        $content_element1->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
-
-        $this->assertNotNull($content_element1->published_at);
+        $this->assertNotNull($content_element1->contentables()->first()->version->published_at);
 
         $content_element2 = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'uuid' => $content_element1->uuid,
-            'version_id' => $page->draft_version_id,
         ]);
 
         $content_element2->pages()->detach();
-        $content_element2->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+        $content_element2->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false, 'version_id' => $page->draft_version_id]);
 
-        $this->assertInstanceOf(ContentElement::class, $content_element2->getPreviousVersion());
-        $this->assertEquals($content_element1->id, $content_element2->getPreviousVersion()->id);
+        $this->assertInstanceOf(ContentElement::class, $content_element2->getPreviousVersion($page));
+        $this->assertEquals($content_element1->id, $content_element2->getPreviousVersion($page)->id);
         $this->assertEquals($content_element1->uuid, $content_element2->uuid);
     }
 
@@ -160,7 +151,7 @@ class ContentElementTest extends TestCase
         $content = $content_element->content;
 
         $page = Page::factory()->published()->create();
-        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false, 'version_id' => $page->getDraftVersion()->id]);
 
         $input = ContentElement::factory()->for(TextBlock::factory(), 'content')->raw();
         $input['type'] = 'text-block';
@@ -184,4 +175,16 @@ class ContentElementTest extends TestCase
         $this->assertEquals('2020-08-23T12:00:00.000000Z', Arr::get($content_element_array, 'publish_at'));
     }
 
+    /** @test **/
+    public function a_content_element_can_get_its_page_version()
+    {
+        $page = Page::factory()->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $page);
+
+        $version = $page->getDraftVersion();
+
+        $this->assertInstanceOf(Version::class, $content_element->getPageVersion($page));
+        $this->assertEquals($version->id, $content_element->getPageVersion($page)->id);
+
+    }
 }

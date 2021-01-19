@@ -136,6 +136,7 @@
                     }
 
                     this.page.footer_fg_photo = newPhoto;
+                    console.log('SAVE PAGE FROM FOOTER FG');
                     this.$eventer.$emit('save-page');
                 }
             },
@@ -159,6 +160,7 @@
                     }
 
                     this.page.footer_bg_photo = newPhoto;
+                    console.log('SAVE PAGE FROM FOOTER BG');
                     this.$eventer.$emit('save-page');
                 }
             },

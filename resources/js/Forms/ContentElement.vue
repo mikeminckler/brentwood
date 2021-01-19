@@ -229,10 +229,7 @@
             loadContentElement: function() {
 
                 let input = {
-                    pivot: {
-                        contentable_id: this.$store.state.page.id,
-                        contentable_type: this.$store.state.page.type,
-                    }
+                    pivot: this.pivot,
                 };
 
                 this.$http.post('/content-elements/' + this.contentElement.id + '/load', input).then( response => {

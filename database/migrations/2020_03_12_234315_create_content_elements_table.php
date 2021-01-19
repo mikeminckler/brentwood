@@ -17,7 +17,7 @@ class CreateContentElementsTable extends Migration
             $table->bigIncrements('id');
             $table->uuid('uuid');
             $table->morphs('content');
-            $table->unsignedBigInteger('version_id');
+            //$table->unsignedBigInteger('version_id');
             $table->dateTime('publish_at')->nullable();
             $table->softDeletes();
             $table->timestamps();

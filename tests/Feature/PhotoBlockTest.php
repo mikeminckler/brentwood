@@ -307,7 +307,7 @@ class PhotoBlockTest extends TestCase
         $page->publish();
 
         $content_element->refresh();
-        $this->assertNotNull($content_element->published_at);
+        $this->assertNotNull($content_element->getPageVersion($page)->published_at);
 
         $input = $content_element->toArray();
         $input['type'] = 'photo-block';

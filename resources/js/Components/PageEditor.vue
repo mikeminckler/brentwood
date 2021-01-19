@@ -38,13 +38,13 @@
                     <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white font-bold cursor-pointer justify-center items-center h-8 overflow-visible" 
                          v-if="(hasDraft && page.editable) && !$store.state.saving.length"
                     >
-                        <div class="flex" @click="publishPage()">
+                        <div class="flex h-full items-center pr-2" @click="publishPage()">
                             <transition name="slide">
                                 <div class="pl-2" v-if="!showPagePublishAt"><i class="fas fa-sign-out-alt"></i></div>
                             </transition>
                             <div class="pl-2">Publish</div>
                         </div>
-                        <div class="px-2 ml-2 h-full flex items-center bg-green-500" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
+                        <div class="px-2 h-full flex items-center bg-green-500" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
                         <date-time-picker v-show="showPagePublishAt" v-model="page.publish_at" ></date-time-picker>
                         <transition name="slide">
                             <div class="px-2" v-if="showPagePublishAt" @click="savePage()"><i class="fas fa-save"></i></div>
@@ -155,12 +155,14 @@
             }
 
             const savePageEvent = event => {
+                console.log('SAVE PAGE LOCAL');
                 this.savePage();
             };
             this.$eventer.$on('save-page', savePageEvent);
 
             // load page from history state and side menu link
             const loadPageEvent = slug => {
+                console.log('LOAD PAGE LOCAL');
                 this.loadPage(slug);
             };
             this.$eventer.$on('load-page', loadPageEvent);
@@ -175,21 +177,25 @@
             this.$echo.private('role.2')
                 .listen('PageSaved', data => {
                     if (this.page.id === data.page.id) {
+                        console.log('LOAD PAGE FROM PAGE SAVED');
                         this.loadPage();
                     }
                 })
                 .listen('PageDraftCreated', data => {
                     if (this.page.id === data.page.id) {
+                        console.log('PAGE DRAFT CREATED EVENT');
                         this.page.versions = data.page.versions;
                     }
                 })
                 .listen('ContentElementCreated', data => {
                     if (this.page.id === data.page.id) {
+                        console.log('LOAD PAGE FROM CONTENT ELEMENT CREATED');
                         this.loadPage();
                     }
                 })
                 .listen('ContentElementRemoved', data => {
                     if (this.page.id === data.page.id) {
+                        console.log('LOAD PAGE FROM CONTENT ELEMENT REMOVED');
                         this.loadPage();
                     }
                 });
@@ -337,7 +343,12 @@
                     this.$store.dispatch('setPageLoading', true);
 
                     this.$http.post('/' + this.resource + '/' + this.page.id + '/publish').then( response => {
-                        location.reload();
+                        console.log('PAGE PUBLISH COMPLETE');
+                        this.$eventer.$emit('refresh-page-tree');
+                        console.log('LOAD PAGE FROM PAGE PUBLISHED LOCAL');
+                        this.loadPage();
+
+                        //location.reload();
                         //console.log('SET PAGE AFTER PUBLISH');
                         //this.$store.dispatch('setPage', response.data.page);
                         //this.processSuccess(response);
@@ -376,6 +387,7 @@
 
             removePublishAt: function() {
                 this.page.publish_at = null;
+                console.log('SAVE PAGE FROM REMOVE PUBLISH AT');
                 this.savePage();
             }
 

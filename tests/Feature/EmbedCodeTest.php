@@ -87,11 +87,9 @@ class EmbedCodeTest extends TestCase
     public function a_embed_code_can_be_updated()
     {
         $page = Page::factory()->create();
-        $content_element = ContentElement::factory()->for(EmbedCode::factory(), 'content')->create([
-            'version_id' => $page->draft_version_id,
-        ]);
+        $content_element = ContentElement::factory()->for(EmbedCode::factory(), 'content')->create();
         $content_element->pages()->detach();
-        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false, 'version_id' => $page->draft_version_id]);
         $embed_code = $content_element->content;
         $this->assertInstanceOf(EmbedCode::class, $embed_code);
 

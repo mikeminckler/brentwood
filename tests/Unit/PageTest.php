@@ -22,6 +22,7 @@ use App\Models\FileUpload;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Photo;
+use App\Models\Tag;
 
 use App\Events\PageDraftCreated;
 
@@ -148,8 +149,6 @@ class PageTest extends TestCase
         $content_element = $this->createContentElement(TextBlock::factory());
         $this->assertEquals(1, $content_element->pages()->count());
         $page = $content_element->pages->first();
-        $content_element->version_id = $page->getDraftVersion()->id;
-        $content_element->save();
 
         $this->assertFalse($page->preview_content_elements->contains('id', $content_element->id));
         $this->signInAdmin();
@@ -340,5 +339,21 @@ class PageTest extends TestCase
 
         $this->assertNotNull($page->footer_text_color);
         $this->assertEquals('text-gray-200', $page->footer_text_color);
+    }
+
+    /** @test **/
+    public function loading_a_page_includes_its_tags()
+    {
+        $page = Page::factory()->create();
+        $tag = Tag::factory()->create();
+
+        $page->addTag($tag);
+
+        $page->refresh();
+        $this->assertTrue($page->tags->contains('id', $tag->id));
+
+        $data = Page::find($page->id)->toArray();
+
+        $this->assertNotNull(Arr::get($data, 'tags'));
     }
 }

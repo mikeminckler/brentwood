@@ -224,12 +224,10 @@ trait PagesTestTrait
         $page = $this->getModel();
         $page->publish();
 
-        $published_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
-            'version_id' => $page->published_version_id,
-        ]);
+        $published_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create();
 
         $published_content_element->{Str::plural($this->getClassname())}()->detach();
-        $published_content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+        $published_content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false, 'version_id' => $page->published_version_id]);
 
         $this->assertInstanceOf(get_class($page), $published_content_element->{Str::plural($this->getClassname())}()->first());
         $page = $published_content_element->{Str::plural($this->getClassname())}()->first();
@@ -239,11 +237,10 @@ trait PagesTestTrait
 
         $content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'uuid' => $published_content_element->uuid,
-            'version_id' => $page->draft_version_id,
         ]);
 
         $content_element->{Str::plural($this->getClassname())}()->detach();
-        $content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+        $content_element->{Str::plural($this->getClassname())}()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false, 'version_id' => $page->draft_version_id]);
 
         $page->refresh();
 
@@ -270,8 +267,8 @@ trait PagesTestTrait
         $this->assertEquals(1, ContentElement::where('id', $content_element->id)->get()->count());
         $this->signInAdmin();
 
-        $this->assertNotNull($content_element->getPreviousVersion());
-        $this->assertEquals($published_content_element->id, $content_element->getPreviousVersion()->id);
+        $this->assertNotNull($content_element->getPreviousVersion($page));
+        $this->assertEquals($published_content_element->id, $content_element->getPreviousVersion($page)->id);
 
         $this->withoutExceptionHandling();
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), $input)
@@ -317,17 +314,14 @@ trait PagesTestTrait
     {
         $page = $this->getModel();
         $page->publish();
-        $published_content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
-            'version_id' => $page->published_version_id,
-        ]);
+        $published_content_element = $this->createContentElement(TextBlock::factory(), $page, $page->publishedVersion);
 
         $content_element = ContentElement::factory()->for(TextBlock::factory(), 'content')->create([
             'uuid' => $published_content_element->uuid,
-            'version_id' => $page->draft_version_id,
         ]);
 
         $content_element->pages()->detach();
-        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false]);
+        $content_element->pages()->attach($page, ['sort_order' => $this->faker->randomNumber(1), 'unlisted' => false, 'expandable' => false, 'version_id' => $page->draft_version_id]);
 
         $this->json('POST', route('content-elements.remove', ['id' => $content_element->id]), ['remove_all' => true])
             ->assertStatus(401);
@@ -458,12 +452,15 @@ trait PagesTestTrait
 
         $page->refresh();
         $content_element->refresh();
-        $this->assertEquals($content_element->version->id, $page->publishedVersion->id);
+
+        $this->assertEquals(1, $content_element->contentables()->count());
+
+        $this->assertEquals($content_element->getPageVersion($page)->id, $page->publishedVersion->id);
 
         $content_element = ContentElement::find($content_element_id);
 
         $this->assertNotNull($page->published_at);
-        $this->assertNotNull($content_element->published_at);
+        $this->assertNotNull($content_element->getPageVersion($page)->published_at);
         
         $content_element['pivot'] = [
             'contentable_id' => $page->id,
@@ -667,6 +664,7 @@ trait PagesTestTrait
 
         $this->assertEquals($new_page->id, Arr::get($input, 'pivot.contentable_id'));
 
+        $this->withoutExceptionHandling();
         $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
              ->assertSuccessful()
              ->assertJsonFragment([

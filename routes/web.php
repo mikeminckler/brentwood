@@ -64,6 +64,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/content-elements/{id}/load', [ContentElementsController::class, 'load'])->name('content-elements.load')->where('id', '\d+');
     Route::post('/content-elements/{id}/remove', [ContentElementsController::class, 'remove'])->name('content-elements.remove')->where('id', '\d+');
     Route::post('/content-elements/{id}/restore', [ContentElementsController::class, 'restore'])->name('content-elements.restore')->where('id', '\d+');
+    Route::post('/content-elements/{id}/publish', [ContentElementsController::class, 'publish'])->name('content-elements.publish')->where('id', '\d+');
 
     Route::post('/photos/{id}', [PhotosController::class, 'store'])->name('photos.update')->where('id', '\d+');
     Route::post('/photos/{id}/remove', [PhotosController::class, 'remove'])->name('photos.remove')->where('id', '\d+');

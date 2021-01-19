@@ -1,6 +1,6 @@
 <template>
 
-    <div class="bg-white relative flex w-64 items-center" dusk="date-time-picker">
+    <div class="relative flex" dusk="date-time-picker">
 
         <div class="">
             <transition name="text-sm">

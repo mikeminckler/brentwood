@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\ContentElement;
 use App\Models\Page;
 use App\Events\ContentElementRemoved;
+use App\Http\Requests\ContentElementPublishValidation;
 
 class ContentElementsController extends Controller
 {
@@ -117,5 +118,16 @@ class ContentElementsController extends Controller
         $content_element->restore();
 
         return response()->json(['success' => Str::title(str_replace('-', ' ', $content_element->type)).' Restored']);
+    }
+
+    public function publish(ContentElementPublishValidation $request, $id) 
+    {
+        $contentable = ContentElement::findContentable(requestInput());
+        $content_element = $contentable->contentElements()->where('content_element_id', $id)->first();
+
+        $contentable->publishContentElement($content_element);
+
+        return response()->json(['success' => Str::title(str_replace('-', ' ', $content_element->type)).' Published']);
+
     }
 }

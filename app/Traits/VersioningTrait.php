@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Version;
+use App\Models\ContentElement;
 
 trait VersioningTrait
 {
@@ -21,15 +22,24 @@ trait VersioningTrait
         return optional($this->publishedVersion)->published_at;
     }
 
-    public function publish()
+    public function publishContentElement(ContentElement $content_element) 
+    {
+        return $this->publish($content_element);
+    }
+
+    public function publish(ContentElement $publish_now_content_element = null)
     {
 
-        $publish_at_content_elements = $this->contentElements()
-                                            ->where('publish_at', '<', now())
-                                            ->get()
-                                            ->filter( function($content_element) {
-                                                return Version::find($content_element->pivot->version_id)->published_at ? false : true;
-                                            });
+        if ($publish_now_content_element) {
+            $publish_at_content_elements = collect([$publish_now_content_element]);
+        } else {
+            $publish_at_content_elements = $this->contentElements()
+                                                ->where('publish_at', '<', now())
+                                                ->get()
+                                                ->filter( function($content_element) {
+                                                    return Version::find($content_element->pivot->version_id)->published_at ? false : true;
+                                                });
+        }
 
         $new_draft_content_elements = $this->contentElements()
                                         ->get()

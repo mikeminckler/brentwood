@@ -63,6 +63,8 @@ trait ContentElementsTestTrait
 
         $this->assertEquals(1, $page->contentElements->count());
         $content_element = $page->contentElements->first();
+        $this->assertInstanceOf(ContentElement::class, $content_element);
+        $this->assertEquals(Arr::get($input, 'content.body'), $content_element->body);
     }
 
     /** @test **/

@@ -73,6 +73,45 @@ trait VersioningTrait
 
         broadcast(new $event_class($this))->toOthers();
 
+        // find other instances of the content elements that were just published and update them as well
+        if ($publish_at_content_elements->count()) {
+            $search_content_elements = $publish_at_content_elements;
+        } else {
+            $search_content_elements = $this->contentElements;
+        }
+
+        $uuids = $search_content_elements->map(function($ce) {
+            return $ce->uuid;
+        })
+        ->flatten()
+        ->unique();
+
+        $published_content_elements = collect();
+
+        foreach ($uuids as $uuid) {
+            $pages = ContentElement::findPagesByUuid($uuid)->filter(function($page) {
+                return $page->id !== $this->id || get_class($page) !== get_class($this);
+            });
+
+            if ($pages->count()) {
+                foreach ($pages as $page) {
+                    $content_element = $page->content_elements->filter(function($ce) use ($uuid) {
+                        return $ce->uuid === $uuid;
+                    })->first();
+
+                    if (!$published_content_elements->contains('id', $content_element)) {
+
+                        if (!$content_element->getPageVersion($page)->published_at) {
+                            $page->publishContentElement($content_element);
+                        }
+
+                        $published_content_elements->push($content_element);
+                    }
+                }
+            }
+
+        }
+
         return $this;
     }
 

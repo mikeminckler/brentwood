@@ -30,23 +30,18 @@ class ContentElement extends Model
     public function saveContentElement(array $input, $id = null)
     {
         $contentable = self::findContentable($input);
-
+        $uuid = null;
         $new_version = true;
+
         if ($id) {
             $content_element = ContentElement::findOrFail($id);
             $uuid = $content_element->uuid;
 
-            $pivot = $content_element->contentables()
-                                    ->where('contentable_id', $contentable->id)
-                                    ->where('contentable_type', get_class($contentable))
-                                    ->first();
-            $is_published = false;
+            $is_published = $content_element->contentables()->whereHas('version', function($query) {
+                $query->whereNotNull('published_at');
+            })->count();
 
-            if ($pivot) {
-                $is_published = $pivot->version->published_at ? true : false;
-            } 
-
-            if (!$is_published || Arr::get($input, 'instance')) {
+            if (!$is_published) {
                 $new_version = false;
             } else {
 
@@ -88,25 +83,36 @@ class ContentElement extends Model
 
         // assign or update the content element to the contentable
 
-        if (!$contentable->contentElements()->get()->contains('id', $content_element->id)) {
-            $contentable->contentElements()->attach($content_element, [
-                'version_id' => $contentable->getDraftVersion()->id,
-                'sort_order' => Arr::get($input, 'pivot.sort_order'),
-                'unlisted' => Arr::get($input, 'pivot.unlisted'),
-                'expandable' => Arr::get($input, 'pivot.expandable'),
-            ]);
+        if ($uuid) {
+            $pages = ContentElement::findPagesByUuid($uuid, $contentable);
         } else {
-            $contentable->contentElements()->updateExistingPivot($content_element, [
-                'version_id' => $contentable->getDraftVersion()->id,
-                'sort_order' => Arr::get($input, 'pivot.sort_order'),
-                'unlisted' => Arr::get($input, 'pivot.unlisted'),
-                'expandable' => Arr::get($input, 'pivot.expandable'),
-            ]);
+            $pages = collect([$contentable]);
+        }
+
+        foreach ($pages as $page) {
+
+            if (!$page->contentElements()->get()->contains('id', $content_element->id)) {
+                $page->contentElements()->attach($content_element, [
+                    'version_id' => $page->getDraftVersion()->id,
+                    'sort_order' => Arr::get($input, 'pivot.sort_order'),
+                    'unlisted' => Arr::get($input, 'pivot.unlisted'),
+                    'expandable' => Arr::get($input, 'pivot.expandable'),
+                ]);
+            } else {
+                $page->contentElements()->updateExistingPivot($content_element, [
+                    'version_id' => $page->getDraftVersion()->id,
+                    'sort_order' => Arr::get($input, 'pivot.sort_order'),
+                    'unlisted' => Arr::get($input, 'pivot.unlisted'),
+                    'expandable' => Arr::get($input, 'pivot.expandable'),
+                ]);
+            }
+
+            cache()->tags([cache_name($contentable)])->flush();
         }
 
         // refresh the content element so that it updates its content
         $content_element->refresh();
-        cache()->tags([cache_name($content_element), cache_name($contentable)])->flush();
+        cache()->tags([cache_name($content_element)])->flush();
 
         if ($new_version) {
             broadcast(new ContentElementCreated($content_element, $contentable))->toOthers();
@@ -115,6 +121,24 @@ class ContentElement extends Model
         }
 
         return $content_element;
+    }
+
+    public static function findPagesByUuid($uuid, $add_page = null) {
+
+        $pages = ContentElement::where('uuid', $uuid)
+             ->get()
+             ->map(function($ce) {
+                return $ce->contentables->map->pageable;
+             })
+             ->flatten();
+
+        if ($add_page) {
+             $pages->push($add_page);
+        }
+
+        return $pages->unique(function($item) {
+            return $item->type.$item->id;
+        });
     }
 
     public static function findContentable($input)

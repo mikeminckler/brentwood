@@ -11,6 +11,7 @@ use App\Models\ContentElement;
 use App\Models\Page;
 use App\Events\ContentElementRemoved;
 use App\Http\Requests\ContentElementPublishValidation;
+use App\Models\Contentable;
 
 class ContentElementsController extends Controller
 {
@@ -89,7 +90,15 @@ class ContentElementsController extends Controller
             ]);
         } else {
             $previous_content_element = $content_element->getPreviousVersion($contentable);
-            $content_element->delete();
+
+            $pivot = Contentable::where('content_element_id', $content_element->id)
+                                ->where('contentable_id', $contentable->id)
+                                ->where('contentable_type', get_class($contentable))
+                                ->delete();
+
+            if (!Contentable::where('content_element_id', $content_element->id)->count()) {
+                $content_element->delete();
+            }
 
             return response()->json([
                 'success' => Str::title(str_replace('-', ' ', $content_element->type)).' Version Removed',

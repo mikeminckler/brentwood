@@ -647,7 +647,6 @@ trait PagesTestTrait
         $this->assertInstanceOf(get_class($this->getModel()), $page);
 
         $new_page = $this->getModel();
-
         $this->assertEquals(0, $new_page->contentElements()->count());
 
         $this->signInAdmin();
@@ -705,14 +704,180 @@ trait PagesTestTrait
     }
 
     /** @test **/
-    public function a_content_element_can_be_removed_from_one_page_but_stay_on_another()
+    public function a_published_content_can_be_instanced_onto_another_page()
     {
-        $this->fail('write this test');
+        // create a content element
+        $page = Page::factory()->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $page);
+        // publish it
+        $page->publish();
+
+        $content_element->refresh();
+        $this->assertNotNull($content_element->getPageVersion($page)->published_at);
+        // instance it onto another page
+
+        $new_page = $this->getModel();
+        $this->assertEquals(0, $new_page->contentElements()->count());
+
+        $this->signInAdmin();
+
+        $content_element['pivot'] = [
+            'contentable_id' => $new_page->id,
+            'contentable_type' => get_class($new_page),
+            'sort_order' => 1,
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+
+        $input = $content_element->toArray();
+        $input['instance'] = 'true';
+
+        $this->assertEquals($new_page->id, Arr::get($input, 'pivot.contentable_id'));
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $new_page->refresh();
+        $page->refresh();
+
+        // assert its a new content element
+        $this->assertEquals(1, $new_page->contentElements()->count());
+        $new_content_element = $new_page->contentElements()->first();
+        $this->assertNotEquals($content_element->id, $new_content_element->id);
+
+        // assert that the origanl page has a draft that is the new ce
+        $this->assertEquals(2, $page->contentElements()->count());
+        $page_new_content_element = $page->contentElements()->get()->last();
+        $this->assertNotEquals($content_element->id, $page_new_content_element->id);
+        // assert that both ce's are the same id
+        $this->assertEquals($new_content_element->id, $page_new_content_element->id);
+        // make a text change
+
+        $input['content'] = TextBlock::factory()->raw();
+
+        // Update the content
+
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $page->refresh();
+        $new_page->refresh();
+        $new_content_element->refresh();
+        $page_new_content_element->refresh();
+
+        // assert the change is on both pages
+        $this->assertEquals(2, $page->contentElements()->count());
+        $this->assertEquals(1, $new_page->contentElements()->count());
+        $this->assertEquals(Arr::get($input, 'content.body'), $new_content_element->content->body);
+        $this->assertEquals(Arr::get($input, 'content.body'), $page_new_content_element->content->body);
+        $this->assertEquals($new_content_element->content->body, $page_new_content_element->content->body);
+
+        // publish the content element on the new page
+        $this->json('POST', route(Str::plural($this->getClassname()).'.publish', ['id' => $new_page->id]))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => Str::title($this->getClassname()).' Published',
+             ]);
+
+        $page->refresh();
+        $new_page->refresh();
+        $new_content_element->refresh();
+        $page_new_content_element->refresh();
+
+        // assert the instanced ce is published
+        $this->assertNotNull($new_content_element->getPageVersion($new_page)->published_at);
+
+        // assert the original page ce is also published with the updated content
+        $this->assertNotNull($page_new_content_element->getPageVersion($page)->published_at);
+
+        $this->assertEquals($new_content_element->content->body, $page_new_content_element->content->body);
     }
 
     /** @test **/
-    public function a_content_element_can_be_restored_to_one_page_but_not_the_other()
+    public function a_content_element_can_be_removed_from_one_page_but_stay_on_another()
     {
-        $this->fail('write this test');
+        $page = Page::factory()->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $page);
+        $page->publish();
+
+        $content_element->refresh();
+        $this->assertNotNull($content_element->getPageVersion($page)->published_at);
+
+        $new_page = $this->getModel();
+        $this->assertEquals(0, $new_page->contentElements()->count());
+
+        $this->signInAdmin();
+
+        $content_element['pivot'] = [
+            'contentable_id' => $new_page->id,
+            'contentable_type' => get_class($new_page),
+            'sort_order' => 1,
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+
+        $input = $content_element->toArray();
+        $input['instance'] = 'true';
+
+        $this->assertEquals($new_page->id, Arr::get($input, 'pivot.contentable_id'));
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.update', ['id' => $content_element->id]), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+             ]);
+
+        $new_page->refresh();
+        $page->refresh();
+
+        $this->assertEquals(1, $new_page->contentElements()->count());
+        $new_content_element = $new_page->contentElements()->first();
+        $this->assertNotEquals($content_element->id, $new_content_element->id);
+
+        $this->assertEquals(2, $page->contentElements()->count());
+        $page_new_content_element = $page->contentElements()->get()->last();
+        $this->assertNotEquals($content_element->id, $page_new_content_element->id);
+        $this->assertEquals($new_content_element->id, $page_new_content_element->id);
+
+        $new_page->publish();
+
+        $new_content_element->refresh();
+        $page_new_content_element->refresh();
+
+        $this->assertNotNull($new_content_element->getPageVersion($new_page)->published_at);
+        $this->assertNotNull($page_new_content_element->getPageVersion($page)->published_at);
+
+        $input = [];
+        $input['pivot'] = [
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
+        ];
+
+        $this->assertEquals(1, ContentElement::where('id', $page_new_content_element->id)->get()->count());
+
+        $this->assertNotNull($page_new_content_element->getPreviousVersion($page));
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('content-elements.remove', ['id' => $page_new_content_element->id]), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Text Block Version Removed',
+                'uuid' => $page_new_content_element->uuid,
+            ]);
+
+        $page->refresh();
+        $new_page->refresh();
+
+        $this->assertEquals(1, $page->content_elements->count());
+        $this->assertEquals(1, $new_page->content_elements->count());
     }
+
 }

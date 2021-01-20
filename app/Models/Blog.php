@@ -32,6 +32,8 @@ class Blog extends Model
 
     protected $with = ['tags'];
 
+    protected $appends = ['type'];
+
     public $append_attributes = [
         'editable',
         'full_slug',

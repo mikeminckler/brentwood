@@ -36,6 +36,8 @@ class Page extends Model
     protected $dates = ['publish_at'];
 
     protected $with = ['pages', 'footerFgPhoto', 'footerBgPhoto', 'tags'];
+
+    protected $appends = ['type'];
     
     protected $casts = [
         'unlisted' => 'boolean',

@@ -318,7 +318,7 @@ class TextBlockTest extends TestCase
         $page->refresh();
         $page2->refresh();
 
-        $this->assertEquals(1, $page->contentElements()->count());
+        $this->assertEquals(2, $page->contentElements()->count());
         $this->assertEquals(1, $page2->contentElements()->count());
 
         $this->assertEquals($content_element->id, $page->contentElements()->first()->id);

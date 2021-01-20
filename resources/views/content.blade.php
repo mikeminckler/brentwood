@@ -36,7 +36,9 @@
         @endif
     @endauth
 
-    <inquiry></inquiry>
+    @if (!$page->editable || ($page->editable && request('preview')))
+        <inquiry></inquiry>
+    @endif
 
     @if ($page->type === 'blog')
         <div class="blog-footer relative w-full">

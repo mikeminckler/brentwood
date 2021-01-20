@@ -142,6 +142,8 @@
                     'small',
                     'medium',
                     'large',
+                    'contentable_id',
+                    'contentable_type',
                 ];
                 return this.changedFields.filter( f => {
                     return ignore.indexOf(f) < 0;

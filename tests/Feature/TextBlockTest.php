@@ -297,7 +297,7 @@ class TextBlockTest extends TestCase
         $this->signInAdmin();
 
         $input = $content_element->toArray();
-        $input['instance'] = 'true';
+        //$input['instance'] = 'true';
         $input['pivot'] = [
             'contentable_id' => $page2->id,
             'contentable_type' => get_class($page2),

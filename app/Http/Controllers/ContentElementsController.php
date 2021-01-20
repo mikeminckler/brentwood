@@ -31,9 +31,12 @@ class ContentElementsController extends Controller
             'pivot.contentable_type' => 'required|string',
         ])->validate();
 
-        //$content_element = ContentElement::findOrFail($id);
+        $content_element = ContentElement::findOrFail($id);
         $contentable = ContentElement::findContentable(requestInput());
-        $content_element = $contentable->contentElements()->where('content_element_id', $id)->first();
+        $content_element = $contentable->contentElements()
+                                       ->where('uuid', $content_element->uuid)
+                                        ->orderByDesc('content_elements.id')
+                                        ->first();
 
         if (!auth()->user()->can('view', $content_element)) {
             if (request()->expectsJson()) {

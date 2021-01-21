@@ -38,7 +38,7 @@
 
             <div class="flex items-center justify-center bg-gray-200" key="no-photos" v-if="photosCount === 0">
                 <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
-                    <div class="">Upload Files</div>
+                    <div class="">Add Photos</div>
                 </div>
             </div>
 
@@ -118,23 +118,12 @@
 
         </transition-group>
 
-        <div class="flex bg-gray-200 p-2 shadow mt-4" v-if="photosCount > 0">
+        <div class="flex bg-gray-200 p-2 shadow mt-4 justify-center" v-if="photosCount > 0">
 
-            <div class="flex-1">
-                <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
-                    <div class="">Upload Files</div>
-                </div>
+            <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
+                <div class="icon"><i class="fas fa-file-image"></i></div>
+                <div class="pl-2">Add More Photos</div>
             </div>
-
-            <div class="bg-primary ml-1" v-if="photos.length === 1" @click="setText1()"><img src="/images/text1.png" /></div>
-            <div class="bg-primary ml-1" v-if="photos.length === 1" @click="setText2()"><img src="/images/text2.png" /></div>
-            <div class="bg-primary ml-1" v-if="photos.length === 1" @click="setText3()"><img src="/images/text3.png" /></div>
-            <div class="bg-primary ml-1" v-if="photos.length === 1" @click="setText4()"><img src="/images/text4.png" /></div>
-
-            <div class="bg-primary ml-1" v-if="photos.length === 2" @click="setText5()"><img src="/images/text1.png" /></div>
-            <div class="bg-primary ml-1" v-if="photos.length === 2" @click="setText6()"><img src="/images/text2.png" /></div>
-            <div class="bg-primary ml-1" v-if="photos.length === 2" @click="setText7()"><img src="/images/text3.png" /></div>
-            <div class="bg-primary ml-1" v-if="photos.length === 2" @click="setText8()"><img src="/images/text3.png" /></div>
 
         </div>
 

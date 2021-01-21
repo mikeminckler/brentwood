@@ -16,7 +16,6 @@ trait PagesControllerTrait
 
     private function loadPageAttributes($page)
     {
-
         if (session()->has('editing')) {
             $page->refresh();
             $page->load('versions');
@@ -63,7 +62,12 @@ trait PagesControllerTrait
             ]);
         }
 
-        return view('page', compact('page', 'content_elements'));
+        if ($page->editable && !request('preview')) {
+            return view('pages.edit', compact('page', 'content_elements'));
+        } else {
+            return view($this->base_view ?? 'pages.view', compact('page', 'content_elements'));
+        }
+
     }
 
     /**

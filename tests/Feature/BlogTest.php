@@ -218,4 +218,18 @@ class BlogTest extends TestCase
                 'name' => $blog3->name,
             ]);
     }
+
+    /** @test **/
+    public function a_blog_can_be_viewed()
+    {
+        $blog = Blog::factory()->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $blog);
+
+        $blog->publish();
+
+        $this->withoutExceptionHandling();
+        $this->get( $blog->full_slug)
+            ->assertSuccessful();
+        
+    }
 }

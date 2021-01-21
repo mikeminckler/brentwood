@@ -190,7 +190,7 @@
 
             <div id="footer" class="relative flex justify-center" style="min-height: 700px" :class="$store.state.editing ? 'px-12' : ''">
 
-                @if (optional($page ?? '')->editable && !request('preview'))
+                @if (optional($page ?? '')->editable && optional($page ?? '')->type === 'page' && !request('preview'))
                     <footer-editor></footer-editor>
                 @else
 

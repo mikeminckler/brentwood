@@ -133,6 +133,7 @@
                         fill: true,
                         large: null,
                         file_upload: this.fgUpload,
+                        file_upload_id: this.fgUpload.id,
                     }
 
                     this.page.footer_fg_photo = newPhoto;
@@ -157,6 +158,7 @@
                         fill: true,
                         large: null,
                         file_upload: this.bgUpload,
+                        file_upload_id: this.bgUpload.id,
                     }
 
                     this.page.footer_bg_photo = newPhoto;

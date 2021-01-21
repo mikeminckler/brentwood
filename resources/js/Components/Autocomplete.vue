@@ -1,69 +1,71 @@
 <template>
 
-    <div class="form autocomplete relative" :class="{'mb-4' : !noMargin}" :dusk="'autocomplete-' + dusk">
+    <div class="form autocomplete relative" :class="{'mb-4' : !noMargin, 'flex' : flex}" :dusk="'autocomplete-' + dusk">
 
-        <div class="flex items-end">
-            <div class="flex-1">
+        <div class="flex-1">
+            <div class="flex items-end">
+                <div class="flex-1">
 
-                <transition name="text-sm">
-                    <div class="label" v-if="showLabel & !hideLabel">
-                        <label for="name">{{ label ? label : placeholder }}</label>
+                    <transition name="text-sm">
+                        <div class="label" v-if="showLabel & !hideLabel">
+                            <label for="name">{{ label ? label : placeholder }}</label>
+                        </div>
+                    </transition>
+
+                    <div class="">
+
+                        <div class="absolute z-10 text-gray-500 py-2 px-2">
+                            <i class="fas fa-search"></i>
+                        </div>
+
+                        <input type="search"
+                            id="name" 
+                            name="terms" 
+                            :dusk="'autocomplete-search-' + (dusk ? dusk : (model ? model : name))"
+                            v-model="terms" 
+                            class="icon"
+                            autocomplete="off" 
+                            :placeholder="placeholder ? placeholder : (multiple ? 'Add...' : 'Search')"
+                            ref="input"
+
+                            @focus="showResults()"
+                            @blur="hideResults()"
+
+                            @keyup.enter="selectCurrent" 
+                            @keyup.up="selectPrev" 
+                            @keyup.down="selectNext"
+                            @keydown.tab="selectCurrent" 
+
+                            @keydown.up.stop.prevent=""
+                            @keydown.down.stop.prevent=""
+                            @keyup.esc="$emit('esc')"
+                        >
+
                     </div>
-                </transition>
-
-                <div class="">
-
-                    <div class="absolute z-10 text-gray-500 py-2 px-2">
-                        <i class="fas fa-search"></i>
-                    </div>
-
-                    <input type="search"
-                        id="name" 
-                        name="terms" 
-                        :dusk="'autocomplete-search-' + (dusk ? dusk : (model ? model : name))"
-                        v-model="terms" 
-                        class="icon"
-                        autocomplete="off" 
-                        :placeholder="placeholder ? placeholder : (multiple ? 'Add...' : 'Search')"
-                        ref="input"
-
-                        @focus="showResults()"
-                        @blur="hideResults()"
-
-                        @keyup.enter="selectCurrent" 
-                        @keyup.up="selectPrev" 
-                        @keyup.down="selectNext"
-                        @keydown.tab="selectCurrent" 
-
-                        @keydown.up.stop.prevent=""
-                        @keydown.down.stop.prevent=""
-                        @keyup.esc="$emit('esc')"
-                    >
 
                 </div>
 
+                <remove v-if="clear" class="py-1" @remove="remove()"></remove>
             </div>
 
-            <remove v-if="clear" class="py-1" @remove="remove()"></remove>
+            <div class="w-full relative" v-show="results.length > 0 && resultsVisible">
+                <transition-group tag="div" name="search-results" :style="'max-height: ' + maxHeight + 'px'" class="shadow-lg overflow-y-scroll absolute w-full" dusk="autocomplete-results">
+                    <div class="px-2 py-1 relative z-20 w-full cursor-pointer flex" 
+                        v-for="result in $lodash.take(results, 100)" 
+                        @click="result.add ? addModel() : select(result)"
+                        :key="'result-' + ( result.class_name ? result.class_name : model ) + '-' + result.id"
+                        :dusk="'result-' + result.id"
+                        :selected="result.selected ? 'selected' : false"
+                        :class="result.selected ? 'bg-yellow-100 text-primary-900' : 'bg-gray-100 odd:bg-gray-200 text-gray-700 hover:bg-white hover:text-primary-500'"
+                    >
+                        <div class="flex-1">{{ result.search_label }}</div>
+                        <div class="text-gray-500 italic" v-if="result.count">{{ result.count }}</div>
+                    </div>
+                </transition-group>
+            </div>
         </div>
 
-        <div class="w-full relative" v-show="results.length > 0 && resultsVisible">
-            <transition-group tag="div" name="search-results" :style="'max-height: ' + maxHeight + 'px'" class="shadow-lg overflow-y-scroll absolute w-full" dusk="autocomplete-results">
-                <div class="px-2 py-1 relative z-20 w-full cursor-pointer flex" 
-                    v-for="result in $lodash.take(results, 100)" 
-                    @click="result.add ? addModel() : select(result)"
-                    :key="'result-' + ( result.class_name ? result.class_name : model ) + '-' + result.id"
-                    :dusk="'result-' + result.id"
-                    :selected="result.selected ? 'selected' : false"
-                    :class="result.selected ? 'bg-yellow-100 text-primary-900' : 'bg-gray-100 odd:bg-gray-200 text-gray-700 hover:bg-white hover:text-primary-500'"
-                >
-                    <div class="flex-1">{{ result.search_label }}</div>
-                    <div class="text-gray-500 italic" v-if="result.count">{{ result.count }}</div>
-                </div>
-            </transition-group>
-        </div>
-
-        <div class="mt-2 rounded overflow-hidden" :class="flex ? 'flex' : ''" v-if="multiple">
+        <div class="flex-2 overflow-hidden" :class="flex ? 'flex items-center' : 'mt-2'" v-if="multiple">
 
             <component v-if="model"
                  :is="model"

@@ -6,9 +6,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
+use Illuminate\Support\Arr;
+
 use App\Models\Page;
 use App\Models\TextBlock;
 use App\Models\User;
+use App\Models\Tag;
+use App\Models\ContentElement;
 
 class ContentElementTest extends TestCase
 {
@@ -117,6 +121,64 @@ class ContentElementTest extends TestCase
                  'contentable_id' => $page->id,
                  'body' => $paragraph,
              ]);
+
+    }
+
+    /** @test **/
+    public function a_content_element_can_save_tags()
+    {
+        $tag = Tag::factory()->create();
+
+        $input = [];
+        $input['id'] = '0.0';
+        $input['type'] = 'text-block';
+        $input['content'] = TextBlock::factory()->raw();
+        $input['content']['id'] = 0;
+
+        $page = Page::factory()->create();
+
+        $input['pivot'] = [
+            'contentable_id' => $page->id,
+            'contentable_type' => get_class($page),
+            'sort_order' => 1,
+            'unlisted' => false,
+            'expandable' => false,
+        ];
+
+        $input['tags'] = [
+            $tag->toArray(),
+        ];
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+
+        $this->json('POST', route('content-elements.store'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Text Block Saved',
+                'contentable_id' => $page->id,
+                'sort_order' => 1,
+                'unlisted' => 0,
+                'expandable' => 0,
+             ]);
+
+        $page->refresh();
+        $content_element = ContentElement::all()->last();
+
+        $this->assertEquals(1, $page->contentElements()->count());
+        $this->assertEquals($content_element->id, $page->contentElements()->first()->id);
+
+        $this->assertNotNull($content_element->tags);
+        $this->assertEquals(1, $content_element->tags->count());
+        $this->assertTrue($content_element->tags->contains('id', $tag->id));
+
+        // make sure that json encoding includes the tags
+        $data = ContentElement::find($content_element->id)->toArray();
+
+        $this->assertNotNull(Arr::get($data, 'tags'));
+        $this->assertTrue(collect(Arr::get($data, 'tags'))->contains('id', $tag->id));
+
 
     }
 }

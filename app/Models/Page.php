@@ -20,6 +20,7 @@ use App\Traits\VersioningTrait;
 use App\Traits\HasContentElementsTrait;
 use App\Traits\SlugTrait;
 use App\Traits\TagsTrait;
+use App\Traits\HasFooterTrait;
 
 use App\Events\PageSaved;
 
@@ -32,6 +33,7 @@ class Page extends Model
     use HasContentElementsTrait;
     use SlugTrait;
     use TagsTrait;
+    use HasFooterTrait;
 
     protected $dates = ['publish_at'];
 
@@ -58,11 +60,11 @@ class Page extends Model
 
     public function savePage(array $input, $id = null)
     {
-        $home_page = false;
+        $protect_page = false;
         if ($id) {
             $page = Page::findOrFail($id);
-            if ($page->slug === '/') {
-                $home_page = true;
+            if ($page->slug === '/' || $page->slug === 'inquiry') {
+                $protect_page = true;
             }
         } else {
             $page = new Page;
@@ -70,11 +72,11 @@ class Page extends Model
 
         $page->name = Arr::get($input, 'name');
         $page->title = Arr::get($input, 'title');
-        if (!$home_page) {
+        if (!$protect_page) {
             $page->slug = Arr::get($input, 'slug');
         }
 
-        if (!$home_page) {
+        if (!$protect_page) {
             $parent_page = Page::find(Arr::get($input, 'parent_page_id'));
             if ($parent_page instanceof Page) {
                 $page->parent_page_id = $parent_page->id;
@@ -218,18 +220,6 @@ class Page extends Model
                 return null;
             }
         }
-    }
-
-    public function getFooterTextColorAttribute() 
-    {
-        if (!Str::contains($this->footer_color, ',')) {
-            return null;
-        }
-        $number_total = round(collect(explode(',', $this->footer_color))->sum() / 3);
-        if ($number_total < 75) {
-            return 'text-gray-200';
-        }
-        return null;
     }
 
     public function getSubMenuAttribute()

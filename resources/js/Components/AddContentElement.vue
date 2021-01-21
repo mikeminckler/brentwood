@@ -1,8 +1,10 @@
 <template>
 
-    <div class="relative z-2 w-full my-4 bg-gray-200 overflow-hidden shadow">
+    <div class="relative z-2 w-full my-4 pt-4 overflow-hidden"
+            :class="border ? 'border-t border-dashed border-gray-400' : ''"
+        >
 
-        <div class="relative flex items-center justify-center w-full flex-wrap">
+        <div class="relative flex items-center bg-gray-200 py-1 shadow justify-center w-full flex-wrap">
             <div class="relative z-2 button mx-2 my-1" @click="add('addTextBlock')">
                 <div class="pr-2"><i class="fas fa-align-justify"></i></div>
                 <div class="whitespace-no-wrap">Text</div>
@@ -51,7 +53,7 @@
 <script>
     export default {
 
-        props: ['sortOrder'],
+        props: ['sortOrder', 'border'],
         data() {
             return {
             }

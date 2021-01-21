@@ -1,13 +1,13 @@
 <template>
 
-    <div class="relative mt-8 form-content-element"
+    <div class="relative mt-8 form-content-element border-dashed border-b border-gray-400"
          :class="contentElement.pivot.unlisted ? 'bg-gray-200 opacity-75' : ''" 
         v-if="contentElement.id >= 1"
     >
 
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
-            <div class="">{{ contentElement.id }}</div>
             <div class="content-element-icons" @click="showAdd = !showAdd" title="Add Content Element After"><i class="fas fa-file-medical"></i></div>
+            <div class="content-element-icons" @click="showTags = !showTags" title="Edit Tags"><i class="fas fa-tag"></i></div>
             <div class="content-element-icons text-green-600 hover:text-green-500" title="Publish Now" @click="publishNow()" v-if="!isPublished"><i class="fas fa-sign-out-alt"></i></div>
             <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!isPublished"><i class="fas fa-clock"></i></div>
             <div class="content-element-icons" v-if="contentElementIndex !== 0" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
@@ -57,7 +57,7 @@
         </div>
 
         <expander :expandable="contentElement.pivot.expandable" :uuid="contentElement.uuid">
-            <div class="" style="min-height: 150px">
+            <div class="" style="min-height: 350px">
                 <component :is="contentElement.type" 
                     :content="contentElement.content"
                     :uuid="contentElement.uuid"
@@ -67,8 +67,14 @@
             </div>
         </expander>
 
+        <transition name="form-tags">
+            <div class="bg-gray-200 px-2 py-1" v-if="showTags || contentElement.tags.length">
+                <form-tags v-model="contentElement.tags" placeholder="Add Tags"></form-tags>
+            </div>
+        </transition>
+
         <transition name="add-content">
-            <add-content-element v-if="showAdd && !last" :sort-order="contentElement.pivot.sort_order" @selected="showAdd = false"></add-content-element>
+            <add-content-element v-if="showAdd && !last" :sort-order="contentElement.pivot.sort_order" @selected="showAdd = false" :border="true"></add-content-element>
         </transition>
 
     </div>
@@ -96,6 +102,7 @@
             'banner-photo': () => import(/* webpackChunkName: "banner-photo" */ '@/Forms/BannerPhoto.vue'),
             'blog-list': () => import(/* webpackChunkName: "blog-list" */ '@/Forms/BlogList.vue'),
             'date-time-picker': () => import(/* webpackChunkName: "date-time-picker" */ '@/Components/DateTimePicker.vue'),
+            'form-tags': () => import(/* webpackChunkName: "form-tags" */ '@/Forms/Tags.vue'),
         },
 
         data() {
@@ -103,6 +110,7 @@
                 showPublishAt: false,
                 showAdd: false,
                 showSaving: false,
+                showTags: false,
                 changedFields: [],
                 saveContent: _.debounce( function() {
                     if (this.filteredChangedFields.length) {
@@ -137,11 +145,16 @@
                     'created_at',
                     'id',
                     'content_id',
+                    'version',
                     'version_id',
                     'content_element_id',
+                    'content',
+                    //'photos',
+                    'banner',
                     'small',
                     'medium',
                     'large',
+                    'contentables',
                     'contentable_id',
                     'contentable_type',
                 ];
@@ -165,6 +178,7 @@
                     // we can't rely on watching the array as it only tracks the keys not the values
                     // the debouncer will take care of it's excessive firing
                     if (!this.preventChanges) {
+                        // you can find this method in the mixin
                         this.saveContent();
                     }
                 },
@@ -210,7 +224,7 @@
         methods: {
 
             findDifferentProperties: function(newObject, oldObject) {
-                 return this.changes(newObject, oldObject);
+                 this.changes(newObject, oldObject);
             },
 
             changes: function(newObject, oldObject) {
@@ -226,11 +240,13 @@
                             }
                         } else {
                             resultKey = value;
-                            console.log(key + '::' + value);
-                            //console.log(typeof value);
-                            if (!this.$lodash.includes(this.changedFields, key) && !this.preventChanges) {
-                                this.changedFields.push(key);
-                            }
+                        }
+
+                        //console.log(key + '::' + value);
+                        //console.log(typeof value);
+
+                        if (!this.$lodash.includes(this.changedFields, key) && !this.preventChanges && !this.$lodash.isInteger(key)) {
+                            this.changedFields.push(key);
                         }
 
                         result[key] = resultKey;
@@ -367,12 +383,12 @@
     0% {
         max-height: 0;
         opacity: 0;
-        @apply my-0;
+        @apply my-0 pt-0;
     }
     100%   {
         max-height: 65px;
         opacity: 1;
-        @apply my-4;
+        @apply my-4 pt-4;
     }
 }
 

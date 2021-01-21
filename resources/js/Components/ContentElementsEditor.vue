@@ -154,7 +154,8 @@
                         sort_order: this.sortOrder,
                         unlisted: 0,
                         expandable: 0,
-                    }
+                    },
+                    tags: [],
                 };
             },
 

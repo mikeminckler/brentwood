@@ -16,9 +16,6 @@
                 @change="$eventer.$emit('save-page')"
             />
         </div>
-
-        <form-tags v-model="tags"></form-tags>
-
     </div>
 
 </template>
@@ -26,56 +23,11 @@
 <script>
     export default {
 
-        data() {
-            return {
-                tags: [],
-            }
-        },
-
-        components: {
-            'form-tags': () => import(/* webpackChunkName: "form-tags" */ '@/Forms/Tags.vue'),
-        },
-
         computed: {
             page() {
                 return this.$store.state.page;
             },
         },
 
-        mounted() {
-            this.setTags();
-        },
-
-        watch: {
-            'page.tags': function() {
-                this.setTags();
-            },
-
-            tags: function() {
-
-                let pageTagIds = this.$lodash.map(this.page.tags, t => {
-                    return t.id;
-                });
-
-                let tagIds = this.$lodash.map(this.tags, t => {
-                    return t.id;
-                });
-
-                if (!this.$lodash.isEqual(pageTagIds, tagIds)) {
-                    this.page.tags = this.tags;
-                    this.$eventer.$emit('save-page');
-                }
-
-            }
-        },
-
-        methods: {
-
-            setTags: function() {
-                this.tags = this.$lodash.cloneDeep(this.page.tags);
-            },
-
-        },
-        
     }
 </script>

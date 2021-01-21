@@ -15,7 +15,9 @@ use App\Traits\AppendAttributesTrait;
 use App\Traits\VersioningTrait;
 use App\Traits\SlugTrait;
 use App\Traits\TagsTrait;
+use App\Traits\HasFooterTrait;
 
+use App\Models\Page;
 use App\Models\Tag;
 
 class Blog extends Model
@@ -27,6 +29,7 @@ class Blog extends Model
     use VersioningTrait;
     use SlugTrait;
     use TagsTrait;
+    use HasFooterTrait;
 
     protected $dates = ['publish_at'];
 
@@ -141,5 +144,34 @@ class Blog extends Model
         ->sortByDesc(function($blog) {
             return $blog->published_at;
         })->first();
+    }
+
+    public function getFooterFgPhoto() 
+    {
+        $value = $this->footerFgPhoto;   
+        if ($value) {
+            return $value;
+        } else {
+            return Page::find(1)->footerFgPhoto;   
+        }
+    }
+
+    public function getFooterBgPhoto() 
+    {
+        $value = $this->footerBgPhoto;   
+        if ($value) {
+            return $value;
+        } else {
+            return Page::find(1)->footerBgPhoto;   
+        }
+    }
+
+    public function getFooterColorAttribute($value)
+    {
+        if ($value) {
+            return $value;
+        } else {
+            return Page::find(1)->footer_color;   
+        }
     }
 }

@@ -27,6 +27,7 @@ class PagesSeeder extends Seeder
 
         $inquiry = new Page;
         $inquiry->name = 'Inquiry';
+        $inquiry->slug = 'inquiry';
         $inquiry->parent_page_id = 1;
         $inquiry->sort_order = 1;
         $inquiry->unlisted = true;

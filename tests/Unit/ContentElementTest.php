@@ -13,9 +13,22 @@ use App\Models\Page;
 use App\Models\Version;
 use App\Models\Blog;
 
+use Tests\Unit\TagsTrait;
+
 class ContentElementTest extends TestCase
 {
     use WithFaker;
+    use TagsTrait;
+
+    protected function getClassname()
+    {
+        return 'content-element';
+    }
+
+    protected function getModel()
+    {
+        return $this->createContentElement(TextBlock::factory());
+    }
 
     /** @test **/
     public function a_content_element_can_be_created_from_the_saveContentElement_function()

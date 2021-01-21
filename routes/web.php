@@ -22,6 +22,7 @@ use App\Http\Controllers\PhotosController;
 use App\Http\Controllers\FileUploadsController;
 use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\TagsController;
+use App\Http\Controllers\InquiriesController;
 
 //Auth::routes();
 
@@ -86,8 +87,15 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('/tags/search', [TagsController::class, 'search'])->name('tags.search');
     Route::post('/tags/create', [TagsController::class, 'store'])->name('tags.store');
+
+    Route::get('/inquiries', [InquiriesController::class, 'index'])->name('inquiries.index');
 });
 
 Route::post('/blogs', [BlogsController::class, 'index'])->name('blogs.index');
 Route::get('/blogs/{page}', [BlogsController::class, 'load'])->name('blogs.load')->where('page', '.*');
+
+Route::get('/inquiry', [InquiriesController::class, 'create'])->name('inquiries.create');
+Route::post('/inquiry', [InquiriesController::class, 'store'])->name('inquiries.store');
+Route::get('/inquiry/{id}', [InquiriesController::class, 'view'])->name('inquiries.view')->where('id', '\d+');
+
 Route::get('{page}', [PagesController::class, 'load'])->name('pages.load')->where('page', '.*');

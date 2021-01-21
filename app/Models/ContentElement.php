@@ -18,12 +18,15 @@ use App\Models\TextBlock;
 use App\Events\ContentElementSaved;
 use App\Events\ContentElementCreated;
 
+use App\Traits\TagsTrait;
+
 class ContentElement extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    use TagsTrait;
 
-    protected $with = ['content', 'contentables', 'contentables.version'];
+    protected $with = ['content', 'contentables', 'contentables.version', 'tags'];
     protected $appends = ['type'];
     protected $dates = ['publish_at'];
 
@@ -80,6 +83,8 @@ class ContentElement extends Model
         $content_element->publish_at = Arr::get($input, 'publish_at');
 
         $content_element->save();
+
+        $content_element->saveTags($input);
 
         // assign or update the content element to the contentable
 

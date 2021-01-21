@@ -1,30 +1,27 @@
 <template>
 
-    <div class="">
-        <div class="mt-2">
-            <autocomplete
-                url="/tags/search"
-                v-model="tags"
-                name="tags"
-                :multiple="true"
-                dusk="page-tags"
-                @remove="removeTag($event)"
-                placeholder="Add Tag"
-                :hideLabel="true"
-                model="tag"
-                :flex="true"
-                :add="true"
-                add-url="/tags/create"
-            ></autocomplete>
-        </div>
-    </div>
+    <autocomplete
+        url="/tags/search"
+        v-model="tags"
+        name="tags"
+        :multiple="true"
+        dusk="page-tags"
+        @remove="removeTag($event)"
+        :placeholder="placeholder ? placeholder : 'Add Tag'"
+        :hideLabel="true"
+        :no-margin="true"
+        model="tag"
+        :flex="true"
+        :add="true"
+        add-url="/tags/create"
+    ></autocomplete>
 
 </template>
 
 <script>
     export default {
 
-        props: ['value'],
+        props: ['value', 'placeholder'],
 
         components: {
             'autocomplete': () => import(/* webpackChunkName: "autocomplete" */ '@/Components/Autocomplete'),

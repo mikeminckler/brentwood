@@ -60,7 +60,9 @@ class Tag extends Model
             $tag = new Tag;
         }
 
-        $tag->name = Str::title(Arr::get($input, 'name'));
+        if (!$tag->protected) {
+            $tag->name = Str::title(Arr::get($input, 'name'));
+        }
         $tag->save();
 
         return $tag;

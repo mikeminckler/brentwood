@@ -41,11 +41,6 @@ class InquiriesController extends Controller
         return view('inquiries.index');
     }
 
-    public function create() 
-    {
-        return $this->load();
-    }
-
     public function store(InquiryValidation $request, $id = null) 
     {
         $inquiry = (new Inquiry)->saveInquiry(requestInput(), $id);
@@ -66,9 +61,22 @@ class InquiriesController extends Controller
 
         $page = Inquiry::findPage();
 
-        $content_elements = $page->published_content_elements;
+        $content_elements = $page->published_content_elements
+                                 ->filter(function($content_element) use ($inquiry) {
+                                    if (!$content_element->tags->count()) {
+                                        return true;
+                                    }
+                                    return $inquiry->tags->intersect($content_element->tags)->count();
+                                 });
 
         return view('inquiries.view', compact('page', 'content_elements', 'inquiry'));
+    }
+
+    public function tags() 
+    {
+        return response()->json([
+            'tags' => Inquiry::getTags(),
+        ]);   
     }
 
 }

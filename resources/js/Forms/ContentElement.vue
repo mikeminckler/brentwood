@@ -7,7 +7,6 @@
 
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
             <div class="content-element-icons" @click="showAdd = !showAdd" title="Add Content Element After"><i class="fas fa-file-medical"></i></div>
-            <div class="content-element-icons" @click="showTags = !showTags" title="Edit Tags"><i class="fas fa-tag"></i></div>
             <div class="content-element-icons text-green-600 hover:text-green-500" title="Publish Now" @click="publishNow()" v-if="!isPublished"><i class="fas fa-sign-out-alt"></i></div>
             <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!isPublished"><i class="fas fa-clock"></i></div>
             <div class="content-element-icons" v-if="contentElementIndex !== 0" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
@@ -68,7 +67,7 @@
         </expander>
 
         <transition name="form-tags">
-            <div class="bg-gray-200 px-2 py-1" v-if="showTags || contentElement.tags.length">
+            <div class="bg-gray-200 px-2 py-1">
                 <form-tags v-model="contentElement.tags" placeholder="Add Tags"></form-tags>
             </div>
         </transition>
@@ -110,7 +109,6 @@
                 showPublishAt: false,
                 showAdd: false,
                 showSaving: false,
-                showTags: false,
                 changedFields: [],
                 saveContent: _.debounce( function() {
                     if (this.filteredChangedFields.length) {
@@ -142,21 +140,18 @@
                 let ignore = [
                     'published_at',
                     'updated_at',
-                    'created_at',
-                    'id',
-                    'content_id',
-                    'version',
-                    'version_id',
-                    'content_element_id',
-                    'content',
-                    //'photos',
-                    'banner',
-                    'small',
-                    'medium',
-                    'large',
-                    'contentables',
-                    'contentable_id',
-                    'contentable_type',
+                    //'created_at',
+                    //'id',
+                    //'content_id',
+                    //'version',
+                    //'version_id',
+                    //'content_element_id',
+                    //'small',
+                    //'medium',
+                    //'large',
+                    //'contentables',
+                    //'contentable_id',
+                    //'contentable_type',
                 ];
                 return this.changedFields.filter( f => {
                     return ignore.indexOf(f) < 0;
@@ -224,7 +219,27 @@
         methods: {
 
             findDifferentProperties: function(newObject, oldObject) {
-                 this.changes(newObject, oldObject);
+                let changes = this.changes(newObject, oldObject);
+
+                this.pushChangesKeys(changes);
+
+                console.log('DETECTING CHANGES');
+                console.log(this.changedFields);
+
+            },
+
+            pushChangesKeys: function(item) {
+
+                this.$lodash.forOwn(item, (value, key) =>  {
+                    if (this.$lodash.isObject(value)) {
+                        this.pushChangesKeys(value);
+                    } else {
+                        if (!this.$lodash.includes(this.changedFields, key) && !this.preventChanges) {
+                            this.changedFields.push(key);
+                        }
+                    }
+                });
+
             },
 
             changes: function(newObject, oldObject) {
@@ -235,18 +250,9 @@
                         let resultKey;
 
                         if (this.$lodash.isObject(value) && this.$lodash.isObject(oldObject[key])) {
-                            if (key !== 'version') {
-                                resultKey = this.changes(value, oldObject[key]);
-                            }
+                            resultKey = this.changes(value, oldObject[key]);
                         } else {
                             resultKey = value;
-                        }
-
-                        //console.log(key + '::' + value);
-                        //console.log(typeof value);
-
-                        if (!this.$lodash.includes(this.changedFields, key) && !this.preventChanges && !this.$lodash.isInteger(key)) {
-                            this.changedFields.push(key);
                         }
 
                         result[key] = resultKey;

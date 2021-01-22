@@ -63,9 +63,7 @@ class Page extends Model
         $protect_page = false;
         if ($id) {
             $page = Page::findOrFail($id);
-            if ($page->slug === '/' || $page->slug === 'inquiry') {
-                $protect_page = true;
-            }
+            $protect_page = $page->protected;
         } else {
             $page = new Page;
         }

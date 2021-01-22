@@ -13,6 +13,13 @@ class InquiryValidation extends FormRequest
      */
     public function authorize()
     {
+
+        if ($this->route('id')) {
+            if (! request()->hasValidSignature()) {
+                return false;
+            }
+        }
+
         return true;
     }
 

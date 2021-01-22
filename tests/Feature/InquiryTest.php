@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Page;
 use App\Models\Inquiry;
 use App\Models\Tag;
+use App\Models\TextBlock;
 
 class InquiryTest extends TestCase
 {
@@ -81,6 +82,41 @@ class InquiryTest extends TestCase
         $this->assertEquals(2, $inquiry_page->id);
     }
 
+    /** @test **/
+    public function the_inquiry_content_page_important_fields_cannot_be_changed()
+    {
+        $fake_page = Page::factory()->create();
+        $inquiry_page = Page::where('slug', 'inquiry-content')->first();
+        $this->assertInstanceOf(Page::class, $inquiry_page);
+
+        $inquiry_page_slug = $inquiry_page->slug;
+        $inquiry_page_parent_page_id = $inquiry_page->parent_page_id;
+
+        $this->signInAdmin();
+
+        $input = [
+            'name' => $this->faker->firstName,
+            'slug' => $this->faker->firstName,
+            'parent_page_id' => $fake_page->id,
+            'sort_order' => $this->faker->numberBetween(10, 100),
+        ];
+
+        $this->assertTrue($inquiry_page->id === 3);
+        $this->assertTrue(Str::contains(route('pages.update', ['id' => $inquiry_page->id]), 3));
+
+        $this->json('POST', route('pages.update', ['id' => $inquiry_page->id]), $input)
+            ->assertJsonFragment([
+                'success' => 'Page Saved',
+            ])
+            ->assertSuccessful();
+
+        $inquiry_page->refresh();
+
+        $this->assertEquals($inquiry_page_slug, $inquiry_page->slug);
+        $this->assertEquals($inquiry_page_parent_page_id, $inquiry_page->parent_page_id);
+        $this->assertEquals(3, $inquiry_page->id);
+    }
+
     // an inquiry can be created
     /** @test **/
     public function an_inquiry_can_be_created()
@@ -131,6 +167,46 @@ class InquiryTest extends TestCase
         $this->assertNotNull($inquiry->url);
     }
 
+    /** @test **/
+    public function an_inquiry_can_be_updated()
+    {
+        $inquiry = Inquiry::factory()->has(Tag::factory()->count(3))->create();
+        $tag = Tag::factory()->create();
+
+        $this->json('POST', route('inquiries.view', ['id' => $inquiry->id]), [])
+            ->assertStatus(403);
+
+        $this->json('POST', $inquiry->url, [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                'name',
+                'email',
+                'target_grade',
+                'target_year',
+                'student_type',
+             ]);
+        
+        $input = Inquiry::factory()->raw();
+        $input['tags'] = [ $tag ];
+
+        $this->json('POST', $inquiry->url, $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Inquiry Saved',
+            ]);
+
+        $inquiry->refresh();
+        $this->assertEquals(Arr::get($input, 'name'), $inquiry->name);
+        $this->assertEquals(Arr::get($input, 'email'), $inquiry->email);
+        $this->assertEquals(Arr::get($input, 'phone'), $inquiry->phone);
+        $this->assertEquals(Arr::get($input, 'target_grade'), $inquiry->target_grade);
+        $this->assertEquals(Arr::get($input, 'target_year'), $inquiry->target_year);
+        $this->assertEquals(Arr::get($input, 'student_type'), $inquiry->student_type);
+
+        $this->assertEquals(1, $inquiry->tags->count());
+        $this->assertTrue($inquiry->tags->contains('id', $tag->id));
+    }
+
     // an inquiry can be viewed
 
     /** @test **/
@@ -166,8 +242,62 @@ class InquiryTest extends TestCase
         
     }
 
-    // an inquiry has a user....
+    /** @test **/
+    public function untagged_content_elements_always_show_on_the_inquiry_page()
+    {
+        $inquiry_page = Inquiry::findPage();
+        // clear out old content elements
+        $inquiry_page->contentElements()->delete();
+        $inquiry_page->refresh();
+        $this->assertEquals(0, $inquiry_page->contentElements->count());
 
-    // global inquiry content always show
-    // tagged content can be filtered by selection
+        // create new content elements
+        $content_element_start = $this->createContentElement(TextBlock::factory(), $inquiry_page);
+        $tagged_content_element = $this->createContentElement(TextBlock::factory(), $inquiry_page);
+        $tag = Tag::factory()->create();
+        $tagged_content_element->addTag($tag);
+        $content_element_end = $this->createContentElement(TextBlock::factory(), $inquiry_page);
+
+        $this->assertEquals(1, $tagged_content_element->tags()->count());
+
+        $inquiry_page->publish();
+
+        $this->assertEquals(3, $inquiry_page->published_content_elements->count());
+
+        $inquiry = Inquiry::factory()->create();
+
+        $this->get($inquiry->url)
+            ->assertSee($content_element_start->content->body)
+            ->assertDontSee($tagged_content_element->content->body)
+            ->assertSee($content_element_end->content->body);
+
+        $inquiry->addTag($tag);
+
+        $inquiry->refresh();
+
+        $this->get($inquiry->url)
+            ->assertSee($content_element_start->content->body)
+            ->assertSee($tagged_content_element->content->body)
+            ->assertSee($content_element_end->content->body);
+
+    }
+    
+    /** @test **/
+    public function inquiry_tags_can_be_loaded()
+    {
+        $inquiry_page = Inquiry::findPage();
+        $tag = Tag::factory()->create();
+        $content_element = $this->createContentElement(TextBlock::factory(), $inquiry_page);
+        $content_element->addTag($tag);
+
+        $inquiry_page->publish();
+        $this->assertTrue(Inquiry::getTags()->contains('id', $tag->id));
+
+        $this->json('GET', route('inquiries.tags'))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'name' => $tag->name,
+                'id' => $tag->id,
+             ]);
+    }
 }

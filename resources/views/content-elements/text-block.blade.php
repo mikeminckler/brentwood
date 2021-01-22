@@ -7,7 +7,7 @@
 
         <div class="flex-2 justify-center {{ $content->photos->count() ? 'md:flex' : 'flex' }} {{ !$content->photos->count() && $content->style ? 'text-style-'.$content->style : '' }}">
 
-            <div class="{{ $content->full_width ? 'px-8 md:px-12 pt-4 w-full' : 'text-block' }} relative {{ $content->style ? 'pt-8' : '' }}">
+            <div class="{{ $content->full_width ? 'px-8 md:px-12 pt-4 w-full' : 'text-block' }} relative z-4{{ $content->style ? 'pt-8' : '' }}">
                 <h{{ $first ? '1' : '2'}}>{{ $content->header }}</h{{ $first ? '1': '2' }}>
             </div>
 
@@ -34,7 +34,7 @@
 
     <div class="flex-2 justify-center {{ $content->photos->count() || ($content->stat_number && $content->stat_name) ? 'md:flex' : 'flex' }} {{ !$content->photos->count() && $content->style ? 'text-style-'.$content->style : '' }}">
 
-        <div class="{{ $content->full_width ? 'pb-8 px-8 md:px-12 columns-2' : 'text-block' }} relative {{ $content->style ? 'pb-8' : '' }}">
+        <div class="{{ $content->full_width ? 'pb-8 px-8 md:px-12 columns-2' : 'text-block' }} relative z-4 {{ $content->style ? 'pb-8' : '' }}">
             <div class="body">
                 {!! $content->body !!}
             </div>

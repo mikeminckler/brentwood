@@ -22,7 +22,13 @@
         @endif
 
         @if ($index === 0 && $content_element->type !== 'text-block')
+
             @include ('sub-menu')
+
+            @if (isset($inquiry))
+                @include ('inquiries.personalized')
+            @endif
+
         @endif 
 
     @endforeach

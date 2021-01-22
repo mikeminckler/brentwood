@@ -6,7 +6,7 @@
         <div class="flex-2">
 
             <div class="flex items-center justify-center w-full">
-                <div class="form my-4 max-w-sm bg-gray-100 border border-gray-200 px-8 py-4 rounded-lg overflow-hidden">
+                <div class="form max-w-sm bg-gray-100 border border-gray-200 px-8 py-4 rounded-lg overflow-hidden">
 
                     <transition-group :name="transitionDirection" tag="div" class="relative mt-8 first:mt-0">
 
@@ -65,25 +65,52 @@
                         </div>
 
                         <div class="" key="step3" v-if="currentStep === 3">
-                            <div class="">The applicant is most interested in</div>
+                            <div class="">Let us know what you are interested in</div>
 
-                            <div class="">
+                            <div class="flex items-center flex-wrap">
 
-                                <div class="" v-for="category in categories">{{ category }}</div>
+                                <div class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap" 
+                                     :class="$lodash.find(form.tags, tag) ? 'bg-primary text-white font-bold' : 'bg-gray-200 hover:bg-white'"
+                                    v-for="tag in filteredTags"
+                                    :key="'tag-' + tag.id"
+                                    @click="toggleTag(tag)"
+                                >{{ tag.name }}</div>
 
                             </div>
+
                         </div>
 
                         <div class="" key="step4" v-if="currentStep === 4">
+
                             <div class="mt-4">
-                                <div class="text-gray-500 text-sm">Contact Name</div>
-                                <div class="">{{ form.name }}</div>
 
-                                <div class="text-gray-500 text-sm mt-2">Contact Email</div>
-                                <div class="">{{ form.email }}</div>
+                                <h2>Review Information</h2>
 
-                                <div class="text-gray-500 text-sm mt-2">Contact Phone Number</div>
-                                <div class="">{{ form.phone }}</div>
+                                <div class="mt-4">
+                                    <div class="text-gray-500 text-sm">Contact Name</div>
+                                    <div class="">{{ form.name }}</div>
+
+                                    <div class="text-gray-500 text-sm mt-2">Contact Email</div>
+                                    <div class="">{{ form.email }}</div>
+
+                                    <div class="text-gray-500 text-sm mt-2">Contact Phone Number</div>
+                                    <div class="">{{ form.phone }}</div>
+
+                                    <div class="text-gray-500 text-sm mt-2">Start Year</div>
+                                    <div class="">{{ form.target_year }}-{{ form.target_year + 1 }}</div>
+
+                                    <div class="text-gray-500 text-sm mt-2">Start Grade</div>
+                                    <div class="">Grade {{ form.target_grade }}</div>
+
+                                    <div class="text-gray-500 text-sm mt-2">Student Type</div>
+                                    <div class="">{{ form.student_type }}</div>
+
+                                    <div class="text-gray-500 text-sm mt-2" v-if="filteredFormTags.length">Interests</div>
+                                    <div class="">
+                                        <div class="" v-for="tag in filteredFormTags">{{ tag.name }}</div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
@@ -97,7 +124,7 @@
 
                         <div class="flex flex-1 mx-2">
                             <div class="mx-2 transition transition-all" 
-                                 :class="[validateStep(step) ? 'text-green-500 hover:text-green-400 cursor-pointer' : (currentStep === step ? 'text-gray-600' : 'text-gray-300'), step === steps.length ? 'hidden' : '']"
+                                 :class="[validateStep(step) ? 'text-green-500 hover:text-green-400 cursor-pointer' : (currentStep === step ? 'text-gray-600' : 'text-gray-300'), step > 2 ? 'hidden' : '']"
                                  v-for="step in steps"
                                  @click="goToStep(step)"
                             >
@@ -141,16 +168,17 @@
                 steps: [1,2,3,4],
                 types: ['Boarding', 'Day'],
 
-                categories: [],
+                tags: [],
 
                 form: {
                     name: '',
                     email: '',
                     phone: '',
-                    target_grade: '',
-                    target_year: '',
-                    student_type: '',
-                    gender: '',
+                    target_grade: null,
+                    target_year: null,
+                    student_type: null,
+                    tags: [],
+                    //gender: '',
                 },
 
                 grades: [8,9,10,11,12],
@@ -204,10 +232,61 @@
                 });
 
                 return valid;
-            }
+            },
+
+            filteredTags() {
+                return this.$lodash.filter(this.tags, tag => {
+                    return tag.name !== 'Boarding Student' && tag.name !== 'Day Student';
+                });
+            },
+
+            filteredFormTags() {
+                return this.$lodash.filter(this.form.tags, tag => {
+                    return tag.name !== 'Boarding Student' && tag.name !== 'Day Student';
+                });
+            },
+
+            boardingTag() {
+                return this.$lodash.find(this.tags, tag => {
+                    return tag.name === 'Boarding Student';
+                });
+            },
+
+            dayTag() {
+                return this.$lodash.find(this.tags, tag => {
+                    return tag.name === 'Day Student';
+                });
+            },
+        },
+
+        mounted() {
+            this.loadTags();
         },
 
         watch: {
+            'form.student_type': function() {
+
+                if (this.form.student_type === 'Boarding') {
+                    if (!this.$lodash.find(this.form.tags, this.boardingTag)) {
+                        this.form.tags.push(this.boardingTag);
+                    }
+                    let index = this.$lodash.findIndex(this.form.tags, this.dayTag);
+                    if (index >= 0) {
+                        this.form.tags.splice(index, 1);
+                    }
+                }
+
+                if (this.form.student_type === 'Day') {
+                    if (!this.$lodash.find(this.form.tags, this.dayTag)) {
+                        this.form.tags.push(this.dayTag);
+                    }
+                    let index = this.$lodash.findIndex(this.form.tags, this.boardingTag);
+                    if (index >= 0) {
+                        this.form.tags.splice(index, 1);
+                    }
+                }
+
+            },
         },
 
         methods: {
@@ -227,7 +306,7 @@
                 }
 
                 if (step === 3) {
-                    return true;
+                    return this.validateStep(2);
                 }
 
                 if (step === 4) {
@@ -279,6 +358,20 @@
                     this.processErrors(error.response);
                 });
 
+            },
+
+            loadTags: function() {
+
+                this.$http.get('/inquiry/tags').then( response => {
+                    this.tags = response.data.tags;
+                }, error => {
+                    this.processErrors(error.response);
+                });
+
+            },
+
+            toggleTag: function(tag) {
+                this.form.tags = this.$lodash.xor(this.form.tags, [tag]);
             }
         },
 

@@ -16,6 +16,10 @@ class TagsSeeder extends Seeder
     public function run()
     {
         $names = collect([
+
+            'Boarding Student',
+            'Day Student',
+
              //"Torch - Featured",
              //"Torch Issue 35",
              //"Torch - Arts",
@@ -117,7 +121,7 @@ class TagsSeeder extends Seeder
              //"Torch Issue 38",
              //"The Torch",
              "Golf",
-        ])->sort();
+        ]);
 
         foreach ($names as $name) {
             $tag = new Tag;

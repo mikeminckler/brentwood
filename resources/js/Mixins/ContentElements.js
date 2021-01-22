@@ -35,7 +35,7 @@ export default {
 
                 this.$http.post(url, contentElement).then( response => {
 
-                    //console.log('SAVING COMPLETE CE: ' + savingId);
+                    console.log('SAVING COMPLETE CE: ' + savingId);
 
                     this.$store.dispatch('completeSaving', savingId);
 
@@ -56,15 +56,15 @@ export default {
 
         updateContentElement: function(oldContentElement, newContentElement) {
             this.preventChanges = true;
-            //console.log('PREVENT ON');
-            //console.log('MERGING: ' + oldContentElement.id);
+            console.log('PREVENT ON');
+            console.log('MERGING: ' + oldContentElement.id);
             //console.log(newContentElement);
             this.$lodash.mergeWith(oldContentElement, newContentElement);
             //this.changedFields = [];
 
             this.$nextTick(() => {
                 this.preventChanges = false;
-                //console.log('PREVENT OFF');
+                console.log('PREVENT OFF');
             });
 
         },

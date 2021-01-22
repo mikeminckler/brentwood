@@ -48,17 +48,37 @@ class Inquiry extends Model
 
     public static function findPage() 
     {
-        return Page::where('slug', 'inquiry')->first();
+        return Page::where('slug', 'inquiry-content')->first();
     }
 
     public static function getTags() 
     {
-        return self::findPage()
+        
+        $tags = self::findPage()
                     ->published_content_elements
                     ->map(function($content_element) {
                         return $content_element->tags;
                     })
-                    ->flatten()
-                    ->unique();
+                    ->flatten();
+
+        $boarding_tag = Tag::where('name', 'Boarding Student')->first();
+        $day_tag = Tag::where('name', 'Day Student')->first();
+
+        $tags->push($boarding_tag);
+        $tags->push($day_tag);
+
+        return $tags->unique(function($tag) {
+                    return $tag->id;
+                });
+    }
+
+    public function getFilteredTagsAttribute() 
+    {
+        $boarding_tag = Tag::where('name', 'Boarding Student')->first();
+        $day_tag = Tag::where('name', 'Day Student')->first();
+
+        return $this->tags->filter(function($tag) use ($boarding_tag, $day_tag) {
+            return $tag->id !== $boarding_tag->id && $tag->id !== $day_tag->id;
+        });
     }
 }

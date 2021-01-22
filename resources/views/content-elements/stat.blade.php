@@ -5,7 +5,7 @@
 @endif
 >
     <div class="flex flex-col items-center justify-center">
-        <div class="font-oswald font-normal leading-none whitespace-nowrap {{ strlen($number) > 7 ? 'text-4xl' : 'text-6xl' }}">{!! preg_match('/[0-9]/', $number) === 1 ? ( preg_replace('/\d+/', '<span class="md:text-8xl">$0</span>', preg_replace('/\D+/', '<span class="">$0</span>', $number))) : $number !!}</div>
+        <div class="font-oswald font-normal leading-none whitespace-nowrap text-6xl">{!! preg_match('/[0-9]/', $number) === 1 ? ( preg_replace('/\d+/', '<span class="md:text-8xl">$0</span>', preg_replace('/\D+/', '<span class="">$0</span>', $number))) : $number !!}</div>
         <div class="font-oswald text-xl md:text-3xl text-center">{{ $name }}</div>
         <div class="h-1 w-16 my-2 {{ $photo ? 'bg-white drop-shadow' : 'bg-gray-400' }}"></div>
     </div>

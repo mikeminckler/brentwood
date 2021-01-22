@@ -85,7 +85,7 @@
 
                 <div v-if="first" class="h-1 w-16 bg-gray-400 my-4"></div>
 
-                <div class="flex">
+                <div class="flex relative z-3">
                     <div class="text-xl w-6 h-6 p-1 flex items-center justify-center bg-transparent cursor-pointer" title="Background Transparent" @click="content.style = ''"><i class="fas fa-ban"></i></div>
                     <div class="w-6 h-6 bg-white cursor-pointer" title="Background White" @click="content.style = 'white'"></div>
                     <div class="w-6 h-6 bg-gray-200 cursor-pointer" title="Background Grey" @click="content.style = 'gray'"></div>

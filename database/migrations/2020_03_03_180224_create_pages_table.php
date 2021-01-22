@@ -26,6 +26,7 @@ class CreatePagesTable extends Migration
             $table->unsignedBigInteger('footer_fg_photo_id')->nullable();
             $table->unsignedBigInteger('footer_bg_photo_id')->nullable();
             $table->dateTime('publish_at')->nullable();
+            $table->boolean('protected')->default(false);
             $table->softDeletes();
             $table->timestamps();
         });

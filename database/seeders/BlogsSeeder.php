@@ -228,6 +228,7 @@ class BlogsSeeder extends Seeder
                 'alt' => "",
                 'description' => "",
                 'file_upload' => $file_upload,
+                'file_upload_id' => $file_upload->id,
                 'fill' => true,
                 'id' => 0,
                 'large' => null,

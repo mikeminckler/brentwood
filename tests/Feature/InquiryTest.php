@@ -21,7 +21,7 @@ class InquiryTest extends TestCase
     use WithFaker;
 
     /** @test **/
-    public function the_inquiry_index_can_be_loaded()
+    public function the_inquiries_index_can_be_loaded()
     {
         $this->get(route('inquiries.index'))
             ->assertStatus(302);
@@ -298,6 +298,33 @@ class InquiryTest extends TestCase
              ->assertJsonFragment([
                 'name' => $tag->name,
                 'id' => $tag->id,
+             ]);
+    }
+
+    /** @test **/
+    public function inquiries_can_be_loaded_for_pagination()
+    {
+        $inquiry = Inquiry::factory()->create();
+
+        $this->assertInstanceOf(Inquiry::class, $inquiry);
+
+        $this->json('GET', route('inquiries.index'))
+            ->assertStatus(401);
+
+        $this->signIn(User::factory()->create());
+
+        $this->json('GET', route('inquiries.index'))
+            ->assertStatus(403);
+
+        $this->signInAdmin();
+        session()->put('editing', true);
+
+        $this->withoutExceptionHandling();
+        $this->json('GET', route('inquiries.index'))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                 'name' => $inquiry->name,
+                 'email' => $inquiry->email,
              ]);
     }
 }

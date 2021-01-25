@@ -33,7 +33,7 @@
 
         props: ['item'],
 
-        ata() {
+        data() {
             return {
             
             }

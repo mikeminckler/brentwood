@@ -4,6 +4,11 @@
         <div class="pr-2"><i class="fas fa-blog"></i></div>
         <div class="">Blogs</div>
     </a>
+
+    <a href="/inquiries" class="side-menu-link" >
+        <div class="pr-2"><i class="fas fa-question-circle"></i></div>
+        <div class="">Inquiries</div>
+    </a>
     
     <a href="/users" class="side-menu-link">
         <div class="pr-2"><i class="fas fa-users"></i></div>

@@ -6,7 +6,7 @@
 
             <h1>Inquiries</h1>
 
-            <div class="">
+            <div class="mt-4">
                 <paginator resource="inquiries" @selected="viewInquiry($event)"></paginator>
             </div>
 

@@ -6,6 +6,7 @@
     >
 
         <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
+            <div class="">{{ contentElement.pivot.sort_order }}</div>
             <div class="content-element-icons" @click="showAdd = !showAdd" title="Add Content Element After"><i class="fas fa-file-medical"></i></div>
             <div class="content-element-icons text-green-600 hover:text-green-500" title="Publish Now" @click="publishNow()" v-if="!isPublished"><i class="fas fa-sign-out-alt"></i></div>
             <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!isPublished"><i class="fas fa-clock"></i></div>
@@ -73,7 +74,7 @@
         </transition>
 
         <transition name="add-content">
-            <add-content-element v-if="showAdd && !last" :sort-order="contentElement.pivot.sort_order" @selected="showAdd = false" :border="true"></add-content-element>
+            <add-content-element v-if="showAdd && !last" :sort-order="contentElement.pivot.sort_order + 1" @selected="showAdd = false" :border="true"></add-content-element>
         </transition>
 
     </div>

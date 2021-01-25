@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Inquiry;
 use App\Models\Page;
+use App\Utilities\Paginate;
 
 use App\Http\Requests\InquiryValidation;
 
@@ -34,11 +35,21 @@ class InquiriesController extends Controller
 
     public function index() 
     {
-        if (!auth()->user()->can('viewAny', Inquiry::class)) {
-            return redirect('/')->with(['error' => 'You do not have permission to view that page']);
+        if (auth()->user()) {
+            if (!auth()->user()->can('viewAny', Inquiry::class)) {
+                if (request()->expectsJson()) {
+                    return response()->json(['error' => 'You do not have permission load inquiries'], 403);
+                } else {
+                    return redirect('/')->with('error', 'You do not have access to view Inquiries');
+                }
+            }
         }
 
-        return view('inquiries.index');
+        if (request()->expectsJson()) {
+            return Paginate::create(Inquiry::all());
+        } else {
+            return view('inquiries.index');
+        }
     }
 
     public function store(InquiryValidation $request, $id = null) 

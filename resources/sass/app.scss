@@ -366,6 +366,10 @@ div.cell {
     grid-template-columns: 1fr 200px 200px 100px;
 }
 
+.grid-inquiries {
+    grid-template-columns: 32px 1fr auto auto auto auto auto auto;
+}
+
 .ignore {
     display: contents;
 

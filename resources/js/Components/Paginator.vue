@@ -12,6 +12,8 @@
              ></component>
         </div>
 
+        <div class="mt-4" v-if="!paginator.data.length">There are no items to view.</div>
+
         <div class="flex justify-center">
             <transition-group
                 class="flex items-center justify-center"
@@ -65,13 +67,16 @@
 
         components: {
             'blogs-row': () => import(/* webpackChunkName: "blogs-row" */ '@/Models/BlogsRow.vue'),
+            'inquiries-row': () => import(/* webpackChunkName: "inquiries-row" */ '@/Models/InquiriesRow.vue'),
         },
 
         data() {
             return {
                 page: 1,
                 count: 15,
-                paginator: {},
+                paginator: {
+                    data: [],
+                },
                 terms: '',
                 fields: [],
                 sort: '',

@@ -89,7 +89,7 @@
             addContentElement: function(data) {
 
                 this.$lodash.each(this.contentElements, ce => {
-                    if (ce.pivot.sort_order > data.sortOrder) {
+                    if (ce.pivot.sort_order >= data.sortOrder) {
                         ce.pivot.sort_order++;
                     }
                 });
@@ -108,7 +108,7 @@
 
             sortUp: function(contentElement) {
 
-                if (contentElement.pivot.sort_order > 1) {
+                if (contentElement.pivot.sort_order > 0) {
                     let currentIndex = this.$lodash.findIndex(this.sortedContentElements, ce => {
                         return contentElement.id === ce.id;
                     });

@@ -68,6 +68,7 @@
         components: {
             'blogs-row': () => import(/* webpackChunkName: "blogs-row" */ '@/Models/BlogsRow.vue'),
             'inquiries-row': () => import(/* webpackChunkName: "inquiries-row" */ '@/Models/InquiriesRow.vue'),
+            'livestreams-row': () => import(/* webpackChunkName: "livestreams-row" */ '@/Models/LivestreamsRow.vue'),
         },
 
         data() {

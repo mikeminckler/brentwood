@@ -4,7 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PageAccessValidation extends FormRequest
+use App\Models\Permission;
+
+class PermissionValidation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,8 +15,15 @@ class PageAccessValidation extends FormRequest
      */
     public function authorize()
     {
-        // TODO can probably replace this with a policy
-        return auth()->user()->hasRole('admin');
+        if (!auth()->check()) {
+            return false;
+        }
+
+        if ($this->route('id')) {
+            $permission = Permission::findorFail($this->route('id'));
+            return $this->user()->can('update', $permission);
+        }
+        return $this->user()->can('create', Permission::class);
     }
 
     /**
@@ -25,7 +34,8 @@ class PageAccessValidation extends FormRequest
     public function rules()
     {
         return [
-            'page_id' => 'required|exists:pages,id',
+            'objectable_id' => 'required',
+            'objectable_type' => 'required',
             'users' => 'required_without:roles',
             'roles' => 'required_without:users',
             'users.*.id' => 'exists:users,id',

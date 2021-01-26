@@ -386,7 +386,7 @@ class PageTest extends TestCase
     }
 
     /** @test **/
-    public function a_user_without_update_permisson_cannot_save_a_page()
+    public function a_user_without_update_permission_cannot_save_a_page()
     {
         $page = Page::factory()->create();
         $user = User::factory()->create();
@@ -401,7 +401,7 @@ class PageTest extends TestCase
         $this->postJson(route('pages.update', ['id' => $page->id]), $input)
              ->assertStatus(403);
 
-        $page->createPageAccess($user);
+        $page->createPermission($user);
 
         $user->refresh();
 

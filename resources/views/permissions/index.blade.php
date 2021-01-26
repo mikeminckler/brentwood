@@ -2,7 +2,7 @@
 @section ('content')
 
 <div class="flex flex-col flex-1">
-    <page-access></page-access>
+    <permissions type="page"></permissions>
 </div>
 
 @endsection

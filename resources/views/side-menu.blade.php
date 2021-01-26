@@ -1,5 +1,11 @@
 <div class="p-4 sticky bottom-0 bg-gray-100 shadow z-3">
 
+
+    <a href="/livestreams" class="side-menu-link" >
+        <div class="pr-2"><i class="fab fa-youtube"></i></div>
+        <div class="">Livestreams</div>
+    </a>
+
     <a href="/blogs" class="side-menu-link" >
         <div class="pr-2"><i class="fas fa-blog"></i></div>
         <div class="">Blogs</div>

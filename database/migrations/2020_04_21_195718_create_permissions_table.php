@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePageAccessesTable extends Migration
+class CreatePermissionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreatePageAccessesTable extends Migration
      */
     public function up()
     {
-        Schema::create('page_accesses', function (Blueprint $table) {
+        Schema::create('permissions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->morphs('pageable');
-            $table->morphs('accessable');
+            $table->morphs('objectable'); // pages, blogs, content elements, livestreams
+            $table->morphs('accessable'); // the user or role 
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ class CreatePageAccessesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('page_accesses');
+        Schema::dropIfExists('permissions');
     }
 }

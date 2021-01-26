@@ -188,14 +188,14 @@ trait ContentElementsTestTrait
     }
 
     /** @test **/
-    public function a_page_has_many_page_accesses()
+    public function a_page_has_many_permissions()
     {
         $page = $this->getModel();
         $role = Role::factory()->create();
 
-        $page->createPageAccess($role);
+        $page->createPermission($role);
 
-        $this->assertInstanceOf(Collection::class, $page->pageAccesses()->get());
+        $this->assertInstanceOf(Collection::class, $page->permissions()->get());
     }
 
     /** @test **/
@@ -204,7 +204,7 @@ trait ContentElementsTestTrait
         $page = $this->getModel();
         $role = Role::factory()->create();
 
-        $page->createPageAccess($role);
+        $page->createPermission($role);
 
         $this->assertTrue($role->canEditPage($page));
     }
@@ -215,7 +215,7 @@ trait ContentElementsTestTrait
         $page = $this->getModel();
         $user = User::factory()->create();
 
-        $page->createPageAccess($user);
+        $page->createPermission($user);
 
         $this->assertTrue($user->canEditPage($page));
     }
@@ -234,7 +234,7 @@ trait ContentElementsTestTrait
         $this->assertFalse($page->editable);
 
         $role = Role::factory()->create();
-        $page->createPageAccess($role);
+        $page->createPermission($role);
         $user1->addRole($role);
 
         $user1->refresh();
@@ -250,7 +250,7 @@ trait ContentElementsTestTrait
         $this->signIn($user2);
 
         $this->assertFalse($page->editable);
-        $page->createPageAccess($user2);
+        $page->createPermission($user2);
         $user2->refresh();
         $this->assertTrue($page->editable);
 

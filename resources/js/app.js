@@ -67,6 +67,7 @@ const app = new Vue({
         'feedback': () => import(/* webpackChunkName: "feedback" */ '@/Components/Feedback'),
         'inquiries-index': () => import(/* webpackChunkName: "inquiries-index" */ '@/Components/InquiriesIndex'),
         'inquiry': () => import(/* webpackChunkName: "inquiry" */ '@/Forms/Inquiry'),
+        'livestreams-index': () => import(/* webpackChunkName: "livestreams-index" */ '@/Components/LivestreamsIndex.vue'),
         'page-access': () => import(/* webpackChunkName: "page-access" */ '@/Components/PageAccess'),
         'page-editor': () => import(/* webpackChunkName: "page-editor" */ '@/Components/PageEditor'),
         'page-tree': () => import(/* webpackChunkName: "page-tree" */ '@/Components/PageTree'),

@@ -15,7 +15,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\RolesController;
-use App\Http\Controllers\PageAccessesController;
+use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\ContentElementsController;
 use App\Http\Controllers\PhotosController;
@@ -23,6 +23,7 @@ use App\Http\Controllers\FileUploadsController;
 use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\TagsController;
 use App\Http\Controllers\InquiriesController;
+use App\Http\Controllers\LivestreamsController;
 
 //Auth::routes();
 
@@ -44,10 +45,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/roles/search', [RolesController::class, 'search'])->name('roles.search');
     //Route::post('/roles/{id}/remove-user', [RolesController::class, 'removeUser'])->name('roles.remove-user')->where('id', '\d+');
 
-    Route::get('/page-accesses', [PageAccessesController::class, 'index'])->name('page-accesses.index');
-    Route::get('/page-accesses/page/{id}', [PageAccessesController::class, 'page'])->name('page-accesses.page')->where('id', '\d+');
-    Route::post('/page-accesses/create', [PageAccessesController::class, 'store'])->name('page-accesses.store');
-    Route::post('/page-accesses/{id}/destroy', [PageAccessesController::class, 'destroy'])->name('page-accesses.destroy')->where('id', '\d+');
+    Route::get('/permissions', [PermissionsController::class, 'index'])->name('permissions.index');
+    Route::post('/permissions/load', [PermissionsController::class, 'load'])->name('permissions.load');
+    Route::post('/permissions/create', [PermissionsController::class, 'store'])->name('permissions.store');
+    Route::post('/permissions/{id}/destroy', [PermissionsController::class, 'destroy'])->name('permissions.destroy')->where('id', '\d+');
 
     Route::post('/editing-toggle', [SessionsController::class, 'editingToggle'])->name('editing-toggle');
 
@@ -89,9 +90,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/tags/create', [TagsController::class, 'store'])->name('tags.store');
 
     Route::get('/inquiries', [InquiriesController::class, 'index'])->name('inquiries.index');
+
+    Route::get('/livestreams', [LivestreamsController::class, 'index'])->name('livestreams.index');
+    Route::post('/livestreams/create', [LivestreamsController::class, 'store'])->name('livestreams.store');
+    Route::post('/livestreams/{id}', [LivestreamsController::class, 'store'])->name('livestreams.update')->where('id', '\d+');
 });
 
-Route::post('/blogs', [BlogsController::class, 'index'])->name('blogs.index');
+//Route::post('/blogs', [BlogsController::class, 'index'])->name('blogs.index');
 Route::get('/blogs/{page}', [BlogsController::class, 'load'])->name('blogs.load')->where('page', '.*');
 
 Route::get('/inquiry', [InquiriesController::class, 'load'])->name('inquiries.create');

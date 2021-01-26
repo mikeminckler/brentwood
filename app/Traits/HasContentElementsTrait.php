@@ -149,20 +149,4 @@ trait HasContentElementsTrait
         return auth()->user()->can('update', $this);
     }
 
-    public function createPageAccess($pageable)
-    {
-        $page_access = (new PageAccess)->savePageAccess($this, $pageable);
-        return $this;
-    }
-
-    public function removePageAccess($pageable)
-    {
-        $page_access = (new PageAccess)->removePageAccess($this, $pageable);
-        return $this;
-    }
-
-    public function pageAccesses()
-    {
-        return $this->morphMany(PageAccess::class, 'pageable');
-    }
 }

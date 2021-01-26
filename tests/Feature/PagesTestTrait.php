@@ -369,7 +369,7 @@ trait PagesTestTrait
         $this->assertInstanceOf(get_class($this->getModel()), $page);
 
         $user = User::factory()->create();
-        $page->createPageAccess($user);
+        $page->createPermission($user);
         $user->refresh();
 
         $this->assertTrue($user->can('update', $page));
@@ -400,7 +400,7 @@ trait PagesTestTrait
         $this->assertInstanceOf(get_class($this->getModel()), $page);
 
         $user = User::factory()->create();
-        $page->createPageAccess($user);
+        $page->createPermission($user);
         $user->refresh();
 
         $this->assertTrue($user->can('update', $page));

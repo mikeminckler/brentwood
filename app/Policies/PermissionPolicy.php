@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\PageAccess;
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class PageAccessPolicy
+class PermissionPolicy
 {
     use HandlesAuthorization;
 
@@ -21,7 +21,7 @@ class PageAccessPolicy
     }
 
     /**
-     * Determine whether the user can view any page accesses.
+     * Determine whether the user can view any permissions.
      *
      * @param  \App\User  $user
      * @return mixed
@@ -32,19 +32,19 @@ class PageAccessPolicy
     }
 
     /**
-     * Determine whether the user can view the page access.
+     * Determine whether the user can view the permission.
      *
      * @param  \App\User  $user
-     * @param  \App\PageAccess  $pageAccess
+     * @param  \App\Permission  $permission
      * @return mixed
      */
-    public function view(User $user, PageAccess $pageAccess)
+    public function view(User $user, Permission $permission)
     {
         //
     }
 
     /**
-     * Determine whether the user can create page accesses.
+     * Determine whether the user can create permissions.
      *
      * @param  \App\User  $user
      * @return mixed
@@ -55,49 +55,49 @@ class PageAccessPolicy
     }
 
     /**
-     * Determine whether the user can update the page access.
+     * Determine whether the user can update the permission.
      *
      * @param  \App\User  $user
-     * @param  \App\PageAccess  $pageAccess
+     * @param  \App\Permission  $permission
      * @return mixed
      */
-    public function update(User $user, PageAccess $pageAccess)
+    public function update(User $user, Permission $permission)
     {
         //
     }
 
     /**
-     * Determine whether the user can delete the page access.
+     * Determine whether the user can delete the permission.
      *
      * @param  \App\User  $user
-     * @param  \App\PageAccess  $pageAccess
+     * @param  \App\Permission  $permission
      * @return mixed
      */
-    public function delete(User $user, PageAccess $pageAccess)
+    public function delete(User $user, Permission $permission)
     {
         //
     }
 
     /**
-     * Determine whether the user can restore the page access.
+     * Determine whether the user can restore the permission.
      *
      * @param  \App\User  $user
-     * @param  \App\PageAccess  $pageAccess
+     * @param  \App\Permission  $permission
      * @return mixed
      */
-    public function restore(User $user, PageAccess $pageAccess)
+    public function restore(User $user, Permission $permission)
     {
         //
     }
 
     /**
-     * Determine whether the user can permanently delete the page access.
+     * Determine whether the user can permanently delete the permission.
      *
      * @param  \App\User  $user
-     * @param  \App\PageAccess  $pageAccess
+     * @param  \App\Permission  $permission
      * @return mixed
      */
-    public function forceDelete(User $user, PageAccess $pageAccess)
+    public function forceDelete(User $user, Permission $permission)
     {
         //
     }

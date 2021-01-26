@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Arr;
 
 use App\Traits\SearchTrait;
+use App\Traits\UsesPermissionsTrait;
 
 use App\Models\PageAccess;
 use App\Models\User;
@@ -15,6 +16,7 @@ class Role extends Model
 {
     use HasFactory;
     use SearchTrait;
+    use UsesPermissionsTrait;
 
     protected $appends = ['search_label'];
 
@@ -44,29 +46,12 @@ class Role extends Model
         return $role;
     }
 
-    public function pageAccesses()
+    public function canEditPage($objectable)
     {
-        return $this->morphMany(PageAccess::class, 'accessable');
-    }
-
-    public function createPageAccess($page)
-    {
-        $page_access = (new PageAccess)->savePageAccess($page, $this);
-        return $this;
-    }
-
-    public function removePageAccess($page)
-    {
-        $page_access = (new PageAccess)->removePageAccess($page, $this);
-        return $this;
-    }
-
-    public function canEditPage($pageable)
-    {
-        return $this->pageAccesses()
+        return $this->permissions()
             ->get()
-            ->contains(function ($page_access) use ($pageable) {
-                return $page_access->pageable_id === $pageable->id && $page_access->pageable_type == get_class($pageable);
+            ->contains(function ($permission) use ($objectable) {
+                return $permission->objectable_id === $objectable->id && $permission->objectable_type == get_class($objectable);
             });
     }
 

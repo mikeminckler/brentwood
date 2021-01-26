@@ -5,72 +5,72 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
-use App\Models\PageAccess;
-use App\Http\Requests\PageAccessValidation;
+use App\Models\Permission;
+use App\Http\Requests\PermissionValidation;
 
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Page;
 
-class PageAccessesController extends Controller
+class PermissionsController extends Controller
 {
     public function index()
     {
-        if (!auth()->user()->can('viewAny', PageAccess::class)) {
+        if (!auth()->user()->can('viewAny', Permission::class)) {
             return redirect('/')->with(['error' => 'You do not have permission to view that page']);
         }
 
-        return view('page-accesses.index');
+        return view('permissions.index');
     }
 
-    public function page($id)
+    public function load()
     {
-        if (!auth()->user()->can('viewAny', PageAccess::class)) {
+        if (!auth()->user()->can('viewAny', Permission::class)) {
             return response()->json(['error' => 'You do not have permission to view page accesses'], 403);
         }
 
-        $page = Page::findOrFail($id);
-        $page->load('pageAccesses', 'pageAccesses.accessable');
+        $objectable = Permission::findObjectable(requestInput());
+        $objectable->load('permissions', 'permissions.accessable');
 
         return response()->json([
-            'page' => $page,
+            'objectable' => $objectable,
         ]);
     }
 
-    public function store(PageAccessValidation $request)
+    public function store(PermissionValidation $request)
     {
-        $page = Page::find(request('page_id'));
+        $objectable = Permission::findObjectable(requestInput());
 
         if (requestInput('users')) {
             foreach (requestInput('users') as $user) {
                 $user = User::findOrFail(Arr::get($user, 'id'));
-                $page->createPageAccess($user);
+                $objectable->createPermission($user);
             }
         }
 
         if (requestInput('roles')) {
             foreach (requestInput('roles') as $role) {
                 $role = Role::findOrFail(Arr::get($role, 'id'));
-                $page->createPageAccess($role);
+                $objectable->createPermission($role);
             }
         }
 
         return response()->json([
-            'success' => 'Page Access Created',
-            'page' => $page->refresh()->load('pageAccesses', 'pageAccesses.accessable'),
+            'success' => 'Permission Created',
+            'objectable' => $objectable->refresh()->load('permissions', 'permissions.accessable'),
         ]);
     }
 
     public function destroy($id)
     {
-        $page_access = PageAccess::findOrFail($id);
+        $permission = Permission::findOrFail($id);
 
-        if (!auth()->user()->can('delete', $page_access)) {
+        if (!auth()->user()->can('delete', $permission)) {
             return response()->json(['error' => 'You do not have permission to remove page accesses'], 403);
         }
 
-        $page_access->delete();
+        $permission->delete();
 
-        return response()->json(['success' => 'Page Access Removed']);
+        return response()->json(['success' => 'Permission Removed']);
     }
 }

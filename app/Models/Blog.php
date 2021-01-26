@@ -16,6 +16,7 @@ use App\Traits\VersioningTrait;
 use App\Traits\SlugTrait;
 use App\Traits\TagsTrait;
 use App\Traits\HasFooterTrait;
+use App\Traits\HasPermissionsTrait;
 
 use App\Models\Page;
 use App\Models\Tag;
@@ -30,6 +31,7 @@ class Blog extends Model
     use SlugTrait;
     use TagsTrait;
     use HasFooterTrait;
+    use HasPermissionsTrait;
 
     protected $dates = ['publish_at'];
 

@@ -21,6 +21,7 @@ use App\Traits\HasContentElementsTrait;
 use App\Traits\SlugTrait;
 use App\Traits\TagsTrait;
 use App\Traits\HasFooterTrait;
+use App\Traits\HasPermissionsTrait;
 
 use App\Events\PageSaved;
 
@@ -34,6 +35,7 @@ class Page extends Model
     use SlugTrait;
     use TagsTrait;
     use HasFooterTrait;
+    use HasPermissionsTrait;
 
     protected $dates = ['publish_at'];
 

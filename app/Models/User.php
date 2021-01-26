@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use App\Models\Role;
 use App\Models\FileUpload;
-use App\Models\PageAccess;
+use App\Models\Permission;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
@@ -21,12 +21,14 @@ use Google_Client;
 use Google_Service_Directory;
 
 use App\Traits\SearchTrait;
+use App\Traits\UsesPermissionsTrait;
 
 class User extends Authenticatable
 {
     use HasFactory;
     use Notifiable;
     use SearchTrait;
+    use UsesPermissionsTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -213,44 +215,27 @@ class User extends Authenticatable
         return $this;
     }
 
-    public function pageAccesses()
-    {
-        return $this->morphMany(PageAccess::class, 'accessable');
-    }
-
-    public function createPageAccess($page)
-    {
-        $page_access = (new PageAccess)->savePageAccess($page, $this);
-        return $this;
-    }
-
-    public function removePageAccess($page)
-    {
-        $page_access = (new PageAccess)->removePageAccess($page, $this);
-        return $this;
-    }
-
-    public function canEditPage($pageable)
+    public function canEditPage($objectable)
     {
         if ($this->hasRole('admin')) {
             return true;
         }
 
-        //return cache()->tags([cache_name($this), cache_name($pageable)])->rememberForever(cache_name($this).'-can-access-'.cache_name($pageable), function () use ($pageable) {
-        $page_accesses = $this->pageAccesses;
+        //return cache()->tags([cache_name($this), cache_name($objectable)])->rememberForever(cache_name($this).'-can-access-'.cache_name($objectable), function () use ($objectable) {
+        $permissions = $this->permissions;
 
-        $this->roles->each(function ($role) use ($page_accesses) {
-            $role->pageAccesses()->get()->each(function ($pa) use ($page_accesses) {
-                $page_accesses->push($pa);
+        $this->roles->each(function ($role) use ($permissions) {
+            $role->permissions()->get()->each(function ($pa) use ($permissions) {
+                $permissions->push($pa);
             });
         });
 
-        $page_accesses = $page_accesses->unique(function ($pa) {
-            return class_basename($pa->pageable).$pa->pageable->id;
+        $permissions = $permissions->unique(function ($pa) {
+            return class_basename($pa->objectable).$pa->objectable->id;
         });
 
-        return $page_accesses->contains(function ($page_access) use ($pageable) {
-            return $page_access->pageable_id === $pageable->id && $page_access->pageable_type === get_class($pageable);
+        return $permissions->contains(function ($permission) use ($objectable) {
+            return $permission->objectable_id === $objectable->id && $permission->objectable_type === get_class($objectable);
         });
         //});
     }

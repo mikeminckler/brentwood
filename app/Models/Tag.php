@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 
@@ -62,10 +63,27 @@ class Tag extends Model
 
         if (!$tag->protected) {
             $tag->name = Str::title(Arr::get($input, 'name'));
+            $tag->parent_tag_id = Arr::get($input, 'parent_tag_id');
         }
         $tag->save();
 
         return $tag;
+    }
+
+    public function getLabelAttribute() 
+    {
+        $name = '';
+
+        if ($this->parentTag) {
+            $name .= $this->parentTag->label.' - ';
+        }
+
+        return $name.$this->name;
+    }
+
+    public function getSearchLabelAttribute()
+    {
+        return $this->label;
     }
 
     public function blogs()
@@ -77,4 +95,53 @@ class Tag extends Model
     {
         return $this->morphedByMany(Page::class, 'taggable');
     }
+
+    public function parentTag()
+    {
+        return $this->belongsTo(Tag::class, 'parent_tag_id');
+    }
+
+    public function tags() 
+    {
+        return $this->hasMany(Tag::class, 'parent_tag_id');   
+    }
+
+
+    public static function filterWithHierarchy(Collection $filter_tags) 
+    {
+
+        // this takes in an array of tags and filters out tags that aren't 
+        // present from all of the tags in the db, to preserve the hierarchy
+        // for displaying in the frontend
+
+        return Tag::whereNull('parent_tag_id')->get()->map(function($tag) use($filter_tags) {
+            return $tag->filterTags($filter_tags);
+        })
+        ->filter()
+        ->values();
+    }
+
+    public function filterTags($filter_tags) 
+    {
+        if ($filter_tags->contains('id', $this->id)) {
+            return $this;
+        }
+
+        if ($this->tags->count()) {
+
+            $this->tags->transform(function($tag) use($filter_tags) {
+                return $tag->filterTags($filter_tags);
+            });
+
+            if ($this->tags->filter()->count()) {
+                return $this;
+            } else {
+                return null;
+            }
+
+        } else {
+            return null;
+        }
+    }
+
 }

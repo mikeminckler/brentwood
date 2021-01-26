@@ -18,7 +18,7 @@
                             <div class="input"><input type="text" id="email" v-model="form.email" class="" placeholder="example@example.ca" /></div>
 
                             <div class="input-label"><label for="phone">Contact Phone Number</label></div>
-                            <div class="input"><input type="text" id="phone" v-model="form.phone" class="" placeholder="250-555-5555" /></div>
+                            <div class="input"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="250-555-5555" /></div>
                         </div>
 
                         <div class="" key="step2" v-if="currentStep === 2">
@@ -67,16 +67,7 @@
                         <div class="" key="step3" v-if="currentStep === 3">
                             <div class="">Let us know what you are interested in</div>
 
-                            <div class="flex items-center flex-wrap">
-
-                                <div class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap" 
-                                     :class="$lodash.find(form.tags, tag) ? 'bg-primary text-white font-bold' : 'bg-gray-200 hover:bg-white'"
-                                    v-for="tag in filteredTags"
-                                    :key="'tag-' + tag.id"
-                                    @click="toggleTag(tag)"
-                                >{{ tag.name }}</div>
-
-                            </div>
+                            <tags-selector :tags="tags" :selected-tags="form.tags" @selected="toggleTag($event)"></tags-selector>
 
                         </div>
 
@@ -159,6 +150,10 @@
 
         mixins: [Feedback],
 
+        components: {
+            'tags-selector': () => import(/* webpackChunkName: "tags-selector" */ '@/Components/TagsSelector.vue'),
+        },
+
         data() {
             return {
 
@@ -234,12 +229,6 @@
                 return valid;
             },
 
-            filteredTags() {
-                return this.$lodash.filter(this.tags, tag => {
-                    return tag.name !== 'Boarding Student' && tag.name !== 'Day Student';
-                });
-            },
-
             filteredFormTags() {
                 return this.$lodash.filter(this.form.tags, tag => {
                     return tag.name !== 'Boarding Student' && tag.name !== 'Day Student';
@@ -247,13 +236,13 @@
             },
 
             boardingTag() {
-                return this.$lodash.find(this.tags, tag => {
+                return this.$lodash.find(this.tags[0].tags, tag => {
                     return tag.name === 'Boarding Student';
                 });
             },
 
             dayTag() {
-                return this.$lodash.find(this.tags, tag => {
+                return this.$lodash.find(this.tags[0].tags, tag => {
                     return tag.name === 'Day Student';
                 });
             },
@@ -331,12 +320,16 @@
 
             nextStep: function() {
 
-                this.transitionDirection = 'inquiry-form-forward';
+                if (this.validateStep()) {
 
-                if (this.currentStep < this.steps.length && this.validateStep()) {
-                    this.currentStep++;
-                } else if (this.currentStep === this.steps.length && this.formIsValid) {
-                    this.submit();
+                    this.transitionDirection = 'inquiry-form-forward';
+
+                    if (this.currentStep < this.steps.length && this.validateStep()) {
+                        this.currentStep++;
+                    } else if (this.currentStep === this.steps.length && this.formIsValid) {
+                        this.submit();
+                    }
+
                 }
 
             },

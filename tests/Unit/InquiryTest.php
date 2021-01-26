@@ -59,8 +59,8 @@ class InquiryTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $tags);
 
-        // these two plus the default tags
-        $this->assertEquals(4, $tags->count());
+        // these two plus the default admissions group
+        $this->assertEquals(3, $tags->count());
         $this->assertTrue($tags->contains('id', $tag1->id));
         $this->assertTrue($tags->contains('id', $tag2->id));
         $this->assertFalse($tags->contains('id', $unpublished_tag->id));
@@ -75,9 +75,9 @@ class InquiryTest extends TestCase
 
         $this->assertNotNull($boarding_tag);
         $this->assertNotNull($day_tag);
-
-        $this->assertTrue(Inquiry::getTags()->contains('id', $boarding_tag->id));
-        $this->assertTrue(Inquiry::getTags()->contains('id', $day_tag->id));
+                                            // admissions -> tags -> 
+        $this->assertTrue(Inquiry::getTags()->first()->tags->contains('id', $boarding_tag->id));
+        $this->assertTrue(Inquiry::getTags()->first()->tags->contains('id', $day_tag->id));
     }
 
     /** @test **/
@@ -110,6 +110,34 @@ class InquiryTest extends TestCase
         $this->assertTrue($inquiry->filtered_tags->contains('id', $tag->id));
         $this->assertFalse($inquiry->filtered_tags->contains('id', $boarding_tag->id));
         $this->assertFalse($inquiry->filtered_tags->contains('id', $day_tag->id));
+
+    }
+
+    /** @test **/
+    public function inquiry_tags_have_heiarchy()
+    {
+        $inquiry_page = Inquiry::findPage();
+        $inquiry_page->contentElements()->delete();
+        $text_block = $this->createContentElement(TextBlock::factory(), $inquiry_page);
+
+        $parent_tag = Tag::factory()->create();
+        $tag = Tag::factory()->create([
+            'parent_tag_id' => $parent_tag->id,
+        ]);
+        $text_block->tags()->attach($tag);
+
+        $inquiry_page->publish();
+
+        //dump('CHECKING FOR: '.$tag->name);
+
+        $tags = Inquiry::getTags();
+
+        // we include the two default tags
+        $this->assertEquals(2, $tags->count());
+        $this->assertTrue($tags->contains('id', $parent_tag->id));
+        $this->assertEquals($parent_tag->id, $tags->last()->id);
+        $this->assertEquals(1, $tags->last()->tags()->count());
+        $this->assertEquals($tag->id, $tags->last()->tags()->first()->id);
 
     }
 }

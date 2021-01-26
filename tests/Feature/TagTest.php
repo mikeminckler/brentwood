@@ -85,4 +85,35 @@ class TagTest extends TestCase
         $this->assertInstanceOf(Tag::class, $tag);
         $this->assertEquals(Arr::get($input, 'name'), $tag->name);
     }
+
+    /** @test **/
+    public function creating_a_tag_that_has_a_parent()
+    {
+        $parent_tag = Tag::factory()->create();
+
+        $this->assertNull($parent_tag->parent_tag_id);
+
+        $input = Tag::factory()->raw([
+            'parent_tag_id' => $parent_tag->id,
+        ]);
+
+        $this->signInAdmin();
+
+        $this->json('POST', route('tags.store'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => Arr::get($input, 'name').' Saved',
+             ]);
+
+        $tag = Tag::all()->last();
+        $parent_tag->refresh();
+
+        $this->assertInstanceOf(Tag::class, $tag);
+        $this->assertEquals(Arr::get($input, 'name'), $tag->name);
+
+        $this->assertInstanceOf(Tag::class, $tag->parentTag);
+        $this->assertEquals($parent_tag->id, $tag->parentTag->id);
+        $this->assertEquals(1, $parent_tag->tags->count());
+        $this->assertTrue($parent_tag->tags->contains('id', $tag->id));
+    }
 }

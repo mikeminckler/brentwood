@@ -87,4 +87,40 @@ class TagTest extends TestCase
 
         $this->assertEquals($tag->id, $tag->id);
     }
+
+    /** @test **/
+    public function a_tag_has_a_heiarchy()
+    {
+        $parent_tag = Tag::factory()->create([
+            'parent_tag_id' => null,
+        ]);
+
+        $tag = Tag::factory()->create([
+            'parent_tag_id' => $parent_tag->id,
+        ]);
+
+        $parent_tag->refresh();
+
+        $this->assertInstanceOf(Tag::class, $tag->parentTag);
+        $this->assertEquals(1, $parent_tag->tags->count());
+        $this->assertTrue($parent_tag->tags->contains('id', $tag->id));
+    }
+
+    /** @test **/
+    public function a_tag_has_a_label_attribute()
+    {
+        $parent_tag = Tag::factory()->create();
+        $tag = Tag::factory()->create([
+            'parent_tag_id' => $parent_tag->id,
+        ]);
+
+        $this->assertNotNull($tag->label);
+        $this->assertTrue(Str::contains($tag->label, $parent_tag->name));
+
+        $data = Tag::find($tag->id)->toArray();
+
+        $this->assertNotNull(Arr::get($data, 'search_label'));
+
+        $this->assertTrue(Str::contains(Arr::get($data, 'search_label'), $parent_tag->name));
+    }
 }

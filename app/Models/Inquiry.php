@@ -67,9 +67,11 @@ class Inquiry extends Model
         $tags->push($boarding_tag);
         $tags->push($day_tag);
 
-        return $tags->unique(function($tag) {
+        $inquiry_tags = $tags->unique(function($tag) {
                     return $tag->id;
                 });
+
+        return Tag::filterWithHierarchy($inquiry_tags);
     }
 
     public function getFilteredTagsAttribute() 

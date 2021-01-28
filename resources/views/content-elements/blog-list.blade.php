@@ -54,15 +54,19 @@
 
             <div class="flex-1 flex flex-col">
 
-                <div class="flex-1 overflow-hidden mt-4">
-                    <blog-preview>
-                        @include ('content', ['page' => $content->blogs->first(), 'content_elements' => $content->blogs->first()->content_elements]);
-                    </blog-preview>
-                </div>
+                @if ($content->blogs->count())
+                    <div class="flex-1 overflow-hidden mt-4">
+                            <blog-preview>
+                                @include ('content', ['page' => $content->blogs->first(), 'content_elements' => $content->blogs->first()->content_elements]);
+                            </blog-preview>
+                    </div>
 
-                <div class="my-2 flex justify-end">
-                    <a href="{{ $content->blogs->first()->full_slug }}">Read More...</a>
-                </div>
+                    <div class="my-2 flex justify-end">
+                        <a href="{{ $content->blogs->first()->full_slug }}">Read More...</a>
+                    </div>
+                @else
+                    <p>There are no blogs available to preview.</p>
+                @endif
 
             </div>
 

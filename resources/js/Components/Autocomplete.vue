@@ -74,6 +74,7 @@
                  v-bind="childProps(item)"
                  @remove="$emit('remove', $event)"
                  :remove="true"
+                 :flex="flex"
              ></component>
 
             <div v-if="!model" class="">

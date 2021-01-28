@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-8">
+    <div class="mt-8 mx-12">
 
         <h1>User Management</h1>
 

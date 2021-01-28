@@ -11,6 +11,7 @@ use App\Models\TextBlock;
 use App\Models\PhotoBlock;
 use App\Models\Tag;
 use App\Models\Inquiry;
+use App\Models\Livestream;
 
 use Tests\Unit\TagsTrait;
 
@@ -139,5 +140,18 @@ class InquiryTest extends TestCase
         $this->assertEquals(1, $tags->last()->tags()->count());
         $this->assertEquals($tag->id, $tags->last()->tags()->first()->id);
 
+    }
+
+    /** @test **/
+    public function an_inquiry_can_belong_to_many_livestreams()
+    {
+        $inquiry = Inquiry::factory()->create();
+        $livestream = Livestream::factory()->create();
+
+        $inquiry->livestreams()->attach($livestream);
+
+        $inquiry->refresh();
+        $this->assertEquals(1, $inquiry->livestreams()->count());
+        $this->assertEquals($livestream->id, $inquiry->livestreams()->first()->id);
     }
 }

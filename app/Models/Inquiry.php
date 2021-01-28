@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\URL;
 
 use App\Traits\TagsTrait;
 
+use App\Models\Livestream;
+
 class Inquiry extends Model
 {
     use HasFactory;
@@ -82,5 +84,10 @@ class Inquiry extends Model
         return $this->tags->filter(function($tag) use ($boarding_tag, $day_tag) {
             return $tag->id !== $boarding_tag->id && $tag->id !== $day_tag->id;
         });
+    }
+
+    public function livestreams() 
+    {
+        return $this->belongsToMany(Livestream::class);   
     }
 }

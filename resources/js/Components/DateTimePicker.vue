@@ -1,37 +1,35 @@
 <template>
 
-    <div class="relative flex" dusk="date-time-picker">
+    <div class="relative flex items-end" dusk="date-time-picker">
 
-        <div class="">
-            <transition name="text-sm">
-                <div class="label" v-if="date">
-                    <label for="name">{{ label ? label : placeholder }}</label>
-                </div>
-            </transition>
+        <div class="flex-1 relative">
 
-            <div class="input-icon" v-if="!inline">
-                <i class="fas fa-calendar"></i>
-            </div>
+            <v-date-picker
+                v-model="dateTime"
+                mode="dateTime"
+                :masks="masks"
+            >
+                <template v-slot="{ inputValue, inputEvents }" v-if="popup">
 
-            <div class="date-picker-input">
+                    <div class="flex items-center">
+                        <div class="input-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <input
+                            class="icon"
+                            :value="inputValue"
+                            v-on="inputEvents"
+                            :placeholder="placeholder"
+                        />
+                        <div class="button text-sm" @click="dateTime = $moment.utc().toDate()" v-if="!hideNow">Now</div>
+                    </div>
+                </template>
+            </v-date-picker>
 
-                <v-date-picker
-                    v-model="datePicker"
-                    color="gray"
-                    :input-props="{ dusk: dusk, placeholder: placeholder ? placeholder : 'Select Date' }"
-                    :is-inline="inline"
-                >
-                </v-date-picker>
-
-            </div>
         </div>
 
-        <div class="">
-            <time-picker v-model="time" ></time-picker>
-        </div>
-
-        <div class="remove-icon px-1" @click="clear()" v-if="remove">
-            <i class="fas fa-times"></i>
+        <div class="icon remove" @click="clear()" v-if="remove">
+            <i class="fas fa-times-circle"></i>
         </div>
 
     </div>
@@ -40,102 +38,51 @@
 
 <script>
 
-    export default {
+    import Dates from '@/Mixins/Dates';
 
-        mixins: [],
+    export default {
+        mixins: [Dates],
         props: [
-            'inline', 
+            'popup', 
             'value',
             'dusk',
             'remove',
             'placeholder',
             'label',
+            'hideNow',
         ],
-
-        components: {
-            'time-picker': () => import(/* webpackChunkName: "time-picker" */ '@/Components/TimePicker'),
-        },
-
         data() {
             return {
-                date: null,
-                time: null,
-                datePicker: null,
+                dateTime: null,
+                masks: {
+                    input: 'YYYY-MM-DD h:mm A',
+                },
             }
         },
-
-        computed: {
-            input() {
-                if (this.date && this.time) {
-                    let utc = this.$moment(this.date + ' ' + this.time + ':00', 'YYYY-MM-DD HH:mm:ss').utc();
-                    if (utc.isValid()) {
-                        let json = utc.toJSON();
-                        return json.substring(0, json.length - 1) + '000Z';
-                    } else {
-                        return null;
-                    }
-                } else {
-                    return null;
-                }
-            }
-        },
-
         watch: {
             value() {
-                this.setInput();
+                this.setDateTime();
             },
-            input() {
-                this.emitInput();
-            },
-            datePicker() {
-                this.date = this.$moment(this.datePicker).format('YYYY-MM-DD');
-            },
-            date() {
-                if (this.date !== this.$moment(this.datePicker).format('YYYY-MM-DD')) {
-                    this.datePicker = this.$moment(this.date, 'YYYY-MM-DD').toDate();
+            dateTime() {
+                if (this.dateTime) {
+                    this.$emit('input', this.dateTime.toISOString());
                 }
             }
         },
-
         mounted() {
             if (this.value) {
-                this.setInput();
+                this.setDateTime();
             }
         },
-
         methods: {
-
-            setInput: function() {
-                if (this.value) {
-
-                    if (!this.input) {
-                        this.date = this.$moment(this.value).format('YYYY-MM-DD');
-                        this.time = this.$moment(this.value).format('HH:mm');
-                    } else {
-                        if (this.input != this.value) {
-                            this.date = this.$moment(this.value).format('YYYY-MM-DD');
-                            this.time = this.$moment(this.value).format('HH:mm');
-                        }
-                    }
-                } else {
-                    this.date = null;
-                    this.time = null;
+            setDateTime: function() {
+                if (this.dateTime !== this.value) {
+                    this.dateTime = this.$moment.utc(this.value, true).toDate();
                 }
             },
-
-            emitInput: function() {
-                if (this.input) {
-                    this.$emit('input', this.input);
-                } else {
-                    this.$emit('input', null);
-                }
-            },
-
             clear: function() {
-                this.date = null;
-                this.time = null;
+                this.dateTime = null;
             },
         },
-
     }
 </script>

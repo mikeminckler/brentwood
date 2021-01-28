@@ -1,7 +1,22 @@
 <template>
 
-    <div class="ignore" @click="$emit('selected', livestream)">
-        <div class="cursor-pointer py-1 px-2">{{ livestream.name }}</div>
+    <div class="ignore">
+        <div class="grid-cell"><a @click.stop :href="'/livestreams/' + livestream.id" title="View Livestream"><div class="icon"><i class="fas fa-eye"></i></div></a></div>
+        <div class="grid-cell cursor-pointer text-primary" @click="$emit('selected', livestream)">{{ livestream.name }}</div>
+        <div class="grid-cell">{{ displayDateTime(livestream.start_date) }}</div>
+        <div class="grid-cell">
+            <a class="inline-flex items-center" :href="'https://studio.youtube.com/video/' + livestream.video_id + '/livestreaming'" target="_blank">
+                <div class="icon"><i class="fab fa-youtube"></i></div>
+                <div class="pl-2">{{ livestream.video_id }}</div>
+            </a>
+        </div>
+        <div class="grid-cell">
+            <div class="inline-flex items-center link" @click="openChat()">
+                <div class="icon"><i class="fas fa-comments"></i></div>
+                <div class="pl-2">Live Chat</div>
+            </div>
+
+        </div>
     </div>
 
 </template>
@@ -35,6 +50,9 @@
         },
 
         methods: {
+            openChat: function() {
+                window.open('https://www.youtube.com/live_chat?v=' + this.livestream.video_id + '&embed_domain=brentwood.ca', 'livestream-' + this.livestream.video_id, 'width=600,height=800,scrollbars=yes');
+            }
         },
 
     }

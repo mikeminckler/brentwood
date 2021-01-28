@@ -203,7 +203,7 @@ iframe {
 }
 
 .input-icon {
-    @apply absolute flex items-center justify-center px-2 py-2 text-gray-500;
+    @apply absolute flex items-center justify-center px-2 py-2 text-gray-400;
 }
 
 div.date-picker-input, div.time-picker-input {
@@ -279,7 +279,7 @@ input[type=range]:hover {
         @apply mb-4;
     }
 
-    & input { 
+    & input, div.fake-input { 
         @apply border border-gray-200 bg-white px-4 py-2 w-full;
     }
 
@@ -293,7 +293,19 @@ input[type=range]:hover {
 }
 
 button, .button {
-    @apply inline-flex bg-primary text-white font-bold px-4 py-1 mx-2 cursor-pointer whitespace-nowrap;
+    @apply inline-flex bg-primary text-white font-bold px-4 py-1 cursor-pointer whitespace-nowrap justify-center;
+}
+
+button:hover, .button:hover {
+    @apply bg-primaryHover;
+}
+
+.button-secondary {
+    @apply inline-flex bg-gray-200 border border-gray-300 px-4 py-1 cursor-pointer whitespace-nowrap justify-center text-gray-500;
+}
+
+.button-secondary:hover {
+    @apply bg-gray-100 text-gray-600;
 }
 
 .button-icon {
@@ -358,6 +370,10 @@ button, .button {
     grid-gap: 0;
 }
 
+div.grid-cell {
+    @apply px-2 py-1;
+}
+
 div.cell {
     @apply px-2 border-b border-l border-gray-500;
 }
@@ -368,6 +384,10 @@ div.cell {
 
 .grid-inquiries {
     grid-template-columns: 32px 1fr auto auto auto auto auto auto;
+}
+
+.grid-livestreams {
+    grid-template-columns: 32px 1fr auto auto auto;
 }
 
 .ignore {
@@ -576,6 +596,27 @@ div.cell {
 .slide-down-leave-active {
     position: absolute;
     animation: slide-down var(--transition-time) reverse;
+}
+
+@keyframes input {
+    0% {
+        opacity: 0;
+        max-height: 0;
+        @apply mb-0;
+    }
+    100%   {
+        opacity: 1;
+        max-height: 42px;
+        @apply mb-4;
+    }
+}
+
+.input-enter-active {
+    animation: input var(--transition-time) ease-out;
+}
+
+.input-leave-active {
+    animation: input var(--transition-time) reverse;
 }
 
 @tailwind utilities;

@@ -3,6 +3,9 @@
     <div class="">
 
         <div class="grid" :class="'grid-' + (grid ? grid : resource)">
+
+            <slot name="header" v-if="paginator.data.length"></slot>
+
             <component :is="resource + '-row'"
                  v-for="(item, index) in $lodash.values(paginator.data)"
                  :key="resource + '-' + item.id"
@@ -172,6 +175,18 @@
 
         mounted() {
             this.loadPaginator();
+
+            const listener = data => {
+                if (data.resource === this.resource){
+                    this.loadPaginator();
+                }
+            };
+            this.$eventer.$on('paginate', listener);
+
+            this.$once('hook:destroyed', () => {
+                this.$eventer.$off('paginate', listener);
+            });
+
         },
 
         methods: {

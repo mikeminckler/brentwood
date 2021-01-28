@@ -52,4 +52,11 @@ class LivestreamsController extends Controller
         ]);
     }
 
+    public function view($id) 
+    {
+        $livestream = Livestream::findOrFail($id);
+
+        return view('livestreams.view', compact('livestream'));
+    }
+
 }

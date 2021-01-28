@@ -20,6 +20,7 @@ class TagsSeeder extends Seeder
             'Admissions' => [
                 'Boarding Student',
                 'Day Student',
+                'Open House',
             ],
 
             "Academics" => [

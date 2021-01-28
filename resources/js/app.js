@@ -57,25 +57,29 @@ const app = new Vue({
     store,
 
     components: {
+
+        // Pages
+        'blogs-index': () => import(/* webpackChunkName: "blogs-index" */ '@/Pages/BlogsIndex.vue'),
+        'inquiries-index': () => import(/* webpackChunkName: "inquiries-index" */ '@/Pages/InquiriesIndex'),
+        'livestreams-index': () => import(/* webpackChunkName: "livestreams-index" */ '@/Pages/LivestreamsIndex.vue'),
+        'page-access': () => import(/* webpackChunkName: "page-access" */ '@/Pages/PageAccess'),
+        'role-management': () => import(/* webpackChunkName: "role-management" */ '@/Pages/RoleManagement'),
+        'user-management': () => import(/* webpackChunkName: "user-management" */ '@/Pages/UserManagement'),
+
+        // Components
         'blog-preview': () => import(/* webpackChunkName: "blog-preview" */ '@/Components/BlogPreview.vue'),
-        'blogs-index': () => import(/* webpackChunkName: "blogs-index" */ '@/Components/BlogsIndex.vue'),
         'clock': () => import(/* webpackChunkName: "clock" */ '@/Components/Clock.vue'),
         'content-elements-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/ContentElementsEditor'),
         'echos': () => import(/* webpackChunkName: "echos" */ '@/Components/Echos.vue'),
         'editing-button': () => import(/* webpackChunkName: "editing-button" */ '@/Components/EditingButton'),
         'footer-editor': () => import(/* webpackChunkName: "footer-editor" */ '@/Components/FooterEditor'),
         'feedback': () => import(/* webpackChunkName: "feedback" */ '@/Components/Feedback'),
-        'inquiries-index': () => import(/* webpackChunkName: "inquiries-index" */ '@/Components/InquiriesIndex'),
         'inquiry': () => import(/* webpackChunkName: "inquiry" */ '@/Forms/Inquiry'),
-        'livestreams-index': () => import(/* webpackChunkName: "livestreams-index" */ '@/Components/LivestreamsIndex.vue'),
-        'page-access': () => import(/* webpackChunkName: "page-access" */ '@/Components/PageAccess'),
         'page-editor': () => import(/* webpackChunkName: "page-editor" */ '@/Components/PageEditor'),
         'page-tree': () => import(/* webpackChunkName: "page-tree" */ '@/Components/PageTree'),
         'photo-viewer': () => import(/* webpackChunkName: "photo-viewer" */ '@/Components/PhotoViewer'),
         'processing': () => import(/* webpackChunkName: "processing" */ '@/Components/Processing'),
-        'role-management': () => import(/* webpackChunkName: "role-management" */ '@/Components/RoleManagement'),
         'saving-indicator': () => import(/* webpackChunkName: "saving-indicator" */ '@/Components/SavingIndicator'),
-        'user-management': () => import(/* webpackChunkName: "user-management" */ '@/Components/UserManagement'),
         'user-menu': () => import(/* webpackChunkName: "user-menu" */ '@/Components/UserMenu.vue'),
     },
 

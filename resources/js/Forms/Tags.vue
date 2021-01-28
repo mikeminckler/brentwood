@@ -11,7 +11,7 @@
         :hideLabel="true"
         :no-margin="true"
         model="tag"
-        :flex="true"
+        :flex="flex"
         :add="true"
         add-url="/tags/create"
     ></autocomplete>
@@ -21,7 +21,7 @@
 <script>
     export default {
 
-        props: ['value', 'placeholder'],
+        props: ['value', 'placeholder', 'flex'],
 
         components: {
             'autocomplete': () => import(/* webpackChunkName: "autocomplete" */ '@/Components/Autocomplete'),

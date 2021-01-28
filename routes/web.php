@@ -96,7 +96,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/livestreams/{id}', [LivestreamsController::class, 'store'])->name('livestreams.update')->where('id', '\d+');
 });
 
-//Route::post('/blogs', [BlogsController::class, 'index'])->name('blogs.index');
+Route::get('/livestreams/{id}', [LivestreamsController::class, 'view'])->name('livestreams.view')->where('id', '\d+');
+
+Route::post('/blogs', [BlogsController::class, 'index'])->name('blogs.index');
 Route::get('/blogs/{page}', [BlogsController::class, 'load'])->name('blogs.load')->where('page', '.*');
 
 Route::get('/inquiry', [InquiriesController::class, 'load'])->name('inquiries.create');

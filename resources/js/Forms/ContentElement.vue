@@ -68,7 +68,7 @@
 
         <transition name="form-tags">
             <div class="bg-gray-200 px-2 py-1">
-                <form-tags v-model="contentElement.tags" placeholder="Add Tags"></form-tags>
+                <form-tags v-model="contentElement.tags" placeholder="Add Tags" :flex="true"></form-tags>
             </div>
         </transition>
 

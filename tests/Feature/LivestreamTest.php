@@ -164,4 +164,15 @@ class LivestreamTest extends TestCase
              ]);
     }
 
+    /** @test **/
+    public function a_livestream_can_be_viewed()
+    {
+        $livestream = Livestream::factory()->create();
+
+        $this->withoutExceptionHandling();
+        $this->get( route('livestreams.view', ['id' => $livestream->id]))
+             ->assertSuccessful()
+             ->assertViewHas('livestream');
+    }
+
 }

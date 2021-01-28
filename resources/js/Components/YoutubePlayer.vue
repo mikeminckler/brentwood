@@ -96,7 +96,13 @@
                 return this.$lodash.isFunction(this.player.playVideo);
             },
             banner() {
-                return this.photo ? this.photo : this.content.photos[0];
+                if (this.photo) {
+                    return this.photo;
+                } else {
+                    if (this.content.photos) {
+                        return this.content.photos[0];
+                    }
+                }
             }
         },
 

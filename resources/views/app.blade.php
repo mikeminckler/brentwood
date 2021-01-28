@@ -61,7 +61,7 @@
 
         <div id="main" class="relative flex-1 flex flex-col">
 
-            <div id="header" class="sticky top-0 z-10 {{ optional($page ?? '')->editable && !request('preview') ? 'px-12' : '' }}">
+            <div id="header" class="sticky top-0 z-10 {{ optional($page ?? '')->editable && !request('preview') ? '' : '' }}">
 
                 <div class="flex justify-center relative">
                     
@@ -172,7 +172,7 @@
 
 
             <div class="items-center flex-1 flex flex-col relative" 
-                :class="$store.state.editing ? 'px-12' : ''"
+                :class="$store.state.editing ? '' : ''"
                 style="background-image: linear-gradient(180deg, rgba(243, 244, 246 ,1) 75%, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1));"> 
 
                 <div class="flex flex-1 flex-col w-full max-w-6xl relative">
@@ -188,7 +188,7 @@
             </div>
 
 
-            <div id="footer" class="relative flex justify-center" style="min-height: 700px" :class="$store.state.editing ? 'px-12' : ''">
+            <div id="footer" class="relative flex justify-center" style="min-height: 700px" :class="$store.state.editing ? '' : ''">
 
                 @if (optional($page ?? '')->editable && optional($page ?? '')->type === 'page' && !request('preview'))
                     <footer-editor></footer-editor>

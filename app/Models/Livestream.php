@@ -14,6 +14,8 @@ class Livestream extends Model
     use HasFactory;
     use TagsTrait;
 
+    protected $with = ['tags'];
+
     protected $dates = ['start_date'];
 
     public function saveLivestream($input, $id = null) 

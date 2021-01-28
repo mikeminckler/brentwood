@@ -79,7 +79,7 @@
 
             <transition name="form-tags">
                 <div class="bg-gray-300 px-2 py-1" v-if="showTags || page.type === 'blog'">
-                    <form-tags v-model="tags" placeholder="Add Page Tags"></form-tags>
+                    <form-tags v-model="tags" placeholder="Add Page Tags" :flex="true"></form-tags>
                 </div>
             </transition>
 

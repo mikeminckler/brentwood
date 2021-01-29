@@ -15,7 +15,7 @@
              ></component>
         </div>
 
-        <div class="mt-4" v-if="!paginator.data.length">There are no items to view.</div>
+        <div class="mt-4" v-if="!$lodash.values(paginator.data).length">There are no {{ resource }} to view.</div>
 
         <div class="flex justify-center">
             <transition-group

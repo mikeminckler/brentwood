@@ -8,10 +8,11 @@ use App\Http\Requests\LivestreamValidation;
 
 use App\Models\Livestream;
 use App\Utilities\Paginate;
+use App\Utilities\PageResponse;
+use App\Models\Page;
 
 class LivestreamsController extends Controller
 {
-    
     public function index()
     {
         if (auth()->user()) {
@@ -52,11 +53,16 @@ class LivestreamsController extends Controller
         ]);
     }
 
-    public function view($id) 
+    public function view($id)
     {
         $livestream = Livestream::findOrFail($id);
-
         return view('livestreams.view', compact('livestream'));
     }
 
+    public function register($id)
+    {
+        $livestream = Livestream::findOrFail($id);
+        $page = Page::where('slug', 'livestream-register')->first();
+        return (new PageResponse)->view($page, 'livestreams.register', ['livestream' => $livestream]);
+    }
 }

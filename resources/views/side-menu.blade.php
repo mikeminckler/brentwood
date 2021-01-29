@@ -21,9 +21,9 @@
         <div>User Management</div>
     </a>
 
-    <a href="/page-accesses" class="side-menu-link">
+    <a href="/permissions" class="side-menu-link">
         <div class="pr-2"><i class="fas fa-user-lock"></i></div>
-        <div>Page Access</div>
+        <div>Page Permissions</div>
     </a>
 
     <a href="/roles" class="side-menu-link">

@@ -7,24 +7,14 @@ use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Support\Str;
 
+use App\Utilities\PageResponse;
+
 trait PagesControllerTrait
 {
     use SoftDeletesControllerTrait;
 
     abstract protected function getValidation();
     abstract protected function findPage($page);
-
-    private function loadPageAttributes($page)
-    {
-        if (session()->has('editing')) {
-            $page->refresh();
-            $page->load('versions');
-        }
-
-        $page->appendAttributes();
-
-        return $page;
-    }
 
     /**
      * Find the page associated with the requested URL path
@@ -33,40 +23,7 @@ trait PagesControllerTrait
     public function load()
     {
         $page = $this->findPage(request()->path());
-
-        if (!$page) {
-            return abort(404);
-        }
-
-        // if the page hasn't been published and we are not logged in dont show
-        if (!$page->published_at && !auth()->check()) {
-            return abort(404);
-        }
-
-        if (session()->has('editing') && request('preview')) {
-            $content_elements = $page->content_elements;
-        } else {
-            $content_elements = $page->published_content_elements;
-        }
-
-        $page = $this->loadPageAttributes($page);
-
-        if (request()->wantsJson()) {
-            if (request('render')) {
-                return response()->json(['html' => view('content', compact('page', 'content_elements'))->render() ]);
-            }
-
-            return response()->json([
-                'page' => $page,
-                'content_elements' => $content_elements,
-            ]);
-        }
-
-        if ($page->editable && !request('preview')) {
-            return view('pages.edit', compact('page', 'content_elements'));
-        } else {
-            return view('pages.view', compact('page', 'content_elements'));
-        }
+        return (new PageResponse)->view($page, 'pages.view');
     }
 
     /**
@@ -92,7 +49,7 @@ trait PagesControllerTrait
 
         $page = ($this->getModel())->savePage(requestInput(), $id);
 
-        $page = $this->loadPageAttributes($page);
+        $page = (new PageResponse)->loadPageAttributes($page);
 
         return response()->json([
             'success' => class_basename($page).' Saved',
@@ -120,7 +77,7 @@ trait PagesControllerTrait
 
         $page->publish();
 
-        $page = $this->loadPageAttributes($page);
+        $page = (new PageResponse)->loadPageAttributes($page);
 
         return response()->json([
             'success' => class_basename($page).' Published',
@@ -181,7 +138,7 @@ trait PagesControllerTrait
        
         $page->refresh();
 
-        $page = $this->loadPageAttributes($page);
+        $page = (new PageResponse)->loadPageAttributes($page);
 
         return response()->json([
             'success' => Str::title(class_basename($page)).' Hidden',
@@ -212,7 +169,7 @@ trait PagesControllerTrait
         
         $page->refresh();
 
-        $page = $this->loadPageAttributes($page);
+        $page = (new PageResponse)->loadPageAttributes($page);
 
         return response()->json([
             'success' => Str::title(class_basename($page)).' Revealed',

@@ -173,6 +173,7 @@ trait VersioningTestTrait
 
         $this->assertTrue($page->can_be_published);
 
+        $this->withoutExceptionHandling();
         $this->json('POST', route(Str::plural($this->getClassname()).'.publish', ['id' => $page->id]))
              ->assertSuccessful()
              ->assertJsonFragment([

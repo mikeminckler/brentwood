@@ -46,5 +46,15 @@ class PagesSeeder extends Seeder
         $inquiry_content->protected = true;
         $inquiry_content->save();
         $inquiry_content->publish();
+
+        $livestream = new Page;
+        $livestream->name = 'Livestream Registration';
+        $livestream->slug = 'livestream-register';
+        $livestream->parent_page_id = 1;
+        $livestream->sort_order = 1;
+        $livestream->unlisted = true;
+        $livestream->protected = true;
+        $livestream->save();
+        $livestream->publish();
     }
 }

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-8">
+    <div class="m-4 md:m-8">
 
         <div class="" v-if="$store.state.page.id < 1">
 

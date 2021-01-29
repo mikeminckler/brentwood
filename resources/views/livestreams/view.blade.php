@@ -8,7 +8,7 @@
 
         <div class="my-4">
             <h1>{{ $livestream->name }}</h1>
-            <div class="py-2 text-gray-500">{{ $livestream->start_date->format('Y-m-d h:ma') }}</div>
+            <div class="text-lg font-bold mt-2">{{ $livestream->start_date->timezone('America/Vancouver')->format('l F jS g:ia') }}</div>
         </div>
 
         <div class="md:flex w-full">

@@ -6,7 +6,7 @@
         <div class="flex-2">
 
             <div class="flex items-center justify-center w-full">
-                <div class="form max-w-sm bg-gray-100 border border-gray-200 px-8 py-4 rounded-lg overflow-hidden mt-4">
+                <div class="form max-w-sm bg-gray-100 border border-gray-200 px-8 py-4 rounded-lg overflow-hidden mt-4" id="inquiry-form">
 
                     <transition-group :name="transitionDirection" tag="div" class="relative mt-8 first:mt-0">
 
@@ -18,10 +18,10 @@
                             <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
 
                             <form-label label="Contact Email" :value="form.email"></form-label>
-                            <div class="input"><input type="text" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
+                            <div class="input"><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
 
                             <form-label label="Contact Phone Number" :value="form.phone"></form-label>
-                            <div class="input"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
+                            <div class="input"><input type="text" inputmode="tel" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
 
                         </div>
 
@@ -88,7 +88,7 @@
 
                             <div class="mt-4">
                                 <div class="flex cursor-pointer px-2 py-1" 
-                                     :class="form.livestream ? (form.livestream.id === livestream.id ? 'bg-green-100 text-gray-800' : 'bg-white odd:bg-gray-100 hover:text-gray-800') : 'bg-white odd:bg-gray-100 hover:text-gray-800'"
+                                     :class="form.livestream ? (form.livestream.id === livestream.id ? 'bg-green-100 text-gray-800' : 'bg-white odd:bg-gray-200 hover:text-gray-800') : 'bg-white odd:bg-gray-200 hover:text-gray-800'"
                                     v-for="livestream in livestreams" 
                                     @click="toggleLivestream(livestream)"
                                 >
@@ -110,7 +110,7 @@
                                     <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
 
                                     <form-label label="Contact Email" :value="form.email"></form-label>
-                                    <div class="input"><input type="text" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
+                                    <div class="input"><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
 
                                     <form-label label="Contact Phone Number" :value="form.phone"></form-label>
                                     <div class="input"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
@@ -439,6 +439,8 @@
 
                         this.currentStep = this.steps[this.currentIndex + 1];
 
+                        window.scrollTo({top: document.getElementById('inquiry-form').offsetTop, behavior: 'smooth'});
+
                     } else if (this.currentIndex === (this.steps.length - 1) && this.formIsValid) {
 
                         this.submit();
@@ -454,6 +456,7 @@
 
                 if (this.currentIndex > 0) {
                     this.currentStep = this.steps[this.currentIndex - 1];
+                    window.scrollTo({top: document.getElementById('inquiry-form').offsetTop, behavior: 'smooth'});
                 }
             },
 

@@ -327,7 +327,7 @@ class InquiryTest extends TestCase
     }
 
     /** @test **/
-    public function an_inquiry_can_save_an_associated_livestream()
+    public function an_inquiry_can_save_an_associated_array_of_livestream()
     {
         $livestream = Livestream::factory()->create();
 
@@ -349,6 +349,35 @@ class InquiryTest extends TestCase
 
         $this->assertEquals(1, $inquiry->livestreams->count());
         $this->assertEquals($livestream->id, $inquiry->livestreams->first()->id);
+
+        $this->get($inquiry->url)
+             ->assertSuccessful();
+    }
+
+    /** @test **/
+    public function an_inquiry_can_save_an_associated_livestream()
+    {
+        $livestream = Livestream::factory()->create();
+
+        $input = Inquiry::factory()->raw();
+        $input['livestream'] = $livestream;
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('inquiries.store'), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Inquiry Saved',
+            ]);
+
+        $inquiry = Inquiry::all()->last();
+
+        $this->assertInstanceOf(Inquiry::class, $inquiry);
+
+        $this->assertEquals(1, $inquiry->livestreams->count());
+        $this->assertEquals($livestream->id, $inquiry->livestreams->first()->id);
+
+        $this->get($inquiry->url)
+             ->assertSuccessful();
     }
 
     /** @test **/
@@ -371,22 +400,5 @@ class InquiryTest extends TestCase
                 'name' => $livestream->name,
                 'id' => $livestream->id,
              ]);
-    }
-
-    /** @test **/
-    public function a_livestream_can_be_loaded_into_the_inquiry_form()
-    {
-        $livestream = Livestream::factory()->create();
-
-        $open_house_tag = Tag::where('name', 'Open House')->first();
-
-        $livestream->tags()->attach($open_house_tag);
-
-        $this->assertTrue(Inquiry::getLivestreams()->contains('id', $livestream->id));
-
-        $this->withoutExceptionHandling();
-        $this->get(route('inquiries.create', ['livestream_id' => $livestream->id]))
-             ->assertSuccessful()
-             ->assertViewHas('livestream', $livestream);
     }
 }

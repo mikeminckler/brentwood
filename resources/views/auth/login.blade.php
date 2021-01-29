@@ -16,7 +16,7 @@
                     @csrf
 
                     <div class="input">
-                        <input type="text" autofocus name="email" value="" placeholder="Email" />
+                        <input type="email" autofocus name="email" value="" placeholder="Email" />
                     </div>
                     <div class="input">
                         <input type="password" name="password" value="" placeholder="Password" />

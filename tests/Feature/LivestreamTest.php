@@ -71,7 +71,6 @@ class LivestreamTest extends TestCase
         $this->assertEquals(Arr::get($input, 'start_date'), $livestream->start_date);
         $this->assertInstanceOf(Carbon::class, $livestream->start_date);
         $this->assertEquals(Arr::get($input, 'length'), $livestream->length);
-
     }
 
     /** @test **/
@@ -110,7 +109,6 @@ class LivestreamTest extends TestCase
         $this->assertEquals(Arr::get($input, 'video_id'), $livestream->video_id);
         $this->assertEquals(Arr::get($input, 'start_date'), $livestream->start_date);
         $this->assertEquals(Arr::get($input, 'length'), $livestream->length);
-
     }
 
     /** @test **/
@@ -137,7 +135,6 @@ class LivestreamTest extends TestCase
         $this->assertNotNull($livestream->tags);
         $this->assertEquals(1, $livestream->tags->count());
         $this->assertTrue($livestream->tags->contains('id', $tag->id));
-
     }
 
     /** @test **/
@@ -170,9 +167,19 @@ class LivestreamTest extends TestCase
         $livestream = Livestream::factory()->create();
 
         $this->withoutExceptionHandling();
-        $this->get( route('livestreams.view', ['id' => $livestream->id]))
+        $this->get(route('livestreams.view', ['id' => $livestream->id]))
              ->assertSuccessful()
              ->assertViewHas('livestream');
     }
 
+    /** @test **/
+    public function registering_for_a_livestream()
+    {
+        $livestream = Livestream::factory()->create();
+
+        $this->withoutExceptionHandling();
+        $this->get(route('livestreams.register', ['id' => $livestream->id]))
+             ->assertSuccessful()
+             ->assertViewHas('livestream', $livestream);
+    }
 }

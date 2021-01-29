@@ -52,12 +52,22 @@ class Inquiry extends Model
 
     public function saveLivestreams($input)
     {
+        $livestreams = collect();
         if (is_array(Arr::get($input, 'livestreams'))) {
             foreach (Arr::get($input, 'livestreams') as $livestream_data) {
                 $livestream = Livestream::findOrFail(Arr::get($livestream_data, 'id'));
-                if (!$this->livestreams->contains('id', $livestream->id)) {
-                    $this->livestreams()->attach($livestream);
-                }
+                $livestreams->push($livestream);
+            }
+        }
+
+        if (Arr::get($input, 'livestream')) {
+            $livestream = Livestream::findOrFail(Arr::get($input, 'livestream.id'));
+            $livestreams->push($livestream);
+        }
+
+        foreach ($livestreams as $livestream) {
+            if (!$this->livestreams->contains('id', $livestream->id)) {
+                $this->livestreams()->attach($livestream);
             }
         }
 

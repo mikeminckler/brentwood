@@ -444,6 +444,7 @@ trait PagesTestTrait
         $this->assertInstanceOf(get_class($this->getModel()), $page);
         $this->assertEquals(1, $content_element->{Str::plural($this->getClassname())}()->count());
 
+        $this->withoutExceptionHandling();
         $this->json('POST', route(Str::plural($this->getClassname()).'.publish', ['id' => $page->id]))
              ->assertSuccessful()
              ->assertJsonFragment([
@@ -700,7 +701,6 @@ trait PagesTestTrait
 
         $this->assertEquals(Arr::get($input, 'content.body'), $page->contentElements()->first()->content->body);
         $this->assertEquals(Arr::get($input, 'content.body'), $new_page->contentElements()->first()->content->body);
-
     }
 
     /** @test **/
@@ -879,5 +879,4 @@ trait PagesTestTrait
         $this->assertEquals(1, $page->content_elements->count());
         $this->assertEquals(1, $new_page->content_elements->count());
     }
-
 }

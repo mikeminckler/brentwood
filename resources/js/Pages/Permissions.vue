@@ -3,14 +3,16 @@
 
     <div class="flex mt-8">
         <div class="flex-1">
-            <h1>Page Access</h1>
+            <div class="px-8">
+                <h1>Page Permissions</h1>
 
-            <div class="my-4">
-                <page-tree 
-                    :emit-event="true" 
-                    @selected="selectedPageId = $event"
-                    :expanded="true"
-                ></page-tree>
+                <div class="my-4">
+                    <page-tree 
+                        :emit-event="true" 
+                        @selected="selectedPageId = $event"
+                        :expanded="true"
+                    ></page-tree>
+                </div>
             </div>
         </div>
 

@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-8">
+    <div class="m-4 md:m-8">
 
         <div class="" v-if="$store.state.page.id < 1">
 
@@ -11,8 +11,8 @@
                     <div class="icon"><i class="fas fa-plus"></i></div>
                     <div class="ml-2">Create Blog</div>
                 </div>
-                <div class="font-bold">Published At</div>
-                <div class="font-bold">Scheduled Launch</div>
+                <div class="">Published At</div>
+                <div class="">Scheduled Launch</div>
                 <div class=""></div>
             </div>
 

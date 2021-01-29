@@ -229,7 +229,7 @@
                                 this.results = [];
                             }
 
-                            if (this.add) {
+                            if (this.add && false) {
 
                                 if (!this.$lodash.find(this.results, result => {
                                     return result.search_label === this.terms;

@@ -8,6 +8,7 @@ use App\Models\Inquiry;
 use App\Models\Page;
 use App\Models\Livestream;
 use App\Utilities\Paginate;
+use App\Utilities\PageResponse;
 
 use App\Http\Requests\InquiryValidation;
 
@@ -35,47 +36,7 @@ class InquiriesController extends Controller
     public function create()
     {
         $page = $this->findPage(request()->path());
-
-        if (!$page) {
-            return abort(404);
-        }
-
-        // if the page hasn't been published and we are not logged in dont show
-        if (!$page->published_at && !auth()->check()) {
-            return abort(404);
-        }
-
-        if (session()->has('editing') && request('preview')) {
-            $content_elements = $page->content_elements;
-        } else {
-            $content_elements = $page->published_content_elements;
-        }
-
-        $page = $this->loadPageAttributes($page);
-
-        $livestream = null;
-
-        if (request('livestream_id')) {
-            $livestream = Livestream::findOrFail(request('livestream_id'));
-        }
-
-        if (request()->wantsJson()) {
-            if (request('render')) {
-                return response()->json(['html' => view('content', compact('page', 'content_elements'))->render() ]);
-            }
-
-            return response()->json([
-                'page' => $page,
-                'content_elements' => $content_elements,
-                'livestream' => $livestream,
-            ]);
-        }
-
-        if ($page->editable && !request('preview')) {
-            return view('pages.edit', compact('page', 'content_elements'));
-        } else {
-            return view('inquiries.create', compact('page', 'content_elements', 'livestream'));
-        }
+        return (new PageResponse)->view($page, 'inquiries.create');
     }
 
     public function index()
@@ -114,6 +75,8 @@ class InquiriesController extends Controller
         }
 
         $inquiry = Inquiry::findOrFail($id);
+
+        $inquiry->load('livestreams');
 
         $page = Inquiry::findPage();
 

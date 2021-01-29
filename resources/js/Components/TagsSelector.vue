@@ -2,7 +2,7 @@
 
     <div class="w-full">
 
-        <div class="flex-1 last:mr-0 mr-4 mt-2 w-full"
+        <div class="flex-1 last:mr-0 mr-4 my-2 w-full"
             v-for="tag in $lodash.omitBy(tags, $lodash.isNull)"
             v-if="tag.name !== 'Admissions'"
             :key="'tag-' + tag.id"
@@ -13,8 +13,8 @@
                  v-if="!tag.tags"
             >{{ tag.name }}</div>
 
-            <div class="mb-4" v-if="tag.tags">
-                <div class="">{{ tag.name }}</div>
+            <div class="" v-if="tag.tags">
+                <div class="text-gray-700 py-1 pl-4 bg-gray-300 rounded-t">{{ tag.name }}</div>
                 <tags-selector class="flex flex-wrap" :tags="tag.tags" :selected-tags="selectedTags" @selected="$emit('selected', $event)"></tags-selector>
             </div>
 

@@ -70,7 +70,7 @@ class Tag extends Model
         return $tag;
     }
 
-    public function getLabelAttribute() 
+    public function getLabelAttribute()
     {
         $name = '';
 
@@ -101,35 +101,34 @@ class Tag extends Model
         return $this->belongsTo(Tag::class, 'parent_tag_id');
     }
 
-    public function tags() 
+    public function tags()
     {
-        return $this->hasMany(Tag::class, 'parent_tag_id');   
+        return $this->hasMany(Tag::class, 'parent_tag_id');
     }
 
 
-    public static function filterWithHierarchy(Collection $filter_tags) 
+    public static function filterWithHierarchy(Collection $filter_tags)
     {
 
-        // this takes in an array of tags and filters out tags that aren't 
+        // this takes in an array of tags and filters out tags that aren't
         // present from all of the tags in the db, to preserve the hierarchy
         // for displaying in the frontend
 
-        return Tag::whereNull('parent_tag_id')->get()->map(function($tag) use($filter_tags) {
+        return Tag::whereNull('parent_tag_id')->get()->map(function ($tag) use ($filter_tags) {
             return $tag->filterTags($filter_tags);
         })
         ->filter()
         ->values();
     }
 
-    public function filterTags($filter_tags) 
+    public function filterTags($filter_tags)
     {
         if ($filter_tags->contains('id', $this->id)) {
             return $this;
         }
 
         if ($this->tags->count()) {
-
-            $this->tags->transform(function($tag) use($filter_tags) {
+            $this->tags->transform(function ($tag) use ($filter_tags) {
                 return $tag->filterTags($filter_tags);
             });
 
@@ -138,10 +137,8 @@ class Tag extends Model
             } else {
                 return null;
             }
-
         } else {
             return null;
         }
     }
-
 }

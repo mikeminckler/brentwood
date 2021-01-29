@@ -65,9 +65,8 @@ trait PagesControllerTrait
         if ($page->editable && !request('preview')) {
             return view('pages.edit', compact('page', 'content_elements'));
         } else {
-            return view($this->base_view ?? 'pages.view', compact('page', 'content_elements'));
+            return view('pages.view', compact('page', 'content_elements'));
         }
-
     }
 
     /**

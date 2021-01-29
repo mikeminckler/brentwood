@@ -14,10 +14,10 @@ use App\Models\Page;
 use App\Models\Inquiry;
 use App\Models\Tag;
 use App\Models\TextBlock;
+use App\Models\Livestream;
 
 class InquiryTest extends TestCase
 {
-
     use WithFaker;
 
     /** @test **/
@@ -217,10 +217,10 @@ class InquiryTest extends TestCase
         $this->assertInstanceOf(Inquiry::class, $inquiry);
         $this->assertEquals(3, $inquiry->tags->count());
 
-        $this->get( route('inquiries.view', ['id' => $inquiry->id]))
+        $this->get(route('inquiries.view', ['id' => $inquiry->id]))
             ->assertStatus(401);
 
-        $this->get( $inquiry->url)
+        $this->get($inquiry->url)
              ->assertSuccessful()
             ->assertViewHas('inquiry', $inquiry);
     }
@@ -233,13 +233,12 @@ class InquiryTest extends TestCase
         $this->assertInstanceOf(Inquiry::class, $inquiry);
         $this->assertEquals(3, $inquiry->tags->count());
 
-        $this->get( route('inquiries.view', ['id' => $inquiry->id]))
+        $this->get(route('inquiries.view', ['id' => $inquiry->id]))
             ->assertStatus(401);
 
-        $this->get( $inquiry->url)
+        $this->get($inquiry->url)
              ->assertSuccessful()
             ->assertViewHas('inquiry', $inquiry);
-        
     }
 
     /** @test **/
@@ -279,7 +278,6 @@ class InquiryTest extends TestCase
             ->assertSee($content_element_start->content->body)
             ->assertSee($tagged_content_element->content->body)
             ->assertSee($content_element_end->content->body);
-
     }
     
     /** @test **/
@@ -326,5 +324,69 @@ class InquiryTest extends TestCase
                  'name' => $inquiry->name,
                  'email' => $inquiry->email,
              ]);
+    }
+
+    /** @test **/
+    public function an_inquiry_can_save_an_associated_livestream()
+    {
+        $livestream = Livestream::factory()->create();
+
+        $input = Inquiry::factory()->raw();
+        $input['livestreams'] = [
+            $livestream
+        ];
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('inquiries.store'), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Inquiry Saved',
+            ]);
+
+        $inquiry = Inquiry::all()->last();
+
+        $this->assertInstanceOf(Inquiry::class, $inquiry);
+
+        $this->assertEquals(1, $inquiry->livestreams->count());
+        $this->assertEquals($livestream->id, $inquiry->livestreams->first()->id);
+    }
+
+    /** @test **/
+    public function inquiry_livestreams_can_be_loaded()
+    {
+        $inquiry_page = Inquiry::findPage();
+
+        $livestream = Livestream::factory()->create();
+        $open_house_tag = Tag::where('name', 'Open House')->first();
+        $livestream->tags()->attach($open_house_tag);
+
+        $livestreams = Inquiry::getLivestreams();
+
+        $this->assertTrue($livestreams->contains('id', $livestream->id));
+
+        $this->withoutExceptionHandling();
+        $this->json('GET', route('inquiries.livestreams'))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'name' => $livestream->name,
+                'id' => $livestream->id,
+             ]);
+    }
+
+    /** @test **/
+    public function a_livestream_can_be_loaded_into_the_inquiry_form()
+    {
+        $livestream = Livestream::factory()->create();
+
+        $open_house_tag = Tag::where('name', 'Open House')->first();
+
+        $livestream->tags()->attach($open_house_tag);
+
+        $this->assertTrue(Inquiry::getLivestreams()->contains('id', $livestream->id));
+
+        $this->withoutExceptionHandling();
+        $this->get(route('inquiries.create', ['livestream_id' => $livestream->id]))
+             ->assertSuccessful()
+             ->assertViewHas('livestream', $livestream);
     }
 }

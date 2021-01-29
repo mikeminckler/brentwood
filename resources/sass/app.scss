@@ -275,7 +275,7 @@ input[type=range]:hover {
         }
     }
 
-    & div.input {
+    & div.input, div.fake-input {
         @apply mb-4;
     }
 
@@ -387,7 +387,7 @@ div.cell {
 }
 
 .grid-livestreams {
-    grid-template-columns: 32px 1fr auto auto auto;
+    grid-template-columns: 32px 1fr auto auto auto auto;
 }
 
 .ignore {

@@ -13,6 +13,14 @@ class TagsSeeder extends Seeder
      *
      * @return void
      */
+
+    protected $protected_tags = [
+        'Admissions',
+        'Boarding Student',
+        'Day Student',
+        'Open House',
+    ];
+
     public function run()
     {
         $tags = collect([
@@ -74,7 +82,6 @@ class TagsSeeder extends Seeder
         ]);
 
         foreach ($tags as $parent => $childern) {
-
             $parent_tag = new Tag;
             $parent_tag->name = $parent;
             $parent_tag->save();
@@ -85,7 +92,15 @@ class TagsSeeder extends Seeder
                 $tag->parent_tag_id = $parent_tag->id;
                 $tag->save();
             }
+        }
 
+        foreach ($this->protected_tags as $name) {
+            $tag = Tag::where('name', $name)->first();
+            if (!$tag) {
+                throw \Exception('Could not find tag '.$name);
+            }
+            $tag->protected = true;
+            $tag->save();
         }
     }
 }

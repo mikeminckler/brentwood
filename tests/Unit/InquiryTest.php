@@ -17,7 +17,6 @@ use Tests\Unit\TagsTrait;
 
 class InquiryTest extends TestCase
 {
-
     use TagsTrait;
 
     protected function getClassname()
@@ -29,7 +28,7 @@ class InquiryTest extends TestCase
     public function the_inquiry_content_page_can_be_found()
     {
         $page = Page::find(3);
-        $inquiry_page = Inquiry::findPage();  
+        $inquiry_page = Inquiry::findPage();
         $this->assertInstanceOf(Page::class, $inquiry_page);
         $this->assertEquals($page->id, $inquiry_page->id);
     }
@@ -65,7 +64,6 @@ class InquiryTest extends TestCase
         $this->assertTrue($tags->contains('id', $tag1->id));
         $this->assertTrue($tags->contains('id', $tag2->id));
         $this->assertFalse($tags->contains('id', $unpublished_tag->id));
-
     }
 
     /** @test **/
@@ -76,7 +74,7 @@ class InquiryTest extends TestCase
 
         $this->assertNotNull($boarding_tag);
         $this->assertNotNull($day_tag);
-                                            // admissions -> tags -> 
+        // admissions -> tags ->
         $this->assertTrue(Inquiry::getTags()->first()->tags->contains('id', $boarding_tag->id));
         $this->assertTrue(Inquiry::getTags()->first()->tags->contains('id', $day_tag->id));
     }
@@ -84,7 +82,6 @@ class InquiryTest extends TestCase
     /** @test **/
     public function an_inquiries_tags_filters_out_boarding_and_day()
     {
-        
         $boarding_tag = Tag::where('name', 'Boarding Student')->first();
         $day_tag = Tag::where('name', 'Day Student')->first();
 
@@ -111,7 +108,6 @@ class InquiryTest extends TestCase
         $this->assertTrue($inquiry->filtered_tags->contains('id', $tag->id));
         $this->assertFalse($inquiry->filtered_tags->contains('id', $boarding_tag->id));
         $this->assertFalse($inquiry->filtered_tags->contains('id', $day_tag->id));
-
     }
 
     /** @test **/
@@ -139,7 +135,6 @@ class InquiryTest extends TestCase
         $this->assertEquals($parent_tag->id, $tags->last()->id);
         $this->assertEquals(1, $tags->last()->tags()->count());
         $this->assertEquals($tag->id, $tags->last()->tags()->first()->id);
-
     }
 
     /** @test **/
@@ -153,5 +148,30 @@ class InquiryTest extends TestCase
         $inquiry->refresh();
         $this->assertEquals(1, $inquiry->livestreams()->count());
         $this->assertEquals($livestream->id, $inquiry->livestreams()->first()->id);
+    }
+
+    /** @test **/
+    public function livestreams_can_be_loaded_for_the_inquiries_page()
+    {
+        
+        $inquiry_page = Inquiry::findPage();
+
+        $livestream = Livestream::factory()->create();
+
+        $past_livestream = Livestream::factory()->create([
+            'start_date' => now()->subDays(1),
+        ]);
+
+        $open_house_tag = Tag::where('name', 'Open House')->first();
+
+        $this->assertInstanceOf(Tag::class, $open_house_tag);
+
+        $livestream->tags()->attach($open_house_tag);
+        $past_livestream->tags()->attach($open_house_tag);
+
+        $livestreams = Inquiry::getLivestreams();
+
+        $this->assertTrue($livestreams->contains('id', $livestream->id));
+        $this->assertFalse($livestreams->contains('id', $past_livestream->id));
     }
 }

@@ -17,7 +17,7 @@ class Inquiry extends Model
     use HasFactory;
     use TagsTrait;
 
-    public function saveInquiry(array $input, $id = null) 
+    public function saveInquiry(array $input, $id = null)
     {
         if ($id) {
             $inquiry = Inquiry::findOrFail($id);
@@ -34,6 +34,8 @@ class Inquiry extends Model
 
         $inquiry->save();
 
+        $inquiry->saveLivestreams($input);
+
         $inquiry->refresh();
 
         if (!$inquiry->url) {
@@ -48,17 +50,30 @@ class Inquiry extends Model
         return $inquiry;
     }
 
-    public static function findPage() 
+    public function saveLivestreams($input)
+    {
+        if (is_array(Arr::get($input, 'livestreams'))) {
+            foreach (Arr::get($input, 'livestreams') as $livestream_data) {
+                $livestream = Livestream::findOrFail(Arr::get($livestream_data, 'id'));
+                if (!$this->livestreams->contains('id', $livestream->id)) {
+                    $this->livestreams()->attach($livestream);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    public static function findPage()
     {
         return Page::where('slug', 'inquiry-content')->first();
     }
 
-    public static function getTags() 
+    public static function getTags()
     {
-        
         $tags = self::findPage()
                     ->published_content_elements
-                    ->map(function($content_element) {
+                    ->map(function ($content_element) {
                         return $content_element->tags;
                     })
                     ->flatten();
@@ -69,25 +84,36 @@ class Inquiry extends Model
         $tags->push($boarding_tag);
         $tags->push($day_tag);
 
-        $inquiry_tags = $tags->unique(function($tag) {
-                    return $tag->id;
-                });
+        $inquiry_tags = $tags->unique(function ($tag) {
+            return $tag->id;
+        });
 
         return Tag::filterWithHierarchy($inquiry_tags);
     }
 
-    public function getFilteredTagsAttribute() 
+    public function getFilteredTagsAttribute()
     {
         $boarding_tag = Tag::where('name', 'Boarding Student')->first();
         $day_tag = Tag::where('name', 'Day Student')->first();
 
-        return $this->tags->filter(function($tag) use ($boarding_tag, $day_tag) {
+        return $this->tags->filter(function ($tag) use ($boarding_tag, $day_tag) {
             return $tag->id !== $boarding_tag->id && $tag->id !== $day_tag->id;
         });
     }
 
-    public function livestreams() 
+    public function livestreams()
     {
-        return $this->belongsToMany(Livestream::class);   
+        return $this->belongsToMany(Livestream::class);
+    }
+
+    public static function getLivestreams()
+    {
+        $open_house_tag = Tag::where('name', 'Open House')->first();
+
+        return Livestream::whereHas('tags', function ($query) use ($open_house_tag) {
+            $query->where('tags.id', $open_house_tag->id);
+        })
+        ->where('start_date', '>=', now())
+        ->get();
     }
 }

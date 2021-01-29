@@ -157,7 +157,7 @@ class RoleTest extends TestCase
     public function a_roles_user_is_removed_if_it_is_not_included_in_the_save_input()
     {
         $user = User::factory()->create();
-        $role = Role::all()->random();
+        $role = Role::factory()->create();
 
         $user->addRole($role);
         $user->refresh();

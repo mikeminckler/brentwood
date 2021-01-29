@@ -6,22 +6,28 @@
         <div class="flex-2">
 
             <div class="flex items-center justify-center w-full">
-                <div class="form max-w-sm bg-gray-100 border border-gray-200 px-8 py-4 rounded-lg overflow-hidden">
+                <div class="form max-w-sm bg-gray-100 border border-gray-200 px-8 py-4 rounded-lg overflow-hidden mt-4">
 
                     <transition-group :name="transitionDirection" tag="div" class="relative mt-8 first:mt-0">
 
-                        <div class="" key="step1" v-if="currentStep === 1">
-                            <div class="input-label"><label for="name">Contact Name</label></div>
+                        <div class="" key="step1" v-if="currentStep === 'Contact Information'">
+
+                            <h3 class="mb-4">{{ currentStep }}</h3>
+
+                            <form-label label="Contact Name" :value="form.name"></form-label>
                             <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
 
-                            <div class="input-label"><label for="email">Contact Email</label></div>
-                            <div class="input"><input type="text" id="email" v-model="form.email" class="" placeholder="example@example.ca" /></div>
+                            <form-label label="Contact Email" :value="form.email"></form-label>
+                            <div class="input"><input type="text" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
 
-                            <div class="input-label"><label for="phone">Contact Phone Number</label></div>
-                            <div class="input"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="250-555-5555" /></div>
+                            <form-label label="Contact Phone Number" :value="form.phone"></form-label>
+                            <div class="input"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
+
                         </div>
 
-                        <div class="" key="step2" v-if="currentStep === 2">
+                        <div class="" key="step2" v-if="currentStep === 'Student Information'">
+
+                            <h3>{{ currentStep }}</h3>
 
                             <div class="mt-4">
                                 <div class="input-label">Start Year</div>
@@ -29,7 +35,7 @@
                                     <div v-for="year in years"
                                          :key="'year-' + year"
                                          class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
-                                        :class="year === form.target_year ? 'bg-primary text-white font-bold' : 'bg-gray-200 hover:bg-white'" 
+                                        :class="year === form.target_year ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
                                          @click="form.target_year = year"
                                          >{{ year }}-{{ year + 1 }}</div>
                                 </div>
@@ -42,7 +48,7 @@
                                     <div v-for="grade in grades"
                                          :key="'grade-' + grade"
                                          class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
-                                        :class="grade === form.target_grade ? 'bg-primary text-white font-bold' : 'bg-gray-200 hover:bg-white'" 
+                                        :class="grade === form.target_grade ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
                                          @click="form.target_grade = grade"
                                          >Grade {{ grade }}</div>
                                     <div class="flex-1 mr-4 my-1 px-4">&nbsp;</div>
@@ -56,7 +62,7 @@
                                     <div v-for="type in types"
                                          :key="'type-' + type"
                                          class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
-                                        :class="type === form.student_type ? 'bg-primary text-white font-bold' : 'bg-gray-200 hover:bg-white'" 
+                                        :class="type === form.student_type ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
                                          @click="form.student_type = type"
                                          >{{ type }}</div>
                                 </div>
@@ -64,42 +70,71 @@
 
                         </div>
 
-                        <div class="" key="step3" v-if="currentStep === 3">
-                            <div class="">Let us know what you are interested in</div>
+                        <div class="" key="step3" v-if="currentStep === 'Student Interests'">
+
+                            <h3>{{ currentStep }}</h3>
+
+                            <div class="mt-4">Select the items that the student is interested in.</div>
 
                             <tags-selector :tags="tags" :selected-tags="form.tags" @selected="toggleTag($event)"></tags-selector>
 
                         </div>
 
-                        <div class="" key="step4" v-if="currentStep === 4">
+                        <div class="" key="step4" v-if="currentStep === 'Online Open Houses'">
+
+                            <h3>{{ currentStep }}</h3>
+
+                            <p>To learn more about Brentwood <span class="font-bold">select an online open house</span> from the list below to sign up for an online open house presented by our admissions team.</p>
+
+                            <div class="mt-4">
+                                <div class="flex cursor-pointer px-2 py-1" 
+                                     :class="form.livestream ? (form.livestream.id === livestream.id ? 'bg-green-100 text-gray-800' : 'bg-white odd:bg-gray-100 hover:text-gray-800') : 'bg-white odd:bg-gray-100 hover:text-gray-800'"
+                                    v-for="livestream in livestreams" 
+                                    @click="toggleLivestream(livestream)"
+                                >
+                                    <div class="icon" v-show="form.livestream ? (form.livestream.id === livestream.id ? false : true) : true"><i class="far fa-circle"></i></div>
+                                    <div class="icon" v-show="form.livestream ? (form.livestream.id === livestream.id ? true : false) : false"><i class="fas fa-check-circle"></i></div>
+                                    <div class="pl-2">{{ $moment(livestream.start_date).format('dddd MMMM Do h:mmA') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="" key="step5" v-if="currentStep === 'Review Information'">
 
                             <div class="mt-4">
 
-                                <h2>Review Information</h2>
+                                <h3>{{ currentStep }}</h3>
 
                                 <div class="mt-4">
-                                    <div class="text-gray-500 text-sm">Contact Name</div>
-                                    <div class="">{{ form.name }}</div>
+                                    <form-label label="Contact Name" :value="form.name"></form-label>
+                                    <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
 
-                                    <div class="text-gray-500 text-sm mt-2">Contact Email</div>
-                                    <div class="">{{ form.email }}</div>
+                                    <form-label label="Contact Email" :value="form.email"></form-label>
+                                    <div class="input"><input type="text" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
 
-                                    <div class="text-gray-500 text-sm mt-2">Contact Phone Number</div>
-                                    <div class="">{{ form.phone }}</div>
+                                    <form-label label="Contact Phone Number" :value="form.phone"></form-label>
+                                    <div class="input"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
 
-                                    <div class="text-gray-500 text-sm mt-2">Start Year</div>
-                                    <div class="">{{ form.target_year }}-{{ form.target_year + 1 }}</div>
 
-                                    <div class="text-gray-500 text-sm mt-2">Start Grade</div>
-                                    <div class="">Grade {{ form.target_grade }}</div>
+                                    <form-label label="Start Year" :value="form.target_year"></form-label>
+                                    <div class="fake-input">{{ form.target_year }}-{{ form.target_year + 1 }}</div>
 
-                                    <div class="text-gray-500 text-sm mt-2">Student Type</div>
-                                    <div class="">{{ form.student_type }}</div>
+                                    <form-label label="Start Grade" :value="form.target_grade"></form-label>
+                                    <div class="fake-input">Grade {{ form.target_grade }}</div>
 
-                                    <div class="text-gray-500 text-sm mt-2" v-if="filteredFormTags.length">Interests</div>
-                                    <div class="">
+                                    <form-label label="Student Type" :value="form.student_type"></form-label>
+                                    <div class="fake-input">{{ form.student_type }}</div>
+
+                                    <form-label label="Student Interests" :value="filteredFormTags.length"></form-label>
+                                    <div class="fake-input" v-if="filteredFormTags.length">
                                         <div class="" v-for="tag in filteredFormTags">{{ tag.name }}</div>
                                     </div>
+
+                                    <div class="" v-if="form.livestream">
+                                        <form-label label="Online Open House" :value="form.livestream"></form-label>
+                                        <div class="fake-input">{{ $moment(form.livestream.start_date).format('dddd MMMM Do h:mmA') }}</div>
+                                    </div>
+
                                 </div>
 
                             </div>
@@ -108,19 +143,19 @@
                     </transition-group>
 
                     <div class="flex justify-around items-center mt-4">
-                        <div class="flex-1 flex items-center hover:bg-white px-4 py-2 transition-opacity transition" :class="currentStep === 1 ? 'opacity-0' : 'opacity-1 cursor-pointer'" @click="prevStep()">
+                        <div class="flex-1 flex items-center hover:bg-white px-4 py-2 transition-opacity transition" :class="currentStep === 'Contact Information' ? 'opacity-0' : 'opacity-1 cursor-pointer'" @click="prevStep()">
                             <div class="icon mr-2"><i class="fas fa-chevron-left"></i></div>
                             <div class="">Back</div>
                         </div>
 
                         <div class="flex flex-1 mx-2">
                             <div class="mx-2 transition transition-all" 
-                                 :class="[validateStep(step) ? 'text-green-500 hover:text-green-400 cursor-pointer' : (currentStep === step ? 'text-gray-600' : 'text-gray-300'), step > 2 ? 'hidden' : '']"
+                                 :class="stepClass(step)"
                                  v-for="step in steps"
                                  @click="goToStep(step)"
                             >
-                                <div class="icon" v-if="!validateStep(step)"><i class="fas fa-circle"></i></div>
-                                <div class="icon" v-if="validateStep(step)"><i class="fas fa-check-circle"></i></div>
+                                <div class="icon" v-if="!showCheck(step)"><i class="fas fa-circle"></i></div>
+                                <div class="icon" v-if="showCheck(step)"><i class="fas fa-check-circle"></i></div>
                             </div>
                         </div>
 
@@ -142,15 +177,17 @@
 
 <script>
 
+    import Dates from '@/Mixins/Dates';
     import Feedback from '@/Mixins/Feedback';
 
     export default {
 
-        props: [],
+        props: ['livestream'],
 
-        mixins: [Feedback],
+        mixins: [Feedback, Dates],
 
         components: {
+            'form-label': () => import(/* webpackChunkName: "form-label" */ '@/Components/FormLabel.vue'),
             'tags-selector': () => import(/* webpackChunkName: "tags-selector" */ '@/Components/TagsSelector.vue'),
         },
 
@@ -159,11 +196,18 @@
 
                 url: '',
                 transitionDirection: 'inquiry-form-forward',
-                currentStep: 1,
-                steps: [1,2,3,4],
+                currentStep: 'Contact Information',
+                allSteps: [
+                    'Contact Information',
+                    'Student Information',
+                    'Student Interests',
+                    'Online Open Houses',
+                    'Review Information',
+                ],
                 types: ['Boarding', 'Day'],
 
                 tags: [],
+                livestreams: [],
 
                 form: {
                     name: '',
@@ -173,6 +217,7 @@
                     target_year: null,
                     student_type: null,
                     tags: [],
+                    livestream: null,
                     //gender: '',
                 },
 
@@ -181,6 +226,23 @@
         },
 
         computed: {
+
+            steps() {
+                if (!this.livestream) {
+                    return this.allSteps;
+                } else {
+                    let steps = this.$lodash.clone(this.allSteps);
+                    return this.$lodash.remove(steps, step => {
+                        return step !== 'Online Open Houses';
+                    });
+                }
+            },
+
+            currentIndex() {
+                return this.$lodash.findIndex(this.steps, step => {
+                    return step === this.currentStep;
+                });
+            },
 
             years() {
                 let years = [];
@@ -199,7 +261,7 @@
             },
 
             nextText() {
-                if (this.currentStep === this.steps.length) {
+                if (this.currentIndex === (this.steps.length - 1)) {
                     return 'Finish';
                 } else {
                     return 'Next';
@@ -250,6 +312,11 @@
 
         mounted() {
             this.loadTags();
+            this.loadLivestreams();
+
+            if (this.livestream) {
+                this.form.livestream = this.livestream;
+            }
         },
 
         watch: {
@@ -280,25 +347,65 @@
 
         methods: {
 
+            showCheck: function(step) {
+
+                if (step === 'Contact Information' || step === 'Student Information') {
+                    return this.validateStep(step);
+                } 
+
+                let index = this.$lodash.findIndex(this.steps, s => {
+                    return s === step;
+                });
+                if (this.currentIndex > index) {
+                    return true;
+                }
+
+                return false;
+
+            },
+
+            stepClass: function(step) {
+
+                let classes = '';
+                if (step === 'Review Information') {
+                    classes += ' hidden';
+                }
+                
+                if (this.showCheck(step)) {
+                    classes += ' text-green-500 hover:text-green-400 cursor-pointer';
+                } else if (this.currentStep === step) {
+                    classes += ' text-gray-600';
+                } else {
+                    classes += ' text-gray-400';
+                }
+
+                return classes;
+
+            },
+
             validateStep: function(step) {
 
                 if (!step) {
                     step = this.currentStep;
                 }
 
-                if (step === 1) {
+                if (step === 'Contact Information') {
                     return this.form.name.length > 2 && this.form.phone.length > 9 && this.validEmail;
                 }
 
-                if (step === 2) {
+                if (step === 'Student Information') {
                     return this.form.target_year && this.form.target_grade && this.form.student_type;
                 }
 
-                if (step === 3) {
-                    return this.validateStep(2);
+                if (step === 'Student Interests') {
+                    return this.currentStep === 'Student Interests' || this.currentStep === 'Online Open Houses' || this.currentStep === 'Review Information';
                 }
 
-                if (step === 4) {
+                if (step === 'Online Open Houses') {
+                    return this.currentStep === 'Online Open Houses' || this.currentStep === 'Review Information';
+                }
+
+                if (step === 'Review Information') {
                     return this.formIsValid;
                 }
 
@@ -306,7 +413,11 @@
 
             goToStep: function(step) {
 
-                if (step < this.currentStep) {
+                let index = this.$lodash.findIndex(this.steps, s => {
+                    return s === step;
+                });
+
+                if (index < this.currentIndex) {
                     this.transitionDirection = 'inquiry-form-backward';
                 } else {
                     this.transitionDirection = 'inquiry-form-forward';
@@ -324,10 +435,14 @@
 
                     this.transitionDirection = 'inquiry-form-forward';
 
-                    if (this.currentStep < this.steps.length && this.validateStep()) {
-                        this.currentStep++;
-                    } else if (this.currentStep === this.steps.length && this.formIsValid) {
+                    if (this.currentIndex < (this.steps.length - 1) && this.validateStep()) {
+
+                        this.currentStep = this.steps[this.currentIndex + 1];
+
+                    } else if (this.currentIndex === (this.steps.length - 1) && this.formIsValid) {
+
                         this.submit();
+
                     }
 
                 }
@@ -337,8 +452,8 @@
             prevStep: function() {
                 this.transitionDirection = 'inquiry-form-backward';
 
-                if (this.currentStep > 1) {
-                    this.currentStep--;
+                if (this.currentIndex > 0) {
+                    this.currentStep = this.steps[this.currentIndex - 1];
                 }
             },
 
@@ -363,9 +478,31 @@
 
             },
 
+            loadLivestreams: function() {
+
+                this.$http.get('/inquiry/livestreams').then( response => {
+                    this.livestreams = response.data.livestreams;
+                }, error => {
+                    this.processErrors(error.response);
+                });
+
+            },
+
             toggleTag: function(tag) {
                 this.form.tags = this.$lodash.xor(this.form.tags, [tag]);
-            }
+            },
+
+            toggleLivestream: function(livestream) {
+
+                if (!this.form.livestream) {
+                    this.form.livestream = livestream;
+                } else if (this.form.livestream.id === livestream.id) {
+                    this.form.livestream = null;
+                } else {
+                    this.form.livestream = livestream;
+                }
+
+            },
         },
 
     }

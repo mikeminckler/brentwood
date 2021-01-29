@@ -15,6 +15,7 @@
                             <div class="icon"><i class="fas fa-plus"></i></div>
                             <div class="ml-2">Create Livestream</div>
                         </div>
+                        <div class="grid-cell"></div>
                         <div class="grid-cell">Start Date</div>
                         <div class="grid-cell">Youtube Page</div>
                         <div class="grid-cell">Popout Chat</div>

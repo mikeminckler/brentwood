@@ -36,4 +36,9 @@ class Livestream extends Model
 
         return $livestream;
     }
+
+    public function inquiries() 
+    {
+        return $this->belongsToMany(Inquiry::class);   
+    }
 }

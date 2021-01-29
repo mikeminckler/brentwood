@@ -101,9 +101,10 @@ Route::get('/livestreams/{id}', [LivestreamsController::class, 'view'])->name('l
 Route::post('/blogs', [BlogsController::class, 'index'])->name('blogs.index');
 Route::get('/blogs/{page}', [BlogsController::class, 'load'])->name('blogs.load')->where('page', '.*');
 
-Route::get('/inquiry', [InquiriesController::class, 'load'])->name('inquiries.create');
+Route::get('/inquiry', [InquiriesController::class, 'create'])->name('inquiries.create');
 Route::post('/inquiry', [InquiriesController::class, 'store'])->name('inquiries.store');
 Route::get('/inquiry/tags', [InquiriesController::class, 'tags'])->name('inquiries.tags');
+Route::get('/inquiry/livestreams', [InquiriesController::class, 'livestreams'])->name('inquiries.livestreams');
 Route::get('/inquiry/{id}', [InquiriesController::class, 'view'])->name('inquiries.view')->where('id', '\d+');
 Route::post('/inquiry/{id}', [InquiriesController::class, 'store'])->name('inquiries.update')->where('id', '\d+');
 

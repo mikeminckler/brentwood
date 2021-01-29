@@ -4,7 +4,7 @@
 
         <div class="grid" :class="'grid-' + (grid ? grid : resource)">
 
-            <slot name="header" v-if="paginator.data.length"></slot>
+            <slot name="header"></slot>
 
             <component :is="resource + '-row'"
                  v-for="(item, index) in $lodash.values(paginator.data)"

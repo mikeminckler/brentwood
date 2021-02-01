@@ -25,7 +25,7 @@
             <div class="relative overflow-visible h-0" v-if="hover" style="bottom: -13px;"><i class="fas fa-caret-right"></i></div>
         </div>
 
-        <div class="flex hover:bg-white border-b border-gray-300 items-center relative z-1" :class="activePage ? 'bg-yellow-100 text-black' : ''">
+        <div class="flex hover:bg-white border-b border-gray-300 items-center relative z-1" :class="page.id === $store.state.page.id ? 'bg-yellow-100 text-black' : ''">
             <div class="cursor-pointer w-3 mr-2 flex items-center justify-center caret text-lg leading-none" 
                 :class="{ 'rotate90' : expand }"
                 @click="expand = !expand" v-if="page.pages ? ( page.pages.length ? true : false ) : false"
@@ -108,12 +108,6 @@
                 expand: false,
                 displayContentElements: false,
                 hover: false,
-            }
-        },
-
-        computed: {
-            activePage() {
-                return window.location.pathname === '/' + this.page.full_slug;
             }
         },
 

@@ -1,5 +1,5 @@
 @if ($content->header)
-    <div class="w-full md:flex relative z-2 {{ $content->full_width ? 'bg-white' : ($content->photos->count() && $content->style ? 'text-style-'.$content->style : '') }} {{ $sort_order === 1 ? 'mt-8' : 'mt-0'}}">
+    <div class="w-full md:flex relative z-2 {{ $content->full_width ? 'bg-white pt-4' : ($content->photos->count() && $content->style ? 'text-style-'.$content->style : '') }} {{ $sort_order === 1 ? 'mt-8' : 'mt-0'}}">
 
         @if (!$content->full_width)
             <div class="flex-1 relative {{ $content->photos->count() ? 'md:m-0 md:w-auto md:pb-0 md:float-none' : '' }}"></div>
@@ -15,7 +15,7 @@
     </div>
 @endif
 
-<div class="w-full md:flex relative z-3 {{ $content->full_width ? 'bg-white' : ($content->photos->count() && $content->style ? 'text-style-'.$content->style : '') }}">
+<div class="w-full md:flex relative z-3 {{ $content->full_width ? ( !$content->header ? 'bg-white pt-8' : 'bg-white' ) : ($content->photos->count() && $content->style ? 'text-style-'.$content->style : '') }}">
     @if (!$content->full_width)
         <div class="flex-1 relative {{ $content->photos->count() || ($content->stat_number && $content->stat_name) ? 'pb-50p z-3 md:m-0 md:pb-0' : '' }} {{ $content->header ? ( $content->style ? 'md:-mt-20' : 'md:-mt-12' ) : '' }}">
 

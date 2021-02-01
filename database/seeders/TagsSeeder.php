@@ -18,7 +18,7 @@ class TagsSeeder extends Seeder
         'Admissions',
         'Boarding Student',
         'Day Student',
-        'Open House',
+        'Open Houses',
     ];
 
     public function run()
@@ -28,7 +28,7 @@ class TagsSeeder extends Seeder
             'Admissions' => [
                 'Boarding Student',
                 'Day Student',
-                'Open House',
+                'Open Houses',
             ],
 
             "Academics" => [

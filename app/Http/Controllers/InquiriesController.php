@@ -12,32 +12,8 @@ use App\Utilities\PageResponse;
 
 use App\Http\Requests\InquiryValidation;
 
-use App\Traits\PagesControllerTrait;
-
 class InquiriesController extends Controller
 {
-    use PagesControllerTrait;
-
-    protected function getModel()
-    {
-        return new Page;
-    }
-
-    protected function getValidation()
-    {
-        return (new PageValidation);
-    }
-
-    protected function findPage($path)
-    {
-        return (new Page)->findByFullSlug($path);
-    }
-
-    public function create()
-    {
-        $page = $this->findPage(request()->path());
-        return (new PageResponse)->view($page, 'inquiries.create');
-    }
 
     public function index()
     {
@@ -95,13 +71,6 @@ class InquiriesController extends Controller
     {
         return response()->json([
             'tags' => Inquiry::getTags(),
-        ]);
-    }
-
-    public function livestreams()
-    {
-        return response()->json([
-            'livestreams' => Inquiry::getLivestreams(),
         ]);
     }
 }

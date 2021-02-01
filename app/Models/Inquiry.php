@@ -115,15 +115,4 @@ class Inquiry extends Model
     {
         return $this->belongsToMany(Livestream::class);
     }
-
-    public static function getLivestreams()
-    {
-        $open_house_tag = Tag::where('name', 'Open House')->first();
-
-        return Livestream::whereHas('tags', function ($query) use ($open_house_tag) {
-            $query->where('tags.id', $open_house_tag->id);
-        })
-        ->where('start_date', '>=', now())
-        ->get();
-    }
 }

@@ -40,6 +40,11 @@
                 <div class="whitespace-no-wrap">Blog Listing</div>
             </div>
 
+            <div class="relative z-2 button mx-2 my-1 items-center" @click="add('addInquiryForm')">
+                <div class="pr-2 text-lg leading-none"><i class="fas fa-question-circle"></i></div>
+                <div class="whitespace-no-wrap">Inquiry Form</div>
+            </div>
+
             <div class="relative z-2 button mx-2 my-1 items-center" @click="add('addInstance')">
                 <div class="pr-2 text-lg leading-none"><i class="fas fa-copy"></i></div>
                 <div class="whitespace-no-wrap">Instance</div>

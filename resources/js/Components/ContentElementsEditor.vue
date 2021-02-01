@@ -279,6 +279,26 @@
 
             },
 
+            addInquiryForm: function() {
+
+                let contentElement = this.newContentElement();
+
+                contentElement.type = 'inquiry-form';
+                contentElement.content = {
+                    id: 0,
+                    header: '',
+                    body: '',
+                    show_student_info: false,
+                    show_interests: false,
+                    show_livestreams: false,
+                    show_livestreams_first: false,
+                    tags: [],
+                };
+
+                this.saveNewContentElement(contentElement);
+
+            },
+
             addInstance: function() {
                 this.showPageTree = !this.showPageTree;
             },

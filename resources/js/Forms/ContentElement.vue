@@ -102,6 +102,7 @@
             'blog-list': () => import(/* webpackChunkName: "blog-list" */ '@/Forms/BlogList.vue'),
             'date-time-picker': () => import(/* webpackChunkName: "date-time-picker" */ '@/Components/DateTimePicker.vue'),
             'form-tags': () => import(/* webpackChunkName: "form-tags" */ '@/Forms/Tags.vue'),
+            'inquiry-form': () => import(/* webpackChunkName: "inquiry-form" */ '@/Forms/InquiryForm.vue'),
         },
 
         data() {

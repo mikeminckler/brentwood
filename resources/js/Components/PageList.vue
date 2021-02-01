@@ -34,7 +34,7 @@
             </div>
             <div class="cursor-pointer flex-1 pr-4 whitespace-no-wrap" :class="[page.pages ? ( page.pages.length ? '' : 'pl-3' ) : 'pl-3', page.unlisted ? 'text-gray-500' : '']" @click="selectPage()">{{ page.name }}</div>
             <div class="" v-if="page.unlisted" class="text-gray-400 pl-2"><i class="fas fa-eye-slash"></i></div>
-            <div class="text-gray-600 pl-2 text-lg" v-if="showChanges && (!page.published_version_id || page.can_be_published)"><i class="fas fa-pen-square"></i></div>
+            <div class="text-gray-600 pl-2 text-lg" v-if="showChanges && (!page.published_version_id || page.can_be_published)"><i class="fas fa-stream"></i></div>
             <div class="text-xl px-2" v-if="showContentElements" @click="displayContentElements = !displayContentElements"><i class="fas fa-caret-square-down"></i></div>
         </div>
 

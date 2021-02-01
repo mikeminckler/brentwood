@@ -150,28 +150,4 @@ class InquiryTest extends TestCase
         $this->assertEquals($livestream->id, $inquiry->livestreams()->first()->id);
     }
 
-    /** @test **/
-    public function livestreams_can_be_loaded_for_the_inquiries_page()
-    {
-        
-        $inquiry_page = Inquiry::findPage();
-
-        $livestream = Livestream::factory()->create();
-
-        $past_livestream = Livestream::factory()->create([
-            'start_date' => now()->subDays(1),
-        ]);
-
-        $open_house_tag = Tag::where('name', 'Open House')->first();
-
-        $this->assertInstanceOf(Tag::class, $open_house_tag);
-
-        $livestream->tags()->attach($open_house_tag);
-        $past_livestream->tags()->attach($open_house_tag);
-
-        $livestreams = Inquiry::getLivestreams();
-
-        $this->assertTrue($livestreams->contains('id', $livestream->id));
-        $this->assertFalse($livestreams->contains('id', $past_livestream->id));
-    }
 }

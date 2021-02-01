@@ -1,19 +1,104 @@
 <template>
 
-    <div class="md:flex">
+    <div class="flex items-center justify-center w-full">
+        <div class="form max-w-sm bg-gray-100 border border-gray-200 px-8 py-4 rounded-lg overflow-hidden mt-4" id="inquiry-form">
 
-        <div class="flex-1"></div>
-        <div class="flex-2">
+            <transition-group :name="transitionDirection" tag="div" class="relative mt-8 first:mt-0">
 
-            <div class="flex items-center justify-center w-full">
-                <div class="form max-w-sm bg-gray-100 border border-gray-200 px-8 py-4 rounded-lg overflow-hidden mt-4" id="inquiry-form">
+                <div class="" key="step1" v-if="currentStep === 'Contact Information'">
 
-                    <transition-group :name="transitionDirection" tag="div" class="relative mt-8 first:mt-0">
+                    <h3 class="mb-4">{{ currentStep }}</h3>
 
-                        <div class="" key="step1" v-if="currentStep === 'Contact Information'">
+                    <form-label label="Contact Name" :value="form.name"></form-label>
+                    <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
 
-                            <h3 class="mb-4">{{ currentStep }}</h3>
+                    <form-label label="Contact Email" :value="form.email"></form-label>
+                    <div class="input"><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
 
+                    <form-label label="Contact Phone Number" :value="form.phone"></form-label>
+                    <div class="input"><input type="text" inputmode="tel" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
+
+                </div>
+
+                <div class="" key="step2" v-if="currentStep === 'Student Information'">
+
+                    <h3>{{ currentStep }}</h3>
+
+                    <div class="mt-4">
+                        <div class="input-label">Start Year</div>
+                        <div class="flex items-center flex-wrap">
+                            <div v-for="year in years"
+                                 :key="'year-' + year"
+                                 class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
+                                :class="year === form.target_year ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
+                                 @click="form.target_year = year"
+                                 >{{ year }}-{{ year + 1 }}</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="">Start Grade</div>
+
+                        <div class="flex items-center flex-wrap">
+                            <div v-for="grade in grades"
+                                 :key="'grade-' + grade"
+                                 class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
+                                :class="grade === form.target_grade ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
+                                 @click="form.target_grade = grade"
+                                 >Grade {{ grade }}</div>
+                            <div class="flex-1 mr-4 my-1 px-4">&nbsp;</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="">Student Type</div>
+
+                        <div class="flex items-center flex-wrap w-full">
+                            <div v-for="type in types"
+                                 :key="'type-' + type"
+                                 class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
+                                :class="type === form.student_type ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
+                                 @click="form.student_type = type"
+                                 >{{ type }}</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="" key="step3" v-if="currentStep === 'Student Interests'">
+
+                    <h3>{{ currentStep }}</h3>
+
+                    <div class="mt-4">Select the items that the student is interested in.</div>
+
+                    <tags-selector :tags="tags" :selected-tags="form.tags" @selected="toggleTag($event)"></tags-selector>
+
+                </div>
+
+                <div class="" key="step4" v-if="currentStep === 'Livestreams'">
+
+                    <h3>{{ livestreamTitle }}</h3>
+
+                    <div class="mt-4">
+                        <div class="flex cursor-pointer px-2 py-1" 
+                             :class="form.livestream ? (form.livestream.id === livestream.id ? 'bg-green-100 text-gray-800' : 'bg-white odd:bg-gray-200 hover:text-gray-800') : 'bg-white odd:bg-gray-200 hover:text-gray-800'"
+                            v-for="livestream in livestreams" 
+                            @click="toggleLivestream(livestream)"
+                        >
+                            <div class="icon" v-show="form.livestream ? (form.livestream.id === livestream.id ? false : true) : true"><i class="far fa-circle"></i></div>
+                            <div class="icon" v-show="form.livestream ? (form.livestream.id === livestream.id ? true : false) : false"><i class="fas fa-check-circle"></i></div>
+                            <div class="pl-2">{{ $moment(livestream.start_date).format('dddd MMMM Do h:mmA') }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="" key="step5" v-if="currentStep === 'Review Information'">
+
+                    <div class="mt-4">
+
+                        <h3>{{ currentStep }}</h3>
+
+                        <div class="mt-4">
                             <form-label label="Contact Name" :value="form.name"></form-label>
                             <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
 
@@ -21,152 +106,55 @@
                             <div class="input"><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
 
                             <form-label label="Contact Phone Number" :value="form.phone"></form-label>
-                            <div class="input"><input type="text" inputmode="tel" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
+                            <div class="input"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" v-if="form.phone" /></div>
 
-                        </div>
+                            <form-label label="Start Year" :value="form.target_year"></form-label>
+                            <div class="fake-input" v-if="form.target_year">{{ form.target_year }}-{{ form.target_year + 1 }}</div>
 
-                        <div class="" key="step2" v-if="currentStep === 'Student Information'">
+                            <form-label label="Start Grade" :value="form.target_grade"></form-label>
+                            <div class="fake-input" v-if="form.target_grade">Grade {{ form.target_grade }}</div>
 
-                            <h3>{{ currentStep }}</h3>
+                            <form-label label="Student Type" :value="form.student_type"></form-label>
+                            <div class="fake-input" v-if="form.student_type">{{ form.student_type }}</div>
 
-                            <div class="mt-4">
-                                <div class="input-label">Start Year</div>
-                                <div class="flex items-center flex-wrap">
-                                    <div v-for="year in years"
-                                         :key="'year-' + year"
-                                         class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
-                                        :class="year === form.target_year ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
-                                         @click="form.target_year = year"
-                                         >{{ year }}-{{ year + 1 }}</div>
-                                </div>
+                            <form-label label="Student Interests" :value="filteredFormTags.length"></form-label>
+                            <div class="fake-input" v-if="filteredFormTags.length">
+                                <div class="" v-for="tag in filteredFormTags">{{ tag.name }}</div>
                             </div>
 
-                            <div class="mt-4">
-                                <div class="">Start Grade</div>
-
-                                <div class="flex items-center flex-wrap">
-                                    <div v-for="grade in grades"
-                                         :key="'grade-' + grade"
-                                         class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
-                                        :class="grade === form.target_grade ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
-                                         @click="form.target_grade = grade"
-                                         >Grade {{ grade }}</div>
-                                    <div class="flex-1 mr-4 my-1 px-4">&nbsp;</div>
-                                </div>
-                            </div>
-
-                            <div class="mt-4">
-                                <div class="">Student Type</div>
-
-                                <div class="flex items-center flex-wrap w-full">
-                                    <div v-for="type in types"
-                                         :key="'type-' + type"
-                                         class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
-                                        :class="type === form.student_type ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
-                                         @click="form.student_type = type"
-                                         >{{ type }}</div>
-                                </div>
+                            <div class="" v-if="form.livestream">
+                                <form-label label="Online Open House" :value="form.livestream"></form-label>
+                                <div class="fake-input" v-if="form.livestream">{{ $moment(form.livestream.start_date).format('dddd MMMM Do h:mmA') }}</div>
                             </div>
 
                         </div>
 
-                        <div class="" key="step3" v-if="currentStep === 'Student Interests'">
-
-                            <h3>{{ currentStep }}</h3>
-
-                            <div class="mt-4">Select the items that the student is interested in.</div>
-
-                            <tags-selector :tags="tags" :selected-tags="form.tags" @selected="toggleTag($event)"></tags-selector>
-
-                        </div>
-
-                        <div class="" key="step4" v-if="currentStep === 'Online Open Houses'">
-
-                            <h3>{{ currentStep }}</h3>
-
-                            <p>To learn more about Brentwood <span class="font-bold">select an online open house</span> from the list below to sign up for an online open house presented by our admissions team.</p>
-
-                            <div class="mt-4">
-                                <div class="flex cursor-pointer px-2 py-1" 
-                                     :class="form.livestream ? (form.livestream.id === livestream.id ? 'bg-green-100 text-gray-800' : 'bg-white odd:bg-gray-200 hover:text-gray-800') : 'bg-white odd:bg-gray-200 hover:text-gray-800'"
-                                    v-for="livestream in livestreams" 
-                                    @click="toggleLivestream(livestream)"
-                                >
-                                    <div class="icon" v-show="form.livestream ? (form.livestream.id === livestream.id ? false : true) : true"><i class="far fa-circle"></i></div>
-                                    <div class="icon" v-show="form.livestream ? (form.livestream.id === livestream.id ? true : false) : false"><i class="fas fa-check-circle"></i></div>
-                                    <div class="pl-2">{{ $moment(livestream.start_date).format('dddd MMMM Do h:mmA') }}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="" key="step5" v-if="currentStep === 'Review Information'">
-
-                            <div class="mt-4">
-
-                                <h3>{{ currentStep }}</h3>
-
-                                <div class="mt-4">
-                                    <form-label label="Contact Name" :value="form.name"></form-label>
-                                    <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
-
-                                    <form-label label="Contact Email" :value="form.email"></form-label>
-                                    <div class="input"><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
-
-                                    <form-label label="Contact Phone Number" :value="form.phone"></form-label>
-                                    <div class="input"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
-
-
-                                    <form-label label="Start Year" :value="form.target_year"></form-label>
-                                    <div class="fake-input">{{ form.target_year }}-{{ form.target_year + 1 }}</div>
-
-                                    <form-label label="Start Grade" :value="form.target_grade"></form-label>
-                                    <div class="fake-input">Grade {{ form.target_grade }}</div>
-
-                                    <form-label label="Student Type" :value="form.student_type"></form-label>
-                                    <div class="fake-input">{{ form.student_type }}</div>
-
-                                    <form-label label="Student Interests" :value="filteredFormTags.length"></form-label>
-                                    <div class="fake-input" v-if="filteredFormTags.length">
-                                        <div class="" v-for="tag in filteredFormTags">{{ tag.name }}</div>
-                                    </div>
-
-                                    <div class="" v-if="form.livestream">
-                                        <form-label label="Online Open House" :value="form.livestream"></form-label>
-                                        <div class="fake-input">{{ $moment(form.livestream.start_date).format('dddd MMMM Do h:mmA') }}</div>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </transition-group>
-
-                    <div class="flex justify-around items-center mt-4">
-                        <div class="flex-1 flex items-center hover:bg-white px-4 py-2 transition-opacity transition" :class="currentStep === 'Contact Information' ? 'opacity-0' : 'opacity-1 cursor-pointer'" @click="prevStep()">
-                            <div class="icon mr-2"><i class="fas fa-chevron-left"></i></div>
-                            <div class="">Back</div>
-                        </div>
-
-                        <div class="flex flex-1 mx-2">
-                            <div class="mx-2 transition transition-all" 
-                                 :class="stepClass(step)"
-                                 v-for="step in steps"
-                                 @click="goToStep(step)"
-                            >
-                                <div class="icon" v-if="!showCheck(step)"><i class="fas fa-circle"></i></div>
-                                <div class="icon" v-if="showCheck(step)"><i class="fas fa-check-circle"></i></div>
-                            </div>
-                        </div>
-
-                        <div class="flex-1 flex items-center text-white font-bold bg-primary px-4 py-2 transition-opacity transition" :class="validateStep() ? 'opacity-1 cursor-pointer' : 'opacity-0'" @click="nextStep()">
-                            <div class="">{{ nextText }}</div>
-                            <div class="icon ml-2"><i class="fas fa-chevron-right"></i></div>
-                        </div>
                     </div>
-
                 </div>
 
+            </transition-group>
+
+            <div class="flex justify-around items-center mt-4">
+                <div class="flex-1 flex items-center hover:bg-white px-4 py-2 transition-opacity transition" :class="currentStep === steps[0] ? 'opacity-0' : 'opacity-1 cursor-pointer'" @click="prevStep()">
+                    <div class="icon mr-2"><i class="fas fa-chevron-left"></i></div>
+                    <div class="">Back</div>
+                </div>
+
+                <div class="flex flex-1 mx-2">
+                    <div class="mx-2 transition transition-all" 
+                         :class="stepClass(step)"
+                         v-for="step in steps"
+                         @click="goToStep(step)"
+                    >
+                        <div class="icon" v-if="!showCheck(step)"><i class="fas fa-circle"></i></div>
+                        <div class="icon" v-if="showCheck(step)"><i class="fas fa-check-circle"></i></div>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex items-center text-white font-bold bg-primary px-4 py-2 transition-opacity transition" :class="validateStep() || $store.state.editing ? 'opacity-1 cursor-pointer' : 'opacity-0'" @click="nextStep()">
+                    <div class="">{{ nextText }}</div>
+                    <div class="icon ml-2"><i class="fas fa-chevron-right"></i></div>
+                </div>
             </div>
 
         </div>
@@ -182,7 +170,14 @@
 
     export default {
 
-        props: ['livestream'],
+        props: [
+            'showStudentInfo',
+            'showInterests',
+            'showLivestreams',
+            'showLivestreamsFirst',
+            'livestream',
+            'livestreams',
+        ],
 
         mixins: [Feedback, Dates],
 
@@ -196,18 +191,17 @@
 
                 url: '',
                 transitionDirection: 'inquiry-form-forward',
-                currentStep: 'Contact Information',
+                currentStep: 'Start',
                 allSteps: [
                     'Contact Information',
                     'Student Information',
                     'Student Interests',
-                    'Online Open Houses',
+                    'Livestreams',
                     'Review Information',
                 ],
                 types: ['Boarding', 'Day'],
 
                 tags: [],
-                livestreams: [],
 
                 form: {
                     name: '',
@@ -228,14 +222,47 @@
         computed: {
 
             steps() {
-                if (!this.livestream) {
-                    return this.allSteps;
-                } else {
-                    let steps = this.$lodash.clone(this.allSteps);
-                    return this.$lodash.remove(steps, step => {
-                        return step !== 'Online Open Houses';
+
+                let steps = this.$lodash.clone(this.allSteps);
+
+                if (!this.showStudentInfo) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Student Information';
                     });
                 }
+
+                if (!this.showInterests || !this.filteredFormTags.length) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Student Interests';
+                    });
+                }
+
+                if (!this.showLivestreams) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Livestreams';
+                    });
+                }
+
+                if (this.livestream) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Livestreams';
+                    });
+                }
+
+                if (!this.livestreams) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Livestreams';
+                    });
+                }
+
+                if (this.showLivestreams && this.showLivestreamsFirst) {
+                    steps = this.$lodash.sortBy(steps, step => {
+                        return step === 'Livestreams' ? 0 : 1;
+                    });
+                }
+
+                this.currentStep = steps[0];
+                return steps;
             },
 
             currentIndex() {
@@ -258,6 +285,26 @@
                     year++;
                 }
                 return years;
+            },
+
+            livestreamTitle() {
+
+                if (!this.livestreams) {
+                    return 'Upcoming Livestreams';
+                }
+
+                let tags = [];
+
+                this.$lodash.each(this.livestreams, livestream => {
+                    if (livestream.tags.length) {
+                        this.$lodash.each(livestream.tags, tag => {
+                            tags.push(tag.name);
+                        });
+                    }
+                });
+
+                return 'Upcoming ' + this.$lodash.join(tags, ' ');
+
             },
 
             nextText() {
@@ -312,10 +359,14 @@
 
         mounted() {
             this.loadTags();
-            this.loadLivestreams();
 
             if (this.livestream) {
                 this.form.livestream = this.livestream;
+            }
+            
+            if (this.$store.state.user.id) {
+                this.form.name = this.$store.state.user.name;
+                this.form.email = this.$store.state.user.email;
             }
         },
 
@@ -398,11 +449,11 @@
                 }
 
                 if (step === 'Student Interests') {
-                    return this.currentStep === 'Student Interests' || this.currentStep === 'Online Open Houses' || this.currentStep === 'Review Information';
+                    return this.currentStep === 'Student Interests' || this.currentStep === 'Livestreams' || this.currentStep === 'Review Information';
                 }
 
-                if (step === 'Online Open Houses') {
-                    return this.currentStep === 'Online Open Houses' || this.currentStep === 'Review Information';
+                if (step === 'Livestreams') {
+                    return this.currentStep === 'Livestreams' || this.currentStep === 'Review Information';
                 }
 
                 if (step === 'Review Information') {
@@ -431,19 +482,20 @@
 
             nextStep: function() {
 
-                if (this.validateStep()) {
+                if (this.validateStep() || this.$store.state.editing) {
 
                     this.transitionDirection = 'inquiry-form-forward';
 
-                    if (this.currentIndex < (this.steps.length - 1) && this.validateStep()) {
+                    if (this.currentIndex < (this.steps.length - 1)) {
 
                         this.currentStep = this.steps[this.currentIndex + 1];
-
-                        window.scrollTo({top: document.getElementById('inquiry-form').offsetTop, behavior: 'smooth'});
+                        this.scrollToForm();
 
                     } else if (this.currentIndex === (this.steps.length - 1) && this.formIsValid) {
 
-                        this.submit();
+                        if (!this.$store.state.editing) {
+                            this.submit();
+                        }
 
                     }
 
@@ -456,8 +508,17 @@
 
                 if (this.currentIndex > 0) {
                     this.currentStep = this.steps[this.currentIndex - 1];
-                    window.scrollTo({top: document.getElementById('inquiry-form').offsetTop, behavior: 'smooth'});
+                    this.scrollToForm();
                 }
+            },
+
+            scrollToForm: function() {
+                let elm = document.getElementById('inquiry-form');
+
+                if (elm.offsetTop < window.scrollY) {
+                    window.scrollTo({top: elm.offsetTop, behavior: 'smooth'});
+                }
+
             },
 
             submit: function() {
@@ -475,16 +536,6 @@
 
                 this.$http.get('/inquiry/tags').then( response => {
                     this.tags = response.data.tags;
-                }, error => {
-                    this.processErrors(error.response);
-                });
-
-            },
-
-            loadLivestreams: function() {
-
-                this.$http.get('/inquiry/livestreams').then( response => {
-                    this.livestreams = response.data.livestreams;
                 }, error => {
                     this.processErrors(error.response);
                 });

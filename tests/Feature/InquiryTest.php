@@ -42,7 +42,7 @@ class InquiryTest extends TestCase
     public function the_inquiry_page_can_be_loaded()
     {
         $this->withoutExceptionHandling();
-        $this->get(route('inquiries.create'))
+        $this->get('/inquiry')
             ->assertSuccessful();
     }
 
@@ -380,25 +380,4 @@ class InquiryTest extends TestCase
              ->assertSuccessful();
     }
 
-    /** @test **/
-    public function inquiry_livestreams_can_be_loaded()
-    {
-        $inquiry_page = Inquiry::findPage();
-
-        $livestream = Livestream::factory()->create();
-        $open_house_tag = Tag::where('name', 'Open House')->first();
-        $livestream->tags()->attach($open_house_tag);
-
-        $livestreams = Inquiry::getLivestreams();
-
-        $this->assertTrue($livestreams->contains('id', $livestream->id));
-
-        $this->withoutExceptionHandling();
-        $this->json('GET', route('inquiries.livestreams'))
-             ->assertSuccessful()
-             ->assertJsonFragment([
-                'name' => $livestream->name,
-                'id' => $livestream->id,
-             ]);
-    }
 }

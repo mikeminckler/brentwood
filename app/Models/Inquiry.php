@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
 
 use App\Traits\TagsTrait;
 
 use App\Models\Livestream;
+
+use App\Mail\InquiryConfirmation;
 
 class Inquiry extends Model
 {
@@ -46,6 +49,11 @@ class Inquiry extends Model
         $inquiry->saveTags($input);
 
         cache()->tags([cache_name($inquiry)])->flush();
+
+        if (!$id) {
+            Mail::to($inquiry->email)
+                ->queue(new InquiryConfirmation($inquiry));
+        }
 
         return $inquiry;
     }

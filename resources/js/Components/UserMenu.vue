@@ -6,7 +6,7 @@
 
         <transition name="fade">
             <div class="absolute shadow right-0 z-3 bg-white mt-4" v-if="showMenu">
-                <div class="whitespace-no-wrap px-2 py-1">{{ user.name }}</div>
+                <div class="whitespace-nowrap px-2 py-1">{{ user.name }}</div>
                 <div class="text-primary px-2 py-1 hover:bg-gray-200 flex cursor-pointer" @click="logout">
                     <div class="pr-1">Logout</div>
                     <div class="icon"><i class="fas fa-sign-out-alt"></i></div>

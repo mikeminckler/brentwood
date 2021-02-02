@@ -41,4 +41,9 @@ class Livestream extends Model
     {
         return $this->belongsToMany(Inquiry::class)->withPivot('url');
     }
+
+    public function getDateAttribute() 
+    {
+        return $this->start_date->timezone('America/Vancouver')->format('l F jS g:ia');   
+    }
 }

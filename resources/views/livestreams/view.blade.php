@@ -17,7 +17,7 @@
             </div>
 
             <div class="flex-1">
-                <chat room-id="livestream-{{ $livestream->id }}"></chat>
+                <chat room-id="livestream-{{ $livestream->id }}" {{ isset($inquiry) ? 'name="{{ $inquiry->name }}"' : '' }}></chat>
             </div>
         </div>
 

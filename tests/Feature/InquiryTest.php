@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 use Illuminate\Support\Arr;
@@ -15,6 +16,8 @@ use App\Models\Inquiry;
 use App\Models\Tag;
 use App\Models\TextBlock;
 use App\Models\Livestream;
+
+use App\Mail\InquiryConfirmation;
 
 class InquiryTest extends TestCase
 {
@@ -409,6 +412,34 @@ class InquiryTest extends TestCase
 
         $this->assertEquals($name, $inquiry->name);
         $this->assertEquals($email, $inquiry->email);
+
+    }
+
+    /** @test **/
+    public function registering_for_a_livestream_sends_a_confimation_email()
+    {
+        $name = $this->faker->name;
+        $email = $this->faker->safeEmail;
+        $livestream = Livestream::factory()->create();
+
+        $input = [
+            'name' => $name,
+            'email' => $email,
+            'livestream' => $livestream,
+        ];
+
+        Mail::fake();
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('inquiries.store'), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Inquiry Saved',
+            ]);
+
+        Mail::assertQueued(InquiryConfirmation::class, function ($mail) use ($email) {
+            return $mail->hasTo($email);
+        });
 
     }
 

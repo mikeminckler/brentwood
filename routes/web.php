@@ -109,4 +109,9 @@ Route::get('/inquiry/tags', [InquiriesController::class, 'tags'])->name('inquiri
 Route::get('/inquiry/{id}', [InquiriesController::class, 'view'])->name('inquiries.view')->where('id', '\d+');
 Route::post('/inquiry/{id}', [InquiriesController::class, 'store'])->name('inquiries.update')->where('id', '\d+');
 
+Route::get('/mailable', function () {
+    $inquiry = App\Models\Inquiry::all()->last();
+    return new App\Mail\InquiryConfirmation($inquiry);
+});
+
 Route::get('{page}', [PagesController::class, 'load'])->name('pages.load')->where('page', '.*');

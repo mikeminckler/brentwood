@@ -31,4 +31,12 @@ class LivestreamTest extends TestCase
         $this->assertEquals(1, $livestream->inquiries()->count());
         $this->assertEquals($inquiry->id, $livestream->inquiries()->first()->id);
     }
+
+    /** @test **/
+    public function a_livestream_has_a_date_attribute()
+    {
+        $livestream = Livestream::factory()->create();
+        $this->assertNotNull($livestream->date);
+        $this->assertEquals($livestream->start_date->timezone('America/Vancouver')->format('l F jS g:ia'), $livestream->date);
+    }
 }

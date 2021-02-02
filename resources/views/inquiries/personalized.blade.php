@@ -47,8 +47,8 @@
                     @endif
 
                     @if ($inquiry->livestreams->count())
-                        <h3 class="mt-4">Online Open House</h3>
-                        <p>You have registered for the <span class="font-bold">{{ $inquiry->livestreams->first()->start_date->timezone('America/Vancouver')->format('l F jS g:ia') }}</span> online open house. You will receive an email closer to the event with a link to view the presentation.</p>
+                        <h2 class="mt-8">{{ $inquiry->livestreams->first()->name }}</h2>
+                        <p>You have registered for the <span class="font-bold">{{ $inquiry->livestreams->first()->name }}</span> on <span class="font-bold">{{ $inquiry->livestreams->first()->date }}</span>. You will receive an email closer to the event with a link to view the presentation.</p>
                     @endif
 
                     <p>If you have any questions please contact us at <a href="mailto:admissions@brentwood.ca">admissions@brentwood.ca</a>.</p>

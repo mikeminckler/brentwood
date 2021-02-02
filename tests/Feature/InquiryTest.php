@@ -126,9 +126,9 @@ class InquiryTest extends TestCase
              ->assertJsonValidationErrors([
                 'name',
                 'email',
-                'target_grade',
-                'target_year',
-                'student_type',
+                //'target_grade',
+                //'target_year',
+                //'student_type',
              ]);
 
         $tag1 = Tag::factory()->create();
@@ -181,9 +181,9 @@ class InquiryTest extends TestCase
              ->assertJsonValidationErrors([
                 'name',
                 'email',
-                'target_grade',
-                'target_year',
-                'student_type',
+                //'target_grade',
+                //'target_year',
+                //'student_type',
              ]);
         
         $input = Inquiry::factory()->raw();
@@ -378,6 +378,38 @@ class InquiryTest extends TestCase
 
         $this->get($inquiry->url)
              ->assertSuccessful();
+
+        $this->assertNotNull($inquiry->livestreams()->first()->pivot->url);
+
+        $this->get($inquiry->livestreams()->first()->pivot->url)
+            ->assertSuccessful();
+    }
+
+    /** @test **/
+    public function an_inquiry_can_be_created_with_just_a_name_and_email()
+    {
+        $name = $this->faker->name;
+        $email = $this->faker->safeEmail;
+
+        $input = [
+            'name' => $name,
+            'email' => $email,
+        ];
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('inquiries.store'), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Inquiry Saved',
+            ]);
+
+        $inquiry = Inquiry::all()->last();
+
+        $this->assertInstanceOf(Inquiry::class, $inquiry);
+
+        $this->assertEquals($name, $inquiry->name);
+        $this->assertEquals($email, $inquiry->email);
+
     }
 
 }

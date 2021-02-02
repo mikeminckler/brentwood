@@ -3,19 +3,20 @@
     <div class="w-full">
 
         <div class="flex-1 last:mr-0 mr-4 my-2 w-full"
-            v-for="tag in $lodash.omitBy(tags, $lodash.isNull)"
-            v-if="tag.name !== 'Admissions'"
+            v-for="tag in tags"
             :key="'tag-' + tag.id"
         >
             <div class="w-full text-center border px-4 py-2 cursor-pointer whitespace-nowrap"
                  :class="$lodash.find(selectedTags, tag) ? 'bg-primary text-white font-bold' : 'bg-gray-200 hover:bg-white'"
                  @click.stop="$emit('selected', tag)"
-                 v-if="!tag.tags"
-            >{{ tag.name }}</div>
+                 v-if="!filterTags(tag.tags).length && ignoreCheck(tag)"
+            >
+                {{ tag.name }}
+            </div>
 
-            <div class="" v-if="tag.tags">
+            <div class="mt-4" v-if="filterTags(tag.tags).length && ignoreCheck(tag)">
                 <div class="text-gray-700 py-1 pl-4 bg-gray-300 rounded-t">{{ tag.name }}</div>
-                <tags-selector class="flex flex-wrap" :tags="tag.tags" :selected-tags="selectedTags" @selected="$emit('selected', $event)"></tags-selector>
+                <tags-selector class="flex flex-wrap" :tags="filterTags(tag.tags)" :ignore-tags="ignoreTags" :selected-tags="selectedTags" @selected="$emit('selected', $event)"></tags-selector>
             </div>
 
         </div>
@@ -27,7 +28,7 @@
 <script>
     export default {
 
-        props: ['tags', 'selectedTags'],
+        props: ['tags', 'selectedTags', 'ignoreTags'],
 
         components: {
             'tags-selector': () => import(/* webpackChunkName: "tags-selector" */ '@/Components/TagsSelector.vue'),
@@ -49,6 +50,18 @@
         },
 
         methods: {
+
+            ignoreCheck: function(tag) {
+                return this.$lodash.findIndex(this.ignoreTags, t => {
+                    return t === tag.name;
+                }) >= 0 ? false : true;
+            },
+
+            filterTags: function(tags) {
+                return this.$lodash.filter(tags, tag => {
+                    return this.ignoreCheck(tag);
+                });
+            }
         },
 
     }

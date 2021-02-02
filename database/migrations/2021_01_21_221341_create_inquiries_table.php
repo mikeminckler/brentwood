@@ -19,9 +19,9 @@ class CreateInquiriesTable extends Migration
             $table->string('name');
             $table->string('email');
             $table->string('phone')->nullable();
-            $table->string('target_grade');
-            $table->string('target_year');
-            $table->string('student_type');
+            $table->string('target_grade')->nullable();
+            $table->string('target_year')->nullable();
+            $table->string('student_type')->nullable();
 
             $table->string('url')->nullable();
 

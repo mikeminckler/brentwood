@@ -39,6 +39,6 @@ class Livestream extends Model
 
     public function inquiries() 
     {
-        return $this->belongsToMany(Inquiry::class);   
+        return $this->belongsToMany(Inquiry::class)->withPivot('url');
     }
 }

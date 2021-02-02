@@ -34,9 +34,9 @@ class InquiryValidation extends FormRequest
             'name' => 'required|min:3',
             'email' => 'required|email',
             'phone' => 'nullable',
-            'target_grade' => 'required|integer|between:8,12',
-            'target_year' => 'required|date_format:Y',
-            'student_type' => 'required',
+            'target_grade' => 'nullable|integer|between:8,12',
+            'target_year' => 'nullable|date_format:Y',
+            'student_type' => 'nullable',
         ];
     }
 }

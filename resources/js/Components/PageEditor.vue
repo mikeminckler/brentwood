@@ -28,43 +28,45 @@
                     <div class=""> <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> </div>
                 </div>
 
+                <div class="relative flex items-center">
+
+                    <div class="text-sm pl-2 font-bold text-green-500" v-if="page.publish_at">Publish At: {{ displayDateTime(page.publish_at) }}</div>
+
+                    <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white font-bold cursor-pointer justify-center items-center h-8 overflow-visible" 
+                         v-if="(hasDraft && page.editable) && !$store.state.saving.length"
+                    >
+                        <div class="flex h-full items-center pr-2" @click="publishPage()">
+                            <transition name="slide">
+                                <div class="pl-2" v-if="!showPagePublishAt"><i class="fas fa-sign-out-alt"></i></div>
+                            </transition>
+                            <div class="pl-2">Publish</div>
+                        </div>
+
+                        <div class="relative h-full flex items-center">
+                            <div class="px-2 h-full flex items-center bg-green-500" v-if="!showPagePublishAt" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
+                            <div class="px-2 bg-white h-full text-green-500 flex items-center" v-if="showPagePublishAt" @click="savePage()"><i class="fas fa-save"></i></div>
+                            <div class="px-2 bg-white text-primary h-full flex items-center" v-if="showPagePublishAt" @click="removePublishAt()"><i class="fas fa-times"></i></div>
+                        </div>
+
+                        <div class="absolute right-0 mt-8 top-0" v-show="showPagePublishAt">
+                            <date-time-picker v-model="page.publish_at" ></date-time-picker>
+                        </div>
+
+                    </div>
+
+                    <div class="flex mx-2 text-green-600 px-4 py-1 w-32 justify-center" 
+                         v-if="$store.state.saving.length"
+                    >
+                        <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                        <div class="ml-2">Saving</div>
+                    </div>
+                </div>
+
                 <div class="cursor-pointer flex" @click="showPageVersions = !showPageVersions" v-if="activeVersion">
                     <div class="">v{{ activeVersion.name }}</div>
                     <div class="ml-1" v-if="activeVersion.published_at && activeVersion.id !== page.published_version_id"><i class="fas fa-history"></i></div>
                     <div class="ml-1 text-green-500" v-if="activeVersion.id === page.published_version_id" title="Published"><i class="fas fa-check"></i></div>
                     <div class="ml-1" v-if="!activeVersion.published_at" title="Draft"><i class="fas fa-drafting-compass"></i></div>
-                </div>
-
-                <div class="relative flex">
-                    <transition name="slide-down">
-                        <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white font-bold cursor-pointer justify-center items-center h-8 overflow-visible" 
-                             v-if="(hasDraft && page.editable) && !$store.state.saving.length"
-                        >
-                            <div class="flex h-full items-center pr-2" @click="publishPage()">
-                                <transition name="slide">
-                                    <div class="pl-2" v-if="!showPagePublishAt"><i class="fas fa-sign-out-alt"></i></div>
-                                </transition>
-                                <div class="pl-2">Publish</div>
-                            </div>
-                            <div class="px-2 h-full flex items-center bg-green-500" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
-                            <date-time-picker v-show="showPagePublishAt" v-model="page.publish_at" ></date-time-picker>
-                            <transition name="slide">
-                                <div class="px-2" v-if="showPagePublishAt" @click="savePage()"><i class="fas fa-save"></i></div>
-                            </transition>
-                            <transition name="slide">
-                                <div class="px-2" v-if="showPagePublishAt" @click="removePublishAt()"><i class="fas fa-times"></i></div>
-                            </transition>
-                        </div>
-                    </transition>
-
-                    <transition name="slide-down">
-                        <div class="flex mx-2 text-green-600 px-4 py-1 w-32 justify-center" 
-                             v-if="$store.state.saving.length"
-                        >
-                            <div class="spin"><i class="fas fa-sync-alt"></i></div>
-                            <div class="ml-2">Saving</div>
-                        </div>
-                    </transition>
                 </div>
 
                 <div class="flex px-2 mx-2 items-center cursor-pointer hover:bg-white hover:text-gray-700 rounded" @click="showTags = !showTags" title="Edit Tags">
@@ -106,10 +108,11 @@
 <script>
 
     import Feedback from '@/Mixins/Feedback'
+    import Dates from '@/Mixins/Dates';
 
     export default {
 
-        mixins: [Feedback],
+        mixins: [Feedback, Dates],
         props: ['currentPage', 'resource'],
         data() {
             return {
@@ -356,6 +359,8 @@
                     this.$nextTick(() => {
                         this.$store.dispatch('setPageLoading', false);
                     });
+
+                    this.showPagePublishAt = false;
 
                     let pathname = document.location.pathname;
                     if (pathname !== '/') {

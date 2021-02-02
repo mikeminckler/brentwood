@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\Models\Livestream;
 use App\Models\User;
 use App\Models\Tag;
+use App\Models\Inquiry;
 
 class LivestreamTest extends TestCase
 {
@@ -141,6 +142,9 @@ class LivestreamTest extends TestCase
     public function livestreams_can_be_loaded_for_pagination()
     {
         $livestream = Livestream::factory()->create();
+        $inquiry = Inquiry::factory()->create();
+
+        $inquiry->saveLivestreams(['livestream' => $livestream]);
 
         $this->json('GET', route('livestreams.index'))
             ->assertStatus(401);
@@ -158,6 +162,7 @@ class LivestreamTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'name' => $livestream->name,
+                'name' => $inquiry->name,
              ]);
     }
 
@@ -181,5 +186,33 @@ class LivestreamTest extends TestCase
         $this->get(route('livestreams.register', ['id' => $livestream->id]))
              ->assertSuccessful()
              ->assertViewHas('livestream', $livestream);
+    }
+
+    /** @test **/
+    public function a_livestream_can_load_an_inquiry()
+    {
+        $livestream = Livestream::factory()->create();
+        $inquiry = Inquiry::factory()->create();
+
+        $inquiry->saveLivestreams([
+            'livestream' => $livestream,
+        ]);
+
+        $inquiry->refresh();
+        $livestream->refresh();
+
+        $this->assertTrue($inquiry->livestreams->contains('id', $livestream->id));
+        $this->assertTrue($livestream->inquiries->contains('id', $inquiry->id));
+
+        $this->assertNotNull($livestream->inquiries->first()->pivot->url);
+
+        $this->get( route('livestreams.view', ['id' => $livestream]))
+             ->assertSuccessful()
+            ->assertViewMissing('inquiry', $inquiry);
+
+        $this->get($livestream->inquiries->first()->pivot->url)
+             ->assertSuccessful()
+            ->assertViewHas('inquiry', $inquiry);
+
     }
 }

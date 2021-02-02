@@ -17,6 +17,7 @@ class CreateInquiryLivestreamTable extends Migration
             $table->id();
             $table->unsignedBigInteger('inquiry_id');
             $table->unsignedBigInteger('livestream_id');
+            $table->string('url');
             $table->timestamps();
         });
     }

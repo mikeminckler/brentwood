@@ -7,7 +7,7 @@
 
         <div class="flex-2 relative">
 
-            <div class="bg-white m-8 rounded shadow">
+            <div class="bg-white mx-8 rounded-lg shadow">
                 <div class="flex justify-center relative py-8">
                     <div class="text-block relative">
 

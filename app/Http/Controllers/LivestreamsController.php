@@ -10,6 +10,7 @@ use App\Models\Livestream;
 use App\Utilities\Paginate;
 use App\Utilities\PageResponse;
 use App\Models\Page;
+use App\Models\Inquiry;
 
 class LivestreamsController extends Controller
 {
@@ -26,7 +27,7 @@ class LivestreamsController extends Controller
         }
 
         if (request()->expectsJson()) {
-            return Paginate::create(Livestream::all()->sortByDesc->id);
+            return Paginate::create(Livestream::with('inquiries')->get()->sortByDesc->id);
         } else {
             return view('livestreams.index');
         }
@@ -57,6 +58,18 @@ class LivestreamsController extends Controller
     {
         $livestream = Livestream::findOrFail($id);
         return view('livestreams.view', compact('livestream'));
+    }
+
+    public function inquiry($id, $inquiry_id)
+    {
+        if (! request()->hasValidSignature()) {
+            abort(401);
+        }
+
+        $livestream = Livestream::findOrFail($id);
+        $inquiry = Inquiry::findOrFail($inquiry_id);
+
+        return view('livestreams.view', compact('livestream', 'inquiry'));
     }
 
     public function register($id)

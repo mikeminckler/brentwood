@@ -356,4 +356,18 @@ class PageTest extends TestCase
 
         $this->assertNotNull(Arr::get($data, 'tags'));
     }
+
+    /** @test **/
+    public function slugs_can_have_dashes()
+    {
+        $parent = Page::factory()->create([
+            'slug' => 'parent-page',
+        ]);
+        $page = Page::factory()->create([
+            'slug' => 'full-slug-page',
+            'parent_page_id' => $parent->id,
+        ]);
+
+        $this->assertEquals($page->full_slug, 'parent-page/full-slug-page');
+    }
 }

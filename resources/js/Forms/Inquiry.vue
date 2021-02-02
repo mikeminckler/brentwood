@@ -71,13 +71,17 @@
 
                     <div class="mt-4">Select the items that the student is interested in.</div>
 
-                    <tags-selector :tags="tags" :selected-tags="form.tags" @selected="toggleTag($event)"></tags-selector>
+                    <tags-selector :tags="tags" 
+                         :ignore-tags="['Boarding Student', 'Day Student']"
+                        :selected-tags="form.tags" 
+                        @selected="toggleTag($event)"
+                    ></tags-selector>
 
                 </div>
 
                 <div class="" key="step4" v-if="currentStep === 'Livestreams'">
 
-                    <h3>{{ livestreamTitle }}</h3>
+                    <h3>Upcoming {{ livestreamTitle }}</h3>
 
                     <div class="mt-4">
                         <div class="flex cursor-pointer px-2 py-1" 
@@ -123,7 +127,7 @@
                             </div>
 
                             <div class="" v-if="form.livestream">
-                                <form-label label="Online Open House" :value="form.livestream"></form-label>
+                                <form-label :label="'Selected ' + livestreamTitle" :value="form.livestream"></form-label>
                                 <div class="fake-input" v-if="form.livestream">{{ $moment(form.livestream.start_date).format('dddd MMMM Do h:mmA') }}</div>
                             </div>
 
@@ -231,7 +235,7 @@
                     });
                 }
 
-                if (!this.showInterests || !this.filteredFormTags.length) {
+                if (!this.showInterests || !this.tags.length) {
                     steps = this.$lodash.remove(steps, step => {
                         return step !== 'Student Interests';
                     });
@@ -290,7 +294,7 @@
             livestreamTitle() {
 
                 if (!this.livestreams) {
-                    return 'Upcoming Livestreams';
+                    return 'Livestreams';
                 }
 
                 let tags = [];
@@ -303,7 +307,11 @@
                     }
                 });
 
-                return 'Upcoming ' + this.$lodash.join(tags, ' ');
+                if (tags.length > 1) {
+                    return this.$lodash.join(tags, ' & ');
+                } else {
+                    return tags[0];
+                }
 
             },
 
@@ -441,7 +449,8 @@
                 }
 
                 if (step === 'Contact Information') {
-                    return this.form.name.length > 2 && this.form.phone.length > 9 && this.validEmail;
+                    //return this.form.name.length > 2 && this.form.phone.length > 9 && this.validEmail;
+                    return this.form.name.length > 2 && this.validEmail;
                 }
 
                 if (step === 'Student Information') {
@@ -453,6 +462,9 @@
                 }
 
                 if (step === 'Livestreams') {
+                    if (this.showLivestreamsFirst) {
+                        return this.form.livestream ? true : false;
+                    }
                     return this.currentStep === 'Livestreams' || this.currentStep === 'Review Information';
                 }
 
@@ -513,12 +525,13 @@
             },
 
             scrollToForm: function() {
-                let elm = document.getElementById('inquiry-form');
+                if (window.innerWidth < 768) {
+                    let elm = document.getElementById('inquiry-form');
 
-                if (elm.offsetTop < window.scrollY) {
-                    window.scrollTo({top: elm.offsetTop, behavior: 'smooth'});
+                    if (elm.offsetTop < window.scrollY) {
+                        window.scrollTo({top: elm.offsetTop, behavior: 'smooth'});
+                    }
                 }
-
             },
 
             submit: function() {

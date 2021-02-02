@@ -115,25 +115,30 @@ class Tag extends Model
         // for displaying in the frontend
 
         return Tag::whereNull('parent_tag_id')->get()->map(function ($tag) use ($filter_tags) {
-            return $tag->filterTags($filter_tags);
+            return Tag::filterTags($tag, $filter_tags);
         })
         ->filter()
         ->values();
     }
 
-    public function filterTags($filter_tags)
+    public static function filterTags($tag, $filter_tags)
     {
-        if ($filter_tags->contains('id', $this->id)) {
-            return $this;
+        if ($filter_tags->contains('id', $tag->id)) {
+            return $tag;
         }
 
-        if ($this->tags->count()) {
-            $this->tags->transform(function ($tag) use ($filter_tags) {
-                return $tag->filterTags($filter_tags);
+        $tags = $tag->tags()->get();
+
+        if ($tags->count()) {
+            $tags = $tags->transform(function ($tag) use ($filter_tags) {
+                return Tag::filterTags($tag, $filter_tags);
             });
 
-            if ($this->tags->filter()->count()) {
-                return $this;
+            $tags = $tags->filter();
+
+            if ($tags->count()) {
+                $tag->tags = $tags;
+                return $tag;
             } else {
                 return null;
             }

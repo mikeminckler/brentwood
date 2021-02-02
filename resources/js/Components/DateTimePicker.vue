@@ -76,8 +76,10 @@
         },
         methods: {
             setDateTime: function() {
-                if (this.dateTime !== this.value) {
-                    this.dateTime = this.$moment.utc(this.value, true).toDate();
+                if (this.dateTime) {
+                    if (this.dateTime !== this.value) {
+                        this.dateTime = this.$moment.utc(this.value, true).toDate();
+                    }
                 }
             },
             clear: function() {

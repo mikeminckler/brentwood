@@ -29,7 +29,7 @@ trait SlugTrait
 
         $slug = Str::lower($slug);
 
-        $slug = preg_replace("/[^A-Za-z0-9 ]/", '', $slug);
+        $slug = preg_replace("/[^A-Za-z0-9\- ]/", '', $slug);
         $slug = Str::kebab($slug);
 
         return $slug;

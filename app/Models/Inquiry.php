@@ -67,7 +67,8 @@ class Inquiry extends Model
 
         foreach ($livestreams as $livestream) {
             if (!$this->livestreams->contains('id', $livestream->id)) {
-                $this->livestreams()->attach($livestream);
+                $url = URL::signedRoute('livestreams.inquiry', ['id' => $livestream->id, 'inquiry_id' => $this->id]);
+                $this->livestreams()->attach($livestream, ['url' => $url]);
             }
         }
 
@@ -113,6 +114,6 @@ class Inquiry extends Model
 
     public function livestreams()
     {
-        return $this->belongsToMany(Livestream::class);
+        return $this->belongsToMany(Livestream::class)->withPivot('url');
     }
 }

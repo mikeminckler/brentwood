@@ -97,6 +97,7 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 Route::get('/livestreams/{id}', [LivestreamsController::class, 'view'])->name('livestreams.view')->where('id', '\d+');
+Route::get('/livestreams/{id}/inquiry/{inquiry_id}', [LivestreamsController::class, 'inquiry'])->name('livestreams.inquiry')->where('id', '\d+')->where('inquiry_id', '\d+');
 Route::get('/livestreams/{id}/register', [LivestreamsController::class, 'register'])->name('livestreams.register')->where('id', '\d+');
 
 Route::post('/blogs', [BlogsController::class, 'index'])->name('blogs.index');

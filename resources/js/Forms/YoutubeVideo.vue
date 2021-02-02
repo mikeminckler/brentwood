@@ -8,7 +8,7 @@
                 <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700 z-5 mb-1">
                     <div class="flex items-center py-2 justify-center mb-4" 
                          style="background-color: rgba(255,255,255,0.8)"
-                         v-if="$store.state.editing && !content.full_width && !content.header"
+                         v-if="$store.state.editing && !content.header"
                     >
                         <input class="overflow-visible p-2 -my-2 text-center font-thin" type="text" @blur="saveContent()" v-model="content.title" placeholder="Title" />
                     </div>
@@ -19,9 +19,9 @@
                 <youtube-player :photo="photo" :content="content" :uuid="uuid"></youtube-player>
             </div>
 
-            <div class="relative" 
+            <div class="relative z-6" 
                 style="transition: flex calc(var(--transition-time) * 5)" 
-                :class="content.full_width ? 'flex justify-center z-4 -mt-16' : 'flex-1'"
+                :class="content.full_width ? 'flex justify-center -mt-16' : 'flex-1'"
                 v-show="addText || content.header || content.body || !content.full_width"
             >
 
@@ -52,7 +52,7 @@
 
             <checkbox-input v-model="content.full_width" label="Full Width"></checkbox-input> 
 
-            <div class="button ml-4" @click="addText = !addText">Add Text</div>
+            <div class="button ml-4" @click="addText = !addText">{{ addText ? 'Hide' : 'Add' }} Text</div>
 
             <div class="flex items-center px-2" v-if="!photo && videoId">
                 <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">

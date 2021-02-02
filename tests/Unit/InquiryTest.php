@@ -143,7 +143,7 @@ class InquiryTest extends TestCase
         $inquiry = Inquiry::factory()->create();
         $livestream = Livestream::factory()->create();
 
-        $inquiry->livestreams()->attach($livestream);
+        $inquiry->saveLivestreams(['livestream' => $livestream]);
 
         $inquiry->refresh();
         $this->assertEquals(1, $inquiry->livestreams()->count());

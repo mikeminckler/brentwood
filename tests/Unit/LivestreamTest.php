@@ -25,7 +25,7 @@ class LivestreamTest extends TestCase
         $inquiry = Inquiry::factory()->create();
         $livestream = Livestream::factory()->create();
 
-        $livestream->inquiries()->attach($inquiry);
+        $inquiry->saveLivestreams(['livestream' => $livestream]);
 
         $livestream->refresh();
         $this->assertEquals(1, $livestream->inquiries()->count());

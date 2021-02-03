@@ -69,6 +69,8 @@ class LivestreamsController extends Controller
         $livestream = Livestream::findOrFail($id);
         $inquiry = Inquiry::findOrFail($inquiry_id);
 
+        auth()->login($inquiry->user);
+
         return view('livestreams.view', compact('livestream', 'inquiry'));
     }
 

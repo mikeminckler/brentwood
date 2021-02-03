@@ -46,4 +46,11 @@ class Livestream extends Model
     {
         return $this->start_date->timezone('America/Vancouver')->format('l F jS g:ia');   
     }
+
+    public function getUsers() 
+    {
+        return $this->inquiries->map(function($inquiry) {
+            return $inquiry->user;
+        });    
+    }
 }

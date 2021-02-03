@@ -165,4 +165,28 @@ class UserTest extends TestCase
         $this->assertEquals($google_data->getName(), $user->name);
         $this->assertEquals($google_data->getAvatar(), $user->avatar);
     }
+
+    /** @test **/
+    public function a_user_can_be_found_or_created_from_input()
+    {
+
+        $name = $this->faker->name;
+        $email = $this->faker->safeEmail;
+
+        $input = [
+            'name' => $name,
+            'email' => $email,
+        ];
+
+        $user = User::findOrCreate($input);
+
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->assertEquals($name, $user->name);
+        $this->assertEquals($email, $user->email);
+
+        $user2 = User::findOrCreate($input);
+
+        $this->assertEquals($user->id, $user2->id);
+    }
 }

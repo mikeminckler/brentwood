@@ -68,6 +68,7 @@ const app = new Vue({
 
         // Components
         'blog-preview': () => import(/* webpackChunkName: "blog-preview" */ '@/Components/BlogPreview.vue'),
+        'chat': () => import(/* webpackChunkName: "chat" */ '@/Components/Chat.vue'),
         'clock': () => import(/* webpackChunkName: "clock" */ '@/Components/Clock.vue'),
         'content-elements-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/ContentElementsEditor'),
         'echos': () => import(/* webpackChunkName: "echos" */ '@/Components/Echos.vue'),

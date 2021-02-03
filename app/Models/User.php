@@ -13,6 +13,7 @@ use App\Models\FileUpload;
 use App\Models\Permission;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -81,13 +82,20 @@ class User extends Authenticatable
 
         $user->name = Arr::get($input, 'name');
         $user->email = strtolower(Arr::get($input, 'email'));
+
+        if (!$id && !Arr::get($input, 'password')) {
+            $user->password = Hash::make(Str::random(40));
+        }
+
         $user->save();
 
-        if (auth()->user()->hasRole('admin')) {
-            $user->roles()->detach();
-            if (Arr::get($input, 'roles')) {
-                foreach (Arr::get($input, 'roles') as $role_data) {
-                    $user->addRole(Role::findOrFail(Arr::get($role_data, 'id')));
+        if (auth()->check()) {
+            if (auth()->user()->hasRole('admin')) {
+                $user->roles()->detach();
+                if (Arr::get($input, 'roles')) {
+                    foreach (Arr::get($input, 'roles') as $role_data) {
+                        $user->addRole(Role::findOrFail(Arr::get($role_data, 'id')));
+                    }
                 }
             }
         }
@@ -97,6 +105,17 @@ class User extends Authenticatable
         return $user;
     }
 
+    public static function findOrCreate($input) 
+    {
+        $id = null;
+        $user = User::where('email', Arr::get($input, 'email'))->first();
+
+        if ($user) {
+            $id = $user->id;
+        }
+
+        return (new User)->saveUser($input, $id);
+    }
 
     public function roles()
     {

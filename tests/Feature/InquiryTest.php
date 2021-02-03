@@ -138,7 +138,15 @@ class InquiryTest extends TestCase
         $tag2 = Tag::factory()->create();
         $tag3 = Tag::factory()->create();
 
-        $input = Inquiry::factory()->raw();
+        $name = $this->faker->name;
+        $email = $this->faker->safeEmail;
+
+        $input = Inquiry::factory()->raw([
+            'user_id' => null,
+            'name' => $name,
+            'email' => $email,
+        ]);
+
         $input['tags'] = [ $tag1, $tag2, $tag3 ];
 
         $this->withoutExceptionHandling();
@@ -150,10 +158,10 @@ class InquiryTest extends TestCase
 
         $inquiry = Inquiry::all()->last();
 
-        $this->assertNotNull($inquiry->name);
-        $this->assertEquals(Arr::get($input, 'name'), $inquiry->name);
-        $this->assertNotNull($inquiry->email);
-        $this->assertEquals(Arr::get($input, 'email'), $inquiry->email);
+        $this->assertNotNull($inquiry->user->name);
+        $this->assertEquals(Arr::get($input, 'name'), $inquiry->user->name);
+        $this->assertNotNull($inquiry->user->email);
+        $this->assertEquals(Arr::get($input, 'email'), $inquiry->user->email);
         $this->assertNotNull($inquiry->phone);
         $this->assertEquals(Arr::get($input, 'phone'), $inquiry->phone);
         $this->assertNotNull($inquiry->target_grade);
@@ -173,7 +181,8 @@ class InquiryTest extends TestCase
     /** @test **/
     public function an_inquiry_can_be_updated()
     {
-        $inquiry = Inquiry::factory()->has(Tag::factory()->count(3))->create();
+        $inquiry = Inquiry::factory()->for(User::factory())->has(Tag::factory()->count(3))->create();
+        $user = $inquiry->user;
         $tag = Tag::factory()->create();
 
         $this->json('POST', route('inquiries.view', ['id' => $inquiry->id]), [])
@@ -189,9 +198,14 @@ class InquiryTest extends TestCase
                 //'student_type',
              ]);
         
-        $input = Inquiry::factory()->raw();
+        $input = Inquiry::factory()->raw([
+            'user_id' => $inquiry->user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+        ]);
         $input['tags'] = [ $tag ];
 
+        $this->withoutExceptionHandling();
         $this->json('POST', $inquiry->url, $input)
             ->assertSuccessful()
             ->assertJsonFragment([
@@ -199,8 +213,8 @@ class InquiryTest extends TestCase
             ]);
 
         $inquiry->refresh();
-        $this->assertEquals(Arr::get($input, 'name'), $inquiry->name);
-        $this->assertEquals(Arr::get($input, 'email'), $inquiry->email);
+        $this->assertEquals(Arr::get($input, 'name'), $inquiry->user->name);
+        $this->assertEquals(Arr::get($input, 'email'), $inquiry->user->email);
         $this->assertEquals(Arr::get($input, 'phone'), $inquiry->phone);
         $this->assertEquals(Arr::get($input, 'target_grade'), $inquiry->target_grade);
         $this->assertEquals(Arr::get($input, 'target_year'), $inquiry->target_year);
@@ -324,8 +338,8 @@ class InquiryTest extends TestCase
         $this->json('GET', route('inquiries.index'))
              ->assertSuccessful()
              ->assertJsonFragment([
-                 'name' => $inquiry->name,
-                 'email' => $inquiry->email,
+                 'name' => $inquiry->user->name,
+                 'email' => $inquiry->user->email,
              ]);
     }
 
@@ -334,7 +348,11 @@ class InquiryTest extends TestCase
     {
         $livestream = Livestream::factory()->create();
 
-        $input = Inquiry::factory()->raw();
+        $input = Inquiry::factory()->raw([
+            'user_id' => null,
+            'name' => $this->faker->name,
+            'email' => $this->faker->email,
+        ]);
         $input['livestreams'] = [
             $livestream
         ];
@@ -362,7 +380,11 @@ class InquiryTest extends TestCase
     {
         $livestream = Livestream::factory()->create();
 
-        $input = Inquiry::factory()->raw();
+        $input = Inquiry::factory()->raw([
+            'user_id' => null,
+            'name' => $this->faker->name,
+            'email' => $this->faker->email,
+        ]);
         $input['livestream'] = $livestream;
 
         $this->withoutExceptionHandling();
@@ -410,8 +432,8 @@ class InquiryTest extends TestCase
 
         $this->assertInstanceOf(Inquiry::class, $inquiry);
 
-        $this->assertEquals($name, $inquiry->name);
-        $this->assertEquals($email, $inquiry->email);
+        $this->assertEquals($name, $inquiry->user->name);
+        $this->assertEquals($email, $inquiry->user->email);
 
     }
 

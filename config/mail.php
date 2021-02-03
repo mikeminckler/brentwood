@@ -84,7 +84,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'info@brentwood.ca'),
+        'address' => env('MAIL_FROM_ADDRESS', 'welcome@brentwood.bc.ca'),
         'name' => env('MAIL_FROM_NAME', 'Brentwood College School'),
     ],
 

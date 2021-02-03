@@ -162,7 +162,7 @@ class LivestreamTest extends TestCase
              ->assertSuccessful()
              ->assertJsonFragment([
                 'name' => $livestream->name,
-                'name' => $inquiry->name,
+                'name' => $inquiry->user->name,
              ]);
     }
 
@@ -213,6 +213,9 @@ class LivestreamTest extends TestCase
         $this->get($livestream->inquiries->first()->pivot->url)
              ->assertSuccessful()
             ->assertViewHas('inquiry', $inquiry);
+
+        $this->assertTrue(auth()->check());
+        $this->assertEquals($inquiry->user->id, auth()->user()->id);
 
     }
 }

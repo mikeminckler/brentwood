@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Traits\TagsTrait;
 
 use App\Models\Livestream;
+use App\Models\User;
 
 use App\Mail\InquiryConfirmation;
 
@@ -19,6 +20,8 @@ class Inquiry extends Model
 {
     use HasFactory;
     use TagsTrait;
+
+    protected $with = ['user'];
 
     public function saveInquiry(array $input, $id = null)
     {
@@ -28,8 +31,9 @@ class Inquiry extends Model
             $inquiry = new Inquiry;
         }
 
-        $inquiry->name = Arr::get($input, 'name');
-        $inquiry->email = strtolower(Arr::get($input, 'email'));
+        $user = User::findOrCreate($input);
+        $inquiry->user_id = $user->id;
+
         $inquiry->phone = Arr::get($input, 'phone');
         $inquiry->target_grade = Arr::get($input, 'target_grade');
         $inquiry->target_year = Arr::get($input, 'target_year');
@@ -51,7 +55,7 @@ class Inquiry extends Model
         cache()->tags([cache_name($inquiry)])->flush();
 
         if (!$id) {
-            Mail::to($inquiry->email)
+            Mail::to($inquiry->user->email)
                 ->queue(new InquiryConfirmation($inquiry));
         }
 
@@ -123,5 +127,10 @@ class Inquiry extends Model
     public function livestreams()
     {
         return $this->belongsToMany(Livestream::class)->withPivot('url');
+    }
+
+    public function user() 
+    {
+        return $this->belongsTo(User::class);
     }
 }

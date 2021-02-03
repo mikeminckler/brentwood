@@ -11,6 +11,8 @@
 |
 */
 
+use App\Models\Livestream;
+
 Broadcast::channel('user.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
@@ -23,4 +25,11 @@ Broadcast::channel('page.{id}', function ($user, $id) {
     if ($user) {
         return ['id' => $user->id, 'name' => $user->name];
     }
+});
+
+Broadcast::channel('livestream.{livestream}', function ($user, Livestream $livestream) {
+    if ($user->hasRole('admin')) {
+        return true;
+    }
+    return $livestream->getUsers()->contains('id', $user->id);
 });

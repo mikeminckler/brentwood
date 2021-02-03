@@ -6,6 +6,7 @@ use Tests\TestCase;
 
 use App\Models\Inquiry;
 use App\Models\Livestream;
+use App\Models\User;
 
 class LivestreamTest extends TestCase
 {
@@ -24,7 +25,6 @@ class LivestreamTest extends TestCase
     {
         $inquiry = Inquiry::factory()->create();
         $livestream = Livestream::factory()->create();
-
         $inquiry->saveLivestreams(['livestream' => $livestream]);
 
         $livestream->refresh();
@@ -38,5 +38,18 @@ class LivestreamTest extends TestCase
         $livestream = Livestream::factory()->create();
         $this->assertNotNull($livestream->date);
         $this->assertEquals($livestream->start_date->timezone('America/Vancouver')->format('l F jS g:ia'), $livestream->date);
+    }
+
+    /** @test **/
+    public function a_livestream_has_many_users_through_inquires()
+    {
+        $inquiry = Inquiry::factory()->create();
+        $user = $inquiry->user;
+        $this->assertInstanceOf(User::class, $user);
+        $livestream = Livestream::factory()->create();
+        $inquiry->saveLivestreams(['livestream' => $livestream]);
+
+        $this->assertNotNull($livestream->getUsers());
+        $this->assertTrue($livestream->getUsers()->contains('id', $user->id));
     }
 }

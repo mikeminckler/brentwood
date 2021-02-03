@@ -12,6 +12,7 @@ use App\Models\PhotoBlock;
 use App\Models\Tag;
 use App\Models\Inquiry;
 use App\Models\Livestream;
+use App\Models\User;
 
 use Tests\Unit\TagsTrait;
 
@@ -148,6 +149,19 @@ class InquiryTest extends TestCase
         $inquiry->refresh();
         $this->assertEquals(1, $inquiry->livestreams()->count());
         $this->assertEquals($livestream->id, $inquiry->livestreams()->first()->id);
+    }
+
+    /** @test **/
+    public function an_inquiry_belongs_to_a_user() 
+    {
+        $user = User::factory()->create();
+        $inquiry = Inquiry::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $this->assertNotNull($inquiry->user);
+        $this->assertInstanceOf(User::class, $inquiry->user);
+        $this->assertEquals($user->id, $inquiry->user->id);
     }
 
 }

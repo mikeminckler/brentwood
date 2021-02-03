@@ -16,8 +16,9 @@ class CreateInquiriesTable extends Migration
         Schema::create('inquiries', function (Blueprint $table) {
             $table->id();
 
-            $table->string('name');
-            $table->string('email');
+            $table->unsignedBigInteger('user_id');
+            //$table->string('name');
+            //$table->string('email');
             $table->string('phone')->nullable();
             $table->string('target_grade')->nullable();
             $table->string('target_year')->nullable();

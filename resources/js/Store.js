@@ -35,6 +35,18 @@ const store = new Vuex.Store({
         locale: 'en',
     },
 
+    getters: {
+        hasRole: (state) => (role) => {
+            if (!state.user) {
+                return false;
+            }
+            let r = _.find(state.user.roles, r => {
+                return r.name === role;
+            });
+            return r ? true : false;
+        },
+    },
+
     mutations: {
 
         setUser (state, user) {

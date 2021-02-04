@@ -23,13 +23,18 @@ Broadcast::channel('role.{id}', function ($user, $id) {
 
 Broadcast::channel('page.{id}', function ($user, $id) {
     if ($user) {
-        return ['id' => $user->id, 'name' => $user->name];
+        return [
+            'id' => $user->id,
+            'name' => $user->name
+        ];
     }
 });
 
 Broadcast::channel('livestream.{livestream}', function ($user, Livestream $livestream) {
-    if ($user->hasRole('admin')) {
-        return true;
+    if ($user->can('chat', $livestream)) {
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+        ];
     }
-    return $livestream->getUsers()->contains('id', $user->id);
 });

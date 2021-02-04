@@ -17,4 +17,15 @@ class LoginTest extends TestCase
         $this->get('/login')
          ->assertRedirect();
     }
+
+    /** @test **/
+    public function an_intended_url_can_be_set() 
+    {
+        $url = route('livestreams.index');
+        $this->assertNull(session()->get('url.intended'));
+        $this->json('POST', route('intended-url'), ['url' => $url])
+             ->assertSuccessful();
+        $this->assertNotNull(session()->get('url.intended'));
+        $this->assertEquals($url, session()->get('url.intended'));
+    }
 }

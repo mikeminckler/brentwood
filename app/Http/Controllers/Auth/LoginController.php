@@ -76,4 +76,13 @@ class LoginController extends Controller
         auth()->login($user);
         return redirect()->intended('/');
     }
+
+    public function intendedUrl() 
+    {
+        if (request('url')) {
+            session()->put('url.intended', request('url'));
+        }
+
+        return response()->json();
+    }
 }

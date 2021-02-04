@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Livestream;
+use App\Models\Chat;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class LivestreamPolicy
+class ChatPolicy
 {
     use HandlesAuthorization;
 
@@ -35,10 +35,10 @@ class LivestreamPolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Livestream  $livestream
+     * @param  \App\Models\Chat  $chat
      * @return mixed
      */
-    public function view(User $user, Livestream $livestream)
+    public function view(User $user, Chat $chat)
     {
         //
     }
@@ -58,10 +58,10 @@ class LivestreamPolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Livestream  $livestream
+     * @param  \App\Models\Chat  $chat
      * @return mixed
      */
-    public function update(User $user, Livestream $livestream)
+    public function update(User $user, Chat $chat)
     {
         //
     }
@@ -70,10 +70,10 @@ class LivestreamPolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Livestream  $livestream
+     * @param  \App\Models\Chat  $chat
      * @return mixed
      */
-    public function delete(User $user, Livestream $livestream)
+    public function delete(User $user, Chat $chat)
     {
         //
     }
@@ -82,10 +82,10 @@ class LivestreamPolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Livestream  $livestream
+     * @param  \App\Models\Chat  $chat
      * @return mixed
      */
-    public function restore(User $user, Livestream $livestream)
+    public function restore(User $user, Chat $chat)
     {
         //
     }
@@ -94,23 +94,11 @@ class LivestreamPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Livestream  $livestream
+     * @param  \App\Models\Chat  $chat
      * @return mixed
      */
-    public function forceDelete(User $user, Livestream $livestream)
+    public function forceDelete(User $user, Chat $chat)
     {
         //
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Livestream  $livestream
-     * @return mixed
-     */
-    public function chat(User $user, Livestream $livestream)
-    {
-        return $livestream->getUsers()->contains('id', $user->id);
     }
 }

@@ -117,6 +117,11 @@ class User extends Authenticatable
         return (new User)->saveUser($input, $id);
     }
 
+    public function inquiries() 
+    {
+        return $this->hasMany(Inquiry::class);   
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class);

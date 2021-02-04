@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Inquiry;
 
 use Laravel\Socialite;
 
@@ -188,5 +189,17 @@ class UserTest extends TestCase
         $user2 = User::findOrCreate($input);
 
         $this->assertEquals($user->id, $user2->id);
+    }
+
+    /** @test **/
+    public function a_user_has_many_inquiries()
+    {
+        $inquiry = Inquiry::factory()->create();
+        $user = $inquiry->user;
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->assertNotNull($user->inquiries);
+        $this->assertEquals(1, $user->inquiries->count());
+        $this->assertTrue($user->inquiries->contains('id', $inquiry->id));
     }
 }

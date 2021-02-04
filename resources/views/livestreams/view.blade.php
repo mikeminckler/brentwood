@@ -16,13 +16,7 @@
                 <youtube-player :content='@json($livestream)' uuid="{{ $livestream->id }}" ></youtube-player>
             </div>
 
-            <div class="flex-1">
-                <chat room="livestream.{{ $livestream->id }}" 
-                    @if (isset($inquiry))
-                        name="{{ $inquiry->name }}"
-                    @endif
-                ></chat>
-            </div>
+            <chat room="livestream.{{ $livestream->id }}"></chat>
         </div>
 
 

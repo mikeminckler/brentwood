@@ -24,12 +24,14 @@ use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\TagsController;
 use App\Http\Controllers\InquiriesController;
 use App\Http\Controllers\LivestreamsController;
+use App\Http\Controllers\ChatController;
 
 //Auth::routes();
 
 Route::get('login', [LoginController::class, 'redirectToProvider'])->name('login');
 Route::get('login/google/authorized', [LoginController::class, 'handleProviderCallback']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('intended-url', [LoginController::class, 'intendedUrl'])->name('intended-url');
 
 Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');
 
@@ -94,6 +96,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/livestreams', [LivestreamsController::class, 'index'])->name('livestreams.index');
     Route::post('/livestreams/create', [LivestreamsController::class, 'store'])->name('livestreams.store');
     Route::post('/livestreams/{id}', [LivestreamsController::class, 'store'])->name('livestreams.update')->where('id', '\d+');
+
+    Route::post('/chat/send-message', [ChatController::class, 'sendMessage'])->name('chat.send-message');
+    Route::post('/chat/{id}/delete', [ChatController::class, 'destroy'])->name('chat.delete')->where('id', '\d+');
+    Route::post('/chat/load', [ChatController::class, 'load'])->name('chat.load');
 });
 
 Route::get('/livestreams/{id}', [LivestreamsController::class, 'view'])->name('livestreams.view')->where('id', '\d+');
@@ -109,9 +115,11 @@ Route::get('/inquiry/tags', [InquiriesController::class, 'tags'])->name('inquiri
 Route::get('/inquiry/{id}', [InquiriesController::class, 'view'])->name('inquiries.view')->where('id', '\d+');
 Route::post('/inquiry/{id}', [InquiriesController::class, 'store'])->name('inquiries.update')->where('id', '\d+');
 
+/*
 Route::get('/mailable', function () {
     $inquiry = App\Models\Inquiry::all()->last();
     return new App\Mail\InquiryConfirmation($inquiry);
 });
+ */
 
 Route::get('{page}', [PagesController::class, 'load'])->name('pages.load')->where('page', '.*');

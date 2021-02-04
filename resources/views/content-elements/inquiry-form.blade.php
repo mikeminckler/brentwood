@@ -1,10 +1,10 @@
-<div class="flex relative">
+<div class="md:flex relative">
 
     <div class="flex-1"></div>
 
     <div class="flex-2">
 
-        <div class="md:bg-white md:mx-8 md:p-8 md:rounded-lg md:shadow">
+        <div class="md:bg-white mb-8 md:mx-8 md:p-8 md:rounded-lg md:shadow">
 
             <div class="flex justify-center relative">
                 <div class="text-block relative z-4">

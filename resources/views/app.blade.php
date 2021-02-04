@@ -172,7 +172,6 @@
 
 
             <div class="items-center flex-1 flex flex-col relative" 
-                :class="$store.state.editing ? '' : ''"
                 style="background-image: linear-gradient(180deg, rgba(243, 244, 246 ,1) 75%, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1));"> 
 
                 <div class="flex flex-1 flex-col w-full max-w-6xl relative">
@@ -188,62 +187,61 @@
             </div>
 
 
-            <div id="footer" class="relative flex justify-center" style="min-height: 700px" :class="$store.state.editing ? '' : ''">
+            <div id="footer" class="relative flex justify-center">
 
                 @if (optional($page ?? '')->editable && optional($page ?? '')->type === 'page' && !request('preview'))
                     <footer-editor></footer-editor>
                 @else
 
-                        <div class="md:hidden h-full w-full absolute z-3 bg-white bg-opacity-75"></div>
+                    <div class="hidden md:block absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
+                    <div class="md:hidden absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1) 70%, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
 
-                        <div class="absolute z-1 w-full h-full" style="background-image: linear-gradient(180deg, rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},1), rgba({{ isset($page) ? ($page->footer_color ? $page->footer_color : '218,241,250') : '218,241,250' }},0));" ></div>
+                    <div class="absolute w-full h-full overflow-hidden flex items-end">
 
-                        <div class="absolute w-full h-full overflow-hidden">
+                    @php 
 
-                        @php 
+                        if (isset($page)) {
+                            $footerFgPhoto = $page->getFooterFgPhoto();
+                            $footerBgPhoto = $page->getFooterBgPhoto();
+                        } else {
+                            $home_page = App\Models\Page::find(1);
+                            $footerFgPhoto = $home_page->footerFgPhoto;
+                            $footerBgPhoto = $home_page->footerBgPhoto;
+                        }
 
-                            if (isset($page)) {
-                                $footerFgPhoto = $page->getFooterFgPhoto();
-                                $footerBgPhoto = $page->getFooterBgPhoto();
-                            } else {
-                                $home_page = App\Models\Page::find(1);
-                                $footerFgPhoto = $home_page->footerFgPhoto;
-                                $footerBgPhoto = $home_page->footerBgPhoto;
-                            }
+                    @endphp
 
-                        @endphp
+                    @if ($footerFgPhoto)
+                        <picture class="w-full md:h-full z-2 absolute">
+                            <source media="(min-width: 900px)" srcset="{{ $footerFgPhoto->large }}.webp" type="image/webp" >
+                            <source media="(min-width: 400px)" srcset="{{ $footerFgPhoto->medium }}.webp" type="image/webp" >
+                            <source srcset="{{ $footerFgPhoto->small }}.webp" type="image/webp" >
+                            <img class="w-full h-full md:object-cover"
+                                srcset="{{ $footerFgPhoto->small }} 400w, {{ $footerFgPhoto->medium }} 900w, {{ $footerFgPhoto->large }} 1152w"
+                                src="{{ $footerFgPhoto->large }}"
+                                type="image/{{ optional($footerFgPhoto->fileUpload)->extension }}"
+                                alt="Brentwood College School Footer Foreground" >
+                        </picture>
+                    @endif
 
-                        @if ($footerFgPhoto)
-                            <picture class="w-full h-full z-2 absolute">
-                                <source media="(min-width: 900px)" srcset="{{ $footerFgPhoto->large }}.webp" type="image/webp" >
-                                <source media="(min-width: 400px)" srcset="{{ $footerFgPhoto->medium }}.webp" type="image/webp" >
-                                <source srcset="{{ $footerFgPhoto->small }}.webp" type="image/webp" >
-                                <img class="w-full h-full object-cover"
-                                    srcset="{{ $footerFgPhoto->small }} 400w, {{ $footerFgPhoto->medium }} 900w, {{ $footerFgPhoto->large }} 1152w"
-                                    src="{{ $footerFgPhoto->large }}"
-                                    type="image/{{ optional($footerFgPhoto->fileUpload)->extension }}"
-                                    alt="Brentwood College School Footer Foreground" >
-                            </picture>
-                        @endif
+                    @if ($footerBgPhoto)
+                        <picture class="w-full md:h-full">
+                            <source media="(min-width: 900px)" srcset="{{ $footerBgPhoto->large }}.webp" type="image/webp" >
+                            <source media="(min-width: 400px)" srcset="{{ $footerBgPhoto->medium }}.webp" type="image/webp" >
+                            <source srcset="{{ $footerBgPhoto->small }}.webp" type="image/webp" >
+                            <img class="w-full h-full md:object-cover" 
+                                srcset="{{ $footerBgPhoto->small }} 400w, {{ $footerBgPhoto->medium }} 900w, {{ $footerBgPhoto->large }} 1152w"
+                                src="{{ $footerBgPhoto->large }}"
+                                type="image/{{ optional($footerBgPhoto->fileUpload)->extension }}"
+                                alt="Brentwood College School Footer Background" >
+                        </picture>
+                    @endif
 
-                        @if ($footerBgPhoto)
-                            <picture class="w-full h-full">
-                                <source media="(min-width: 900px)" srcset="{{ $footerBgPhoto->large }}.webp" type="image/webp" >
-                                <source media="(min-width: 400px)" srcset="{{ $footerBgPhoto->medium }}.webp" type="image/webp" >
-                                <source srcset="{{ $footerBgPhoto->small }}.webp" type="image/webp" >
-                                <img class="w-full h-full object-cover" 
-                                    srcset="{{ $footerBgPhoto->small }} 400w, {{ $footerBgPhoto->medium }} 900w, {{ $footerBgPhoto->large }} 1152w"
-                                    src="{{ $footerBgPhoto->large }}"
-                                    type="image/{{ optional($footerBgPhoto->fileUpload)->extension }}"
-                                    alt="Brentwood College School Footer Background" >
-                            </picture>
-                        @endif
-
-                        </div>
+                    </div>
 
                 @endif
 
-                <div class="relative w-full max-w-6xl {{ isset($page) ? $page->footer_text_color : '' }}">
+                <div class="relative w-full max-w-6xl pb-24 md:pb-64 {{ isset($page) ? $page->footer_text_color : '' }}">
 
                     <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p z-4 md:z-1"></div>
                     

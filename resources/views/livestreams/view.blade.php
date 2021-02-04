@@ -6,7 +6,7 @@
 
     <div class="">
 
-        <div class="my-4">
+        <div class="flex flex-col items-center md:items-start m-4">
             <h1>{{ $livestream->name }}</h1>
             <div class="text-lg font-bold mt-2">{{ $livestream->start_date->timezone('America/Vancouver')->format('l F jS g:ia') }}</div>
         </div>

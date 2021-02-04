@@ -1,12 +1,12 @@
 <template>
 
-    <div class="relative transition-all duration-500" :class="showChat ? 'flex-1' : 'flex-0'">
+    <div class="relative transition-all duration-500" :class="showChat ? 'flex-1 pb-100p md:pb-0' : 'flex-0'">
         <div class="absolute z-5 right-0">
             <div v-if="!showChat" class="flex absolute button-secondary right-0" @click="showChat = true">
                 <div class=""><i class="fas fa-comment"></i></div>
                 <div class="whitespace-nowrap pl-2">Show Chat</div>
             </div>
-            <remove class="" v-if="showChat" :transparent="true" @remove="showChat = false"></remove>
+            <remove class="mr-2 md:mr-0" v-if="showChat" :transparent="true" @remove="showChat = false"></remove>
         </div>
 
         <transition name="chat">
@@ -48,7 +48,7 @@
                         </div>
                     </div>
 
-                    <div class="px-2 py-1 relative z-5 border-t border-gray-200">
+                    <div class="px-2 py-1 relative z-5">
                         <textarea v-model="message" class="w-full p-2 leading-none outline-none focus:border-gray-300 border rounded text-sm text-gray-600" @keydown.enter.prevent="sendMessage()" placeholder="Send a message..."></textarea>
                     </div>
                 </div>
@@ -199,6 +199,7 @@
 
                 if (c) {
                     c.message = 'Message Deleted';
+                    c.deleted = true;
                 }
             },
 

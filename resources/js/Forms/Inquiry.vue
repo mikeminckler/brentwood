@@ -12,20 +12,19 @@
                     <div class="input">
                         <form-label label="Contact Name" :value="form.name"></form-label>
                         <div class=""><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
-                        <form-error :errors="errors" name="name"></form-error>
+                        <form-error :errors="errors" name="name" :show="showErrors"></form-error>
                     </div>
 
                     <div class="input">
                         <form-label label="Contact Email" :value="form.email"></form-label>
                         <div class=""><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
-                        <form-error :errors="errors" name="email"></form-error>
+                        <form-error :errors="errors" name="email" :show="showErrors"></form-error>
                     </div>
-
 
                     <div class="input hidden">
                         <form-label label="Contact Phone Number" :value="form.phone"></form-label>
                         <div class=""><input type="text" inputmode="tel" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
-                        <form-error :errors="errors" name="phone"></form-error>
+                        <form-error :errors="errors" name="phone" :show="showErrors"></form-error>
                     </div>
 
                 </div>
@@ -36,6 +35,7 @@
 
                     <div class="mt-4">
                         <div class="input-label">Start Year</div>
+                        <form-error :errors="errors" name="target_year" :show="showErrors"></form-error>
                         <div class="flex items-center flex-wrap">
                             <div v-for="year in years"
                                  :key="'year-' + year"
@@ -48,7 +48,7 @@
 
                     <div class="mt-4">
                         <div class="">Start Grade</div>
-
+                        <form-error :errors="errors" name="target_grade" :show="showErrors"></form-error>
                         <div class="flex items-center flex-wrap">
                             <div v-for="grade in grades"
                                  :key="'grade-' + grade"
@@ -62,7 +62,7 @@
 
                     <div class="mt-4">
                         <div class="">Student Type</div>
-
+                        <form-error :errors="errors" name="student_type" :show="showErrors"></form-error>
                         <div class="flex items-center flex-wrap w-full">
                             <div v-for="type in types"
                                  :key="'type-' + type"
@@ -82,7 +82,7 @@
                     <div class="mt-4">Select the items that the student is interested in.</div>
 
                     <tags-selector :tags="tags" 
-                         :ignore-tags="['Boarding Student', 'Day Student']"
+                         :ignore-tags="['Boarding Student', 'Day Student', 'Admissions']"
                         :selected-tags="form.tags" 
                         @selected="toggleTag($event)"
                     ></tags-selector>
@@ -93,6 +93,11 @@
 
                     <h3>Upcoming {{ livestreamTitle }}</h3>
 
+                    <div class="" v-if="livestreamTitle === 'Open Houses'">
+                        <p>We invite you to join our admissions team for an <span class="font-bold">interactive online presentation</span> where you can <span class="font-bold">ask questions</span> and find out why so many students choose Brentwood for their high school experience. Find a date that best suits your family below.</p>
+                    </div>
+
+                    <form-error :errors="errors" name="livestream" :show="showErrors"></form-error>
                     <div class="mt-4">
                         <div class="flex cursor-pointer px-2 py-1" 
                              :class="form.livestream ? (form.livestream.id === livestream.id ? 'bg-green-100 text-gray-800' : 'bg-white odd:bg-gray-200 hover:text-gray-800') : 'bg-white odd:bg-gray-200 hover:text-gray-800'"
@@ -149,7 +154,7 @@
             </transition-group>
 
             <div class="flex justify-around items-center mt-4">
-                <div class="flex-1 flex items-center hover:bg-white px-4 py-2 transition-opacity transition" :class="currentStep === steps[0] ? 'opacity-0' : 'opacity-1 cursor-pointer'" @click="prevStep()">
+                <div class="flex items-center hover:bg-white px-4 py-2 transition-opacity transition" :class="currentStep === steps[0] ? 'opacity-0' : 'opacity-1 cursor-pointer'" @click="prevStep()">
                     <div class="icon mr-2"><i class="fas fa-chevron-left"></i></div>
                     <div class="">Back</div>
                 </div>
@@ -165,9 +170,9 @@
                     </div>
                 </div>
 
-                <div class="flex-1 flex items-center px-4 py-2 transition-opacity transition cursor-pointer" :class="errors.length ? 'bg-primary text-white font-bold' : 'bg-white'" @click="nextStep()">
+                <div class="relative flex items-center px-4 py-2 cursor-pointer text-white font-bold" :class="errors.length ? 'bg-primary' : 'bg-green-500'" @click="nextStep()">
                     <div class="">{{ nextText }}</div>
-                    <div class="icon ml-2"><i class="fas fa-chevron-right"></i></div>
+                    <div class="ml-2"><i class="fas fa-chevron-right"></i></div>
                 </div>
             </div>
 
@@ -203,8 +208,7 @@
 
         data() {
             return {
-                errors: [],
-                displayErrors: [],
+                showErrors: false,
                 url: '',
                 transitionDirection: 'inquiry-form-forward',
                 currentStep: 'Start',
@@ -281,6 +285,60 @@
                 return steps;
             },
 
+            errors() {
+
+                let errors = [];
+
+                if (this.currentStep === 'Contact Information') {
+
+                    if (!this.form.name) {
+                        errors.push({name: 'Please provide a contact name'});
+                    } else if (this.form.name.length < 3) {
+                        errors.push({name: 'The contact name must be at least 3 characters'});
+                    }
+
+                    if (!this.form.email) {
+                        errors.push({email: 'Please provide a contact email'});
+                    } else if (!this.validEmail) {
+                        errors.push({email: 'Please provide a valid email address'});
+                    }
+                }
+
+                if (this.currentStep === 'Student Information') {
+                    
+                    if (!this.form.target_year) {
+                        errors.push({target_year: 'Please select an entry year'});
+                    }
+
+                    if (!this.form.target_grade) {
+                        errors.push({target_grade: 'Please select an entry grade'});
+                    }
+
+                    if (!this.form.student_type) {
+                        errors.push({student_type: 'Please select a student type'});
+                    }
+                }
+
+                if (this.currentStep === 'Student Interests') {
+
+                    //return this.currentStep === 'Student Interests' || this.currentStep === 'Livestreams' || this.currentStep === 'Review Information';
+                }
+
+                if (this.currentStep === 'Livestreams') {
+                    if (this.showLivestreamsFirst) {
+                        if (!this.form.livestream) {
+                            errors.push({livestream: 'Please select a session'});
+                        }
+                    }
+                }
+
+                if (this.currentStep === 'Review Information') {
+
+                }
+
+                return errors;
+            },
+
             currentIndex() {
                 return this.$lodash.findIndex(this.steps, step => {
                     return step === this.currentStep;
@@ -344,22 +402,6 @@
                 return Boolean(email.match(mailformat));
             },
 
-            /*
-            formIsValid() {
-                let valid = true;
-
-                let steps = this.steps.slice(0, this.steps.length - 1);
-
-                steps.forEach(step => {
-                    if (!this.validateStep(step)) {
-                        valid = false;
-                    }
-                });
-
-                return valid;
-            },
-            */
-
             filteredFormTags() {
                 return this.$lodash.filter(this.form.tags, tag => {
                     return tag.name !== 'Boarding Student' && tag.name !== 'Day Student';
@@ -414,34 +456,44 @@
                         this.form.tags.splice(index, 1);
                     }
                 }
-
             },
+
         },
 
         methods: {
 
             showCheck: function(step) {
-
-                return false;
-                if (step === 'Contact Information' || step === 'Student Information') {
-                    return this.validateStep(step);
-                } 
+                
+                if (!step) {
+                    step = this.currentStep;
+                }
 
                 let index = this.$lodash.findIndex(this.steps, s => {
                     return s === step;
                 });
-                if (this.currentIndex > index) {
-                    return true;
-                }
 
-                return false;
+                if (index < this.currentIndex) {
+                    return true;
+                } else if (index > this.currentIndex) {
+                    return false;
+                } else {
+
+                    if (step === 'Contact Information' || step === 'Student Information') {
+                        return this.errors.length ? false : true;
+                    } else {
+                        return false;
+                    }
+                }
 
             },
 
             stepClass: function(step) {
 
                 let classes = '';
-                return classes;
+
+                let index = this.$lodash.findIndex(this.steps, s => {
+                    return s === step;
+                });
 
                 if (step === 'Review Information') {
                     classes += ' hidden';
@@ -459,49 +511,6 @@
 
             },
 
-            validateStep: function(step) {
-
-                console.log('VALIDATE');
-
-                if (!step) {
-                    step = this.currentStep;
-                }
-
-                this.errors = [];
-
-                if (step === 'Contact Information') {
-
-                    if (this.form.name.length < 3) {
-                        this.errors.push({name: 'The contact name must be at least 3 characters'});
-                    }
-
-                    if (!this.validEmail) {
-                        this.errors.push({email: 'Please provide a valid email address'});
-                    }
-                }
-
-                if (step === 'Student Information') {
-                    return this.form.target_year && this.form.target_grade && this.form.student_type;
-                }
-
-                if (step === 'Student Interests') {
-                    return this.currentStep === 'Student Interests' || this.currentStep === 'Livestreams' || this.currentStep === 'Review Information';
-                }
-
-                if (step === 'Livestreams') {
-                    if (this.showLivestreamsFirst) {
-                        return this.form.livestream ? true : false;
-                    }
-                    return this.currentStep === 'Livestreams' || this.currentStep === 'Review Information';
-                }
-
-                if (step === 'Review Information') {
-                    return this.formIsValid;
-                }
-
-                return this.errors.length ? false : true;
-            },
-            
             goToStep: function(step) {
 
                 let index = this.$lodash.findIndex(this.steps, s => {
@@ -514,7 +523,7 @@
                     this.transitionDirection = 'inquiry-form-forward';
                 }
 
-                if (this.validateStep(step)) {
+                if (this.showCheck(step)) {
                     this.currentStep = step;
                 }
 
@@ -522,7 +531,11 @@
 
             nextStep: function() {
                 
-                this.validateStep();
+                if (this.errors.length > 0) {
+                    this.showErrors = true;
+                } else {
+                    this.showErrors = false;
+                }
 
                 if (this.errors.length === 0 || this.$store.state.editing) {
 
@@ -533,7 +546,7 @@
                         this.currentStep = this.steps[this.currentIndex + 1];
                         this.scrollToForm();
 
-                    } else if (this.currentIndex === (this.steps.length - 1) && this.formIsValid) {
+                    } else if (this.currentIndex === (this.steps.length - 1)) {
 
                         if (!this.$store.state.editing) {
                             this.submit();

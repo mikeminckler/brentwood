@@ -1,7 +1,7 @@
 <template>
 
-    <transition-group name="form-error" tag="div" class="text-sm text-primary">
-        <div class="pt-1" :key="message[name]" v-for="message in messages">{{ message[name] }}</div>
+    <transition-group name="form-error" tag="div" class="text-sm text-primary bg-gray-200 bg-opacity-50 rounded-b">
+        <div class="py-1 pl-4 border-b border-primary" :key="message[name]" v-if="show" v-for="message in messages">{{ message[name] }}</div>
     </transition-group>
 
 </template>
@@ -9,7 +9,7 @@
 <script>
     export default {
 
-        props: ['errors', 'name'],
+        props: ['errors', 'name', 'show'],
 
         data() {
             return {

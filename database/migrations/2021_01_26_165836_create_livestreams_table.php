@@ -19,6 +19,7 @@ class CreateLivestreamsTable extends Migration
             $table->string('video_id');
             $table->dateTime('start_date');
             $table->integer('length')->nullable(); // in minutes
+            $table->boolean('enable_chat')->default(false);
             $table->timestamps();
         });
     }

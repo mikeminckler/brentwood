@@ -8,7 +8,7 @@
 
         <div class="flex flex-col items-center md:items-start m-4">
             <h1>{{ $livestream->name }}</h1>
-            <div class="text-lg font-bold mt-2">{{ $livestream->start_date->timezone('America/Vancouver')->format('l F jS g:ia') }}</div>
+            <div class="text-lg font-bold mt-2">{{ $livestream->date }}</div>
         </div>
 
         <div class="md:flex w-full">
@@ -16,7 +16,9 @@
                 <youtube-player :content='@json($livestream)' uuid="{{ $livestream->id }}" ></youtube-player>
             </div>
 
-            <chat room="livestream.{{ $livestream->id }}"></chat>
+            @if ($livestream->enable_chat)
+                <chat room="{{ $livestream->chat_room }}"></chat>
+            @endif
         </div>
 
 

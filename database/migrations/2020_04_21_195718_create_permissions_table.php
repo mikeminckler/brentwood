@@ -16,7 +16,7 @@ class CreatePermissionsTable extends Migration
         Schema::create('permissions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->morphs('objectable'); // pages, blogs, content elements, livestreams
-            $table->morphs('accessable'); // the user or role 
+            $table->morphs('accessable'); // the user or role
             $table->timestamps();
         });
     }

@@ -57,6 +57,17 @@ class LivestreamsController extends Controller
     public function view($id)
     {
         $livestream = Livestream::findOrFail($id);
+
+        if ($livestream->roles->count() || $livestream->users->count()) {
+            if (!auth()->check()) {
+                session()->put('url.intended', url()->current());
+                return redirect()->route('login');
+            }
+
+            if (!auth()->user()->can('view', $livestream)) {
+                return redirect('/')->with(['error' => 'You do not have permission to view that livestream']);
+            }
+        }
         return view('livestreams.view', compact('livestream'));
     }
 

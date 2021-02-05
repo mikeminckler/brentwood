@@ -62,7 +62,7 @@ const app = new Vue({
         'blogs-index': () => import(/* webpackChunkName: "blogs-index" */ '@/Pages/BlogsIndex.vue'),
         'inquiries-index': () => import(/* webpackChunkName: "inquiries-index" */ '@/Pages/InquiriesIndex.vue'),
         'livestreams-index': () => import(/* webpackChunkName: "livestreams-index" */ '@/Pages/LivestreamsIndex.vue'),
-        'permissions': () => import(/* webpackChunkName: "permissions" */ '@/Pages/Permissions.vue'),
+        'page-permissions': () => import(/* webpackChunkName: "page-permissions" */ '@/Pages/PagePermissions.vue'),
         'role-management': () => import(/* webpackChunkName: "role-management" */ '@/Pages/RoleManagement.vue'),
         'user-management': () => import(/* webpackChunkName: "user-management" */ '@/Pages/UserManagement.vue'),
 

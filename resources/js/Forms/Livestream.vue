@@ -27,6 +27,10 @@
                     <form-tags v-model="livestream.tags" placeholder="Select a Category"></form-tags>
                 </div>
 
+                <div class="input">
+                    <checkbox-input v-model="livestream.enable_chat" label="Enable Chat"></checkbox-input>
+                </div>
+
             </div>
 
             <div class="">
@@ -57,6 +61,23 @@
 
         </div>
 
+        <div class="">
+
+            <div class="mt-2">
+                <autocomplete
+                    url="/roles/search"
+                    v-model="livestream.roles"
+                    name="role"
+                    :multiple="true"
+                    placeholder="Add Role"
+                    :hideLabel="true"
+                    :remove="true"
+                    @remove="removeRole($event)"
+                ></autocomplete>
+            </div>
+
+        </div>
+
         <div class="flex">
             <div class="flex-1 button-secondary mr-2" @click="$eventer.$emit('close-modal')">Cancel</div>
             <div class="flex-1 button ml-2" @click="saveLivestream()">
@@ -81,9 +102,11 @@
         mixins: [Feedback, Dates],
 
         components: {
+            'autocomplete': () => import(/* webpackChunkName: "autocomplete" */ '@/Components/Autocomplete'),
             'form-label': () => import(/* webpackChunkName: "form-label" */ '@/Components/FormLabel.vue'),
             'date-time-picker': () => import(/* webpackChunkName: "date-time-picker" */ '@/Components/DateTimePicker.vue'),
             'form-tags': () => import(/* webpackChunkName: "form-tags" */ '@/Forms/Tags.vue'),
+            'checkbox-input': () => import(/* webpackChunkName: "checkbox-input" */ '@/Components/CheckboxInput.vue'),
         },
 
         data() {
@@ -124,6 +147,10 @@
                     this.processErrors(error.response);
                 });
             },
+
+            removeRole: function(role) {
+                this.livestream.roles = this.$lodash.xor(this.livestream.roles, [role]);
+            }
 
         },
 

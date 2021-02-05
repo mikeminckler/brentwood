@@ -131,4 +131,27 @@ class ChatTest extends TestCase
                 'message' => $other_chat->message,
              ]);
     }
+
+    /** @test **/
+    public function a_chat_room_can_be_viewed()
+    {
+        $livestream = Livestream::factory()->create();
+        $room = $livestream->chat_room;
+
+        $this->assertNotNull($room);
+
+        $this->get(route('chat.view', ['room' => $room]))
+            ->assertRedirect('/login');
+
+        $this->signIn(User::factory()->create());
+
+        $this->get(route('chat.view', ['room' => $room]))
+            ->assertRedirect('/');
+
+        $this->signInAdmin();
+
+        $this->get(route('chat.view', ['room' => $room]))
+             ->assertSuccessful()
+             ->assertViewHas('room', $room);
+    }
 }

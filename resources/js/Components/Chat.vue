@@ -2,11 +2,11 @@
 
     <div class="relative transition-all duration-500" :class="showChat ? 'flex-1 pb-100p md:pb-0' : 'flex-0'">
         <div class="absolute z-5 right-0">
-            <div v-if="!showChat" class="flex absolute button-secondary right-0" @click="showChat = true">
+            <div v-if="!showChat && !hideClose" class="flex absolute button-secondary right-0" @click="showChat = true">
                 <div class=""><i class="fas fa-comment"></i></div>
                 <div class="whitespace-nowrap pl-2">Show Chat</div>
             </div>
-            <remove class="mr-2 md:mr-0" v-if="showChat" :transparent="true" @remove="showChat = false"></remove>
+            <remove class="mr-2 md:mr-0" v-if="showChat && !hideClose" :transparent="true" @remove="showChat = false"></remove>
         </div>
 
         <transition name="chat">
@@ -65,7 +65,7 @@
 
     export default {
 
-        props: ['room'],
+        props: ['room', 'hide-close'],
 
         mixins: [Feedback],
 

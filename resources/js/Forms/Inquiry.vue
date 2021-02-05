@@ -1,22 +1,32 @@
 <template>
 
-    <div class="flex items-center justify-center w-full">
-        <div class="form max-w-sm bg-gray-100 border border-gray-200 px-4 py-2 md:px-8 md:py-4 rounded-lg overflow-hidden mt-4" id="inquiry-form">
+    <div class="flex items-center justify-center w-full relative">
+        <div class="relatice form max-w-sm bg-gray-100 border border-gray-200 px-4 py-2 md:px-8 md:py-4 rounded-lg overflow-hidden mt-4" id="inquiry-form">
 
             <transition-group :name="transitionDirection" tag="div" class="relative mt-8 first:mt-0">
 
-                <div class="" key="step1" v-if="currentStep === 'Contact Information'">
+                <div class="relative" key="step1" v-if="currentStep === 'Contact Information'">
 
                     <h3 class="mb-4">{{ currentStep }}</h3>
 
-                    <form-label label="Contact Name" :value="form.name"></form-label>
-                    <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
+                    <div class="input">
+                        <form-label label="Contact Name" :value="form.name"></form-label>
+                        <div class=""><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
+                        <form-error :errors="errors" name="name"></form-error>
+                    </div>
 
-                    <form-label label="Contact Email" :value="form.email"></form-label>
-                    <div class="input"><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
+                    <div class="input">
+                        <form-label label="Contact Email" :value="form.email"></form-label>
+                        <div class=""><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
+                        <form-error :errors="errors" name="email"></form-error>
+                    </div>
 
-                    <form-label label="Contact Phone Number" :value="form.phone"></form-label>
-                    <div class="input"><input type="text" inputmode="tel" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
+
+                    <div class="input hidden">
+                        <form-label label="Contact Phone Number" :value="form.phone"></form-label>
+                        <div class=""><input type="text" inputmode="tel" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
+                        <form-error :errors="errors" name="phone"></form-error>
+                    </div>
 
                 </div>
 
@@ -110,7 +120,7 @@
                             <div class="input"><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
 
                             <form-label label="Contact Phone Number" :value="form.phone"></form-label>
-                            <div class="input"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" v-if="form.phone" /></div>
+                            <div class="input hidden"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" v-if="form.phone" /></div>
 
                             <form-label label="Start Year" :value="form.target_year"></form-label>
                             <div class="fake-input" v-if="form.target_year">{{ form.target_year }}-{{ form.target_year + 1 }}</div>
@@ -155,7 +165,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1 flex items-center text-white font-bold bg-primary px-4 py-2 transition-opacity transition" :class="validateStep() || $store.state.editing ? 'opacity-1 cursor-pointer' : 'opacity-0'" @click="nextStep()">
+                <div class="flex-1 flex items-center px-4 py-2 transition-opacity transition cursor-pointer" :class="errors.length ? 'bg-primary text-white font-bold' : 'bg-white'" @click="nextStep()">
                     <div class="">{{ nextText }}</div>
                     <div class="icon ml-2"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -187,12 +197,14 @@
 
         components: {
             'form-label': () => import(/* webpackChunkName: "form-label" */ '@/Components/FormLabel.vue'),
+            'form-error': () => import(/* webpackChunkName: "form-error" */ '@/Components/FormError.vue'),
             'tags-selector': () => import(/* webpackChunkName: "tags-selector" */ '@/Components/TagsSelector.vue'),
         },
 
         data() {
             return {
-
+                errors: [],
+                displayErrors: [],
                 url: '',
                 transitionDirection: 'inquiry-form-forward',
                 currentStep: 'Start',
@@ -332,6 +344,7 @@
                 return Boolean(email.match(mailformat));
             },
 
+            /*
             formIsValid() {
                 let valid = true;
 
@@ -345,6 +358,7 @@
 
                 return valid;
             },
+            */
 
             filteredFormTags() {
                 return this.$lodash.filter(this.form.tags, tag => {
@@ -408,6 +422,7 @@
 
             showCheck: function(step) {
 
+                return false;
                 if (step === 'Contact Information' || step === 'Student Information') {
                     return this.validateStep(step);
                 } 
@@ -426,6 +441,8 @@
             stepClass: function(step) {
 
                 let classes = '';
+                return classes;
+
                 if (step === 'Review Information') {
                     classes += ' hidden';
                 }
@@ -444,13 +461,23 @@
 
             validateStep: function(step) {
 
+                console.log('VALIDATE');
+
                 if (!step) {
                     step = this.currentStep;
                 }
 
+                this.errors = [];
+
                 if (step === 'Contact Information') {
-                    //return this.form.name.length > 2 && this.form.phone.length > 9 && this.validEmail;
-                    return this.form.name.length > 2 && this.validEmail;
+
+                    if (this.form.name.length < 3) {
+                        this.errors.push({name: 'The contact name must be at least 3 characters'});
+                    }
+
+                    if (!this.validEmail) {
+                        this.errors.push({email: 'Please provide a valid email address'});
+                    }
                 }
 
                 if (step === 'Student Information') {
@@ -472,8 +499,9 @@
                     return this.formIsValid;
                 }
 
+                return this.errors.length ? false : true;
             },
-
+            
             goToStep: function(step) {
 
                 let index = this.$lodash.findIndex(this.steps, s => {
@@ -493,8 +521,10 @@
             },
 
             nextStep: function() {
+                
+                this.validateStep();
 
-                if (this.validateStep() || this.$store.state.editing) {
+                if (this.errors.length === 0 || this.$store.state.editing) {
 
                     this.transitionDirection = 'inquiry-form-forward';
 
@@ -510,7 +540,6 @@
                         }
 
                     }
-
                 }
 
             },

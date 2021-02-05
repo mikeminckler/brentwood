@@ -15,20 +15,20 @@ class PermissionTest extends TestCase
 {
 
     /** @test **/
-    public function the_permissions_index_can_be_loaded()
+    public function the_page_permissions_index_can_be_loaded()
     {
-        $this->get(route('permissions.index'))
+        $this->get(route('permissions.pages'))
              ->assertRedirect(route('login'));
 
         $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
-        $this->get(route('permissions.index'))
+        $this->get(route('permissions.pages'))
              ->assertRedirect('/');
 
         $this->signInAdmin();
 
-        $this->get(route('permissions.index'))
+        $this->get(route('permissions.pages'))
             ->assertSuccessful();
     }
 

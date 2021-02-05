@@ -64,4 +64,13 @@ class ChatController extends Controller
 
         return response()->json(['success' => 'Message Deleted']);
     }
+
+    public function view($room)
+    {
+        if (!Chat::canJoinRoom($room)) {
+            return redirect('/')->with(['error' => 'You do not have permission to view that chat room']);
+        }
+
+        return view('chat.view', compact('room'));
+    }
 }

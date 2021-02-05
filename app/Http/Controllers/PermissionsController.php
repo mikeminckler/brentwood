@@ -14,13 +14,13 @@ use App\Models\Page;
 
 class PermissionsController extends Controller
 {
-    public function index()
+    public function pages()
     {
         if (!auth()->user()->can('viewAny', Permission::class)) {
             return redirect('/')->with(['error' => 'You do not have permission to view that page']);
         }
 
-        return view('permissions.index');
+        return view('permissions.pages');
     }
 
     public function load()
@@ -30,7 +30,7 @@ class PermissionsController extends Controller
         }
 
         $objectable = Permission::findObjectable(requestInput());
-        $objectable->load('permissions', 'permissions.accessable');
+        $objectable = $this->loadAttributes($objectable);
 
         return response()->json([
             'objectable' => $objectable,
@@ -55,6 +55,8 @@ class PermissionsController extends Controller
             }
         }
 
+        $objectable = $this->loadAttributes($objectable);
+
         return response()->json([
             'success' => 'Permission Created',
             'objectable' => $objectable->refresh()->load('permissions', 'permissions.accessable'),
@@ -72,5 +74,16 @@ class PermissionsController extends Controller
         $permission->delete();
 
         return response()->json(['success' => 'Permission Removed']);
+    }
+
+    protected function loadAttributes($objectable)
+    {
+        $objectable->load('permissions', 'permissions.accessable');
+
+        if (method_exists($objectable, 'appendAttributes')) {
+            $objectable->appendAttributes();
+        }
+
+        return $objectable;
     }
 }

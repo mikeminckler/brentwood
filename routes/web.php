@@ -47,7 +47,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/roles/search', [RolesController::class, 'search'])->name('roles.search');
     //Route::post('/roles/{id}/remove-user', [RolesController::class, 'removeUser'])->name('roles.remove-user')->where('id', '\d+');
 
-    Route::get('/permissions', [PermissionsController::class, 'index'])->name('permissions.index');
+    Route::get('/permissions/pages', [PermissionsController::class, 'pages'])->name('permissions.pages');
     Route::post('/permissions/load', [PermissionsController::class, 'load'])->name('permissions.load');
     Route::post('/permissions/create', [PermissionsController::class, 'store'])->name('permissions.store');
     Route::post('/permissions/{id}/destroy', [PermissionsController::class, 'destroy'])->name('permissions.destroy')->where('id', '\d+');
@@ -100,6 +100,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/chat/send-message', [ChatController::class, 'sendMessage'])->name('chat.send-message');
     Route::post('/chat/{id}/delete', [ChatController::class, 'destroy'])->name('chat.delete')->where('id', '\d+');
     Route::post('/chat/load', [ChatController::class, 'load'])->name('chat.load');
+    Route::get('/chat/view/{room}', [ChatController::class, 'view'])->name('chat.view');
 });
 
 Route::get('/livestreams/{id}', [LivestreamsController::class, 'view'])->name('livestreams.view')->where('id', '\d+');

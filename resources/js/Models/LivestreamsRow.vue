@@ -17,7 +17,8 @@
             </a>
         </div>
         <div class="grid-cell">
-            <div class="inline-flex items-center link" @click="openChat()">
+            <div class="" v-if="!livestream.enable_chat">Chat Disabled</div>
+            <div class="inline-flex items-center link" @click="openChat()" v-if="livestream.enable_chat">
                 <div class="icon"><i class="fas fa-comments"></i></div>
                 <div class="pl-2">Live Chat</div>
             </div>
@@ -57,7 +58,8 @@
 
         methods: {
             openChat: function() {
-                window.open('https://www.youtube.com/live_chat?v=' + this.livestream.video_id + '&embed_domain=brentwood.ca', 'livestream-' + this.livestream.video_id, 'width=600,height=800,scrollbars=yes');
+                window.open('/chat/view/' + this.livestream.chat_room, this.livestream.chat_room, 'width=600,height=800,scrollbars=yes');
+                //window.open('https://www.youtube.com/live_chat?v=' + this.livestream.video_id + '&embed_domain=brentwood.ca', 'livestream-' + this.livestream.video_id, 'width=600,height=800,scrollbars=yes');
             }
         },
 

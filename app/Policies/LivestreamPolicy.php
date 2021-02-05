@@ -40,7 +40,10 @@ class LivestreamPolicy
      */
     public function view(User $user, Livestream $livestream)
     {
-        //
+        $role_check = $user->roles->intersect($livestream->roles)->count();
+        $user_check = $livestream->users->firstWhere('id', auth()->user()->id);
+        $inquiry_check = $livestream->inquiry_users->firstWhere('id', auth()->user()->id);
+        return !$role_check && !$user_check && !$inquiry_check ? false : true;
     }
 
     /**
@@ -111,6 +114,6 @@ class LivestreamPolicy
      */
     public function chat(User $user, Livestream $livestream)
     {
-        return $livestream->getUsers()->contains('id', $user->id);
+        return $user->can('view', $livestream);
     }
 }

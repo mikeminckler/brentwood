@@ -24,8 +24,9 @@ class LivestreamFactory extends Factory
         return [
             'name' => $this->faker->name,
             'video_id' => 'wf5uwSu21io',
-            'start_date' => now()->addMinutes($this->faker->numberBetween(10,5000))->roundSecond(),
-            'length' => $this->faker->numberBetween(10,120),
+            'start_date' => now()->addMinutes($this->faker->numberBetween(10, 5000))->roundSecond(),
+            'length' => $this->faker->numberBetween(10, 120),
+            'enable_chat' => true,
         ];
     }
 }

@@ -7,6 +7,7 @@ use Tests\TestCase;
 use App\Models\Inquiry;
 use App\Models\Livestream;
 use App\Models\User;
+use App\Models\Role;
 
 class LivestreamTest extends TestCase
 {
@@ -49,7 +50,37 @@ class LivestreamTest extends TestCase
         $livestream = Livestream::factory()->create();
         $inquiry->saveLivestreams(['livestream' => $livestream]);
 
-        $this->assertNotNull($livestream->getUsers());
-        $this->assertTrue($livestream->getUsers()->contains('id', $user->id));
+        $this->assertNotNull($livestream->inquiry_users);
+        $this->assertTrue($livestream->inquiry_users->contains('id', $user->id));
+    }
+
+    /** @test **/
+    public function a_livestream_can_have_many_roles()
+    {
+        $livestream = Livestream::factory()->create();
+        $role = Role::factory()->create();
+
+        $livestream->createPermission($role);
+
+        $livestream->refresh();
+
+        $this->assertNotNull($livestream->roles);
+        $this->assertEquals(1, $livestream->roles->count());
+        $this->assertTrue($livestream->roles->contains('id', $role->id));
+    }
+
+    /** @test **/
+    public function a_livestream_can_have_many_users()
+    {
+        $livestream = Livestream::factory()->create();
+        $user = User::factory()->create();
+
+        $livestream->createPermission($user);
+
+        $livestream->refresh();
+
+        $this->assertNotNull($livestream->users);
+        $this->assertEquals(1, $livestream->users->count());
+        $this->assertTrue($livestream->users->contains('id', $user->id));
     }
 }

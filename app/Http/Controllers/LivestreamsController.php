@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 use App\Http\Requests\LivestreamValidation;
 
@@ -11,6 +12,8 @@ use App\Utilities\Paginate;
 use App\Utilities\PageResponse;
 use App\Models\Page;
 use App\Models\Inquiry;
+
+use App\Mail\LivestreamReminder;
 
 class LivestreamsController extends Controller
 {
@@ -27,7 +30,11 @@ class LivestreamsController extends Controller
         }
 
         if (request()->expectsJson()) {
-            return Paginate::create(Livestream::with('inquiries')->get()->sortByDesc->id);
+            $livestreams = Livestream::with('inquiries')->get()->sortByDesc->id;
+            $livestreams->each(function ($livestream) {
+                $livestream->append('inquiry_users');
+            });
+            return Paginate::create($livestreams);
         } else {
             return view('livestreams.index');
         }
@@ -90,5 +97,23 @@ class LivestreamsController extends Controller
         $livestream = Livestream::findOrFail($id);
         $page = Page::where('slug', 'livestream-register')->first();
         return (new PageResponse)->view($page, 'livestreams.register', ['livestream' => $livestream]);
+    }
+
+    public function sendReminderEmails($id)
+    {
+        $livestream = Livestream::findOrFail($id);
+
+        if (!auth()->user()->can('sendReminderEmails', $livestream)) {
+            return response()->json(['error' => 'You do not have permission to send reminder emails'], 403);
+        }
+
+        foreach ($livestream->inquiry_users as $user) {
+            Mail::to($user->email)
+                ->queue(new LivestreamReminder($livestream, $user, $user->pivot->url));
+        }
+
+        return response()->json([
+            'success' => $livestream->inquiry_users->count().' Reminder Emails Queued To Send',
+        ]);
     }
 }

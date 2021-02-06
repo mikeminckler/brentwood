@@ -1,12 +1,14 @@
 <template>
 
-    <div class="relative transition-all duration-500 background-transparent p-0" :class="expanded ? 'md:bg-white md:p-8 shadow-lg' : ''">
+    <div class="relative transition-all duration-500 background-transparent p-0" :class="expanded && !backend ? 'md:bg-white md:p-8 shadow-lg' : ''">
+
         <div class="text-lg hover:text-gray-800 absolute top-0 right-0 -mt-4 z-5 bg-gray-100 shadow rounded-full p-1 cursor-pointer flex items-center justify-center" 
             @click="expanded = false"
              v-if="expanded && !$store.state.editing"
         ><i class="fas fa-times-circle"></i></div>
+
         <transition name="expander">
-            <div class="" v-show="expanded || ($store.state.editing && !preview)">
+            <div class="" v-show="expanded || ($store.state.editing && !preview && !backend)">
                 <slot></slot>
             </div>
         </transition>
@@ -17,7 +19,8 @@
 <script>
     export default {
 
-        props: ['uuid', 'preview'],
+        props: ['uuid', 'preview', 'backend'],
+
         data() {
             return {
                 expanded: false,
@@ -55,11 +58,19 @@
             expand: function(uuid) {
 
                 if (uuid === this.uuid) {
-                    this.expanded = true;
+
+                    if (this.backend) {
+                        this.expanded = !this.expanded;
+                    } else {
+                        this.expanded = true;
+                    }
+
                     let content = document.getElementById('c-' + this.uuid);
-                    let elementRect = content.getBoundingClientRect();
-                    let middle = content.offsetTop - (elementRect.height / 3);
-                    window.scrollTo(0, middle);
+                    if (content) {
+                        let elementRect = content.getBoundingClientRect();
+                        let middle = content.offsetTop - (elementRect.height / 3);
+                        window.scrollTo(0, middle);
+                    }
                 } else {
                     this.expanded = false;
                 }

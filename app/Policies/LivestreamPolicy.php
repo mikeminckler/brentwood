@@ -116,4 +116,9 @@ class LivestreamPolicy
     {
         return $user->can('view', $livestream);
     }
+
+    public function sendReminderEmails(User $user, Livestream $livestream)
+    {
+        //
+    }
 }

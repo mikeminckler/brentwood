@@ -9,12 +9,14 @@ use Illuminate\Support\Arr;
 
 use App\Traits\TagsTrait;
 use App\Traits\HasPermissionsTrait;
+use App\Traits\AppendAttributesTrait;
 
 class Livestream extends Model
 {
     use HasFactory;
     use TagsTrait;
     use HasPermissionsTrait;
+    use AppendAttributesTrait;
 
     protected $with = ['tags'];
 
@@ -56,7 +58,9 @@ class Livestream extends Model
     public function getInquiryUsersAttribute()
     {
         return $this->inquiries->map(function ($inquiry) {
-            return $inquiry->user;
+            $user = $inquiry->user;
+            $user->pivot = $inquiry->pivot;
+            return $user;
         });
     }
 

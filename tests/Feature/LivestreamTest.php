@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Arr;
 use Tests\TestCase;
 use Carbon\Carbon;
@@ -13,6 +14,8 @@ use App\Models\User;
 use App\Models\Tag;
 use App\Models\Inquiry;
 use App\Models\Role;
+
+use App\Mail\LivestreamReminder;
 
 class LivestreamTest extends TestCase
 {
@@ -295,5 +298,38 @@ class LivestreamTest extends TestCase
         $this->get(route('livestreams.view', ['id' => $livestream->id]))
              ->assertSuccessful()
              ->assertViewIs('livestreams.view');
+    }
+
+    /** @test **/
+    public function a_reminder_email_can_be_sent_to_inquiry_users_for_a_livestream()
+    {
+        $inquiry = Inquiry::factory()->create();
+        $livestream = Livestream::factory()->create();
+
+        $inquiry->saveLivestreams([
+            'livestream' => $livestream,
+        ]);
+
+        $this->json('POST', route('livestreams.reminder-emails', ['id' => $livestream->id]))
+            ->assertStatus(401);
+
+        $this->signIn(User::factory()->create());
+
+        $this->json('POST', route('livestreams.reminder-emails', ['id' => $livestream->id]))
+            ->assertStatus(403);
+
+        $this->signInAdmin();
+
+        Mail::fake();
+
+        $this->json('POST', route('livestreams.reminder-emails', ['id' => $livestream->id]))
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => $livestream->inquiry_users->count().' Reminder Emails Queued To Send',
+             ]);
+
+        Mail::assertQueued(LivestreamReminder::class, function ($mail) use ($inquiry) {
+            return $mail->hasTo($inquiry->user->email);
+        });
     }
 }

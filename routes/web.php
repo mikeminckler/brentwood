@@ -96,6 +96,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/livestreams', [LivestreamsController::class, 'index'])->name('livestreams.index');
     Route::post('/livestreams/create', [LivestreamsController::class, 'store'])->name('livestreams.store');
     Route::post('/livestreams/{id}', [LivestreamsController::class, 'store'])->name('livestreams.update')->where('id', '\d+');
+    Route::post('/livestreams/{id}/send-reminder-emails', [LivestreamsController::class, 'sendReminderEmails'])->name('livestreams.reminder-emails')->where('id', '\d+');
 
     Route::post('/chat/send-message', [ChatController::class, 'sendMessage'])->name('chat.send-message');
     Route::post('/chat/{id}/delete', [ChatController::class, 'destroy'])->name('chat.delete')->where('id', '\d+');

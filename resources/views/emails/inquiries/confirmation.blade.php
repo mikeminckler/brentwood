@@ -31,5 +31,5 @@ We will send you a reminder email closer to the date if you lose track of this e
 
 If you have any questions please contact us at [info@brentwood.ca](mailto:info@brentwood.ca).
 
-Thank you for your interest in Brentwood College School and we look forward to speaking with you soon.
+Thank you for your interest in Brentwood College School. We look forward to speaking with you soon.
 @endcomponent

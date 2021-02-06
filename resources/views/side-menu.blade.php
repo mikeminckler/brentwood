@@ -32,6 +32,10 @@
     </a>
     
     @if ( auth()->user()->hasRole('admin'))
+        <a href="/horizon" class="side-menu-link" target="_blank">
+            <div class="pr-2"><i class="fas fa-cog"></i></div>
+            <div>Queue Monitor</div>
+        </a>
         <div class="">@{{ $store.state.wsState }}</div>
     @endif
 </div>

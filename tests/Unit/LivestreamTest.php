@@ -52,6 +52,9 @@ class LivestreamTest extends TestCase
 
         $this->assertNotNull($livestream->inquiry_users);
         $this->assertTrue($livestream->inquiry_users->contains('id', $user->id));
+        $user_test = $livestream->inquiry_users->first();
+        $this->assertNotNull($user_test->pivot);
+        $this->assertNotNull($user_test->pivot->url);
     }
 
     /** @test **/

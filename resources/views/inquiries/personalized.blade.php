@@ -33,6 +33,16 @@
                 <div class="mt-4">
                     <p>Thank you for taking the time to contact us regarding a <span class="font-bold">Grade {{ $inquiry->target_grade }} {{ $inquiry->student_type }} student</span> starting in <span class="font-bold">{{ $inquiry->target_year.'-'.($inquiry->target_year + 1) }}</span>.</p>
 
+                    @if ($inquiry->livestreams->count())
+                        <div class="relative bg-white px-8 py-4 md:rounded-r-lg shadow my-4 -mx-8">
+                            <div class="flex items-center">
+                                <h2 class="flex-1">{{ $inquiry->livestreams->first()->name }}</h2>
+                                <div class="text-4xl text-primary pl-4 -mb-1"><i class="fab fa-youtube"></i></div>
+                            </div>
+                            <p>You have registered for the <span class="font-bold">{{ $inquiry->livestreams->first()->name }}</span> on <span class="font-bold">{{ $inquiry->livestreams->first()->date }}</span>. You will receive an email closer to the event with a link to view the presentation.</p>
+                        </div>
+                    @endif
+
                     @if ($inquiry->filtered_tags->count())
                         <p>This page contains important information about our school including the interests you selected.</p>
                     @endif
@@ -45,16 +55,6 @@
                                     <div class="pl-2">{{ $tag->name }}</div>
                                 </div>
                             @endforeach
-                        </div>
-                    @endif
-
-                    @if ($inquiry->livestreams->count())
-                        <div class="relative bg-white px-8 py-4 md:rounded-r-lg shadow my-4 -mx-8">
-                            <div class="flex items-center">
-                                <h2 class="flex-1">{{ $inquiry->livestreams->first()->name }}</h2>
-                                <div class="text-4xl text-primary pl-4 -mb-1"><i class="fab fa-youtube"></i></div>
-                            </div>
-                            <p>You have registered for the <span class="font-bold">{{ $inquiry->livestreams->first()->name }}</span> on <span class="font-bold">{{ $inquiry->livestreams->first()->date }}</span>. You will receive an email closer to the event with a link to view the presentation.</p>
                         </div>
                     @endif
 

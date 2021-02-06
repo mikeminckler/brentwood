@@ -372,7 +372,11 @@
                 this.$lodash.each(this.livestreams, livestream => {
                     if (livestream.tags.length) {
                         this.$lodash.each(livestream.tags, tag => {
-                            tags.push(tag.name);
+                            if (this.$lodash.findIndex(tags, t => {
+                                return t === tag.name;
+                            }) < 0) {
+                                tags.push(tag.name);
+                            }
                         });
                     }
                 });

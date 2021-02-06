@@ -386,8 +386,8 @@ div.cell {
     grid-template-columns: 32px 1fr auto auto auto auto auto auto;
 }
 
-.grid-livestreams {
-    grid-template-columns: 32px 1fr auto auto auto auto;
+.grid-livestream-row {
+    grid-template-columns: 32px 32px 1fr auto auto auto auto;
 }
 
 .ignore {
@@ -401,13 +401,13 @@ div.cell {
 
 .ignore:hover, .ignore:nth-child(even):hover {
     > div {
-        @apply bg-white;
+        @apply bg-gray-100;
     }
 }
 
 .ignore:nth-child(even) {
     > div {
-        @apply bg-gray-100;
+        @apply bg-white;
     }
 }
 

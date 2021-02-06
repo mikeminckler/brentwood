@@ -7,22 +7,19 @@
             <h1>Livestreams</h1>
 
             <div class="mt-4">
-                <paginator resource="livestreams" @selected="editLivestream($event)">
 
-                    <template #header>
+                <div class="grid grid-livestream-row">
+                    <div class="col-span-3 flex link grid-cell" @click="createLivestream()">
+                        <div class="icon"><i class="fas fa-plus"></i></div>
+                        <div class="ml-2">Create Livestream</div>
+                    </div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell">Start Date</div>
+                    <div class="grid-cell">Youtube Page</div>
+                    <div class="grid-cell">Popout Chat</div>
+                </div>
+                <paginator resource="livestreams" @selected="editLivestream($event)"></paginator>
 
-                        <div class="col-span-2 flex link grid-cell" @click="createLivestream()">
-                            <div class="icon"><i class="fas fa-plus"></i></div>
-                            <div class="ml-2">Create Livestream</div>
-                        </div>
-                        <div class="grid-cell"></div>
-                        <div class="grid-cell">Start Date</div>
-                        <div class="grid-cell">Youtube Page</div>
-                        <div class="grid-cell">Popout Chat</div>
-
-                    </template>
-
-                </paginator>
             </div>
         </div>
 

@@ -12,7 +12,7 @@
             <div class="relative">
                 <transition name="editor-menu-bar">
 
-                    <div v-show="true" class="mt-2 relative z-2">
+                    <div v-show="showMenu" class="mt-2 relative z-2">
 
                         <div class="text-sm flex flex-wrap items-center text-gray-700" :class="showBg ? 'bg-gray-100 border-t border-l border-r' : ''">
                             <div class="menubar__button" :class="{ 'is-active': isActive.bold() }" @click="commands.bold" ><i class="fas fa-bold"></i></div>
@@ -55,7 +55,7 @@
 
         </editor-menu-bar>
 
-        <div class="editor" :class="[showBg ? 'bg-gray-100 border px-4 py-2' : '', isLocked ? 'locked' : '']">
+        <div class="editor border px-2 -mx-2" :class="[showBg ? 'bg-gray-100 border px-4 py-2' : '', isLocked ? 'locked' : '', focused ? 'border-gray-300' : 'border-transparent']">
 
             <editor-menu-bubble
                 :editor="editor" 
@@ -244,9 +244,13 @@
                 }
             },
 
-            focused: _.debounce( function() {
-                this.showMenu = this.focused;
-            }, 250),
+            focused: function() {
+                if (this.focused) {
+                    this.showMenu = true;
+                } else {
+                    this.hideMenu();
+                }
+            },
 
             isLocked() {
                 this.editor.setOptions({
@@ -264,6 +268,11 @@
         },
 
         methods: {
+
+            hideMenu: _.debounce( function() {
+                this.showMenu = this.focused;
+            }, 250),
+
             toggleLinkMenu(attrs) {
                 if (this.linkMenuIsActive) {
                     this.hideLinkMenu();

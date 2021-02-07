@@ -5,7 +5,7 @@
 
             <div class="relative flex-2 flex justify-center items-center relative">
 
-                <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700 z-5 mb-1">
+                <div class="flex absolute bottom-0 w-full items-center leading-none justify-center font-oswald text-xl md:text-2xl text-gray-700 mb-1">
                     <div class="flex items-center py-2 justify-center mb-4" 
                          style="background-color: rgba(255,255,255,0.8)"
                          v-if="$store.state.editing && !content.header"
@@ -14,18 +14,18 @@
                     </div>
                 </div>
 
-                <div v-if="photo" class="z-5 absolute remove-icon right-0 bottom-0 mb-12" @click.stop="removePhoto(photo, 0)"><i class="fas fa-times"></i></div>
+                <div v-if="photo" class="absolute remove-icon right-0 bottom-0 mb-12 z-6" @click.stop="removePhoto(photo, 0)"><i class="fas fa-times"></i></div>
 
-                <youtube-player :photo="photo" :content="content" :uuid="uuid"></youtube-player>
+                <youtube-player :photo="photo" :content="content" :uuid="uuid" :shadow="!content.full_width"></youtube-player>
             </div>
 
-            <div class="relative z-6" 
+            <div class="relative" 
                 style="transition: flex calc(var(--transition-time) * 5)" 
-                :class="content.full_width ? 'flex justify-center -mt-16' : 'flex-1'"
+                :class="content.full_width ? 'flex justify-center -mt-16 z-5' : 'flex-1 flex items-center bg-white pl-8 z-3 -ml-8'"
                 v-show="addText || content.header || content.body || !content.full_width"
             >
 
-                <div class="text-block" :class="content.full_width ? 'bg-white max-w-2xl py-8 px-16' : ''">
+                <div class="text-block" :class="content.full_width ? 'bg-white max-w-2xl py-8 px-16' : 'py-4'">
 
                     <div class="">
                         <input :class="first ? 'h1' : 'h2'" type="text" @blur="saveContent()" v-model="content.header" placeholder="Header" />

@@ -6,7 +6,7 @@
 
     <div class="{{ !$content->full_width && !$content->header && !$content->body ? 'flex-3' : 'flex-2'}} flex justify-center items-center relative z-2">
         <div class="{{ !$content->full_width  && ($content->header && $content->body) ? 'md:relative w-full pb-4 md:pb-0' : 'relative w-full' }}">
-            <youtube-player :content='@json($content)' uuid="{{ $content_element->uuid }}" >
+            <youtube-player :content='@json($content)' uuid="{{ $content_element->uuid }}" :shadow="{{ $content->full_width ? 'false' : 'true' }}">
 
                 <div class="md:bg-white px-8 md:px-16 mt-4 md:py-4 text-gray-600 w-full max-w-2xl md:shadow-lg">
 
@@ -23,7 +23,7 @@
     </div>
 
     @if (!$content->full_width && ($content->header && $content->body))
-        <div class="flex-1 relative flex items-center justify-center bg-white">
+        <div class="flex-1 relative flex items-center justify-center bg-white {{ !$content->full_width ? '-ml-8 pl-8 py-8' : '' }}">
             <div class="text-block relative {{ $content->style ? 'pt-8' : '' }}">
                 <h{{ $first ? '1' : '2'}}>{{ $content->header }}</h{{ $first ? '1': '2' }}>
                 <div class="body">

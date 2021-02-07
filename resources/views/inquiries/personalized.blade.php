@@ -1,6 +1,6 @@
-<div class="md:flex">
+<div class="md:flex mt-8">
     <div class="flex-1">
-        <div class="flex items-center justify-center w-full h-full my-4 md:my0">
+        <div class="flex items-start justify-center w-full h-full my-4 md:my0">
             <img src="https://webdev.brentwood.ca/images/icon.svg" class="w-48 hidden md:block" />
             <img src="https://webdev.brentwood.ca/images/logo.svg" class="md:hidden" />
         </div> 
@@ -48,14 +48,12 @@
                     @endif
 
                     @if ($inquiry->filtered_tags->count())
-                        <div class="md:grid grid-cols-{{ $inquiry->filtered_tags->count() > 2 ? '3' : $inquiry->filtered_tags->count() }} md:my-2 md:bg-white md:shadow rounded px-4 md:py-2">
-                            @foreach ($inquiry->filtered_tags as $tag)
-                                <div class="flex items-center md:justify-center leading-none my-2 md:my-0">
-                                    <div class="text-sm text-gray-500"><i class="fas fa-check"></i></div>
-                                    <div class="pl-2">{{ $tag->name }}</div>
-                                </div>
-                            @endforeach
-                        </div>
+                        @foreach ($inquiry->filtered_tags as $tag)
+                            <div class="flex items-center my-2">
+                                <div class="text-sm text-gray-500"><i class="fas fa-check"></i></div>
+                                <div class="pl-2">{{ $tag->name }}</div>
+                            </div>
+                        @endforeach
                     @endif
 
                     <p>If you have any questions please contact us at <a href="mailto:admissions@brentwood.ca">admissions@brentwood.ca</a>.</p>

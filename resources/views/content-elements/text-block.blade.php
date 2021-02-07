@@ -1,26 +1,11 @@
-@if ($content->header)
-    <div class="w-full md:flex relative z-2 {{ $content->full_width ? 'bg-white pt-4' : ($content->photos->count() && $content->style ? 'text-style-'.$content->style : '') }} {{ $sort_order === 1 ? 'mt-8' : 'mt-0'}}">
-
-        @if (!$content->full_width)
-            <div class="flex-1 relative {{ $content->photos->count() ? 'md:m-0 md:w-auto md:pb-0 md:float-none' : '' }}"></div>
-        @endif
-
-        <div class="flex-2 justify-center {{ $content->photos->count() ? 'md:flex' : 'flex' }} {{ !$content->photos->count() && $content->style ? 'text-style-'.$content->style : '' }}">
-
-            <div class="{{ $content->full_width ? 'px-8 md:px-12 pt-4 w-full' : 'text-block' }} relative z-4 {{ $content->style ? 'pt-8' : '' }}">
-                <h{{ $first ? '1' : '2'}}>{{ $content->header }}</h{{ $first ? '1': '2' }}>
-            </div>
-
-        </div>
-    </div>
-@endif
-
 <div class="w-full md:flex relative z-3 {{ $content->full_width ? ( !$content->header ? 'bg-white pt-8' : 'bg-white' ) : ($content->photos->count() && $content->style ? 'text-style-'.$content->style : '') }}">
     @if (!$content->full_width)
-        <div class="flex-1 relative {{ $content->photos->count() || ($content->stat_number && $content->stat_name) ? 'pb-50p z-3 md:m-0 md:pb-0' : '' }} {{ $content->header ? ( $content->style ? 'md:-mt-20' : 'md:-mt-12' ) : '' }}">
+        <div class="flex-1 relative {{ $content->photos->count() ? 'pb-50p z-3 md:m-0 md:pb-0' : ($content->stat_number && $content->stat_name ? 'pt-4 md:pb-25p z-3 md:m-0 md:pb-0' : '') }}">
 
             @if ($content->stat_number && $content->stat_name && !$content->photos->count())
-                @include ('content-elements.stat', ['number' => $content->stat_number, 'name' => $content->stat_name, 'photo' => null, 'link' => null ])
+                <div class="hidden md:block">
+                    @include ('content-elements.stat', ['number' => $content->stat_number, 'name' => $content->stat_name, 'photo' => null, 'link' => null ])
+                </div>
             @endif
 
             @if ($content->photos->count())
@@ -32,9 +17,12 @@
         </div>
     @endif
 
-    <div class="flex-2 justify-center {{ $content->photos->count() || ($content->stat_number && $content->stat_name) ? 'md:flex' : 'flex' }} {{ !$content->photos->count() && $content->style ? 'text-style-'.$content->style : '' }}">
+    <div class="flex-2 justify-center flex {{ !$content->photos->count() && $content->style ? 'text-style-'.$content->style : '' }}">
 
-        <div class="{{ $content->full_width ? 'pb-8 px-8 md:px-12 columns-2' : 'text-block' }} relative z-4 {{ $content->style ? 'pb-8' : '' }}">
+        <div class="{{ $content->full_width ? 'py-8 px-8 md:px-12 columns-2' : 'text-block' }} relative z-4 py-8">
+
+            <h{{ $first ? '1' : '2'}}>{{ $content->header }}</h{{ $first ? '1': '2' }}>
+
             <div class="body">
                 {!! $content->body !!}
             </div>
@@ -45,4 +33,11 @@
         </div>
 
     </div>
+
+    @if ($content->stat_number && $content->stat_name && !$content->photos->count())
+        <div class="block md:hidden pb-25p relative -mt-4">
+            @include ('content-elements.stat', ['number' => $content->stat_number, 'name' => $content->stat_name, 'photo' => null, 'link' => null ])
+        </div>
+    @endif
+
 </div>

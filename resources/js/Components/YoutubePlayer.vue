@@ -1,7 +1,7 @@
 <template>
 
     <div class="relative w-full">
-        <div class="relative w-full z-4" :class="[videoPadding, shadow ? 'shadow-md' : 'overflow-hidden']" v-show="content.video_id" style="transition: padding calc(var(--transition-time) * 5)">
+        <div class="relative w-full z-4" :class="[videoPadding, shadow ? 'md:shadow-md' : 'overflow-hidden']" v-show="content.video_id" style="transition: padding calc(var(--transition-time) * 5)">
 
             <div class="absolute bottom-0 z-4 w-full h-full" v-if="$store.state.editing && banner">
                 <div class="absolute right-0 bottom-0 transform rotate-90 origin-top-right w-32 mb-16" @click.stop>

@@ -126,10 +126,10 @@ class Inquiry extends Model
 
     public function livestreams()
     {
-        return $this->belongsToMany(Livestream::class)->withPivot('url');
+        return $this->belongsToMany(Livestream::class)->withPivot('url', 'reminder_email_sent_at');
     }
 
-    public function user() 
+    public function user()
     {
         return $this->belongsTo(User::class);
     }

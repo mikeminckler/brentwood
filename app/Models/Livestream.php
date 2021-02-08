@@ -47,7 +47,7 @@ class Livestream extends Model
 
     public function inquiries()
     {
-        return $this->belongsToMany(Inquiry::class)->withPivot('url');
+        return $this->belongsToMany(Inquiry::class)->withPivot('url', 'reminder_email_sent_at');
     }
 
     public function getDateAttribute()

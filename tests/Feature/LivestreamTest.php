@@ -322,6 +322,7 @@ class LivestreamTest extends TestCase
 
         Mail::fake();
 
+        $this->withoutExceptionHandling();
         $this->json('POST', route('livestreams.reminder-emails', ['id' => $livestream->id]))
              ->assertSuccessful()
              ->assertJsonFragment([
@@ -330,6 +331,48 @@ class LivestreamTest extends TestCase
 
         Mail::assertQueued(LivestreamReminder::class, function ($mail) use ($inquiry) {
             return $mail->hasTo($inquiry->user->email);
+        });
+
+        $livestream->refresh();
+        $this->assertEquals(1, $livestream->inquiry_users->count());
+        $inquiry = $livestream->inquiries()->where('inquiry_id', $inquiry->id)->first();
+
+        $this->assertNotNull($inquiry->pivot->reminder_email_sent_at);
+    }
+
+
+    /** @test **/
+    public function an_individual_reminder_can_be_sent_to_a_livestream_user()
+    {
+        $inquiry1 = Inquiry::factory()->create();
+        $inquiry2 = Inquiry::factory()->create();
+        $livestream = Livestream::factory()->create();
+
+        $inquiry1->saveLivestreams([
+            'livestream' => $livestream,
+        ]);
+
+        $inquiry2->saveLivestreams([
+            'livestream' => $livestream,
+        ]);
+
+        $this->signInAdmin();
+
+        Mail::fake();
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('livestreams.reminder-emails', ['id' => $livestream->id]), ['user_ids' => [$inquiry1->user->id]])
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => '1 Reminder Emails Queued To Send',
+             ]);
+
+        Mail::assertQueued(LivestreamReminder::class, function ($mail) use ($inquiry1) {
+            return $mail->hasTo($inquiry1->user->email);
+        });
+
+        Mail::assertNotQueued(LivestreamReminder::class, function ($mail) use ($inquiry2) {
+            return $mail->hasTo($inquiry2->user->email);
         });
     }
 }

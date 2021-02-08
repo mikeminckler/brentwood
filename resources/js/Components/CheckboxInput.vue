@@ -16,7 +16,7 @@
 <script>
     export default {
 
-        props: ['value', 'dusk', 'label', 'iconClass', 'dontStop'],
+        props: ['value', 'dusk', 'label', 'iconClass', 'dontStop', 'multiple'],
 
         data() {
             return {
@@ -24,18 +24,46 @@
             }
         },
 
+        computed: {
+            index() {
+                if (!this.multiple) {
+                    return false;
+                }
+
+                return this.$lodash.findIndex(this.multiple, v => {
+                    return v === this.value;
+                });
+            }
+        },
+
         watch: {
             value() {
-                this.checked = this.value;
+                if (this.multiple) {
+                } else {
+                    this.checked = this.value;
+                }
             },
             checked() {
-                this.$emit('input', this.checked);
+                if (this.multiple) {
+                } else {
+                    this.$emit('input', this.checked);
+                }
+            },
+            index() {
+                if (this.index >= 0) {
+                    this.checked = true;
+                } else {
+                    this.checked = false;
+                }
             }
         },
 
         mounted() {
-            if (this.value) {
-                this.checked = this.value;
+            if (this.multiple) {
+            } else {
+                if (this.value) {
+                    this.checked = this.value;
+                }
             }
         },
 
@@ -45,8 +73,19 @@
                 if (!this.dontStop) {
                     event.stopPropagation();
                 }
-                this.checked = !this.checked;
-                this.$emit('change');
+
+                if (this.multiple) {
+
+                    if (this.index < 0) {
+                        this.multiple.push(this.value);
+                    } else {
+                        this.multiple.splice(this.index, 1);
+                    }
+
+                } else {
+                    this.checked = !this.checked;
+                    this.$emit('change');
+                }
             }
 
         }

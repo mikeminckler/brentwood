@@ -29,12 +29,30 @@
         </div>
 
         <expander :uuid="'livestream-' + livestream.id" :backend="true">
-            <div class="px-4 py-2 flex">
-                <div class="">{{ livestream.inquiry_users.length }} Registered</div>
-                <div class="flex button ml-4" @click="sendReminderEmails()">
-                    <div class="icon"><i class="fas fa-envelope"></i></div>
-                    <div class="pl-2">Send Reminder Emails</div>
+            <div class="px-4 py-2">
+                <div class="flex items-baseline border-b border-gray-300">
+                    <div class="text-lg px-2">{{ livestream.inquiry_users.length }} Registered</div>
+                    <div class="link ml-4" @click="selectAllUsers()">{{ livestream.inquiry_users.length === selectedUsers.length ? 'Deselect' : 'Select' }} All</div>
                 </div>
+
+                <div class="mt-2 grid grid-cols-2">
+                    <div class="">Name</div>
+                    <div class="">Reminder Sent At</div>
+                    <div class="ignore" :key="user.id" v-for="user in livestream.inquiry_users">
+                        <checkbox-input class="py-1" v-model="user.id" :multiple="selectedUsers" :label="user.name"></checkbox-input>
+                        <div class="py-1">{{ user.pivot.reminder_email_sent_at }}</div>
+                    </div>
+                </div>
+
+                <div class="flex my-2">
+                    <transition name="button-down">
+                        <div class="flex button" @click="sendReminderEmails()" v-if="selectedUsers.length">
+                            <div class="icon"><i class="fas fa-envelope"></i></div>
+                            <div class="pl-2">Send {{ selectedUsers.length }} Reminder Emails</div>
+                        </div>
+                    </transition>
+                </div>
+
             </div>
         </expander>
 
@@ -55,11 +73,12 @@
 
         components: {
             'expander': () => import(/* webpackChunkName: "expander" */ '@/Components/Expander.vue'),
+            'checkbox-input': () => import(/* webpackChunkName: "checkbox-input" */ '@/Components/CheckboxInput.vue'),
         },
 
         data() {
             return {
-            
+                selectedUsers: [],
             }
         },
 
@@ -82,12 +101,24 @@
             },
 
             sendReminderEmails: function() {
-                this.$http.post('/livestreams/' + this.livestream.id + '/send-reminder-emails').then( response => {
+                this.$http.post('/livestreams/' + this.livestream.id + '/send-reminder-emails', {user_ids: this.selectAllUsers}).then( response => {
                     this.processSuccess(response);
+                    this.selectAllUsers = [];
                 }, error => {
                     this.processErrors(error.response);
                 });
             },
+
+            selectAllUsers: function() {
+
+                if (this.selectedUsers.length === this.livestream.inquiry_users.length) {
+                    this.selectedUsers = [];
+                } else {
+                    this.selectedUsers = this.$lodash.map(this.livestream.inquiry_users, user => {
+                        return user.id;
+                    });
+                }
+            }
         },
 
     }

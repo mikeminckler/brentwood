@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Arr;
 
 use App\Http\Requests\LivestreamValidation;
 
@@ -12,6 +13,7 @@ use App\Utilities\Paginate;
 use App\Utilities\PageResponse;
 use App\Models\Page;
 use App\Models\Inquiry;
+use App\Models\User;
 
 use App\Mail\LivestreamReminder;
 
@@ -107,13 +109,27 @@ class LivestreamsController extends Controller
             return response()->json(['error' => 'You do not have permission to send reminder emails'], 403);
         }
 
-        foreach ($livestream->inquiry_users as $user) {
+        $input = requestInput();
+
+        if (Arr::get($input, 'user_ids')) {
+            $users = $livestream->inquiry_users->whereIn('id', Arr::get($input, 'user_ids'));
+        } else {
+            $users = $livestream->inquiry_users;
+        }
+
+        foreach ($users as $user) {
             Mail::to($user->email)
                 ->queue(new LivestreamReminder($livestream, $user, $user->pivot->url));
+
+            $inquiry = $livestream->inquiries()->whereHas('user', function ($query) use ($user) {
+                $query->where('users.id', $user->id);
+            })->first();
+
+            $inquiry->livestreams()->updateExistingPivot($livestream->id, ['reminder_email_sent_at' => now()]);
         }
 
         return response()->json([
-            'success' => $livestream->inquiry_users->count().' Reminder Emails Queued To Send',
+            'success' => $users->count().' Reminder Emails Queued To Send',
         ]);
     }
 }

@@ -18,6 +18,7 @@ class CreateInquiryLivestreamTable extends Migration
             $table->unsignedBigInteger('inquiry_id');
             $table->unsignedBigInteger('livestream_id');
             $table->string('url');
+            $table->dateTime('reminder_email_sent_at')->nullable();
             $table->timestamps();
         });
     }

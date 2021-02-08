@@ -147,6 +147,14 @@ iframe {
     @apply absolute w-full h-full;
 }
 
+.row:nth-child(even) {
+    @apply bg-gray-100;
+}
+
+.row:nth-child(odd) {
+    @apply bg-white;
+}
+
 .hover-wash {
     background: radial-gradient(circle, rgba(25,25,25,0), rgba(54,128,187,0) 75%, rgba(54,128,187,0.2));
     background-size: 100% 100%;
@@ -596,6 +604,27 @@ div.cell {
 .slide-down-leave-active {
     position: absolute;
     animation: slide-down var(--transition-time) reverse;
+}
+
+@keyframes button-down {
+    0% {
+        opacity: 0;
+        max-height: 0;
+        @apply py-0;
+    }
+    100%   {
+        opacity: 1;
+        max-height: 32px;
+        @apply py-1;
+    }
+}
+
+.button-down-enter-active {
+    animation: button-down var(--transition-time) ease-out;
+}
+
+.button-down-leave-active {
+    animation: button-down var(--transition-time) reverse;
 }
 
 @keyframes input {

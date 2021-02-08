@@ -181,9 +181,9 @@ class Page extends Model
         return $this->belongsTo(Photo::class, 'footer_bg_photo_id');
     }
 
-    public function getFooterFgPhoto() 
+    public function getFooterFgPhoto()
     {
-        $value = $this->footerFgPhoto;   
+        $value = $this->footerFgPhoto;
         if ($value) {
             return $value;
         } else {
@@ -195,9 +195,9 @@ class Page extends Model
         }
     }
 
-    public function getFooterBgPhoto() 
+    public function getFooterBgPhoto()
     {
-        $value = $this->footerBgPhoto;   
+        $value = $this->footerBgPhoto;
         if ($value) {
             return $value;
         } else {

@@ -23,6 +23,13 @@
             ></autocomplete>
         </div>
 
+        <div class="">
+            <div class="button" @click="save()">
+                <div class="icon"><i class="fas fa-save"></i></div>
+                <div class="pl-2">Save Role</div>
+            </div>
+        </div>
+
     </div>
 
 
@@ -43,9 +50,6 @@
 
         data() {
             return {
-                saveRole: _.debounce( function() {
-                    this.persist();
-                }, 500),
             }
         },
 
@@ -53,19 +57,13 @@
         },
 
         watch: {
-            role: {
-                handler: function(oldValue, newValue) {
-                    this.saveRole();
-                },
-                deep: true
-            },
         },
 
         mounted() {
         },
 
         methods: {
-            persist: function() {
+            save: function() {
                 this.$http.post('/roles/' + this.role.id, this.role).then( response => {
                     this.processSuccess(response);
                     this.$emit('update:role', response.data.role);
@@ -80,6 +78,7 @@
                     return u.id === user.id;
                 });
                 this.role.users.splice(index, 1);
+                this.save();
 
             }
         },

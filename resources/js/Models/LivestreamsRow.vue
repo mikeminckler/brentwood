@@ -13,6 +13,13 @@
                 </div>
             </div>
             <div class="grid-cell">{{ displayDateTime(livestream.start_date) }}</div>
+            <div class="grid-cell relative">
+                <div class="flex link" @click.stop="copyToClipboard()">
+                    <div class="icon"><i class="fas fa-link"></i></div>
+                    <div class="pl-1">Invite Link</div>
+                    <input class="w-0 h-0 focus:outline-none" type="text" ref="url" :value="url" />
+                </div>
+            </div>
             <div class="grid-cell">
                 <a class="inline-flex items-center" :href="'https://studio.youtube.com/video/' + livestream.video_id + '/livestreaming'" target="_blank">
                     <div class="icon"><i class="fab fa-youtube"></i></div>
@@ -79,12 +86,17 @@
         data() {
             return {
                 selectedUsers: [],
+                showLink: true,
             }
         },
 
         computed: {
             livestream() {
                 return this.item;
+            },
+
+            url() {
+                return window.location.origin + '/livestreams/' + this.livestream.id + '/register';
             },
         },
 
@@ -95,6 +107,14 @@
         },
 
         methods: {
+            
+            copyToClipboard: function() {
+                let input = this.$refs.url;
+                input.select();
+                document.execCommand('copy');
+                this.$store.dispatch('addFeedback', {'type': 'success', 'message': 'URL copied to clipboard'});
+            },
+
             openChat: function() {
                 window.open('/chat/view/' + this.livestream.chat_room, this.livestream.chat_room, 'width=600,height=800,scrollbars=yes');
                 //window.open('https://www.youtube.com/live_chat?v=' + this.livestream.video_id + '&embed_domain=brentwood.ca', 'livestream-' + this.livestream.video_id, 'width=600,height=800,scrollbars=yes');
@@ -104,6 +124,7 @@
                 this.$http.post('/livestreams/' + this.livestream.id + '/send-reminder-emails', {user_ids: this.selectAllUsers}).then( response => {
                     this.processSuccess(response);
                     this.selectAllUsers = [];
+                    this.$eventer.$emit('paginate', {resource: 'livestreams'});
                 }, error => {
                     this.processErrors(error.response);
                 });

@@ -76,11 +76,13 @@ class PageTest extends TestCase
         $this->assertNotNull($page->title);
         $this->assertNotNull($page->parent_page_id);
         $this->assertNotNull($page->sort_order);
+        $this->assertNotNull($page->show_sub_menu);
 
         $this->assertEquals(Arr::get($input, 'name'), $page->name);
         $this->assertEquals(Arr::get($input, 'title'), $page->title);
         $this->assertEquals(Arr::get($input, 'parent_page_id'), $page->parent_page_id);
         $this->assertEquals(Arr::get($input, 'sort_order'), $page->sort_order);
+        $this->assertEquals(Arr::get($input, 'show_sub_menu'), $page->show_sub_menu);
     }
 
     /** @test **/
@@ -789,6 +791,5 @@ class PageTest extends TestCase
         $page->refresh();
         $this->assertEquals(1, ContentElement::where('uuid', $uuid)->count());
         $this->assertEquals(1, $page->contentElements()->count());
-
     }
 }

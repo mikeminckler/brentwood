@@ -45,6 +45,7 @@ class Page extends Model
     
     protected $casts = [
         'unlisted' => 'boolean',
+        'show_sub_menu' => 'boolean',
     ];
 
     public $append_attributes = [
@@ -87,6 +88,7 @@ class Page extends Model
 
         $page->sort_order = Arr::get($input, 'sort_order');
         $page->unlisted = Arr::get($input, 'unlisted') == true ? true : false;
+        $page->show_sub_menu = Arr::get($input, 'show_sub_menu') == true ? true : false;
         $page->footer_color = Arr::get($input, 'footer_color');
 
         if (Arr::get($input, 'footer_fg_photo')) {

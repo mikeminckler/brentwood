@@ -97,13 +97,14 @@
                                             @foreach (App\Utilities\Menu::getMenu()->sortBy->sort_order as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
 
-                                                    <div class="font-oswald font-light text-base md:text-lg relative text-primary hover:bg-white md:flex md:items-center
+                                                    <div class="font-oswald font-light text-base md:text-lg relative text-primary hover:underline md:flex md:items-center
                                                         {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'bg-white' : 'bg-gray-100' }}"
                                                         ref="menu{{ $menu_page->id }}"
                                                     >
                                                         <div class="flex items-center h-full">
                                                             <a href="{{ $menu_page->full_slug }}" class="inline-flex items-center whitespace-nowrap px-2 md:px-4 flex-1 py-1 md:py-0 md:h-full 
-                                                                {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline' : '' }}">{{ $menu_page->name }}</a>
+                                                                {{ $menu_page->name === 'Admissions' ? 'bg-white' : '' }}
+                                                                {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->full_slug) ? 'underline' : '' }}">{{ $menu_page->name }}</a>
                                                             @if ($menu_page->pages->count())
                                                                 <div class="block md:hidden text-lg cursor-pointer w-6 px-2 mr-2" @click="$refs.menu{{ $menu_page->id }}.classList.toggle('show-sub-menu')">
                                                                     <div class="icon"><i class="fas fa-caret-down"></i></div>
@@ -125,7 +126,7 @@
                                             @endforeach 
                                         </div>
 
-                                        <div class="bg-gray-200 md:bg-transparent flex items-center md:items-end flex-col relative">
+                                        <div class="bg-gray-200 md:bg-transparent flex items-center md:items-end md:justify-center flex-col relative">
 
                                             <div class="flex md:items-center mb-2 md:mb-0 relative">
                                         

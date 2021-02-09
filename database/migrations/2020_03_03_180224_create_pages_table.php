@@ -22,6 +22,7 @@ class CreatePagesTable extends Migration
             $table->unsignedBigInteger('published_version_id')->nullable();
             $table->integer('sort_order');
             $table->boolean('unlisted')->default(false);
+            $table->boolean('show_sub_menu')->default(false);
             $table->string('footer_color')->nullable();
             $table->unsignedBigInteger('footer_fg_photo_id')->nullable();
             $table->unsignedBigInteger('footer_bg_photo_id')->nullable();

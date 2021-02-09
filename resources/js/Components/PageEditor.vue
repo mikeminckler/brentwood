@@ -26,6 +26,7 @@
                     <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
                     <div class="form ml-4"><input type="text" v-model="page.title" @enter="savePage" @focus="$event.target.select()" @change="savePage()" placeholder="Meta Title"/></div>
                     <div class=""> <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> </div>
+                    <div class="ml-4" v-if="page.type === 'page'"> <checkbox-input v-model="page.show_sub_menu" @change="savePage()" label="Show Menu"></checkbox-input> </div>
                 </div>
 
                 <div class="relative flex items-center">
@@ -294,6 +295,7 @@
                     name: 'Untitled Page',
                     parent_page_id: this.page.id,
                     unlisted: false,
+                    show_sub_menu: false,
                     sort_order: this.page.pages.length + 1,
                     content_elements: [],
                     footer_fg_photo: {},
@@ -314,6 +316,7 @@
                     name: 'Untitled Page',
                     parent_page_id: this.page.parent_page_id,
                     unlisted: false,
+                    show_sub_menu: false,
                     sort_order: this.page.sort_order + 1,
                     content_elements: [],
                     footer_fg_photo: {},
@@ -338,6 +341,7 @@
                     tags: this.page.tags,
                     parent_page_id: this.page.parent_page_id,
                     unlisted: this.page.unlisted ? true : false,
+                    show_sub_menu: this.page.show_sub_menu ? true : false,
                     sort_order: this.page.sort_order,
                     content_elements: this.page.content_elements,
                     footer_fg_photo: this.page.footer_fg_photo,

@@ -30,6 +30,7 @@ class PageFactory extends Factory
             'parent_page_id' => 1,
             'sort_order' => $this->faker->randomNumber(1),
             'unlisted' => 0,
+            'show_sub_menu' => 0,
         ];
     }
 

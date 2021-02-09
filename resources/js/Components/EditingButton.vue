@@ -1,8 +1,6 @@
 <template>
 
-    <div class="">
-        <div class="button-icon" :class="editingEnabled ? 'active' : 'disabled'" @click="toggleEditing"><i class="fas fa-marker"></i></div>
-    </div>
+    <div class="px-2 py-1 cursor-pointer shadow" :class="editingEnabled ? 'bg-primary text-white' : 'hover:bg-white hover:shadow-md'" @click="toggleEditing"><i class="fas fa-marker"></i></div>
 
 </template>
 

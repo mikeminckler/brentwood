@@ -1,11 +1,11 @@
 <template>
 
-    <div class="absolute w-full flex justify-center h-0 overflow-visible">
-        <div class="relative max-w-6xl flex w-full z-5">
+    <div class="contents">
+        <div class="absolute max-w-6xl flex w-full z-5">
 
             <div class="flex-1"></div>
-            <div class="flex-2 flex justify-center">
-                <div class="" v-if="page">
+            <div class="flex-2 flex justify-center relative">
+                <div class="relative" v-if="page">
                     
                     <transition name="slide-down">
                         <div class="absolute flex justify-center items-center w-full h-full bg-white bg-opacity-75 z-3" v-if="saving">
@@ -54,9 +54,9 @@
             </div>
         </div>
 
-        <div class="absolute w-full" style="min-height: 700px;">
+        <div class="absolute w-full h-full">
             <div class="absolute z-1 w-full h-full" :style="backgroundColor"></div>
-            <div class="absolute w-full h-full">
+            <div class="absolute w-full h-full overflow-hidden flex items-end">
 
                 <picture class="w-full h-full z-2 absolute" v-if="page.footer_fg_photo ? page.footer_fg_photo.large ? true : false : false">
                     <source media="(min-width: 900px)" :srcset="page.footer_fg_photo.large + '.webp'" type="image/webp" >

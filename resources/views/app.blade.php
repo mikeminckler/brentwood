@@ -71,13 +71,13 @@
 
                         <div class="relative flex">
 
-                            <div class="relative md:flex-1 flex items-center justify-center">
-                                <div class="p-1 ml-2 md:ml-0 flex justify-center relative">
-                                    <a href="/"><img src="images/logo.svg" :class="scrollPosition > 64 ? 'h-6 md:h-8' : 'h-8 md:h-12'" class="block transition-all duration-500" /></a>
+                            <div class="relative flex-1 flex items-center justify-center">
+                                <div class="ml-2 md:ml-0 flex justify-center items-center relative transition-all duration-500" :class="scrollPosition > 64 ? 'h-6 md:h-6' : 'h-8 md:h-14'">
+                                    <a href="/"><img src="images/logo.svg" class="transition-all duration-500" :class="scrollPosition > 64 ? 'h-6 md:h-8' : 'h-8 md:h-10'" /></a>
                                 </div>
                             </div>
 
-                            <nav class="flex-2 relative flex md:block items-center h-full">
+                            <nav class="flex-1 relative flex md:block items-center h-full">
 
                                 <div class="relative md:hidden flex w-full items-center justify-end">
                                     <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button md:hidden mr-2 whitespace-no-wrap text-sm">Apply</a>
@@ -89,11 +89,11 @@
                                     style="transition: max-height var(--transition-time) ease"
                                 >
 
-                                    <div class="w-full flex bg-gray-100 h-full border-l-4 md:border-l-0 border-primary shadow md:shadow-none"
+                                    <div class="w-full flex bg-gray-100 h-full border-l-4 md:border-l-0 border-primary shadow md:shadow-none relative"
                                         :class="[$store.state.showMenu ? 'shadow md:shadow-none' : '']"
                                     >
 
-                                        <div id="menu" class="flex-1 md:flex relative w-full">
+                                        <div id="menu" class="flex-1 md:flex relative w-full justify-center md:px-4">
                                             @foreach (App\Utilities\Menu::getMenu()->sortBy->sort_order as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
 
@@ -102,7 +102,7 @@
                                                         ref="menu{{ $menu_page->id }}"
                                                     >
                                                         <div class="flex items-center h-full">
-                                                            <a href="{{ $menu_page->full_slug }}" class="inline-flex items-center whitespace-no-wrap px-2 md:px-4 flex-1 py-1 md:py-0 md:h-full 
+                                                            <a href="{{ $menu_page->full_slug }}" class="inline-flex items-center whitespace-nowrap px-2 md:px-4 flex-1 py-1 md:py-0 md:h-full 
                                                                 {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline' : '' }}">{{ $menu_page->name }}</a>
                                                             @if ($menu_page->pages->count())
                                                                 <div class="block md:hidden text-lg cursor-pointer w-6 px-2 mr-2" @click="$refs.menu{{ $menu_page->id }}.classList.toggle('show-sub-menu')">
@@ -125,19 +125,22 @@
                                             @endforeach 
                                         </div>
 
-                                        <div class="bg-gray-200 md:bg-transparent flex items-center justify-center md:items-end flex-col">
+                                        <div class="bg-gray-200 md:bg-transparent flex items-center md:items-end flex-col relative">
 
-                                            <div class="flex items-center mb-2 md:mb-0">
+                                            <div class="flex md:items-center mb-2 md:mb-0 relative">
                                         
-                                                <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button hidden md:block mr-4 my-0 whitespace-no-wrap text-base">Apply Now</a>
-                                                <a href="#" class="hidden md:block text-xl text-gray-500 cursor-pointer mr-4"><i class="fas fa-search"></i></a>
+                                                <a href="/admissions/apply" class="button hidden md:block mr-2 my-0 whitespace-no-wrap text-base">Apply Now</a>
+                                                <a href="#" class="hidden md:block text-xl text-gray-500 cursor-pointer mr-2"><i class="fas fa-search"></i></a>
 
                                                 @auth
+                                                    <user-menu :user='@json(auth()->user())'></user-menu>
+
                                                     @if (auth()->user()->hasRole('editor'))
-                                                        <editing-button v-show="{{ !request('preview') }}" class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}"></editing-button>
+                                                        <div class="absolute -mr-8 right-0 hidden md:block">
+                                                            <editing-button v-show="{{ !request('preview') }}" class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}"></editing-button>
+                                                        </div>
                                                     @endif
 
-                                                    <user-menu :user='@json(auth()->user())'></user-menu>
                                                 @endauth
                                             </div>
 
@@ -277,7 +280,7 @@
                                     </div>
                                 </div>
                                 <div class="flex md:flex-col py-2 md:py-8 px-12 md:px-8 w-full md:w-auto">
-                                    <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
+                                    <a href="/admissions/apply" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Apply Now</a>
                                     <a href="https://www.brentwood.bc.ca/inquiry" target="_blank" class="button ml-4 my-2 whitespace-no-wrap text-sm md:text-base">Contact Us</a>
                                 </div>
                             </div>

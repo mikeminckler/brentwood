@@ -1,11 +1,11 @@
 <template>
 
-    <div class="relative ml-2" v-if="user">
+    <div class="relative md:ml-2" v-if="user">
 
-        <div class="button-icon mr-2 bg-gray-200" @click="showMenu = !showMenu"><i class="fas fa-user"></i></div>
+        <div class="button-icon bg-gray-200 hover:border hover:border-gray-400 border-gray-200" @click="showMenu = !showMenu"><i class="fas fa-user"></i></div>
 
         <transition name="fade">
-            <div class="absolute shadow right-0 z-3 bg-white mt-4" v-if="showMenu">
+            <div class="absolute shadow right-0 z-3 bg-white mt-2" v-if="showMenu">
                 <div class="whitespace-nowrap px-2 py-1">{{ user.name }}</div>
                 <div class="text-primary px-2 py-1 hover:bg-gray-200 flex cursor-pointer" @click="logout">
                     <div class="pr-1">Logout</div>

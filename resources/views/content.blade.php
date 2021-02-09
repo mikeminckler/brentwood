@@ -11,7 +11,7 @@
             <div class="box-border 
                 {{ $index === 0 ? 'first-content-element' : '' }} 
                 {{ 'content-element-'.$content_element->type }}
-                {{ isset($last_tags) ? ($content_element->tags->intersect($last_tags)->count() ? '' : '-mt-16 md:-mt-24 pt-24 md:pt-40 first:pt-12 md:first:pt-24') : '-mt-16 md:-mt-24 pt-24 md:pt-40 first:pt-12 md:first:pt-24' }}
+                {{ isset($last_tags) ? ($content_element->tags->intersect($last_tags)->count() ? '' : '-mt-16 md:-mt-24 pt-16 md:pt-40 first:pt-12 md:first:pt-24') : '-mt-16 md:-mt-24 pt-24 md:pt-40 first:pt-12 md:first:pt-24' }}
                 "
                 id="c-{{ $content_element->uuid }}">
             @include ('content-elements.'.$content_element->type, [

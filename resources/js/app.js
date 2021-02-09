@@ -84,6 +84,10 @@ const app = new Vue({
         'user-menu': () => import(/* webpackChunkName: "user-menu" */ '@/Components/UserMenu.vue'),
     },
 
+    data: {
+        scrollPosition: 0,
+    },
+
     mounted() {
 
         window.onpopstate = event => {
@@ -117,6 +121,18 @@ const app = new Vue({
             return config;
         });
 
+        window.addEventListener("scroll", this.setScrollPosition);
+
+    },
+
+    destroyed () {
+        window.removeEventListener('scroll', this.setScrollPosition);
+    },
+
+    methods: {
+        setScrollPosition: _.debounce(function() {
+            this.scrollPosition = window.scrollY;
+        }, 50),
     },
 
 });

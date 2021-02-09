@@ -72,24 +72,26 @@
                         <div class="relative flex">
 
                             <div class="relative md:flex-1 flex items-center justify-center">
-                                <div class="p-2 ml-4 md:ml-0 flex justify-center relative">
-                                    <a href="/"><img src="images/logo.svg" class="h-8 md:h-12 block" /></a>
+                                <div class="p-1 ml-2 md:ml-0 flex justify-center relative">
+                                    <a href="/"><img src="images/logo.svg" :class="scrollPosition > 64 ? 'h-6 md:h-8' : 'h-8 md:h-12'" class="block transition-all duration-500" /></a>
                                 </div>
                             </div>
 
-                            <nav class="flex-2 relative flex md:block">
+                            <nav class="flex-2 relative flex md:block items-center h-full">
 
-                                <div class="flex w-full items-center justify-end mr-4">
-                                    <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button md:hidden mr-4 whitespace-no-wrap text-sm">Apply Now</a>
-                                    <div class="hidden text-white bg-primary px-2 text-lg cursor-pointer" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
+                                <div class="relative md:hidden flex w-full items-center justify-end">
+                                    <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button md:hidden mr-2 whitespace-no-wrap text-sm">Apply</a>
+                                    <div class="text-white bg-primary px-2 text-lg cursor-pointer mr-2" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
                                 </div>
 
-                                <div class="absolute md:relative w-screen md:w-auto top-0 mt-12 md:mt-0 right-0 md:right-auto md:h-auto md:flex z-5 md:overflow-visible overflow-hidden"
-                                    :class="$store.state.showMenu ? 'max-h-screen' : 'max-h-0 md:max-h-screen'"
+                                <div class="absolute md:relative w-screen md:w-auto top-0 md:mt-0 right-0 md:right-auto md:h-full md:flex items-center z-5 md:overflow-visible overflow-hidden"
+                                    :class="[$store.state.showMenu ? 'max-h-screen pb-1 md:pb-0' : 'max-h-0 md:max-h-screen', scrollPosition > 64 ? 'mt-8' : 'mt-10']"
                                     style="transition: max-height var(--transition-time) ease"
                                 >
 
-                                    <div class="w-full flex bg-gray-100">
+                                    <div class="w-full flex bg-gray-100 h-full border-l-4 md:border-l-0 border-primary shadow md:shadow-none"
+                                        :class="[$store.state.showMenu ? 'shadow md:shadow-none' : '']"
+                                    >
 
                                         <div id="menu" class="flex-1 md:flex relative w-full">
                                             @foreach (App\Utilities\Menu::getMenu()->sortBy->sort_order as $menu_page)
@@ -99,11 +101,11 @@
                                                         {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'bg-white' : 'bg-gray-100' }}"
                                                         ref="menu{{ $menu_page->id }}"
                                                     >
-                                                        <div class="flex items-center">
-                                                            <a href="{{ $menu_page->full_slug }}" class="whitespace-no-wrap px-2 md:px-4 py-1 md:py-4 flex-1 
+                                                        <div class="flex items-center h-full">
+                                                            <a href="{{ $menu_page->full_slug }}" class="inline-flex items-center whitespace-no-wrap px-2 md:px-4 flex-1 py-1 md:py-0 md:h-full 
                                                                 {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'underline' : '' }}">{{ $menu_page->name }}</a>
                                                             @if ($menu_page->pages->count())
-                                                                <div class="block md:hidden text-lg cursor-pointer px-2" @click="$refs.menu{{ $menu_page->id }}.classList.toggle('show-sub-menu')">
+                                                                <div class="block md:hidden text-lg cursor-pointer w-6 px-2 mr-2" @click="$refs.menu{{ $menu_page->id }}.classList.toggle('show-sub-menu')">
                                                                     <div class="icon"><i class="fas fa-caret-down"></i></div>
                                                                 </div>
                                                             @endif
@@ -111,7 +113,7 @@
 
                                                         @if ($menu_page->pages->count())
                                                             @foreach ($menu_page->pages as $menu_sub_page)
-                                                                <div class="sub-menu overflow-hidden font-oswald text-base bg-gray-300 hover:bg-gray-200 md:hidden">
+                                                                <div class="sub-menu overflow-hidden font-oswald text-base bg-gray-100 hover:bg-white md:hidden">
                                                                     <a href="{{ $menu_sub_page->full_slug }}" class="px-4 py-1 block">{{ $menu_sub_page->name }}</a>
                                                                 </div>
                                                             @endforeach
@@ -123,11 +125,11 @@
                                             @endforeach 
                                         </div>
 
-                                        <div class="bg-gray-200 md:bg-transparent flex items-center justify-center md:items-end flex-col pl-2">
+                                        <div class="bg-gray-200 md:bg-transparent flex items-center justify-center md:items-end flex-col">
 
                                             <div class="flex items-center mb-2 md:mb-0">
                                         
-                                                <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button hidden md:block mr-4 my-4 whitespace-no-wrap text-base">Apply Now</a>
+                                                <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button hidden md:block mr-4 my-0 whitespace-no-wrap text-base">Apply Now</a>
                                                 <a href="#" class="hidden md:block text-xl text-gray-500 cursor-pointer mr-4"><i class="fas fa-search"></i></a>
 
                                                 @auth
@@ -139,7 +141,7 @@
                                                 @endauth
                                             </div>
 
-                                            <div class="text-sm leading-loose md:hidden text-center">
+                                            <div class="text-sm leading-loose hidden text-center">
                                                 <a href="tel:2507435521">250.743.5521</a><br/>
                                                 <a href="mailto:info@brentwood.ca">info@brentwood.ca</a>
                                             </div>

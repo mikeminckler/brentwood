@@ -69,9 +69,6 @@ class InquiryTest extends TestCase
             'sort_order' => $this->faker->numberBetween(10, 100),
         ];
 
-        $this->assertTrue($inquiry_page->id === 2);
-        $this->assertTrue(Str::contains(route('pages.update', ['id' => $inquiry_page->id]), 2));
-
         $this->json('POST', route('pages.update', ['id' => $inquiry_page->id]), $input)
             ->assertJsonFragment([
                 'success' => 'Page Saved',
@@ -82,7 +79,6 @@ class InquiryTest extends TestCase
 
         $this->assertEquals($inquiry_page_slug, $inquiry_page->slug);
         $this->assertEquals($inquiry_page_parent_page_id, $inquiry_page->parent_page_id);
-        $this->assertEquals(2, $inquiry_page->id);
     }
 
     /** @test **/
@@ -104,9 +100,6 @@ class InquiryTest extends TestCase
             'sort_order' => $this->faker->numberBetween(10, 100),
         ];
 
-        $this->assertTrue($inquiry_page->id === 3);
-        $this->assertTrue(Str::contains(route('pages.update', ['id' => $inquiry_page->id]), 3));
-
         $this->json('POST', route('pages.update', ['id' => $inquiry_page->id]), $input)
             ->assertJsonFragment([
                 'success' => 'Page Saved',
@@ -117,7 +110,6 @@ class InquiryTest extends TestCase
 
         $this->assertEquals($inquiry_page_slug, $inquiry_page->slug);
         $this->assertEquals($inquiry_page_parent_page_id, $inquiry_page->parent_page_id);
-        $this->assertEquals(3, $inquiry_page->id);
     }
 
     // an inquiry can be created
@@ -434,7 +426,6 @@ class InquiryTest extends TestCase
 
         $this->assertEquals($name, $inquiry->user->name);
         $this->assertEquals($email, $inquiry->user->email);
-
     }
 
     /** @test **/
@@ -462,7 +453,5 @@ class InquiryTest extends TestCase
         Mail::assertQueued(InquiryConfirmation::class, function ($mail) use ($email) {
             return $mail->hasTo($email);
         });
-
     }
-
 }

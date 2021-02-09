@@ -28,7 +28,7 @@ class InquiryTest extends TestCase
     /** @test **/
     public function the_inquiry_content_page_can_be_found()
     {
-        $page = Page::find(3);
+        $page = Page::where('name', 'Inquiry Content')->first();
         $inquiry_page = Inquiry::findPage();
         $this->assertInstanceOf(Page::class, $inquiry_page);
         $this->assertEquals($page->id, $inquiry_page->id);
@@ -152,7 +152,7 @@ class InquiryTest extends TestCase
     }
 
     /** @test **/
-    public function an_inquiry_belongs_to_a_user() 
+    public function an_inquiry_belongs_to_a_user()
     {
         $user = User::factory()->create();
         $inquiry = Inquiry::factory()->create([
@@ -163,5 +163,4 @@ class InquiryTest extends TestCase
         $this->assertInstanceOf(User::class, $inquiry->user);
         $this->assertEquals($user->id, $inquiry->user->id);
     }
-
 }

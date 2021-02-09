@@ -107,7 +107,7 @@ class Page extends Model
         $page->saveContentElements($input);
         $page->saveTags($input);
 
-        cache()->tags([cache_name($page)])->flush();
+        cache()->tags([cache_name($page), 'menu'])->flush();
 
         broadcast(new PageSaved($page))->toOthers();
 
@@ -135,20 +135,22 @@ class Page extends Model
 
     public function getFullSlugAttribute()
     {
-        $slug = $this->getSlug();
+        return cache()->tags([cache_name($this), 'menu'])->rememberForever(cache_name($this).'-full-slug', function () {
+            $slug = $this->getSlug();
 
-        if ($this->parent_page_id > 0) {
-            $parent_page = Page::find($this->parent_page_id);
-            
-            if ($parent_page instanceof Page) {
-                while ($parent_page->id > 1) {
-                    $slug = $parent_page->getSlug().'/'.$slug;
-                    $parent_page = Page::find($parent_page->parent_page_id);
+            if ($this->parent_page_id > 0) {
+                $parent_page = Page::find($this->parent_page_id);
+                
+                if ($parent_page instanceof Page) {
+                    while ($parent_page->id > 1) {
+                        $slug = $parent_page->getSlug().'/'.$slug;
+                        $parent_page = Page::find($parent_page->parent_page_id);
+                    }
                 }
             }
-        }
 
-        return $slug;
+            return $slug;
+        });
     }
 
     public static function publishScheduledContent()

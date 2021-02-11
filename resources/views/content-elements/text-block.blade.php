@@ -1,6 +1,6 @@
 <div class="w-full md:flex relative z-3 {{ $content->full_width ? ( !$content->header ? 'bg-white pt-8' : 'bg-white' ) : ($content->photos->count() && $content->style ? 'text-style-'.$content->style : '') }}">
     @if (!$content->full_width)
-        <div class="flex-1 relative {{ $content->photos->count() ? 'pb-50p z-3 md:m-0 md:pb-0' : ($content->stat_number && $content->stat_name ? 'pt-4 md:pb-25p z-3 md:m-0 md:pb-0' : '') }}">
+        <div class="flex-1 relative {{ $content->photos->count() ? 'pb-66p z-3 md:m-0 md:pb-0' : ($content->stat_number && $content->stat_name ? 'pt-4 md:pb-25p z-3 md:m-0 md:pb-0' : '') }}">
 
             @if ($content->stat_number && $content->stat_name && !$content->photos->count())
                 <div class="hidden md:block">

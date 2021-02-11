@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Chat;
 
 use App\Events\ChatMessageCreated;
+use App\Events\WhisperCreated;
 
 class ChatTest extends TestCase
 {
@@ -153,5 +154,156 @@ class ChatTest extends TestCase
         $this->get(route('chat.view', ['room' => $room]))
              ->assertSuccessful()
              ->assertViewHas('room', $room);
+    }
+
+    /** @test **/
+    public function a_message_can_be_whispered()
+    {
+        $message = $this->faker->sentence;
+        $livestream = Livestream::factory()->create();
+        $inquiry = Inquiry::factory()->create();
+        $inquiry->saveLivestreams(['livestream' => $livestream]);
+
+        $user = $inquiry->user;
+        $this->assertInstanceOf(User::class, $user);
+
+        $input = [
+            'room' => 'livestream.'.$livestream->id,
+            'message' => $message,
+            'whisper_id' => $user->id,
+        ];
+
+        $this->json('POST', route('chat.send-message'), [])
+             ->assertStatus(401);
+
+        $this->signIn(User::factory()->create());
+
+        $this->json('POST', route('chat.send-message'), $input)
+             ->assertStatus(403);
+
+        $this->signInAdmin();
+
+        $this->json('POST', route('chat.send-message'), ['room' => 'livestream.'.$livestream->id])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                'message',
+             ]);
+
+        Event::fake();
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('chat.send-message'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'message' => $message,
+             ]);
+
+        Event::assertDispatched(function (WhisperCreated $event) use ($message, $user) {
+            return $event->chat->message === $message && $event->user->id === $user->id;
+        });
+
+        $this->assertTrue($user->whispers()->get()->contains('message', $message));
+    }
+
+    /** @test **/
+    public function a_whisper_is_not_loaded_into_other_peoples_chat()
+    {
+        $message = $this->faker->sentence;
+        $whisper = $this->faker->sentence;
+        $livestream = Livestream::factory()->create();
+        $inquiry = Inquiry::factory()->create();
+        $inquiry2 = Inquiry::factory()->create();
+        $inquiry->saveLivestreams(['livestream' => $livestream]);
+        $inquiry2->saveLivestreams(['livestream' => $livestream]);
+        $room = 'livestream.'.$livestream->id;
+
+        $user = $inquiry->user;
+        $this->assertInstanceOf(User::class, $user);
+
+        $input = [
+            'room' => $room,
+            'message' => $message,
+        ];
+
+        $whisper_input = [
+            'room' => $room,
+            'message' => $whisper,
+            'whisper_id' => $user->id,
+        ];
+
+        $admin = User::find(1);
+        $this->assertTrue($admin->hasRole('admin'));
+        $this->signIn($admin);
+
+        Event::fake();
+
+        $this->json('POST', route('chat.send-message'), $input)
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'message' => $message,
+             ]);
+
+
+        $this->json('POST', route('chat.send-message'), $whisper_input)
+        ->assertSuccessful()
+        ->assertJsonFragment([
+            'message' => $whisper,
+        ]);
+
+        $this->assertTrue($user->whispers()->get()->contains('message', $whisper));
+
+        $global_chat = Chat::where('message', $message)->first();
+        $this->assertInstanceOf(Chat::class, $global_chat);
+        $whisper_chat = Chat::where('message', $whisper)->first();
+        $this->assertInstanceOf(Chat::class, $whisper_chat);
+
+        Event::assertDispatched(function (WhisperCreated $event) use ($whisper, $user) {
+            return $event->chat->message === $whisper && $event->user->id === $user->id;
+        });
+
+        $this->signIn($user);
+
+        $this->json('POST', route('chat.load'), ['room' => $room])
+             ->assertJsonFragment([
+                 'id' => $whisper_chat->id,
+                 'message' => $whisper_chat->message,
+             ]);
+
+        $this->json('POST', route('chat.load'), ['room' => $room])
+             ->assertJsonFragment([
+                 'id' => $global_chat->id,
+                 'message' => $global_chat->message,
+             ]);
+
+        $this->signIn($inquiry2->user);
+
+        $this->json('POST', route('chat.load'), ['room' => $room])
+             ->assertJsonMissing([
+                 'id' => $whisper_chat->id,
+                 'message' => $whisper_chat->message,
+             ]);
+
+        $this->json('POST', route('chat.load'), ['room' => $room])
+             ->assertJsonFragment([
+                 'id' => $global_chat->id,
+                 'message' => $global_chat->message,
+             ]);
+
+        $this->signIn($admin);
+
+        $this->json('POST', route('chat.load'), ['room' => $room])
+             ->assertJsonFragment([
+                 'id' => $whisper_chat->id,
+                 'message' => $whisper_chat->message,
+             ]);
+
+        $this->json('POST', route('chat.load'), ['room' => $room])
+             ->assertJsonMissing([
+                 'email' => $global_chat->user->email,
+            ])
+             ->assertJsonFragment([
+                 'id' => $global_chat->id,
+                 'message' => $global_chat->message,
+             ]);
     }
 }

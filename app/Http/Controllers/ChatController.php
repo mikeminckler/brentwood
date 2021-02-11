@@ -4,27 +4,37 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Arr;
 
 use App\Http\Requests\ChatSendMessageValidation;
 
 use App\Models\Chat;
+use App\Models\User;
 
 use App\Events\ChatMessageCreated;
+use App\Events\WhisperCreated;
 
 class ChatController extends Controller
 {
     public function sendMessage(ChatSendMessageValidation $request)
     {
-        $chat = new Chat;
-        $chat->user_id = auth()->user()->id;
-        $chat->room = request('room');
-        $chat->message = request('message');
+        $input = requestInput();
+        $chat = (new Chat)->saveChat($input);
 
-        $chat->save();
+        $whispers = collect();
 
-        $chat->append('name');
+        if (Arr::get($input, 'whisper_id')) {
+            $whispers->push(User::findOrFail(Arr::get($input, 'whisper_id')));
+        }
 
-        broadcast(new ChatMessageCreated(request('room'), $chat))->toOthers();
+        if ($whispers->count()) {
+            foreach ($whispers as $user) {
+                $chat->whispers()->attach($user);
+                broadcast(new WhisperCreated($chat, $user));
+            }
+        } else {
+            broadcast(new ChatMessageCreated($chat))->toOthers();
+        }
 
         return response()->json([
             'chat' => $chat,
@@ -42,7 +52,15 @@ class ChatController extends Controller
         }
 
         $chats = Chat::where('room', request('room'))
-            ->where('created_at', '>', now()->subMinutes(5))
+            ->where('created_at', '>', now()->subHours(1))
+            ->where(function ($query) {
+                $query->whereHas('whispers', function ($query) {
+                    $query->where('user_id', auth()->user()->id);
+                })
+                ->orWhereDoesntHave('whispers')
+                ->orWhere('user_id', auth()->user()->id);
+            })
+            ->with('whispers')
             ->get()
             ->sortByDesc('created_at')
             ->values();

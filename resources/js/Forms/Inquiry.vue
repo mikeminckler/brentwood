@@ -211,7 +211,8 @@
                 showErrors: false,
                 url: '',
                 transitionDirection: 'inquiry-form-forward',
-                currentStep: 'Start',
+                currentStep: null,
+                steps: [],
                 allSteps: [
                     'Contact Information',
                     'Student Information',
@@ -240,50 +241,6 @@
         },
 
         computed: {
-
-            steps() {
-
-                let steps = this.$lodash.clone(this.allSteps);
-
-                if (!this.showStudentInfo) {
-                    steps = this.$lodash.remove(steps, step => {
-                        return step !== 'Student Information';
-                    });
-                }
-
-                if (!this.showInterests || !this.tags.length) {
-                    steps = this.$lodash.remove(steps, step => {
-                        return step !== 'Student Interests';
-                    });
-                }
-
-                if (!this.showLivestreams) {
-                    steps = this.$lodash.remove(steps, step => {
-                        return step !== 'Livestreams';
-                    });
-                }
-
-                if (this.livestream) {
-                    steps = this.$lodash.remove(steps, step => {
-                        return step !== 'Livestreams';
-                    });
-                }
-
-                if (!this.livestreams) {
-                    steps = this.$lodash.remove(steps, step => {
-                        return step !== 'Livestreams';
-                    });
-                }
-
-                if (this.showLivestreams && this.showLivestreamsFirst) {
-                    steps = this.$lodash.sortBy(steps, step => {
-                        return step === 'Livestreams' ? 0 : 1;
-                    });
-                }
-
-                this.currentStep = steps[0];
-                return steps;
-            },
 
             errors() {
 
@@ -436,6 +393,7 @@
                 this.form.name = this.$store.state.user.name;
                 this.form.email = this.$store.state.user.email;
             }
+
         },
 
         watch: {
@@ -465,6 +423,52 @@
         },
 
         methods: {
+
+            setSteps() {
+
+                let steps = this.$lodash.clone(this.allSteps);
+
+                if (!this.showStudentInfo) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Student Information';
+                    });
+                }
+
+                if (!this.showInterests || !this.tags.length) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Student Interests';
+                    });
+                }
+
+                if (!this.showLivestreams) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Livestreams';
+                    });
+                }
+
+                if (this.livestream) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Livestreams';
+                    });
+                }
+
+                if (!this.livestreams) {
+                    steps = this.$lodash.remove(steps, step => {
+                        return step !== 'Livestreams';
+                    });
+                }
+
+                if (this.showLivestreams && this.showLivestreamsFirst) {
+                    steps = this.$lodash.sortBy(steps, step => {
+                        return step === 'Livestreams' ? 0 : 1;
+                    });
+                }
+
+                if (!this.currentStep)
+                this.currentStep = steps[0];
+                this.steps = steps;
+            },
+
 
             showCheck: function(step) {
                 
@@ -595,6 +599,7 @@
 
                 this.$http.get('/inquiry/tags').then( response => {
                     this.tags = response.data.tags;
+                    this.setSteps();
                 }, error => {
                     this.processErrors(error.response);
                 });

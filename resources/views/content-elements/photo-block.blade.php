@@ -2,7 +2,7 @@
 
 
     @foreach ($content->photos->sortBy('sort_order') as $index => $photo)
-        <div class="w-full md:w-auto relative overflow-hidden col-span-{{ $photo->span }} pb-50p md:pb-{{ floor($content->height / $photo->span) }}p"
+        <div class="w-full md:w-auto relative overflow-hidden col-span-{{ $photo->span }} pb-66p md:pb-{{ floor($content->height / $photo->span) }}p"
             key="photo-{{ $photo->id }}"
         >
             @if ($index === $content->photos->count() - 1)

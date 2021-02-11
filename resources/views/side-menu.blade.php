@@ -1,3 +1,4 @@
+@if (auth()->user()->hasRole('admin'))
 <div class="p-4 sticky bottom-0 bg-gray-100 shadow z-3">
 
 
@@ -39,3 +40,4 @@
         <div class="">@{{ $store.state.wsState }}</div>
     @endif
 </div>
+@endif

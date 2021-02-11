@@ -33,6 +33,7 @@ const store = new Vuex.Store({
         dragging: false,
         pageLoading: false,
         locale: 'en',
+        scrollPosition: 0,
     },
 
     getters: {
@@ -144,6 +145,10 @@ const store = new Vuex.Store({
 
         setLocale(state, locale) {
             state.locale = locale;
+        },
+
+        setScrollPosition (state, scrollPosition) {
+            state.scrollPosition = scrollPosition;
         },
     },
 
@@ -262,6 +267,10 @@ const store = new Vuex.Store({
 
         setLocale({ commit, state }, locale) {
             commit('setLocale', locale);
+        },
+
+        setScrollPosition({ commit, state }, scrollPosition) {
+            commit('setScrollPosition', scrollPosition);
         },
 
     }

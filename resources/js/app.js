@@ -81,11 +81,8 @@ const app = new Vue({
         'photo-viewer': () => import(/* webpackChunkName: "photo-viewer" */ '@/Components/PhotoViewer'),
         'processing': () => import(/* webpackChunkName: "processing" */ '@/Components/Processing'),
         'saving-indicator': () => import(/* webpackChunkName: "saving-indicator" */ '@/Components/SavingIndicator'),
+        'scroll-position': () => import(/* webpackChunkName: "scroll-position" */ '@/Components/ScrollPosition.vue'),
         'user-menu': () => import(/* webpackChunkName: "user-menu" */ '@/Components/UserMenu.vue'),
-    },
-
-    data: {
-        scrollPosition: 0,
     },
 
     mounted() {
@@ -121,18 +118,6 @@ const app = new Vue({
             return config;
         });
 
-        window.addEventListener("scroll", this.setScrollPosition);
-
-    },
-
-    destroyed () {
-        window.removeEventListener('scroll', this.setScrollPosition);
-    },
-
-    methods: {
-        setScrollPosition: _.debounce(function() {
-            this.scrollPosition = window.scrollY;
-        }, 50),
     },
 
 });

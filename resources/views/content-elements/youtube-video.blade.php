@@ -23,7 +23,7 @@
     </div>
 
     @if (!$content->full_width && ($content->header && $content->body))
-        <div class="flex-1 relative flex items-center justify-center bg-white {{ !$content->full_width ? '-ml-8 pl-8 py-8' : '' }}">
+        <div class="flex-1 relative flex items-center justify-center bg-white py-8 {{ !$content->full_width ? '-ml-8 pl-8' : '' }}">
             <div class="text-block relative {{ $content->style ? 'pt-8' : '' }}">
                 <h{{ $first ? '1' : '2'}}>{{ $content->header }}</h{{ $first ? '1': '2' }}>
                 <div class="body">

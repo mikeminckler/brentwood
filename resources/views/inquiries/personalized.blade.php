@@ -56,7 +56,7 @@
                         @endforeach
                     @endif
 
-                    <p>If you have any questions please contact us at <a href="mailto:admissions@brentwood.ca">admissions@brentwood.ca</a>.</p>
+                    <p>If you have any questions please contact us at <a href="mailto:info@brentwood.ca">info@brentwood.ca</a>.</p>
 
                     <p>Thank you for your interest in Brentwood College School and we look forward to speaking with you soon.</p>
 

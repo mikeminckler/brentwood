@@ -105,7 +105,7 @@ class User extends Authenticatable
         return $user;
     }
 
-    public static function findOrCreate($input) 
+    public static function findOrCreate($input)
     {
         $id = null;
         $user = User::where('email', Arr::get($input, 'email'))->first();
@@ -117,9 +117,9 @@ class User extends Authenticatable
         return (new User)->saveUser($input, $id);
     }
 
-    public function inquiries() 
+    public function inquiries()
     {
-        return $this->hasMany(Inquiry::class);   
+        return $this->hasMany(Inquiry::class);
     }
 
     public function roles()
@@ -262,5 +262,10 @@ class User extends Authenticatable
             return $permission->objectable_id === $objectable->id && $permission->objectable_type === get_class($objectable);
         });
         //});
+    }
+
+    public function whispers()
+    {
+        return $this->belongsToMany(Chat::class, 'whispers');
     }
 }

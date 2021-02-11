@@ -42,11 +42,13 @@
                     <div class="link ml-4" @click="selectAllUsers()">{{ livestream.inquiry_users.length === selectedUsers.length ? 'Deselect' : 'Select' }} All</div>
                 </div>
 
-                <div class="mt-2 grid grid-cols-2">
+                <div class="mt-2 grid grid-cols-3">
                     <div class="">Name</div>
+                    <div class="">Email</div>
                     <div class="">Reminder Sent At</div>
                     <div class="ignore" :key="user.id" v-for="user in livestream.inquiry_users">
                         <checkbox-input class="py-1" v-model="user.id" :multiple="selectedUsers" :label="user.name"></checkbox-input>
+                        <div class="">{{ user.email }}</div>
                         <div class="py-1">{{ user.pivot.reminder_email_sent_at }}</div>
                     </div>
                 </div>
@@ -121,7 +123,7 @@
             },
 
             sendReminderEmails: function() {
-                this.$http.post('/livestreams/' + this.livestream.id + '/send-reminder-emails', {user_ids: this.selectAllUsers}).then( response => {
+                this.$http.post('/livestreams/' + this.livestream.id + '/send-reminder-emails', {user_ids: this.selectedUsers}).then( response => {
                     this.processSuccess(response);
                     this.selectAllUsers = [];
                     this.$eventer.$emit('paginate', {resource: 'livestreams'});

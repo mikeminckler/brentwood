@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Inquiry;
+use App\Models\Chat;
 
 use Laravel\Socialite;
 
@@ -170,7 +171,6 @@ class UserTest extends TestCase
     /** @test **/
     public function a_user_can_be_found_or_created_from_input()
     {
-
         $name = $this->faker->name;
         $email = $this->faker->safeEmail;
 
@@ -201,5 +201,16 @@ class UserTest extends TestCase
         $this->assertNotNull($user->inquiries);
         $this->assertEquals(1, $user->inquiries->count());
         $this->assertTrue($user->inquiries->contains('id', $inquiry->id));
+    }
+
+    /** @test **/
+    public function a_user_can_have_many_whispers()
+    {
+        $user = User::factory()->create();
+        $chat = Chat::factory()->create();
+        $user->whispers()->attach($chat);
+
+        $this->assertEquals(1, $user->whispers->count());
+        $this->assertTrue($user->whispers->contains('message', $chat->message));
     }
 }

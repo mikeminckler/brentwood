@@ -47,17 +47,19 @@
 
     <div id="app" class="relative flex-1 flex">
 
-        @if (session()->get('editing') && !request('preview'))
-            <div class="relative" v-if="$store.state.editing">
+        @auth
+            <div class="relative">
                 <div class="sticky top-0 flex flex-col h-full">
-                    <saving-indicator></saving-indicator>
-                    <div class="flex-1">
-                        <page-tree :sort="true" :expanded="true" :show-changes="true" max-height="100%"></page-tree>
-                    </div>
+                    @if (session()->get('editing') && !request('preview'))
+                        <saving-indicator></saving-indicator>
+                        <div class="flex-1" v-if="$store.state.editing">
+                            <page-tree :sort="true" :expanded="true" :show-changes="true" max-height="100%"></page-tree>
+                        </div>
+                    @endif
                     @include ('side-menu')
                 </div>
             </div>
-        @endif
+        @endauth
 
         <div id="main" class="relative flex-1 flex flex-col">
 
@@ -72,8 +74,8 @@
                         <div class="relative flex">
 
                             <div class="relative flex-1 flex items-center justify-center">
-                                <div class="ml-2 md:ml-0 flex justify-center items-center relative transition-all duration-500" :class="scrollPosition > 64 ? 'h-6 md:h-6' : 'h-8 md:h-14'">
-                                    <a href="/"><img src="images/logo.svg" class="transition-all duration-500" :class="scrollPosition > 64 ? 'h-6 md:h-8' : 'h-8 md:h-10'" /></a>
+                                <div class="ml-2 md:ml-0 flex justify-center items-center relative transition-all duration-500" :class="$store.state.scrollPosition > 64 ? 'h-6 md:h-6' : 'h-8 md:h-14'">
+                                    <a href="/"><img src="images/logo.svg" class="transition-all duration-500" :class="$store.state.scrollPosition > 64 ? 'h-6 md:h-8' : 'h-8 md:h-10'" /></a>
                                 </div>
                             </div>
 
@@ -85,7 +87,7 @@
                                 </div>
 
                                 <div class="absolute md:relative w-screen md:w-auto top-0 md:mt-0 right-0 md:right-auto md:h-full md:flex items-center z-5 md:overflow-visible overflow-hidden"
-                                    :class="[$store.state.showMenu ? 'max-h-screen pb-1 md:pb-0' : 'max-h-0 md:max-h-screen', scrollPosition > 64 ? 'mt-8' : 'mt-10']"
+                                    :class="[$store.state.showMenu ? 'max-h-screen pb-1 md:pb-0' : 'max-h-0 md:max-h-screen', $store.state.scrollPosition > 64 ? 'mt-8' : 'mt-10']"
                                     style="transition: max-height var(--transition-time) ease"
                                 >
 
@@ -303,6 +305,7 @@
         ></feedback>
 
         <photo-viewer></photo-viewer>
+        <scroll-position></scroll-position>
 
     </div>
 

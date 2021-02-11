@@ -14,14 +14,14 @@
 
                 <div class="bg-white text-gray-800 text-center flex items-center justify-center">
                     <div class="">Chat</div>
-                    <div class="ml-4 text-gray-500 flex items-center" :class="admin ? 'cursor-pointer hover:bg-gray-100 hover:shadow' : ''" v-if="members.length > 0" @click="toggleShowMembers()">
+                    <div class="ml-4 text-gray-500 flex items-center" :class="mod ? 'cursor-pointer hover:bg-gray-100 hover:shadow' : ''" v-if="members.length > 0" @click="toggleShowMembers()">
                         <div class="text-sm"><i class="fas fa-user"></i></div>
                         <div class="pl-1">{{ members.length }}</div>
                     </div>
                 </div>
 
                 <transition name="chat-members">
-                    <div class="text-sm h-1/3 bg-white shadow relative z-5 overflow-y-scroll px-2 py-1" v-if="admin && showMembers">
+                    <div class="text-sm bg-white shadow relative z-5 overflow-y-scroll px-2 py-1" v-if="mod && showMembers" style="max-height: 50%;">
                         <div class="odd:bg-gray-100" v-for="member in members">{{ member.name }}</div>
                     </div>
                 </transition>
@@ -34,22 +34,33 @@
                     <div class="flex-1 w-full relative">
                         <div class="w-full h-full absolute flex flex-col-reverse overflow-y-scroll">
                             <div class="px-2"
-                                 :class="chat.id < 1 ? 'bg-yellow-100 bg-opacity-50 text-sm' : 'bg-white odd:bg-gray-100'"
+                                 :class="chat.id < 1 ? 'bg-yellow-100 bg-opacity-50 text-sm' : ( chat.whisper_ids ? 'bg-blue-100 odd:bg-blue-200' : 'bg-white odd:bg-gray-100') "
                                  :key="'chat-' + chat.id"
                                  v-for="chat in chats"
                             >
-                            <div class="absolute right-0 flex text-sm mt-1" v-if="admin && chat.id >= 1">
+                                <div class="absolute right-0 flex text-sm mt-1" v-if="mod && chat.id >= 1">
                                     <div class="px-1 cursor-pointer text-gray-400 hover:text-primary" @click="deleteMessage(chat)"><i class="fas fa-trash"></i></div>
                                 </div>
-                                <span class="text-sm" @click="banUser(chat)" v-if="admin && chat.id >= 1"><i class="fas fa-ban"></i></span>
-                                <span class="text-sm text-gray-500">{{ chat.name }}:</span>
+                                <span class="text-sm hidden" @click="banUser(chat)" v-if="mod && chat.id >= 1"><i class="fas fa-ban"></i></span>
+                                <span class="text-sm text-gray-500" :class="mod || chat.whisper_ids ? 'cursor-pointer hover:text-primary' : ''" @click="setWhisper(chat)">{{ chat.name }}:</span>
+                                <span v-if="chat.whisper_ids" class="italic text-gray-800 text-sm">private</span>
                                 <span class="" :class="chat.deleted ? 'line-through text-gray-400' : ''">{{ chat.message }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="px-2 py-1 relative z-5">
-                        <textarea v-model="message" class="w-full p-2 leading-none outline-none focus:border-gray-300 border rounded text-sm text-gray-600" @keydown.enter.prevent="sendMessage()" placeholder="Send a message..."></textarea>
+                    <div class="px-2 py-1 border-t shadow relative z-5">
+                        <transition name="whisper-text">
+                            <div class="text-sm pl-2 flex overflow-hidden" v-if="whisper">
+                                <div class="">Message <span class="font-bold">{{ whisper.name }}</span></div>
+                                <div class="pl-2 cursor-pointer" @click="whisper = null"><i class="fas fa-times"></i></div>
+                            </div>
+                        </transition>
+                        <textarea v-model="message" 
+                                  class="w-full p-2 leading-none outline-none focus:border-gray-300 border rounded text-sm text-gray-600" 
+                                  @keydown.enter.prevent="sendMessage()" 
+                                  :placeholder="whisper ? 'Send a whisper to ' + whisper.name + '...' : 'Send a message to all users...'"
+                        ></textarea>
                     </div>
                 </div>
 
@@ -80,6 +91,7 @@
                 chats: [],
                 message: '',
                 members: [],
+                whisper: null,
             }
         },
 
@@ -90,7 +102,7 @@
             pathname() {
                 return window.location.pathname;
             },
-            admin() {
+            mod() {
                 return this.$store.getters.hasRole('admin');
             }
         },
@@ -112,6 +124,12 @@
         methods: {
 
             joinRoom: function() {
+
+                this.$echo.private('user.' + this.user.id)
+                    .listen('WhisperCreated', (data) => {
+                        this.chats.unshift(data.chat);
+                    });
+
                 this.$echo.join(this.room)
 
                     .here( (users) => {
@@ -123,7 +141,7 @@
 
                         this.members.push(user);
 
-                        if (this.admin) {
+                        if (this.mod) {
                             let chat = {
                                 id: '0.' + this.chats.length,
                                 message: user.name + ' Joined',
@@ -140,7 +158,8 @@
 
                         this.members = this.$lodash.xor(this.members, [user]);
 
-                        if (this.admin) {
+                        // post a system message in chat
+                        if (this.mod) {
                             let chat = {
                                 id: '0.' + this.chats.length,
                                 message: user.name + ' Left',
@@ -178,7 +197,8 @@
                     let input = {
                         room: this.room,
                         message: this.message,
-                        user_id: this.user.id,
+                        //user_id: this.user.id,
+                        whisper_id: this.whisper ? this.whisper.user_id : '',
                     };
 
                     this.$http.post('/chat/send-message', input).then( response => {
@@ -229,12 +249,20 @@
             },
 
             toggleShowMembers: function() {
-
-                if (this.admin) {
+                if (this.mod) {
                     this.showMembers = !this.showMembers;
                 }
+            },
 
-            }
+            setWhisper: function(chat) {
+                if (this.mod || chat.whisper_ids) {
+                    this.whisper = {
+                        user_id: chat.user_id,
+                        name: chat.name,
+                    };
+                }
+            },
+            
         },
 
     }
@@ -262,11 +290,11 @@
 @keyframes chat-members {
     0% {
         opacity: 0;
-        @apply h-0;
+        max-height: 0;
     }
     100%   {
         opacity: 1;
-        @apply h-1/3;
+        max-height: 50%;
     }
 }
 
@@ -277,4 +305,24 @@
 .chat-members-leave-active {
     animation: chat-members var(--transition-time) reverse;
 }
+
+@keyframes whisper-text {
+    0% {
+        opacity: 0;
+        max-height: 0;
+    }
+    100%   {
+        opacity: 1;
+        max-height: 20px;
+    }
+}
+
+.whisper-text-enter-active {
+    animation: whisper-text var(--transition-time) ease-out;
+}
+
+.whisper-text-leave-active {
+    animation: whisper-text var(--transition-time) reverse;
+}
+
 </style>

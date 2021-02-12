@@ -1,6 +1,6 @@
 <template>
 
-    <div class="">
+    <div class="p-4">
 
         <h2>{{ livestream.id >= 1 ? 'Edit' : 'Create' }} Livestream</h2>
 
@@ -63,6 +63,21 @@
 
         <div class="">
 
+            <h3>Moderators</h3>
+            <div class="mt-2">
+                <autocomplete
+                    url="/users/search"
+                    v-model="livestream.moderators"
+                    name="moderator"
+                    :multiple="true"
+                    placeholder="Add Moderator"
+                    :hideLabel="true"
+                    :remove="true"
+                    @remove="removeModerator($event)"
+                ></autocomplete>
+            </div>
+
+            <h3>Allowed Users</h3>
             <div class="mt-2">
                 <autocomplete
                     url="/roles/search"
@@ -150,7 +165,11 @@
 
             removeRole: function(role) {
                 this.livestream.roles = this.$lodash.xor(this.livestream.roles, [role]);
-            }
+            },
+
+            removeModerator: function(user) {
+                this.livestream.moderators = this.$lodash.xor(this.livestream.moderators, [user]);
+            },
 
         },
 

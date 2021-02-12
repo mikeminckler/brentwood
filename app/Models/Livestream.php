@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Support\Arr;
+use App\Models\User;
 
 use App\Traits\TagsTrait;
 use App\Traits\HasPermissionsTrait;
@@ -18,7 +19,7 @@ class Livestream extends Model
     use HasPermissionsTrait;
     use AppendAttributesTrait;
 
-    protected $with = ['tags'];
+    protected $with = ['tags', 'moderators'];
 
     protected $dates = ['start_date'];
 
@@ -41,8 +42,21 @@ class Livestream extends Model
 
         $livestream->saveTags($input);
         $livestream->saveRoles($input);
+        $livestream->saveModerators($input);
 
         return $livestream;
+    }
+
+    public function saveModerators($input)
+    {
+        $moderators = collect(Arr::get($input, 'moderators'))->pluck('id')->toArray();
+        $this->moderators()->sync($moderators);
+        return $this;
+    }
+
+    public function moderators()
+    {
+        return $this->belongsToMany(User::class, 'livestream_moderator');
     }
 
     public function inquiries()

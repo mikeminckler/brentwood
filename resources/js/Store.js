@@ -150,6 +150,11 @@ const store = new Vuex.Store({
         setScrollPosition (state, scrollPosition) {
             state.scrollPosition = scrollPosition;
         },
+
+        banUser(state) {
+            state.user.banned_at = true;
+        },
+
     },
 
     actions: {
@@ -271,6 +276,10 @@ const store = new Vuex.Store({
 
         setScrollPosition({ commit, state }, scrollPosition) {
             commit('setScrollPosition', scrollPosition);
+        },
+
+        banUser({ commit, state }) {
+            commit('banUser');
         },
 
     }

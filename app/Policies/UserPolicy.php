@@ -100,4 +100,15 @@ class UserPolicy
     {
         //
     }
+
+    /**
+     * Determine whether the user can ban the model.
+     *
+     * @param  \App\User  $user
+     * @param  \App\User  $model
+     * @return mixed
+     */
+    public function ban(User $user, User $model)
+    {
+    }
 }

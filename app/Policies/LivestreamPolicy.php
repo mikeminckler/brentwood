@@ -114,11 +114,29 @@ class LivestreamPolicy
      */
     public function chat(User $user, Livestream $livestream)
     {
+        if ($user->banned_at) {
+            return false;
+        }
         return $user->can('view', $livestream);
     }
 
     public function sendReminderEmails(User $user, Livestream $livestream)
     {
-        //
+        return $livestream->moderators->contains('id', $user->id);
+    }
+
+    /**
+     * Determine whether the user can moderate the livestream.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Livestream  $livestream
+     * @return mixed
+     */
+    public function moderate(User $user, Livestream $livestream)
+    {
+        if ($user->banned_at) {
+            return false;
+        }
+        return $livestream->moderators->contains('id', $user->id);
     }
 }

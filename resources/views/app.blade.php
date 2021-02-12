@@ -56,7 +56,9 @@
                             <page-tree :sort="true" :expanded="true" :show-changes="true" max-height="100%"></page-tree>
                         </div>
                     @endif
-                    @include ('side-menu')
+                    <div class="hidden md:block">
+                        @include ('side-menu')
+                    </div>
                 </div>
             </div>
         @endauth
@@ -126,6 +128,11 @@
 
                                                 @endif
                                             @endforeach 
+                                            @auth
+                                                <div class="md:hidden">
+                                                    @include ('side-menu')
+                                                </div>
+                                            @endauth
                                         </div>
 
                                         <div class="bg-gray-200 md:bg-transparent flex items-center md:items-end md:justify-center flex-col relative">

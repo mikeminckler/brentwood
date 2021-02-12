@@ -4,10 +4,10 @@
 
         <div class="flex items-center justify-center max-h-screen h-full relative">
             <div class="bg-white bg-opacity-75 absolute w-screen h-screen z-20" @click.stop="$emit('close')"></div>
-            <div class="relative shadow bg-gray-100 p-2 md:p-4 z-25 max-h-screen">
+            <div class="relative shadow bg-gray-100 z-25 max-h-screen w-full md:w-auto">
 
                 <div @click="$emit('close')" 
-                    class="text-lg hover:text-gray-800 absolute top-0 right-0 -mt-2 -mr-2 z-5 bg-gray-100 shadow rounded-full p-1 cursor-pointer flex items-center justify-center"
+                    class="text-lg hover:text-gray-800 absolute top-0 right-0 mt-1 mr-2 md:-mt-2 md:-mr-2 z-5 bg-gray-100 shadow rounded-full p-1 cursor-pointer flex items-center justify-center"
                 ><i class="fas fa-times-circle"></i></div>
 
                 <div class="relative max-h-screen overflow-y-scroll">

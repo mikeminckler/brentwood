@@ -43,7 +43,9 @@ class LivestreamTest extends TestCase
     {
         $input = Livestream::factory()->raw();
         $role = Role::factory()->create();
+        $mod = User::factory()->create();
         $input['roles'] = [$role];
+        $input['moderators'] = [$mod];
 
         $this->json('POST', route('livestreams.store'), [])
              ->assertStatus(401);
@@ -79,7 +81,10 @@ class LivestreamTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $livestream->start_date);
         $this->assertEquals(Arr::get($input, 'length'), $livestream->length);
         $this->assertEquals(Arr::get($input, 'enable_chat'), $livestream->enable_chat);
+        $this->assertNotNull($livestream->roles);
         $this->assertTrue($livestream->roles->contains('id', $role->id));
+        $this->assertNotNull($livestream->moderators);
+        $this->assertTrue($livestream->moderators->contains('id', $mod->id));
     }
 
     /** @test **/
@@ -87,12 +92,16 @@ class LivestreamTest extends TestCase
     {
         $livestream = Livestream::factory()->create();
         $role = Role::factory()->create();
+        $mod1 = User::factory()->create();
+        $mod2 = User::factory()->create();
         $livestream->createPermission($role);
+        $livestream->moderators()->attach($mod1);
 
         $new_role = Role::factory()->create();
 
         $input = Livestream::factory()->raw();
         $input['roles'] = [$new_role];
+        $input['moderators'] = [$mod2];
 
         $this->json('POST', route('livestreams.update', ['id' => $livestream->id]), [])
              ->assertStatus(401);
@@ -128,6 +137,8 @@ class LivestreamTest extends TestCase
         $this->assertFalse($livestream->roles->contains('id', $role->id));
         $this->assertTrue($livestream->roles->contains('id', $new_role->id));
         $this->assertInstanceOf(Role::class, Role::find($role->id));
+        $this->assertFalse($livestream->moderators->contains('id', $mod1->id));
+        $this->assertTrue($livestream->moderators->contains('id', $mod2->id));
     }
 
     /** @test **/

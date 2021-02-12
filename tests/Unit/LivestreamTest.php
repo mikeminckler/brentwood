@@ -86,4 +86,16 @@ class LivestreamTest extends TestCase
         $this->assertEquals(1, $livestream->users->count());
         $this->assertTrue($livestream->users->contains('id', $user->id));
     }
+
+    /** @test **/
+    public function a_livestream_can_have_many_moderators()
+    {
+        $livestream = Livestream::factory()->create();
+        $user = User::factory()->create();
+        $livestream->moderators()->attach($user);
+
+        $this->assertNotNull($livestream->moderators);
+        $this->assertEquals(1, $livestream->moderators->count());
+        $this->assertTrue($livestream->moderators->contains('id', $user->id));
+    }
 }

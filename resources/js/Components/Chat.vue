@@ -14,15 +14,15 @@
 
                 <div class="bg-white text-gray-800 text-center flex items-center justify-center">
                     <div class="">Chat</div>
-                    <div class="ml-4 text-gray-500 flex items-center" :class="mod ? 'cursor-pointer hover:bg-gray-100 hover:shadow' : ''" v-if="members.length > 0" @click="toggleShowMembers()">
+                    <div class="ml-4 text-gray-500 flex items-center" :class="moderator ? 'cursor-pointer hover:bg-gray-100 hover:shadow' : ''" v-if="members.length > 0" @click="toggleShowMembers()">
                         <div class="text-sm"><i class="fas fa-user"></i></div>
                         <div class="pl-1">{{ members.length }}</div>
                     </div>
                 </div>
 
                 <transition name="chat-members">
-                    <div class="text-sm bg-white shadow relative z-5 overflow-y-scroll px-2 py-1" v-if="mod && showMembers" style="max-height: 50%;">
-                        <div class="odd:bg-gray-100" v-for="member in members">{{ member.name }}</div>
+                    <div class="text-sm bg-white shadow relative z-5 overflow-y-scroll px-2 py-1" v-if="moderator && showMembers" style="max-height: 50%;">
+                        <div class="odd:bg-gray-100 cursor-pointer hover:text-primary" v-for="member in members" @click="setWhisperFromUser(member)">{{ member.name }} <span v-if="member.id === user.id" class="font-italic text-gray-800">You</span></div>
                     </div>
                 </transition>
 
@@ -38,18 +38,20 @@
                                  :key="'chat-' + chat.id"
                                  v-for="chat in chats"
                             >
-                                <div class="absolute right-0 flex text-sm mt-1" v-if="mod && chat.id >= 1">
+                                <div class="absolute right-0 flex text-sm mt-1" v-if="moderator && chat.id >= 1">
                                     <div class="px-1 cursor-pointer text-gray-400 hover:text-primary" @click="deleteMessage(chat)"><i class="fas fa-trash"></i></div>
                                 </div>
-                                <span class="text-sm hidden" @click="banUser(chat)" v-if="mod && chat.id >= 1"><i class="fas fa-ban"></i></span>
-                                <span class="text-sm text-gray-500" :class="mod || chat.whisper_ids ? 'cursor-pointer hover:text-primary' : ''" @click="setWhisper(chat)">{{ chat.name }}:</span>
+                                <span class="text-sm" @click="banUser(chat)" v-if="moderator && chat.id >= 1"><i class="fas fa-ban"></i></span>
+                                <span class="text-sm text-gray-500" :class="moderator || chat.whisper_ids ? 'cursor-pointer hover:text-primary' : ''" @click="setWhisper(chat)">{{ chat.name }}:</span>
                                 <span v-if="chat.whisper_ids" class="italic text-gray-800 text-sm">private</span>
                                 <span class="" :class="chat.deleted ? 'line-through text-gray-400' : ''">{{ chat.message }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="px-2 py-1 border-t shadow relative z-5">
+                    <div class="px-2 py-1 border-t shadow relative z-5" v-if="user.banned_at">You have been banned from Chat</div>
+
+                    <div class="px-2 py-1 border-t shadow relative z-5" v-if="!user.banned_at">
                         <transition name="whisper-text">
                             <div class="text-sm pl-2 flex overflow-hidden" v-if="whisper">
                                 <div class="">Message <span class="font-bold">{{ whisper.name }}</span></div>
@@ -57,6 +59,7 @@
                             </div>
                         </transition>
                         <textarea v-model="message" 
+                                  ref="message"
                                   class="w-full p-2 leading-none outline-none focus:border-gray-300 border rounded text-sm text-gray-600" 
                                   @keydown.enter.prevent="sendMessage()" 
                                   :placeholder="whisper ? 'Send a whisper to ' + whisper.name + '...' : 'Send a message to all users...'"
@@ -76,7 +79,7 @@
 
     export default {
 
-        props: ['room', 'hide-close'],
+        props: ['room', 'hide-close', 'moderators'],
 
         mixins: [Feedback],
 
@@ -102,34 +105,52 @@
             pathname() {
                 return window.location.pathname;
             },
-            mod() {
-                return this.$store.getters.hasRole('admin');
+            moderator() {
+                if (this.$store.getters.hasRole('admin')) {
+                    return true;
+                }
+
+                if (this.$lodash.find(this.moderators, moderator => {
+                    return moderator.id === this.user.id;
+                })) {
+                    return true;
+                }
+
+                return false;
             }
         },
 
         watch: {
             user() {
                 if (this.user.id) {
-                    this.joinRoom();
+                    this.joinRooms();
                 }
             }
         },
 
         mounted() {
             if (this.user.id) {
-                this.joinRoom();
+                this.joinRooms();
             }
         },
 
         methods: {
 
-            joinRoom: function() {
+            joinRooms: function() {
 
+                // for ban alerts
+                this.$echo.channel('chat')
+                    .listen('UserBanned', (data) => {
+                        this.processBan(data.user);
+                    });
+
+                // for direct messages
                 this.$echo.private('user.' + this.user.id)
                     .listen('WhisperCreated', (data) => {
                         this.chats.unshift(data.chat);
                     });
 
+                // main events from chat
                 this.$echo.join(this.room)
 
                     .here( (users) => {
@@ -141,7 +162,7 @@
 
                         this.members.push(user);
 
-                        if (this.mod) {
+                        if (this.moderator) {
                             let chat = {
                                 id: '0.' + this.chats.length,
                                 message: user.name + ' Joined',
@@ -159,7 +180,7 @@
                         this.members = this.$lodash.xor(this.members, [user]);
 
                         // post a system message in chat
-                        if (this.mod) {
+                        if (this.moderator) {
                             let chat = {
                                 id: '0.' + this.chats.length,
                                 message: user.name + ' Left',
@@ -212,6 +233,21 @@
 
             },
 
+            processBan: function(user) {
+                let chats = this.$lodash.filter(this.chats, c => {
+                    return c.user_id === user.id;
+                });
+
+                this.$lodash.each(chats, c => {
+                    c.message = 'Message Deleted';
+                    c.deleted = true;
+                });
+
+                if (this.user.id === user.id) {
+                    this.$store.dispatch('banUser');
+                }
+            },
+
             purgeMessage: function(chat) {
                 let c = this.$lodash.find(this.chats, c => {
                     return c.id === chat.id;
@@ -236,8 +272,19 @@
 
             },
 
-            banUser: function(userId) {
+            banUser: function(chat) {
 
+                if (this.moderator) {
+                    var answer = confirm('Are you sure you want to BAN ' + chat.name + '?');
+                    if (answer == true) {
+
+                        this.$http.post('/users/' + chat.user_id + '/ban', {room: this.room}).then( response => {
+                            this.processSuccess(response);
+                        }, error => {
+                            this.processErrors(error.response);
+                        });
+                    }
+                }
             },
 
             login: function() {
@@ -249,17 +296,29 @@
             },
 
             toggleShowMembers: function() {
-                if (this.mod) {
+                if (this.moderator) {
                     this.showMembers = !this.showMembers;
                 }
             },
 
             setWhisper: function(chat) {
-                if (this.mod || chat.whisper_ids) {
+                if (this.moderator || chat.whisper_ids) {
                     this.whisper = {
                         user_id: chat.user_id,
                         name: chat.name,
                     };
+                    this.$refs.message.focus();
+                }
+            },
+
+            setWhisperFromUser: function(user) {
+                if (this.moderator) {
+                    this.whisper = {
+                        user_id: user.id,
+                        name: user.name,
+                    };
+                    this.showMembers = false;
+                    this.$refs.message.focus();
                 }
             },
             

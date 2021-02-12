@@ -40,6 +40,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/users/load', [UsersController::class, 'load'])->name('users.load');
     Route::post('/users/{id}', [UsersController::class, 'store'])->name('users.update')->where('id', '\d+');
     Route::post('/users/search', [UsersController::class, 'search'])->name('users.search');
+    Route::post('/users/{id}/ban', [UsersController::class, 'ban'])->name('users.ban')->where('id', '\d+');
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');
     Route::post('/roles/create', [RolesController::class, 'store'])->name('roles.store');

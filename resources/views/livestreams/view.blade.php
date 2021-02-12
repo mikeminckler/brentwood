@@ -17,7 +17,7 @@
             </div>
 
             @if ($livestream->enable_chat)
-                <chat room="{{ $livestream->chat_room }}"></chat>
+                <chat room="{{ $livestream->chat_room }}" :moderators='@json($livestream->moderators)'></chat>
             @endif
         </div>
 

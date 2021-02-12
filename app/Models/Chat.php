@@ -71,6 +71,21 @@ class Chat extends Model
         return auth()->user()->can('chat', $object);
     }
 
+    public static function canModerateRoom($room)
+    {
+        $room = explode('.', $room);
+
+        $class_name = 'App\\Models\\'.Str::studly($room[0]);
+
+        $object = resolve($class_name)->find($room[1]);
+
+        if (!$object) {
+            return false;
+        }
+
+        return auth()->user()->can('moderate', $object);
+    }
+
     public function whispers()
     {
         return $this->belongsToMany(User::class, 'whispers');

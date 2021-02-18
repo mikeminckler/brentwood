@@ -1,6 +1,6 @@
 <template>
 
-    <div class="rounded bg-white border border-gray-200 flex items-center h-8"
+    <div class="bg-white border border-gray-200 flex items-center h-8"
         :class="[flex ? 'first:ml-4 mr-4' : 'mb-2']"
         >
         <div class="flex-1 px-2">{{ tag.name }}</div>

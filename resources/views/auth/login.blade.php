@@ -11,7 +11,7 @@
 
             <h1>Login</h1>
 
-            <div class="border border-gray-200 rounded-lg mt-8 p-4 w-full bg-white form">
+            <div class="border border-gray-200 mt-8 p-4 w-full bg-white form">
                 <form method="POST" action="/login">
                     @csrf
 

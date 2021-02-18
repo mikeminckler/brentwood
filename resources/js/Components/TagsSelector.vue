@@ -15,7 +15,7 @@
             </div>
 
             <div class="mt-4" v-if="filterTags(tag.tags).length && ignoreCheck(tag)">
-                <div class="text-gray-700 py-1 pl-4 bg-gray-300 rounded-t">{{ tag.name }}</div>
+                <div class="text-gray-700 py-1 pl-4 bg-gray-300">{{ tag.name }}</div>
                 <tags-selector class="flex flex-wrap" :tags="filterTags(tag.tags)" :ignore-tags="ignoreTags" :selected-tags="selectedTags" @selected="$emit('selected', $event)"></tags-selector>
             </div>
 

@@ -4,9 +4,9 @@
     @click="$eventer.$emit('view-photo', '{{ $photo->large }}')"
 @endif
 >
-    <div class="flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center justify-center md:-mt-8">
         <div class="font-oswald font-normal leading-none whitespace-nowrap text-6xl">{!! preg_match('/[0-9]/', $number) === 1 ? ( preg_replace('/\d+/', '<span class="md:text-8xl">$0</span>', preg_replace('/\D+/', '<span class="">$0</span>', $number))) : $number !!}</div>
         <div class="font-oswald text-xl md:text-3xl text-center">{{ $name }}</div>
-        <div class="h-1 w-16 my-2 {{ $photo ? 'bg-white drop-shadow' : 'bg-gray-400' }}"></div>
+        <div class="h-1 w-16 my-4 {{ $photo ? 'bg-white drop-shadow' : 'bg-gray-400' }}"></div>
     </div>
 </div>

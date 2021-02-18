@@ -27,7 +27,7 @@
 
                 <div :class="paginator.prev_page_url ? 'cursor-pointer hover:bg-white hover:text-primary-700' : 'text-gray-400'" 
                     key="0"
-                    class="w-6 h-6 p-1 bg-gray-100 flex items-center justify-center rounded-l border-l border-t border-b" 
+                    class="w-6 h-6 p-1 bg-gray-100 flex items-center justify-center border-l border-t border-b" 
                     @click="page > 1 ? page = paginator.current_page - 1 : null"
                 >
                     <span class="fas fa-angle-left"></span>
@@ -42,7 +42,7 @@
 
                 <div :class="paginator.next_page_url ? 'cursor-pointer hover:bg-white hover:text-primary-700' : 'text-gray-400'" 
                     key="1000"
-                    class="w-6 h-6 p-1 bg-gray-100 flex items-center justify-center rounded-r border-r border-t border-b" 
+                    class="w-6 h-6 p-1 bg-gray-100 flex items-center justify-center border-r border-t border-b" 
                     @click="page < pages.length ? page = paginator.current_page + 1 : null"
                 >
                     <span class="fas fa-angle-right"></span>

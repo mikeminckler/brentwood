@@ -3,11 +3,11 @@
     <div class="ignore">
 
         <div class="flex flex-wrap md:grid grid-livestream-row bg-white py-2 relative z-2">
-            <div class="grid-cell"> <div class="px-2 border border-gray-300 bg-white rounded cursor-pointer" @click="$eventer.$emit('toggle-expander', 'livestream-' + livestream.id)">{{ livestream.inquiry_users.length }}</div></div>
+            <div class="grid-cell"> <div class="px-2 border border-gray-300 bg-white cursor-pointer" @click="$eventer.$emit('toggle-expander', 'livestream-' + livestream.id)">{{ livestream.inquiry_users.length }}</div></div>
             <div class="grid-cell"><a @click.stop :href="'/livestreams/' + livestream.id" title="View Livestream"><div class="icon"><i class="fas fa-eye"></i></div></a></div>
             <div class="whitespace-nowrap flex-grow grid-cell cursor-pointer text-primary" @click="$emit('selected', livestream)">{{ livestream.name }}</div>
             <div class="grid-cell">
-                <div class="bg-white border border-gray-300 px-1 rounded flex items-center" v-for="tag in livestream.tags">
+                <div class="bg-white border border-gray-300 px-1 flex items-center" v-for="tag in livestream.tags">
                     <div class="icon text-sm text-gray-400"><i class="fas fa-tag"></i></div>
                     <div class="pl-1">{{ tag.name }}</div>
                 </div>

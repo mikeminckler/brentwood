@@ -71,9 +71,12 @@
             },
 
             joinRoleChannels: function() {
+                /*
                 this.$lodash.each(this.user.roles, role => {
-                    this.roleChannels.push(this.$echo.private('role.' + role.id));
+                    let name = role.name;
+                    this.roleChannels.push(this.$echo.private('role.' + name.replace(/\s/g, '.').toLowerCase()));
                 });
+                */
             },
 
             joinPageChannel: function() {
@@ -103,7 +106,7 @@
                 this.$echo.leave('public');
                 this.$echo.leave('user.' + this.user.id);
                 this.$lodash.each(this.user.roles, role => {
-                    this.$echo.leave('role.' + role.id);
+                    this.$echo.leave('role.' + role.name);
                 });
                 if (this.$store.state.page.id > 0) {
                     this.$echo.leave('page.' + this.$store.state.page.id)

@@ -53,8 +53,10 @@ module.exports = {
         'oswald': ['Oswald'],
       },
       colors: {
-        'primary': '#c8272c',
-        'primaryHover': '#cf2328',
+        //'primary': '#c8272c',
+        //'primaryHover': '#cf2328',
+        'primary': 'rgb(200,39,44)',
+        'primaryHover': 'rgb(207,35,40)',
       },
       flex: {
         '2': '2 2 0%',

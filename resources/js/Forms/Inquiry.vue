@@ -1,7 +1,7 @@
 <template>
 
     <div class="flex items-center justify-center w-full relative">
-        <div class="relatice form max-w-sm bg-gray-100 border border-gray-200 px-4 py-2 md:px-8 md:py-4 rounded-lg overflow-hidden mt-4" id="inquiry-form">
+        <div class="relatice form max-w-sm bg-gray-100 border border-gray-200 px-4 py-2 md:px-8 md:py-4 overflow-hidden mt-4" id="inquiry-form">
 
             <transition-group :name="transitionDirection" tag="div" class="relative mt-8 first:mt-0">
 

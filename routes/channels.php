@@ -18,7 +18,7 @@ Broadcast::channel('user.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('role.{id}', function ($user, $id) {
-    return $user->hasRole((int) $id);
+    return $user->hasRole($id);
 });
 
 Broadcast::channel('page.{id}', function ($user, $id) {

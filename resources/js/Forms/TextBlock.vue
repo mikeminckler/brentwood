@@ -83,7 +83,7 @@
                         @save="saveContent()"
                 ></editor>
 
-                <div v-if="first" class="h-1 w-16 bg-gray-400 my-4"></div>
+                <div v-if="first" class="h-1 w-16 bg-gray-400 my-2"></div>
 
                 <div class="flex relative z-3">
                     <div class="text-xl w-6 h-6 p-1 flex items-center justify-center bg-transparent cursor-pointer" title="Background Transparent" @click="content.style = ''"><i class="fas fa-ban"></i></div>

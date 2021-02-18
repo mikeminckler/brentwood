@@ -41,7 +41,7 @@
                 <div class="mt-4">
                     <div v-for="(permission, index) in objectable.permissions" 
                         :key="permission.id" 
-                        class="flex items-center pl-2 pr-1 py-1 bg-gray-100 m-1 rounded border"
+                        class="flex items-center pl-2 pr-1 py-1 bg-gray-100 m-1 border"
                     >
                         <div class="flex-1">{{ permission.accessable_type.substring(11) }}: {{ permission.accessable.name }}</div>
                         <remove :dusk="'remove-permissions-' + permission.id" @remove="removePermission(permission, index)"></remove>

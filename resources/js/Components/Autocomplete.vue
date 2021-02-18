@@ -80,7 +80,7 @@
             <div v-if="!model" class="">
                 <transition-group name="row">
                     <div v-for="(item, index) in items" 
-                        class="flex items-center pl-2 pr-1 py-1 bg-gray-100 m-1 rounded border" 
+                        class="flex items-center pl-2 pr-1 py-1 bg-gray-100 m-1 border" 
                         :key="( item.class_name ? item.class_name : model ) + '-' + item.id"
                     >
                         <div class="flex-1 whitespace-no-wrap">{{ item.search_label }}</div>

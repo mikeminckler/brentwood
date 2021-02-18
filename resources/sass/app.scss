@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Oswald:300,400|Roboto:300,400,700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Oswald:300,400|Roboto:400,500,700&display=swap');
 
 @tailwind base;
 
@@ -24,7 +24,7 @@ a, .link {
     @apply text-primary cursor-pointer;
 }
 
-h1, h2, h3, .h1, .h2, .h3 {
+h1, h2, h3, h4, .h1, .h2, .h3, .h4 {
     @apply font-oswald p-0 m-0 font-light leading-tight;
 }
 
@@ -40,11 +40,16 @@ h3, .h3 {
     @apply text-xl;
 }
 
+h4, .h4 {
+    @apply text-gray-900;
+}
+
 @media (max-width: 768px) {
     h1, h2, h3 {
         @apply leading-normal;
     }
 
+    /*
     h1, .h1 {
         @apply text-4xl;
     }
@@ -56,10 +61,11 @@ h3, .h3 {
     h3, .h3 {
         @apply text-2xl;
     }
+    */
 }
 
 p {
-    @apply p-0 m-0 py-2;
+    @apply px-0 m-0 py-2;
 }
 
 @media (max-width: 768px) {
@@ -89,11 +95,13 @@ p {
     }
 }
 
-@media (max-width: 768px) {
+@media (min-width: 768px) {
     .columns-2 {
-        @apply w-full;
-        column-count: 2;
-        column-gap: 3rem;
+        & p {
+            @apply w-full;
+            column-count: 2;
+            column-gap: 3rem;
+        }
     }
 }
 
@@ -193,7 +201,7 @@ iframe {
 }
 
 .content-element-icons {
-    @apply cursor-pointer px-2 py-1 mb-2 flex items-center justify-center border-transparent border h-8 w-8 rounded;
+    @apply cursor-pointer px-2 py-1 mb-2 flex items-center justify-center border-transparent border h-8 w-8;
 }
 
 .content-element-icons:hover {
@@ -201,7 +209,7 @@ iframe {
 }
 
 .remove-icon {
-    @apply text-xl text-red-600 border border-transparent rounded cursor-pointer h-6 w-6 flex items-center justify-center;
+    @apply text-xl text-red-600 border border-transparent cursor-pointer h-6 w-6 flex items-center justify-center;
 }
 
 .remove-icon:hover {
@@ -299,11 +307,15 @@ input[type=range]:hover {
 }
 
 button, .button {
-    @apply inline-flex bg-primary text-white font-bold px-4 py-1 cursor-pointer whitespace-nowrap justify-center;
+    @apply inline-flex bg-gray-100 shadow-inner rounded text-gray-700 font-medium px-4 py-1 cursor-pointer whitespace-nowrap justify-center;
 }
 
 button:hover, .button:hover {
-    @apply bg-primaryHover;
+    @apply text-gray-800 shadow;
+}
+
+.button-active {
+    @apply inline-flex bg-white shadow rounded text-primary font-medium px-4 py-1 cursor-pointer whitespace-nowrap justify-center;
 }
 
 .button-secondary {
@@ -344,16 +356,6 @@ button:hover, .button:hover {
 
 .rotate90 {
     transform: rotate(90deg);
-}
-
-/* SIDE MENU */
-
-.side-menu-link {
-    @apply flex items-center text-primary cursor-pointer py-1; 
-}
-
-.side-menu-link:hover {
-    @apply bg-yellow-100;
 }
 
 /* MENU */
@@ -416,7 +418,7 @@ div.cell {
 
 /*
 .tag {
-    @apply mr-4 rounded-lg bg-white border border-gray-200 flex items-center leading-none;
+    @apply mr-4-lg bg-white border border-gray-200 flex items-center leading-none;
 }
 */
 
@@ -536,7 +538,7 @@ div.cell {
 }
 
 .menubar__button, .menubar_table_button {
-    @apply mx-1 cursor-pointer flex items-center justify-center rounded border shadow-inner bg-gray-200;
+    @apply mx-1 cursor-pointer flex items-center justify-center border shadow-inner bg-gray-200;
 }
 
 .menubar__button {

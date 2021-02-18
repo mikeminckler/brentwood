@@ -19,7 +19,7 @@
     <div class="md:flex mt-4 w-full">
         <div class="flex-1"></div>
         <div class="flex-2 flex justify-center">
-            <div class="w-full md:bg-white md:mx-8 md:p-8 md:rounded-lg md:shadow">
+            <div class="w-full md:bg-white md:mx-8 md:p-8 md:shadow">
                 <inquiry :livestream='@json($livestream)'
                     :show-student-info="true"
                     :show-interests="true"

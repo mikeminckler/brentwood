@@ -1,8 +1,11 @@
 <template>
 
-    <div class="relative md:ml-2" v-if="user">
+    <div class="relative md:mr-2" v-if="user">
 
-        <div class="button-icon bg-gray-200 hover:border hover:border-gray-400 border-gray-200" @click="showMenu = !showMenu"><i class="fas fa-user"></i></div>
+        <div class="rounded-full border-2 border-white bg-white overflow-hidden h-8 w-8 shadow hover:shadow-md cursor-pointer" @click="showMenu = !showMenu">
+            <img :src="user.avatar" v-if="user.avatar" class="object-cover w-full h-full" />
+            <div class="w-full h-full flex items-center justify-center" v-if="!user.avatar"><i class="fas fa-user"></i></div>
+        </div>
 
         <transition name="fade">
             <div class="absolute shadow right-0 z-3 bg-white mt-2" v-if="showMenu">
@@ -45,6 +48,7 @@
 
         methods: {
             logout: function() {
+                this.showMenu = false;
                 this.$http.post('/logout').then( response => {
                     window.location.href = '/';
                     this.processSuccess(response);

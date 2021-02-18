@@ -28,7 +28,7 @@
             </div>
 
             @if ($first)
-                <div class="h-1 w-16 bg-gray-400 my-4"></div>
+                <div class="h-1 w-16 bg-gray-400 my-2"></div>
             @endif
         </div>
 

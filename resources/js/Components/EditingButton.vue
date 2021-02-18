@@ -1,6 +1,9 @@
 <template>
 
-    <div class="px-2 py-1 cursor-pointer shadow" :class="editingEnabled ? 'bg-primary text-white' : 'hover:bg-white hover:shadow-md'" @click="toggleEditing"><i class="fas fa-marker"></i></div>
+    <div class="w-6 h-6 flex items-center justify-center cursor-pointer shadow text-sm" 
+        :class="editingEnabled ? 'bg-primary text-white' : 'bg-white hover:shadow-md text-gray-500'" 
+        @click="toggleEditing"
+    ><i class="fas fa-marker"></i></div>
 
 </template>
 
@@ -21,6 +24,13 @@
 
         mounted() {
             this.$store.dispatch('setEditing', this.enabled);
+
+            if (this.$store.state.editing) {
+                this.$echo.private('role.editor')
+                    .listen('PageDraftCreated', (data) => {
+                        this.$eventer.$emit('refresh-page-tree');
+                    });
+            }
         },
 
         methods: {

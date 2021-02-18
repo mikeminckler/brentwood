@@ -14,7 +14,7 @@
         />
 
         <transition-group name="uploading" tag="div" class="">
-            <div class="bg-gray-300 odd:bg-gray-100 mt-2 overflow-hidden rounded" 
+            <div class="bg-gray-300 odd:bg-gray-100 mt-2 overflow-hidden" 
                 v-for="(file, index) in files" 
                 :key="file.id" 
                 v-if="!show ? (file.id >= 1 ? false : true) : true"

@@ -70,11 +70,11 @@
                     <div class="ml-1" v-if="!activeVersion.published_at" title="Draft"><i class="fas fa-drafting-compass"></i></div>
                 </div>
 
-                <div class="flex px-2 mx-2 items-center cursor-pointer hover:bg-white hover:text-gray-700 rounded" @click="showTags = !showTags" title="Edit Tags">
+                <div class="flex px-2 mx-2 items-center cursor-pointer hover:bg-white hover:text-gray-700" @click="showTags = !showTags" title="Edit Tags">
                     <div class="text-xl"><i class="fas fa-tag"></i></div>
                 </div>
 
-                <div class="flex px-2 mx-2 items-center cursor-pointer hover:bg-primary hover:text-white rounded" @click="removePage()" v-if="page.id !== 1" title="Delete Page">
+                <div class="flex px-2 mx-2 items-center cursor-pointer hover:bg-primary hover:text-white" @click="removePage()" v-if="page.id !== 1" title="Delete Page">
                     <div class="text-xl"><i class="fas fa-trash-alt"></i></div>
                 </div>
 
@@ -194,11 +194,10 @@
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('save-page', savePageEvent);
                 this.$eventer.$off('load-page', loadPageEvent);
-                this.$echo.leave('role.2');
+                this.$echo.leave('role.editor');
             });
 
-            // TODO we need a better way to find the roles here. Probably a mixin function
-            this.$echo.private('role.2')
+            this.$echo.private('role.editor')
                 .listen('PageSaved', data => {
                     if (this.page.id === data.page.id) {
                         console.log('LOAD PAGE FROM PAGE SAVED');

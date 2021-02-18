@@ -1,7 +1,7 @@
 <template>
 
     <transition name="label">
-        <div class="text-sm text-gray-500 py-1 pl-4 bg-gray-200 bg-opacity-50 rounded-t" v-if="value">{{ label }}</div>
+        <div class="text-sm text-gray-500 py-1 pl-4 bg-gray-200 bg-opacity-50" v-if="value">{{ label }}</div>
     </transition>
 
 </template>

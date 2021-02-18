@@ -60,7 +60,7 @@
                         </transition>
                         <textarea v-model="message" 
                                   ref="message"
-                                  class="w-full p-2 leading-none outline-none focus:border-gray-300 border rounded text-sm text-gray-600" 
+                                  class="w-full p-2 leading-none outline-none focus:border-gray-300 border text-sm text-gray-600" 
                                   @keydown.enter.prevent="sendMessage()" 
                                   :placeholder="whisper ? 'Send a whisper to ' + whisper.name + '...' : 'Send a message to all users...'"
                         ></textarea>

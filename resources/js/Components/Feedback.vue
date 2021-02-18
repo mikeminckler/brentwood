@@ -1,7 +1,7 @@
 <template>
   
     <transition name="fade">
-        <div class="bg-gray-100 shadow-lg p-1 rounded-l fixed z-50 bottom-0 right-0 mb-20 overflow-hidden" v-show="feedback.length > 0">
+        <div class="bg-gray-100 shadow-lg p-1 fixed z-50 bottom-0 right-0 mb-20 overflow-hidden" v-show="feedback.length > 0">
             <transition-group name="feedback" mode="out-in">
                 <div class="flex text-sm cursor-pointer"  
                     :key="feedback.key" 

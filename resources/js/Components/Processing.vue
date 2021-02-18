@@ -1,7 +1,7 @@
 <template>
   
     <transition name="processing">
-        <div class="fixed rounded-r bottom-0 mb-20 flex items-center justify-center bg-primary-500 text-white font-semibold px-4 py-2 z-40" v-if="processing">
+        <div class="fixed bottom-0 mb-20 flex items-center justify-center bg-primary-500 text-white font-semibold px-4 py-2 z-40" v-if="processing">
             <div class="flex">
                 {{ text ? text : 'Processing' }}
                 <div class="icon spin"><i class="fas fa-spinner"></i></div>

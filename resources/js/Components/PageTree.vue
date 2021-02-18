@@ -1,20 +1,15 @@
 <template>
 
-    <div v-if="editing"
-        class="bg-gray-100 border-r border-gray-300 pt-2 overflow-y-scroll text-gray-700 pb-4"
-        :style="maxHeight ? 'max-height: ' + maxHeight : ''"
-    >
-        <page-list :page="pageTree" 
-            :key="pageTree.id" 
-            :emit-event="emitEvent"
-            :show-changes="showChanges"
-            :show-content-elements="showContentElements"
-            :expanded="expanded"
-            @selected="$emit('selected', $event)"
-            :sort="sort"
-        ></page-list>
-
-    </div>
+    <page-list :page="pageTree" 
+        :key="pageTree.id" 
+        :emit-event="emitEvent"
+        :show-changes="showChanges"
+        :show-content-elements="showContentElements"
+        :expanded="expanded"
+        @selected="$emit('selected', $event)"
+        :sort="sort"
+        :insert="insert"
+    ></page-list>
 
 </template>
 
@@ -24,7 +19,7 @@
 
     export default {
 
-        props: ['emitEvent', 'showContentElements', 'expanded', 'showChanges', 'maxHeight', 'sort'],
+        props: ['emitEvent', 'showContentElements', 'expanded', 'showChanges', 'maxHeight', 'sort', 'insert'],
         mixins: [Feedback],
 
         data() {
@@ -67,12 +62,12 @@
 
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('refresh-page-tree', refreshPageTree);
-                this.$echo.leave('role.2');
+                this.$echo.leave('role.editor');
             });
 
             this.loadPageTree();
 
-            this.$echo.private('role.2')
+            this.$echo.private('role.editor')
                 .listen('PageSaved', data => {
                     this.loadPageTree();
                 });

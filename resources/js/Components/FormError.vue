@@ -1,6 +1,6 @@
 <template>
 
-    <transition-group name="form-error" tag="div" class="text-sm text-primary bg-gray-200 bg-opacity-50 rounded-b">
+    <transition-group name="form-error" tag="div" class="text-sm text-primary bg-gray-200 bg-opacity-50">
         <div class="py-1 pl-4 border-b border-primary" :key="message[name]" v-if="show" v-for="message in messages">{{ message[name] }}</div>
     </transition-group>
 

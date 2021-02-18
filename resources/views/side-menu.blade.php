@@ -1,6 +1,5 @@
 @if (auth()->user()->hasRole('admin'))
-<div class="p-4 sticky bottom-0 bg-gray-100 shadow z-3">
-
+<div class="hidden md:block">
 
     <a href="/livestreams" class="side-menu-link" >
         <div class="pr-2"><i class="fab fa-youtube"></i></div>
@@ -37,7 +36,8 @@
             <div class="pr-2"><i class="fas fa-cog"></i></div>
             <div>Queue Monitor</div>
         </a>
-        <div class="">@{{ $store.state.wsState }}</div>
+        <div class="px-2 text-gray-500">@{{ $store.state.wsState }}</div>
     @endif
+
 </div>
 @endif

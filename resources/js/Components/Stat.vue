@@ -2,7 +2,7 @@
 
     <div class="relative bottom-0 flex flex-col w-full z-3 p-8 items-center" :class="textClasses">
         <div class="">
-            <input class="font-oswald font-normal leading-none whitespace-nowrap leading-none -my-4" :class="[photo ? (photo.span > 1 ? 'text-right' : 'text-center' ) : 'text-center', model.stat_number ? ( model.stat_number.length > 6 ? 'text-6xl' : 'text-8xl' ) : 'text-8xl' ]" type="text" v-model="model.stat_number" placeholder="00" />
+            <input class="font-oswald font-normal whitespace-nowrap h-24 -my-4" :class="[photo ? (photo.span > 1 ? 'text-right' : 'text-center' ) : 'text-center', model.stat_number ? ( model.stat_number.length > 6 ? 'text-6xl' : 'text-8xl' ) : 'text-8xl' ]" type="text" v-model="model.stat_number" placeholder="00" />
         </div>
         <div class="w-full mt-0">
             <input class="font-oswald text-xl md:text-3xl text-center" :class="photo ? (photo.span > 1 ? 'text-right' : 'text-center' ) : 'text-center'" type="text" v-model="model.stat_name" placeholder="Statistic Name" />

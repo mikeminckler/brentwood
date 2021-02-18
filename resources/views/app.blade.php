@@ -48,30 +48,20 @@
     <div id="app" class="relative flex-1 flex">
 
         @auth
-            <div class="relative">
-                <div class="sticky top-0 flex flex-col h-full">
-                    @if (session()->get('editing') && !request('preview'))
-                        <saving-indicator></saving-indicator>
-                        <div class="flex-1" v-if="$store.state.editing">
-                            <page-tree :sort="true" :expanded="true" :show-changes="true" max-height="100%"></page-tree>
-                        </div>
-                    @endif
-                    <div class="hidden md:block">
-                        @include ('side-menu')
-                    </div>
-                </div>
-            </div>
+            @if (session()->get('editing') && !request('preview'))
+                <page-side-menu></page-side-menu>
+            @endif
         @endauth
 
         <div id="main" class="relative flex-1 flex flex-col">
 
             <div id="header" class="sticky top-0 z-10 {{ optional($page ?? '')->editable && !request('preview') ? '' : '' }}">
 
-                <div class="flex justify-center relative">
+                <div class="flex justify-center relative bg-gray-100">
                     
-                    <div class="flex flex-col w-full relative max-w-6xl shadow bg-gray-100">
+                    <div class="flex flex-col w-full relative max-w-6xl shadow bg-white bg-opacity-50">
 
-                        <div class="border-r-4 border-primary absolute top-0 h-full md:ml-33p"></div>
+                        <div class="hidden border-r-4 border-primary absolute top-0 h-full md:ml-33p"></div>
 
                         <div class="relative flex">
 
@@ -93,7 +83,7 @@
                                     style="transition: max-height var(--transition-time) ease"
                                 >
 
-                                    <div class="w-full flex bg-gray-100 h-full border-l-4 md:border-l-0 border-primary shadow md:shadow-none relative"
+                                    <div class="w-full flex h-full border-l-4 md:border-l-0 border-primary shadow md:shadow-none relative"
                                         :class="[$store.state.showMenu ? 'shadow md:shadow-none' : '']"
                                     >
 
@@ -101,14 +91,16 @@
                                             @foreach (App\Utilities\Menu::getMenu()->sortBy->sort_order as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
 
-                                                    <div class="font-oswald font-light text-base md:text-lg relative text-primary hover:underline md:flex md:items-center
-                                                        {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'bg-white' : 'bg-gray-100' }}"
+                                                    <div class="font-oswald font-light text-base md:text-lg relative md:flex md:items-center
+                                                        {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->slug) ? 'bg-white' : '' }}"
                                                         ref="menu{{ $menu_page->id }}"
                                                     >
                                                         <div class="flex items-center h-full">
-                                                            <a href="{{ $menu_page->full_slug }}" class="inline-flex items-center whitespace-nowrap px-2 md:px-4 flex-1 py-1 md:py-0 md:h-full 
-                                                                {{ $menu_page->name === 'Admissions' ? 'bg-white' : '' }}
-                                                                {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->full_slug) ? 'underline' : '' }}">{{ $menu_page->name }}</a>
+                                                            <a href="{{ $menu_page->full_slug }}" class="inline-flex items-center whitespace-nowrap px-2 md:px-4 flex-1 py-1 md:py-0 md:h-full
+                                                                {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->full_slug) ? 'text-primary bg-white' : 'hover:underline text-gray-600 hover:text-gray-700' }}"
+                                                            >
+                                                                {{ $menu_page->name }}
+                                                            </a>
                                                             @if ($menu_page->pages->count())
                                                                 <div class="block md:hidden text-lg cursor-pointer w-6 px-2 mr-2" @click="$refs.menu{{ $menu_page->id }}.classList.toggle('show-sub-menu')">
                                                                     <div class="icon"><i class="fas fa-caret-down"></i></div>
@@ -118,7 +110,7 @@
 
                                                         @if ($menu_page->pages->count())
                                                             @foreach ($menu_page->pages as $menu_sub_page)
-                                                                <div class="sub-menu overflow-hidden font-oswald text-base bg-gray-100 hover:bg-white md:hidden">
+                                                                <div class="sub-menu overflow-hidden font-oswald text-base hover:bg-white md:hidden">
                                                                     <a href="{{ $menu_sub_page->full_slug }}" class="px-4 py-1 block">{{ $menu_sub_page->name }}</a>
                                                                 </div>
                                                             @endforeach
@@ -135,18 +127,18 @@
                                             @endauth
                                         </div>
 
-                                        <div class="bg-gray-200 md:bg-transparent flex items-center md:items-end md:justify-center flex-col relative">
+                                        <div class="flex items-center md:items-end md:justify-center flex-col relative">
 
                                             <div class="flex md:items-center mb-2 md:mb-0 relative">
                                         
                                                 <a href="/admissions/apply" class="button hidden md:block mr-2 my-0 whitespace-no-wrap text-base">Apply Now</a>
-                                                <a href="#" class="hidden md:block text-xl text-gray-500 cursor-pointer mr-2"><i class="fas fa-search"></i></a>
+                                                <a href="#" class="hidden md:block text-lg text-gray-400 cursor-pointer mr-2"><i class="fas fa-search"></i></a>
 
                                                 @auth
                                                     <user-menu :user='@json(auth()->user())'></user-menu>
 
                                                     @if (auth()->user()->hasRole('editor'))
-                                                        <div class="absolute -mr-8 right-0 hidden md:block">
+                                                        <div class="absolute -mr-6 right-0 hidden md:block">
                                                             <editing-button v-show="{{ !request('preview') }}" class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}"></editing-button>
                                                         </div>
                                                     @endif

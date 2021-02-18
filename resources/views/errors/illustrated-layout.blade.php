@@ -263,10 +263,6 @@
                 border-color: #b8c2cc;
             }
 
-            .rounded-lg {
-                border-radius: .5rem;
-            }
-
             .border-2 {
                 border-width: 2px;
             }
@@ -471,7 +467,7 @@
                     </p>
 
                     <a href="{{ app('router')->has('home') ? route('home') : url('/') }}">
-                        <button class="bg-transparent text-grey-darkest font-bold uppercase tracking-wide py-3 px-6 border-2 border-grey-light hover:border-grey rounded-lg">
+                        <button class="bg-transparent text-grey-darkest font-bold uppercase tracking-wide py-3 px-6 border-2 border-grey-light hover:border-grey">
                             {{ __('Go Home') }}
                         </button>
                     </a>

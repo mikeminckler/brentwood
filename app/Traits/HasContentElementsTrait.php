@@ -47,13 +47,15 @@ trait HasContentElementsTrait
     {
         $version_id = requestInput('version_id');
         
-        if ($version_id > 0) {
-            return $this->contentElements()
-                ->wherePivot('version_id', '<=', $version_id)
-                ->get();
-        } else {
-            return $this->contentElements()->get();
-        }
+        return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-content-elements', function () use ($version_id) {
+            if ($version_id > 0) {
+                return $this->contentElements()
+                    ->wherePivot('version_id', '<=', $version_id)
+                    ->get();
+            } else {
+                return $this->contentElements()->get();
+            }
+        });
     }
 
     public function getContentElementsAttribute()
@@ -125,7 +127,7 @@ trait HasContentElementsTrait
 
     /*
      * We were using this to add attributes for the front end but the attributes
-     * are already available in the pivot 
+     * are already available in the pivot
     protected function addContentableAttributes(Collection $content_elements)
     {
         return $content_elements->map(function ($content_element) {
@@ -148,5 +150,4 @@ trait HasContentElementsTrait
 
         return auth()->user()->can('update', $this);
     }
-
 }

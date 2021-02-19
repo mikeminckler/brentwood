@@ -1,8 +1,6 @@
 <div class="md:flex relative">
 
-    <div class="flex-1"></div>
-
-    <div class="flex-2">
+    <div class="flex-1 flex justify-center relative z-2">
 
         <div class="md:bg-white my-8 md:mx-8 md:p-8 md:shadow">
 

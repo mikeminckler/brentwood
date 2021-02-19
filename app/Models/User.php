@@ -165,24 +165,26 @@ class User extends Authenticatable
 
     public function hasRole($role)
     {
-        if (is_int($role)) {
-            $role = Role::findOrFail($role);
-        }
+        return cache()->tags([cache_name($this), cache_name($role)])->rememberForever(cache_name($this).'-has-role-'.cache_name($role), function () use ($role) {
+            if (is_int($role)) {
+                $role = Role::findOrFail($role);
+            }
 
-        if (!$role instanceof Role) {
-            $role_name = $role;
-            $role = Role::where('name', $role)->first();
-        }
+            if (!$role instanceof Role) {
+                $role_name = $role;
+                $role = Role::where('name', $role)->first();
+            }
 
-        if (!$role instanceof Role) {
-            throw new ModelNotFoundException('There is no role with the name '.$role_name);
-        }
+            if (!$role instanceof Role) {
+                throw new ModelNotFoundException('There is no role with the name '.$role_name);
+            }
 
-        if ($this->roles->contains('name', 'admin')) {
-            return true;
-        }
+            if ($this->roles->contains('name', 'admin')) {
+                return true;
+            }
 
-        return $this->roles->contains('id', $role->id);
+            return $this->roles->contains('id', $role->id);
+        });
     }
 
     public static function createOrUpdateFromGoogle(SocialiteUser $data)

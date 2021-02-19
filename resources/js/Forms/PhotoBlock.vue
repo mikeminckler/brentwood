@@ -4,25 +4,23 @@
 
         <div class="absolute flex flex-col justify-center items-center" style="left: -50px;" v-if="photos.length">
 
-            <div class="content-element-icons text-xl" title="Increase Row Height" @click="decreaseHeight()"><i class="fas fa-angle-double-up"></i></div>
-            <div class="content-element-icons text-xl" title="Descrease Row Height" @click="increaseHeight()"><i class="fas fa-angle-double-down"></i></div>
+            <div class="button-icon" title="Increase Row Height" @click="decreaseHeight()"><i class="fas fa-angle-double-up"></i></div>
+            <div class="button-icon mt-2" title="Descrease Row Height" @click="increaseHeight()"><i class="fas fa-angle-double-down"></i></div>
 
-            <div class="content-element-icons" @click="content.columns < 4 ? content.columns++ : null">
-                <div class=""><i class="fas fa-columns"></i></div>
-                <div class="pl-1"><i class="fas fa-plus"></i></div>
+            <div class="button-icon mt-2" @click="content.columns < 4 ? content.columns++ : null" title="Add Column">
+                <div class=""><i class="fas fa-plus"></i></div>
             </div>
 
-            <div class="content-element-icons" @click="content.columns > 1 ? content.columns-- : null">
-                <div class=""><i class="fas fa-columns"></i></div>
-                <div class="pl-1"><i class="fas fa-minus"></i></div>
+            <div class="button-icon mt-2" @click="content.columns > 1 ? content.columns-- : null" title="Remove Column">
+                <div class=""><i class="fas fa-minus"></i></div>
             </div>
 
-            <div class="content-element-icons text-xl" @click="content.show_text = !content.show_text">
+            <div class="button-icon toggle mt-2" :class="content.show_text ? 'active' : ''" @click="content.show_text = !content.show_text" :title="content.show_text ? 'Hide Text' : 'Show Text'">
                 <div v-if="content.show_text"><i class="fas fa-align-justify"></i></div>
                 <div v-if="!content.show_text" class="text-gray-400"><i class="fas fa-align-justify"></i></div>
             </div>
 
-            <div class="content-element-icons text-xl" @click="content.padding = !content.padding" v-if="photos.length > 1">
+            <div class="button-icon toggle mt-2" :class="content.padding ? 'active' : ''" @click="content.padding = !content.padding" v-if="photos.length > 1" :title="content.padding ? 'Remove Padding' : 'Add Padding'">
                 <div v-if="content.padding"><i class="fas fa-border-none"></i></div>
                 <div v-if="!content.padding"><i class="fas fa-border-all"></i></div>
             </div>
@@ -33,10 +31,10 @@
             tag="div" 
             class="relative grid" 
             :class="['grid-cols-' + content.columns, content.padding ? (content.columns === 3 ? 'gap-y-2' : 'gap-2' ) : '']" 
-            style="min-height: 300px"
+            :style="photosCount === 0 ? 'min-height: 300px' : ''"
         >
 
-            <div class="flex items-center justify-center bg-gray-200" key="no-photos" v-if="photosCount === 0">
+            <div class="absolute w-full h-full flex items-center justify-center bg-gray-200" key="no-photos" v-if="photosCount === 0">
                 <div class="button" @click="$eventer.$emit('add-files', fileUploadName)">
                     <div class="">Add Photos</div>
                 </div>

@@ -22,36 +22,11 @@
 </template>
 
 <script>
+
+    import Saving from '@/Mixins/Saving.js';
+
     export default {
-
-        data() {
-            return {
-                saving: false,
-            }
-        },
-
-        computed: {
-            isSaving() {
-                return this.$store.state.saving.length ? true : false;
-            }
-        },
-
-        watch: {
-            isSaving() {
-                if (this.isSaving) {
-                    this.saving = true;
-                } else {
-                    this.setSaving();
-                }
-            }
-        },
-
-        methods: {
-            setSaving: _.debounce( function() {
-                this.saving = this.isSaving;
-            }, 500),
-        },
-
+        mixins: [Saving],
     }
 </script>
 
@@ -60,11 +35,11 @@
 @keyframes saving {
     0% {
         opacity: 0;
-        transform: translateX(-100%);
+        transform: translateY(-100%);
     }
     100%   {
         opacity: 1;
-        transform: translateX(0%);
+        transform: translateY(0%);
     }
 }
 

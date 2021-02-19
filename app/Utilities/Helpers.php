@@ -37,5 +37,9 @@ function decodeInput($input)
 
 function cache_name($item)
 {
-    return Illuminate\Support\Str::kebab(class_basename($item)).'-'.$item->id;
+    if (is_object($item)) {
+        return Illuminate\Support\Str::kebab(class_basename($item)).'-'.$item->id;
+    } else {
+        return Illuminate\Support\Str::kebab($item);
+    }
 }

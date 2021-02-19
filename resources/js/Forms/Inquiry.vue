@@ -7,23 +7,23 @@
 
                 <div class="relative" key="step1" v-if="currentStep === 'Contact Information'">
 
-                    <h3 class="mb-4">{{ currentStep }}</h3>
+                    <h2 class="mb-4">{{ currentStep }}</h2>
 
                     <div class="input">
                         <form-label label="Contact Name" :value="form.name"></form-label>
-                        <div class=""><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
+                        <div class=""><input type="text" id="name" v-model="form.name" class="outline-none focus:border-gray-400" placeholder="Parent or Student Name" /></div>
                         <form-error :errors="errors" name="name" :show="showErrors"></form-error>
                     </div>
 
                     <div class="input">
                         <form-label label="Contact Email" :value="form.email"></form-label>
-                        <div class=""><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
+                        <div class=""><input type="email" id="email" v-model="form.email" class="outline-none focus:border-gray-400" placeholder="Contact Email" /></div>
                         <form-error :errors="errors" name="email" :show="showErrors"></form-error>
                     </div>
 
                     <div class="input hidden">
                         <form-label label="Contact Phone Number" :value="form.phone"></form-label>
-                        <div class=""><input type="text" inputmode="tel" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
+                        <div class=""><input type="text" inputmode="tel" id="phone" v-model="form.phone" class="outline-none focus:border-gray-400" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
                         <form-error :errors="errors" name="phone" :show="showErrors"></form-error>
                     </div>
 
@@ -31,7 +31,7 @@
 
                 <div class="" key="step2" v-if="currentStep === 'Student Information'">
 
-                    <h3>{{ currentStep }}</h3>
+                    <h2>{{ currentStep }}</h2>
 
                     <div class="mt-4">
                         <div class="input-label">Start Year</div>
@@ -39,8 +39,8 @@
                         <div class="flex items-center flex-wrap">
                             <div v-for="year in years"
                                  :key="'year-' + year"
-                                 class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
-                                :class="year === form.target_year ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
+                                 class="button flex-1 mr-4 my-1"
+                                :class="year === form.target_year ? 'button-active border-primary text-primary hover:border-primary hover:text-primary' : ''" 
                                  @click="form.target_year = year"
                                  >{{ year }}-{{ year + 1 }}</div>
                         </div>
@@ -52,8 +52,8 @@
                         <div class="flex items-center flex-wrap">
                             <div v-for="grade in grades"
                                  :key="'grade-' + grade"
-                                 class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
-                                :class="grade === form.target_grade ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
+                                 class="button flex-1 mr-4 my-1"
+                                :class="grade === form.target_grade ? 'button-active border-primary text-primary hover:border-primary hover:text-primary' : ''" 
                                  @click="form.target_grade = grade"
                                  >Grade {{ grade }}</div>
                             <div class="flex-1 mr-4 my-1 px-4">&nbsp;</div>
@@ -66,8 +66,8 @@
                         <div class="flex items-center flex-wrap w-full">
                             <div v-for="type in types"
                                  :key="'type-' + type"
-                                 class="flex-1 text-center border px-4 py-2 mr-4 my-1 cursor-pointer whitespace-nowrap"
-                                :class="type === form.student_type ? 'bg-primary text-white font-bold' : 'bg-white hover:text-gray-800'" 
+                                 class="button flex-1 mr-4 my-1"
+                                :class="type === form.student_type ? 'button-active border-primary text-primary hover:border-primary hover:text-primary' : ''" 
                                  @click="form.student_type = type"
                                  >{{ type }}</div>
                         </div>
@@ -77,7 +77,7 @@
 
                 <div class="" key="step3" v-if="currentStep === 'Student Interests'">
 
-                    <h3>{{ currentStep }}</h3>
+                    <h2>{{ currentStep }}</h2>
 
                     <div class="mt-4">Select the items that the student is interested in.</div>
 
@@ -91,7 +91,7 @@
 
                 <div class="" key="step4" v-if="currentStep === 'Livestreams'">
 
-                    <h3>Upcoming {{ livestreamTitle }}</h3>
+                    <h2>Upcoming {{ livestreamTitle }}</h2>
 
                     <div class="" v-if="livestreamTitle === 'Open Houses'">
                         <p>We invite you to join our admissions team for an <span class="font-bold">interactive online presentation</span> where you can <span class="font-bold">ask questions</span> and find out why so many students choose Brentwood for their high school experience. Find a date that best suits your family below.</p>
@@ -115,17 +115,17 @@
 
                     <div class="mt-4">
 
-                        <h3>{{ currentStep }}</h3>
+                        <h2>{{ currentStep }}</h2>
 
                         <div class="mt-4">
                             <form-label label="Contact Name" :value="form.name"></form-label>
-                            <div class="input"><input type="text" id="name" v-model="form.name" class="" placeholder="Parent or Student Name" /></div>
+                            <div class="fake-input">{{ form.name }}</div>
 
                             <form-label label="Contact Email" :value="form.email"></form-label>
-                            <div class="input"><input type="email" id="email" v-model="form.email" class="" placeholder="Contact Email" /></div>
+                            <div class="fake-input">{{ form.email }}</div>
 
                             <form-label label="Contact Phone Number" :value="form.phone"></form-label>
-                            <div class="input hidden"><input type="text" id="phone" v-model="form.phone" class="" @keyup.enter="nextStep()" placeholder="Contact Phone Number" v-if="form.phone" /></div>
+                            <div class="fake-input hidden">{{ form.phone }}</div>
 
                             <form-label label="Start Year" :value="form.target_year"></form-label>
                             <div class="fake-input" v-if="form.target_year">{{ form.target_year }}-{{ form.target_year + 1 }}</div>
@@ -170,7 +170,7 @@
                     </div>
                 </div>
 
-                <div class="relative flex items-center px-4 py-2 cursor-pointer text-white font-bold" :class="errors.length ? 'bg-primary' : 'bg-green-500'" @click="nextStep()">
+                <div class="button" :class="errors.length ? '' : 'bg-green-500 text-white hover:text-white'" @click="nextStep()">
                     <div class="">{{ nextText }}</div>
                     <div class="ml-2"><i class="fas fa-chevron-right"></i></div>
                 </div>
@@ -579,7 +579,7 @@
                     let elm = document.getElementById('inquiry-form');
 
                     if (elm.offsetTop < window.scrollY) {
-                        window.scrollTo({top: elm.offsetTop, behavior: 'smooth'});
+                        //window.scrollTo({top: elm.offsetTop, behavior: 'smooth'});
                     }
                 }
             },

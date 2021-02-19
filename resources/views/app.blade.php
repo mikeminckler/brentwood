@@ -13,6 +13,9 @@
     <link href="{{ mix('/css/app.css') }}" rel="stylesheet">
     <script src="https://kit.fontawesome.com/da9050191e.js" crossorigin="anonymous"></script>
 
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
     @if (!session()->get('editing') && !request('preview'))
         <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GOOGLE_ANALYTICS_ID') }}"></script>
         <script>
@@ -71,19 +74,19 @@
                                 </div>
                             </div>
 
-                            <nav class="flex-1 relative flex md:block items-center h-full">
+                            <nav class="flex-1 relative flex md:block items-center h-full py-1 md:py-0">
 
                                 <div class="relative md:hidden flex w-full items-center justify-end">
                                     <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button md:hidden mr-2 whitespace-no-wrap text-sm">Apply</a>
-                                    <div class="text-white bg-primary px-2 text-lg cursor-pointer mr-2" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
+                                    <div class="button-icon mr-2 toggle" :class="$store.state.showMenu ? 'active' : ''" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
                                 </div>
 
-                                <div class="absolute md:relative w-screen md:w-auto top-0 md:mt-0 right-0 md:right-auto md:h-full md:flex items-center z-5 md:overflow-visible overflow-hidden"
-                                    :class="[$store.state.showMenu ? 'max-h-screen pb-1 md:pb-0' : 'max-h-0 md:max-h-screen', $store.state.scrollPosition > 64 ? 'mt-8' : 'mt-10']"
-                                    style="transition: max-height var(--transition-time) ease"
+                                <div class="top-0 mt-10 border-l-4 md:border-l-0 border-primary bg-gray-100 md:bg-transparent absolute md:relative w-screen md:w-auto md:mt-0 right-0 md:right-auto md:h-full md:flex items-center z-5 md:overflow-visible overflow-hidden"
+                                    :class="[$store.state.showMenu ? 'max-h-screen pb-1 md:pb-0' : 'max-h-0 md:max-h-screen', $store.state.scrollPosition > 64 ? '' : '']"
+                                    style="transition: max-height var(--transition-time) ease;"
                                 >
 
-                                    <div class="w-full flex h-full border-l-4 md:border-l-0 border-primary shadow md:shadow-none relative"
+                                    <div class="w-full flex h-full relative"
                                         :class="[$store.state.showMenu ? 'shadow md:shadow-none' : '']"
                                     >
 
@@ -135,10 +138,10 @@
                                                 <a href="#" class="hidden md:block text-lg text-gray-400 cursor-pointer mr-2"><i class="fas fa-search"></i></a>
 
                                                 @auth
-                                                    <user-menu :user='@json(auth()->user())'></user-menu>
+                                                    <user-menu :user='@json(auth()->user()->load("roles"))'></user-menu>
 
                                                     @if (auth()->user()->hasRole('editor'))
-                                                        <div class="absolute -mr-6 right-0 hidden md:block">
+                                                        <div class="absolute -mr-10 right-0 hidden md:block">
                                                             <editing-button v-show="{{ !request('preview') }}" class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}"></editing-button>
                                                         </div>
                                                     @endif

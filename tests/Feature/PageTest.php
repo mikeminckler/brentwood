@@ -86,6 +86,53 @@ class PageTest extends TestCase
     }
 
     /** @test **/
+    public function the_page_tree_is_sorted_when_creating_a_new_page()
+    {
+        $parent = Page::factory()->create();
+        $page1 = Page::factory()->create([
+            'parent_page_id' => $parent->id,
+            'sort_order' => 1,
+        ]);
+
+        $page2 = Page::factory()->create([
+            'parent_page_id' => $parent->id,
+            'sort_order' => 2,
+        ]);
+
+        $page3 = Page::factory()->create([
+            'parent_page_id' => $parent->id,
+            'sort_order' => 3,
+        ]);
+
+        $input = Page::factory()->raw([
+            'parent_page_id' => $parent->id,
+            'sort_order' => 2,
+        ]);
+
+        $this->signInAdmin();
+
+        $this->withoutExceptionHandling();
+        $this->postJson(route('pages.store'), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Page Saved',
+                'full_slug' => Page::all()->last()->full_slug,
+            ]);
+
+        $page = Page::all()->last();
+        $this->assertEquals($parent->id, $page->parent_page_id);
+
+        $page1->refresh();
+        $page2->refresh();
+        $page3->refresh();
+
+        $this->assertEquals(1, $page1->sort_order);
+        $this->assertEquals(2, $page2->sort_order);
+        $this->assertEquals(3, $page->sort_order);
+        $this->assertEquals(4, $page3->sort_order);
+    }
+
+    /** @test **/
     public function the_page_tree_can_be_loaded()
     {
         $first_level_page = Page::factory()->create();

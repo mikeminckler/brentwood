@@ -57,6 +57,8 @@ class RolesController extends Controller
             $user = User::findOrFail(requestInput('user_id'));
             $user->removeRole($role);
 
+            cache()->tags([cache_name($user)])->flush();
+
             return response()->json([
                 'success' => $user->name.' Removed From '.$role->name,
             ]);

@@ -168,6 +168,12 @@ const store = new Vuex.Store({
         },
 
         setEditing({ commit, state }, editing) {
+
+            const preview = new URLSearchParams(window.location.search).get('preview');
+            if (preview) {
+                editing = false;
+            }
+
             commit('setEditing', editing);
         },
 

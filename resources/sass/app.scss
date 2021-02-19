@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css?family=Oswald:300,400|Roboto:400,500,700&display=swap');
+/*
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300&family=Roboto:wght@400;500;700&display=swap');
+*/
 
 @tailwind base;
 
@@ -200,14 +202,6 @@ iframe {
     min-height: 325px;
 }
 
-.content-element-icons {
-    @apply cursor-pointer px-2 py-1 mb-2 flex items-center justify-center border-transparent border h-8 w-8;
-}
-
-.content-element-icons:hover {
-    @apply bg-white border-gray-300 text-gray-600;
-}
-
 .remove-icon {
     @apply text-xl text-red-600 border border-transparent cursor-pointer h-6 w-6 flex items-center justify-center;
 }
@@ -294,7 +288,7 @@ input[type=range]:hover {
     }
 
     & input, div.fake-input { 
-        @apply border border-gray-200 bg-white px-4 py-2 w-full;
+        @apply border border-gray-300 bg-white px-4 py-1 w-full rounded;
     }
 
     & input.icon { 
@@ -307,19 +301,19 @@ input[type=range]:hover {
 }
 
 button, .button {
-    @apply inline-flex bg-gray-100 shadow-inner rounded text-gray-700 font-medium px-4 py-1 cursor-pointer whitespace-nowrap justify-center;
+    @apply inline-flex bg-white shadow-inner rounded text-gray-500 font-medium px-4 py-1 cursor-pointer whitespace-nowrap justify-center border-gray-300 border;
 }
 
-button:hover, .button:hover {
-    @apply text-gray-800 shadow;
+button:hover, .button:hover, .button-icon:hover {
+    @apply text-gray-800 shadow border-gray-400;
 }
 
 .button-active {
-    @apply inline-flex bg-white shadow rounded text-primary font-medium px-4 py-1 cursor-pointer whitespace-nowrap justify-center;
+    @apply inline-flex bg-white shadow rounded text-gray-800 font-medium px-4 py-1 cursor-pointer whitespace-nowrap justify-center border border-gray-400;
 }
 
 .button-secondary {
-    @apply inline-flex bg-gray-200 border border-gray-300 px-4 py-1 cursor-pointer whitespace-nowrap justify-center text-gray-500;
+    @apply inline-flex bg-gray-200 border border-gray-300 px-4 py-1 cursor-pointer whitespace-nowrap justify-center text-gray-500 rounded;
 }
 
 .button-secondary:hover {
@@ -327,11 +321,15 @@ button:hover, .button:hover {
 }
 
 .button-icon {
-    @apply h-8 w-8 flex justify-center items-center cursor-pointer;
+    @apply h-8 w-8 flex justify-center items-center cursor-pointer bg-white shadow-inner rounded text-gray-500 border border-gray-300;
+}
+
+.button-icon.toggle {
+    @apply text-gray-400;
 }
 
 .button-icon.active {
-    @apply bg-primary text-white;
+    @apply text-gray-900 border-gray-400 border shadow;
 }
 
 .button-icon.disabled {

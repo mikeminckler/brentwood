@@ -1,108 +1,110 @@
 <template>
 
-    <div class="relative w-full z-9 flex items-center justify-center" v-if="editing && page">
+    <transition name="page-editor" mode="out-in">
+        <div class="relative w-full z-9 flex items-center justify-center" v-if="editing && page" :key="'page-' + page.id">
 
-        <div class="fixed top-0 right-0" v-if="isPreview"></div>
+            <div class="w-full max-w-6xl relative">
 
-            <div class="w-full max-w-6xl relative" v-if="!isPreview">
+                <div class="w-full flex items-center bg-gray-200 p-1 pr-0 shadow relative">
 
-                <div class="w-full flex items-center bg-gray-200 p-1 shadow relative">
-
-                <div class="" v-if="page.type === 'page'">
-                    <div class="button mx-2" @click="createPage()" v-if="page.id > 1" title="Create Page Below">
-                        <div class=""><i class="fas fa-file-medical"></i></div>
-                    </div>
-
-                    <div class="button mx-2" @click="createSubPage()" title="Create Sub Page">
-                        <div class=""><i class="fas fa-file-download"></i></div>
-                    </div>
-                </div>
-
-                <div class="button mx-2" @click="preview()" title="Preview">
-                    <div class=""><i class="fas fa-eye"></i></div>
-                </div>
-
-                <div class="flex items-center flex-1">
-                    <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
-                    <div class="form ml-4"><input type="text" v-model="page.title" @enter="savePage" @focus="$event.target.select()" @change="savePage()" placeholder="Meta Title"/></div>
-                    <div class=""> <checkbox-input v-model="page.unlisted" @change="savePage()" label="Unlisted"></checkbox-input> </div>
-                    <div class="ml-4" v-if="page.type === 'page'"> <checkbox-input v-model="page.show_sub_menu" @change="savePage()" label="Show Menu"></checkbox-input> </div>
-                </div>
-
-                <div class="relative flex items-center">
-
-                    <div class="text-sm pl-2 font-bold text-green-500" v-if="page.publish_at">Publish At: {{ displayDateTime(page.publish_at) }}</div>
-
-                    <div class="flex mx-2 bg-green-600 hover:bg-green-500 text-white font-bold cursor-pointer justify-center items-center h-8 overflow-visible" 
-                         v-if="(hasDraft && page.editable) && !$store.state.saving.length"
+                    <div class="button-icon" 
+                        @click="showPageVersions = !showPageVersions" 
+                        v-if="activeVersion"
+                        :class="[activeVersion.id === page.published_version_id ? 'text-green-500 border-green-300 bg-green-100' : '', !activeVersion.published_at ? 'bg-yellow-100 border-yellow-300' : '']"
                     >
-                        <div class="flex h-full items-center pr-2" @click="publishPage()">
-                            <transition name="slide">
-                                <div class="pl-2" v-if="!showPagePublishAt"><i class="fas fa-sign-out-alt"></i></div>
-                            </transition>
-                            <div class="pl-2">Publish</div>
-                        </div>
+                        <div v-if="activeVersion.published_at && activeVersion.id !== page.published_version_id"><i class="fas fa-history"></i></div>
+                        <div v-if="activeVersion.id === page.published_version_id" title="Published"><i class="fas fa-check"></i></div>
+                        <div v-if="!activeVersion.published_at" title="Draft"><i class="fas fa-drafting-compass"></i></div>
+                    </div>
 
-                        <div class="relative h-full flex items-center">
-                            <div class="px-2 h-full flex items-center bg-green-500" v-if="!showPagePublishAt" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
-                            <div class="px-2 bg-white h-full text-green-500 flex items-center" v-if="showPagePublishAt" @click="savePage()"><i class="fas fa-save"></i></div>
-                            <div class="px-2 bg-white text-primary h-full flex items-center" v-if="showPagePublishAt" @click="removePublishAt()"><i class="fas fa-times"></i></div>
-                        </div>
+                    <div class="button-icon ml-2" @click="preview()" title="Preview">
+                        <div class=""><i class="fas fa-binoculars"></i></div>
+                    </div>
 
-                        <div class="absolute right-0 mt-8 top-0" v-show="showPagePublishAt">
-                            <date-time-picker v-model="page.publish_at" ></date-time-picker>
-                        </div>
+                    <div class="button-icon toggle ml-2" :class="page.unlisted ? 'active' : ''" title="Unlisted" @click="toggleUnlisted()">
+                        <div class=""><i class="fas fa-eye-slash"></i></div>
+                    </div>
+
+                    <div class="button-icon toggle ml-2" :class="page.show_sub_menu ? 'active' : ''" title="Display Sub Menu" @click="toggleShowSubMenu()">
+                        <div class=""><i class="fas fa-ellipsis-h"></i></div>
+                    </div>
+
+                    <div class="button-icon ml-2 toggle" :class="showTags ? 'active' : ''" @click="showTags = !showTags" title="Edit Tags">
+                        <div class=""><i class="fas fa-tag"></i></div>
+                    </div>
+
+                    <div class="button-icon ml-2 hover:text-primary hover:border-primary" @click="removePage()" v-if="page.id !== 1" title="Delete Page">
+                        <div class=""><i class="fas fa-trash-alt"></i></div>
+                    </div>
+
+                    <div class="flex items-center flex-1 px-2">
+                        <div class="form"><input type="text" v-model="page.name" @enter="savePage" @focus="$event.target.select()" @change="savePage()" /></div>
+                        <div class="form ml-2" v-if="$store.getters.hasRole('admin')"><input type="text" v-model="page.title" @enter="savePage" @focus="$event.target.select()" @change="savePage()" placeholder="Meta Title"/></div>
+                    </div>
+
+
+                    <div class="relative flex items-center overflow-hidden">
+                        
+                        <transition name="saving">
+                            <div class="flex bg-green-600 hover:bg-green-500 text-white font-bold cursor-pointer justify-center items-center h-8 overflow-visible w-32" 
+                                 key="saved"
+                                 v-if="(hasDraft && page.editable) && !saving"
+                            >
+                                <div class="flex flex-1 h-full items-center pr-2" @click="publishPage()">
+                                    <transition name="slide">
+                                        <div class="pl-2" v-if="!showPagePublishAt"><i class="fas fa-sign-out-alt"></i></div>
+                                    </transition>
+                                    <div class="pl-2">Publish</div>
+                                </div>
+
+                                <div class="relative h-full flex items-center">
+                                    <div class="px-2 h-full flex items-center bg-green-500" v-if="!showPagePublishAt" @click.stop="showPagePublishAt = !showPagePublishAt"><i class="fas fa-clock"></i></div>
+                                    <div class="px-2 bg-white h-full text-green-500 flex items-center" v-if="showPagePublishAt" @click="savePage()"><i class="fas fa-save"></i></div>
+                                    <div class="px-2 bg-white text-primary h-full flex items-center" v-if="showPagePublishAt" @click="removePublishAt()"><i class="fas fa-times"></i></div>
+                                </div>
+
+                                <div class="absolute right-0 mt-8 top-0 z-3" v-show="showPagePublishAt">
+                                    <date-time-picker v-model="page.publish_at" ></date-time-picker>
+                                </div>
+
+                            </div>
+
+                            <div class="flex text-green-600 px-4 py-1 w-32 justify-center" v-if="saving" key="saving">
+                                <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                                <div class="ml-2">Saving</div>
+                            </div>
+                        </transition>
 
                     </div>
 
-                    <div class="flex mx-2 text-green-600 px-4 py-1 w-32 justify-center" 
-                         v-if="$store.state.saving.length"
-                    >
-                        <div class="spin"><i class="fas fa-sync-alt"></i></div>
-                        <div class="ml-2">Saving</div>
+                </div>
+
+                <div class="z-2 absolute text-sm px-2 py-1 bottom-0 right-0 -mb-6 bg-white shadow" v-if="page.publish_at">Publishing {{ displayDateTime(page.publish_at) }}</div>
+
+                <transition name="form-tags">
+                    <div class="bg-gray-300 px-2 py-1" v-if="showTags || page.type === 'blog'">
+                        <form-tags v-model="tags" placeholder="Add Page Tags" :flex="true"></form-tags>
                     </div>
-                </div>
+                </transition>
 
-                <div class="cursor-pointer flex" @click="showPageVersions = !showPageVersions" v-if="activeVersion">
-                    <div class="">v{{ activeVersion.name }}</div>
-                    <div class="ml-1" v-if="activeVersion.published_at && activeVersion.id !== page.published_version_id"><i class="fas fa-history"></i></div>
-                    <div class="ml-1 text-green-500" v-if="activeVersion.id === page.published_version_id" title="Published"><i class="fas fa-check"></i></div>
-                    <div class="ml-1" v-if="!activeVersion.published_at" title="Draft"><i class="fas fa-drafting-compass"></i></div>
-                </div>
-
-                <div class="flex px-2 mx-2 items-center cursor-pointer hover:bg-white hover:text-gray-700" @click="showTags = !showTags" title="Edit Tags">
-                    <div class="text-xl"><i class="fas fa-tag"></i></div>
-                </div>
-
-                <div class="flex px-2 mx-2 items-center cursor-pointer hover:bg-primary hover:text-white" @click="removePage()" v-if="page.id !== 1" title="Delete Page">
-                    <div class="text-xl"><i class="fas fa-trash-alt"></i></div>
-                </div>
-
-            </div>
-
-            <transition name="form-tags">
-                <div class="bg-gray-300 px-2 py-1" v-if="showTags || page.type === 'blog'">
-                    <form-tags v-model="tags" placeholder="Add Page Tags" :flex="true"></form-tags>
-                </div>
-            </transition>
-
-            <div v-if="showPageVersions" class="absolute w-full justify-end flex overflow-visible max-w-6xl" style="top: 50px;">
-                <div class="relative bg-white shadow px-2 py-1">
-                    <div class="flex px-2 hover:bg-gray-200 cursor-pointer" :class="version.id == activeVersion.id ? 'bg-gray-200' : ''" v-for="version in $lodash.orderBy(page.versions, ['id'], ['desc'])" @click="loadVersion(version)">
-                        <div class="pr-2">v{{ version.name}}</div>
-                        <div class="flex-1">{{ $moment(version.published_at ? version.published_at : version.updated_at).format('ddd YY-M-d h:mma') }}</div>
-                        <div class="">
-                            <div class="pl-2" v-if="version.published_at && version.id !== page.published_version_id" title="Load"><i class="fas fa-history"></i></div>
-                            <div class="pl-2 text-green-500" v-if="version.id === page.published_version_id" title="Published"><i class="fas fa-check"></i></div>
-                            <div class="pl-2" v-if="!version.published_at" title="Draft"><i class="fas fa-drafting-compass"></i></div>
+                <div v-if="showPageVersions" class="absolute flex overflow-visible" style="top: 42px;">
+                    <div class="relative bg-white shadow px-2 py-1">
+                        <div class="flex px-2 hover:bg-gray-200 cursor-pointer" :class="version.id == activeVersion.id ? 'bg-gray-200' : ''" v-for="version in $lodash.orderBy(page.versions, ['id'], ['desc'])" @click="loadVersion(version)">
+                            <div class="pr-2">v{{ version.name}}</div>
+                            <div class="flex-1">{{ $moment(version.published_at ? version.published_at : version.updated_at).format('ddd YY-M-d h:mma') }}</div>
+                            <div class="">
+                                <div class="pl-2" v-if="version.published_at && version.id !== page.published_version_id" title="Load"><i class="fas fa-history"></i></div>
+                                <div class="pl-2 text-green-500" v-if="version.id === page.published_version_id" title="Published"><i class="fas fa-check"></i></div>
+                                <div class="pl-2" v-if="!version.published_at" title="Draft"><i class="fas fa-drafting-compass"></i></div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
         </div>
-
-    </div>
+    </transition>
 
 </template>
 
@@ -110,11 +112,13 @@
 
     import Feedback from '@/Mixins/Feedback'
     import Dates from '@/Mixins/Dates';
+    import Saving from '@/Mixins/Saving';
 
     export default {
 
-        mixins: [Feedback, Dates],
+        mixins: [Feedback, Dates, Saving],
         props: ['currentPage', 'resource'],
+
         data() {
             return {
                 showPageVersions: false,
@@ -158,11 +162,6 @@
                     return this.$lodash.last(this.page.versions);
                 }
             },
-            isPreview() {
-                let uri = window.location.search.substring(1);
-                let params = new URLSearchParams(uri);
-                return params.get("preview") === 'true';
-            }
         },
 
         mounted() {
@@ -288,49 +287,6 @@
                 });
             },
 
-            createSubPage: function() {
-
-                let input = {
-                    name: 'Untitled Page',
-                    parent_page_id: this.page.id,
-                    unlisted: false,
-                    show_sub_menu: false,
-                    sort_order: this.page.pages.length + 1,
-                    content_elements: [],
-                    footer_fg_photo: {},
-                    footer_bg_photo: {},
-                }
-
-                this.$http.post('/' + this.resource + '/create', input).then( response => {
-                    this.processSuccess(response);
-                    window.location = response.data.page.full_slug;
-                }, error => {
-                    this.processErrors(error.response);
-                });
-            },
-
-            createPage: function() {
-
-                let input = {
-                    name: 'Untitled Page',
-                    parent_page_id: this.page.parent_page_id,
-                    unlisted: false,
-                    show_sub_menu: false,
-                    sort_order: this.page.sort_order + 1,
-                    content_elements: [],
-                    footer_fg_photo: {},
-                    footer_bg_photo: {},
-                }
-
-                this.$http.post('/' + this.resource + '/create', input).then( response => {
-                    this.processSuccess(response);
-                    window.location = response.data.page.full_slug;
-                }, error => {
-                    this.processErrors(error.response);
-                });
-            },
-
-
             savePage: _.debounce(function() {
 
                 let input = {
@@ -444,6 +400,16 @@
                 this.page.publish_at = null;
                 console.log('SAVE PAGE FROM REMOVE PUBLISH AT');
                 this.savePage();
+            },
+
+            toggleUnlisted: function() {
+                this.page.unlisted = !this.page.unlisted;
+                this.savePage();
+            },
+
+            toggleShowSubMenu: function() {
+                this.page.show_sub_menu = !this.page.show_sub_menu;
+                this.savePage();
             }
 
         },
@@ -473,6 +439,30 @@
 
 .form-tags-leave-active {
     animation: form-tags var(--transition-time) reverse;
+    overflow: hidden;
+}
+
+
+@keyframes page-editor {
+    0% {
+        max-height: 0;
+        opacity: 0;
+        @apply py-0;
+    }
+    100%   {
+        max-height: 42px;
+        opacity: 1;
+        @apply py-1;
+    }
+}
+
+.page-editor-enter-active {
+    animation: page-editor var(--transition-time) ease-out;
+    overflow: hidden;
+}
+
+.page-editor-leave-active {
+    animation: page-editor var(--transition-time) reverse;
     overflow: hidden;
 }
 

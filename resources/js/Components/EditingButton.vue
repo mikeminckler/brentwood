@@ -1,9 +1,9 @@
 <template>
 
-    <div class="w-6 h-6 flex items-center justify-center cursor-pointer shadow text-sm" 
-        :class="editingEnabled ? 'bg-primary text-white' : 'bg-white hover:shadow-md text-gray-500'" 
+    <div class="button-icon" 
+        :class="editingEnabled ? 'active' : ''" 
         @click="toggleEditing"
-    ><i class="fas fa-marker"></i></div>
+    ><i class="fas fa-pencil-alt"></i></div>
 
 </template>
 

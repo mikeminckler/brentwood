@@ -17,8 +17,6 @@
                 :expanded="true" 
                 :show-changes="true" 
                 max-height="100%"
-                :emit-event="addPage ? true : false"
-                @selected="pageSelected($event)"
                 :insert="addPage ? true : false"
             ></page-tree>
         </div>
@@ -55,9 +53,6 @@
         },
 
         methods: {
-            pageSelected: function(page) {
-                console.log(page);
-            }
         },
 
     }

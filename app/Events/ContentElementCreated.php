@@ -38,6 +38,6 @@ class ContentElementCreated implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('role.'.Role::where('name', 'editor')->first()->id);
+        return new PrivateChannel('role.editor');
     }
 }

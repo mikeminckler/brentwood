@@ -19,9 +19,12 @@
             </form-content-element>
         </transition-group>
 
-        <add-content-element 
-            :sort-order="contentElements.length"
-        ></add-content-element>
+        <transition name="fade" mode="out-in">
+            <add-content-element 
+                :key="'page-' + page.id"
+                :sort-order="contentElements.length"
+            ></add-content-element>
+        </transition>
 
         <div class="" v-if="showPageTree">
 

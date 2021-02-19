@@ -49,10 +49,9 @@
         <div class="relative flex justify-center z-4" 
              :class="hideBanner ? 'mt-0' : 'md:-mt-16'" 
              style="transition: margin var(--transition-time) ease-out"
-            v-if="content.full_width && content.body && !$store.state.editing">
-
+             v-if="content.full_width && content.body && !$store.state.editing"
+        >
             <slot></slot>
-
         </div>
 
     </div>

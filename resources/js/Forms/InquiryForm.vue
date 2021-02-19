@@ -2,13 +2,10 @@
 
     <div class="flex relative">
 
-        <div class="flex-1">
-        </div>
+        <div class="flex-1 flex relative z-2 justify-center">
 
-        <div class="flex-2 relative">
-
-            <div class="bg-white mx-8 shadow">
-                <div class="flex justify-center relative py-8">
+            <div class="md:bg-white my-8 md:mx-8 md:p-8 md:shadow">
+                <div class="flex justify-center relative">
                     <div class="text-block relative">
 
                         <div class="" :class="isLocked('header') ? 'locked relative' : ''">
@@ -45,14 +42,12 @@
                     </div>
                 </div>
 
-                <div class="pb-16">
-                    <inquiry
-                        :show-student-info="content.show_student_info"
-                        :show-interests="content.show_interests"
-                        :show-livestreams="content.show_livestreams"
-                        :show-livestreams-first="content.show_livestreams_first"
-                    ></inquiry>
-                </div>
+                <inquiry
+                    :show-student-info="content.show_student_info"
+                    :show-interests="content.show_interests"
+                    :show-livestreams="content.show_livestreams"
+                    :show-livestreams-first="content.show_livestreams_first"
+                ></inquiry>
             </div>
 
         </div>

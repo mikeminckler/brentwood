@@ -38,6 +38,7 @@ class Role extends Model
                     $user = User::find(Arr::get($user_data, 'id'));
                     if ($user instanceof User) {
                         $user->addRole($role);
+                        cache()->tags([cache_name($user)])->flush();
                     }
                 }
             }

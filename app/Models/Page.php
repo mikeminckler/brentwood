@@ -107,6 +107,10 @@ class Page extends Model
         $page->saveContentElements($input);
         $page->saveTags($input);
 
+        if (!$id) {
+            $this->reorderPages($parent_page, $page);
+        }
+
         cache()->tags([cache_name($page), 'menu'])->flush();
 
         broadcast(new PageSaved($page))->toOthers();
@@ -215,15 +219,17 @@ class Page extends Model
 
     public function getFooterColorAttribute($value)
     {
-        if ($value) {
-            return $value;
-        } else {
-            if ($this->parent_page_id > 0) {
-                return Page::find($this->parent_page_id)->footer_color;
+        return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-footer-color', function () use ($value) {
+            if ($value) {
+                return $value;
             } else {
-                return null;
+                if ($this->parent_page_id > 0) {
+                    return Page::find($this->parent_page_id)->footer_color;
+                } else {
+                    return null;
+                }
             }
-        }
+        });
     }
 
     public function getSubMenuAttribute()
@@ -279,7 +285,7 @@ class Page extends Model
         }
 
         $pages = $pages->sortBy(function ($p) {
-            return $p->sort_order;
+            return $p->sort_order.'-'.$p->created_at->getTimestamp();
         })
         ->values()
         ->each(function ($p, $index) {

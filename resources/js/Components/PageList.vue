@@ -4,9 +4,9 @@
         :id="'page' + page.id" 
         :data-page-id="page.id"
         :draggable="page.id > 1 ? 'true' : 'false'"
-        @dragstart.stop="startDrag($event, page)"
+        @dragstart.stop="!insert ? startDrag($event, page) : null"
         :class="[
-            page.parent_page_id > 0 ? 'cursor-move sort-item' : '',
+            page.parent_page_id > 0 && !insert ? 'cursor-move sort-item' : '',
             page.pages ? ( page.pages.length > 0 ? 'sort-container' : '') : '',
             page.unlisted ? '' : '', 
             !page.published_version_id ? 'text-gray-500 italic' : '', 
@@ -14,7 +14,7 @@
     >
 
         <div
-            v-if="page.id > 1 && sort && $store.state.dragging"
+            v-if="page.id > 1 && sort && $store.state.dragging && !insert"
             class="absolute w-3/4 overflow-visible z-2"
             :class="[$store.state.dragging ? 'h-8' : 'h-0']"
             @drop.stop='onDrop($event)'
@@ -25,27 +25,38 @@
             <div class="relative overflow-visible h-0" v-if="hover" style="bottom: -13px;"><i class="fas fa-caret-right"></i></div>
         </div>
 
-        <div class="absolute" v-if="insert && showInsert">
-            <div class="icon"><i class="fas fa-long-arrow-alt-right"></i></div>
-        </div>
-
-        <div class="flex hover:bg-white border-b border-gray-300 items-center relative z-1" 
-            :class="page.id === $store.state.page.id ? 'bg-yellow-100 text-black' : ''"
+        <div class="hover:bg-white border-b border-gray-300 items-center relative z-1" 
+            :class="page.id === $store.state.page.id ? 'bg-white text-black' : (showChanges && (!page.published_version_id || page.can_be_published) ? 'bg-yellow-100' : '')"
             @mouseenter="showInsert = true"
             @mouseleave="showInsert = false"
         >
-            <div class="cursor-pointer w-3 mr-2 flex items-center justify-center caret text-lg leading-none" 
-                :class="{ 'rotate90' : expand }"
-                @click="expand = !expand" v-if="page.pages ? ( page.pages.length ? true : false ) : false"
-            >
-                <i class="fas fa-caret-right"></i>
+            <div class="flex items-center">
+                <div class="cursor-pointer w-3 mr-2 flex items-center justify-center caret text-lg leading-none" 
+                    :class="{ 'rotate90' : expand }"
+                    @click="expand = !expand" v-if="page.pages ? ( page.pages.length ? true : false ) : false"
+                >
+                    <i class="fas fa-caret-right"></i>
+                </div>
+                <div class="cursor-pointer flex-1 pr-4 whitespace-no-wrap" :class="[page.pages ? ( page.pages.length ? '' : 'pl-3' ) : 'pl-3', page.unlisted ? 'text-gray-500' : '']" @click="selectPage()">{{ page.name }}</div>
+                <div class="" v-if="page.unlisted" class="text-gray-400 pl-2 text-sm"><i class="fas fa-eye-slash"></i></div>
+                <div class="text-gray-700 px-1 text-sm" v-if="showChanges && (!page.published_version_id || page.can_be_published)"><i class="fas fa-file-alt"></i></div>
+                <div class="text-xl px-2" v-if="showContentElements" @click="displayContentElements = !displayContentElements"><i class="fas fa-caret-square-down"></i></div>
             </div>
-            <div class="cursor-pointer flex-1 pr-4 whitespace-no-wrap" :class="[page.pages ? ( page.pages.length ? '' : 'pl-3' ) : 'pl-3', page.unlisted ? 'text-gray-500' : '']" @click="selectPage()">{{ page.name }}</div>
-            <div class="" v-if="page.unlisted" class="text-gray-400 pl-2"><i class="fas fa-eye-slash"></i></div>
-            <div class="text-gray-700 px-1 text-sm" v-if="showChanges && (!page.published_version_id || page.can_be_published)"><i class="fas fa-file-alt"></i></div>
-            <div class="text-xl px-2" v-if="showContentElements" @click="displayContentElements = !displayContentElements"><i class="fas fa-caret-square-down"></i></div>
-        </div>
 
+            <div class="relative z-2 overflow-visible" v-if="insert && showInsert">
+                <div class="relative flex text-sm py-1">
+                    <div class="ml-2 button" @click="addBelow()">
+                        <div class=""><i class="fas fa-long-arrow-alt-down"></i></div>
+                        <div class="pl-1">Below</div>
+                    </div>
+                    <div class="ml-2 button" @click="addInside()">
+                        <div class=""><i class="fas fa-long-arrow-alt-right"></i></div>
+                        <div class="pl-1">Inside</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
 
         <div class="pl-3" v-if="displayContentElements">
             <div class="hover:bg-white border-b border-gray-300 cursor-pointer overflow-hidden relative my-1" 
@@ -128,6 +139,9 @@
         methods: {
 
             selectPage: function() {
+                if (this.insert) {
+                    return null;
+                }
                 if (this.emitEvent) {
                     this.$emit('selected', {page: this.page});
                 } else {
@@ -137,6 +151,36 @@
                         window.location.href = this.page.full_slug;
                     }
                 }
+            },
+
+            createNewPage: function(parent_page_id, sort_order) {
+
+                let input = {
+                    name: 'Untitled Page',
+                    parent_page_id: parent_page_id,
+                    unlisted: false,
+                    show_sub_menu: false,
+                    sort_order: sort_order,
+                    content_elements: [],
+                    footer_fg_photo: {},
+                    footer_bg_photo: {},
+                }
+
+                this.$http.post('/pages/create', input).then( response => {
+                    this.processSuccess(response);
+                    window.location = response.data.page.full_slug;
+                }, error => {
+                    this.processErrors(error.response);
+                });
+
+            },
+
+            addBelow: function() {
+                this.createNewPage(this.page.parent_page_id, this.page.sort_order);
+            },
+
+            addInside: function() {
+                this.createNewPage(this.page.id, this.page.pages.length + 1);
             },
 
             startDrag: function(event, page) {

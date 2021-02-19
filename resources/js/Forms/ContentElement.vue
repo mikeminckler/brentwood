@@ -5,46 +5,25 @@
         v-if="contentElement.id >= 1"
     >
 
-        <div class="absolute text-xl flex flex-col items-center right-0" style="right: -40px">
-            <div class="content-element-icons" @click="showAdd = !showAdd" title="Add Content Element After"><i class="fas fa-file-medical"></i></div>
-            <div class="content-element-icons text-green-600 hover:text-green-500" title="Publish Now" @click="publishNow()" v-if="!isPublished"><i class="fas fa-sign-out-alt"></i></div>
-            <div class="content-element-icons" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!isPublished"><i class="fas fa-clock"></i></div>
-            <div class="content-element-icons" v-if="contentElementIndex !== 0" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
-            <div class="content-element-icons" v-if="!last" @click="$emit('sortDown')" title="Move Down"><i class="fas fa-arrow-alt-circle-down"></i></div>
-            <div class="content-element-icons" @click="contentElement.pivot.unlisted = 0" v-if="contentElement.pivot.unlisted" title="Hide Content"><i class="fas fa-eye"></i></div>
-            <div class="content-element-icons" @click="contentElement.pivot.unlisted = 1" v-if="!contentElement.pivot.unlisted" title="Show Content"><i class="fas fa-eye-slash"></i></div>
-            <div class="content-element-icons text-gray-800" @click="contentElement.pivot.expandable = 0" v-if="contentElement.pivot.expandable" title="Disable Expandable"><i class="fas fa-angle-double-down"></i></div>
-            <div class="content-element-icons text-gray-400" @click="contentElement.pivot.expandable = 1" v-if="!contentElement.pivot.expandable" title="Make Expandable"><i class="fas fa-angle-double-down"></i></div>
-            <div class="content-element-icons" title="Versioning/History?"><i class="fas fa-exchange-alt"></i></div>
-            <div class="content-element-icons hover:text-primary" title="Remove Content" @click="removeContentElement()"><i class="fas fa-trash-alt"></i></div>
+        <div class="absolute flex flex-col items-center right-0" style="right: -40px">
+            <div class="button-icon" @click="showAdd = !showAdd" title="Add Content Element After"><i class="fas fa-file-medical"></i></div>
+            <div class="button-icon mt-2 hover:text-green-600" title="Publish Now" @click="publishNow()" v-if="!isPublished"><i class="fas fa-sign-out-alt"></i></div>
+            <div class="button-icon mt-2" :class="contentElement.publish_at ? 'text-green-600' : ''" title="Set Publish Date" @click="showPublishAt = !showPublishAt" v-if="!isPublished"><i class="fas fa-clock"></i></div>
+            <div class="button-icon mt-2" v-if="contentElementIndex !== 0" @click="$emit('sortUp')" title="Move Up"><i class="fas fa-arrow-alt-circle-up"></i></div>
+            <div class="button-icon mt-2" v-if="!last" @click="$emit('sortDown')" title="Move Down"><i class="fas fa-arrow-alt-circle-down"></i></div>
+            <div class="button-icon toggle mt-2" @click="contentElement.pivot.unlisted = !contentElement.pivot.unlisted" :class="contentElement.pivot.unlisted ? 'active' : ''" :title="contentElement.pivot.unlisted ? 'Unhide Content' : 'Hide Content'"><i class="fas fa-eye"></i></div>
+            <div class="button-icon toggle mt-2" @click="contentElement.pivot.expandable = !contentElement.pivot.expandable" :class="contentElement.pivot.expandable ? 'active' : ''" :title="contentElement.pivot.expandable ? 'Disable Expandable' : 'Make Expandable'"><i class="fas fa-angle-double-down"></i></div>
+            <div class="button-icon mt-2 hidden" title="Versioning/History?"><i class="fas fa-exchange-alt"></i></div>
+            <div class="button-icon mt-2" title="Remove Content" @click="removeContentElement()"><i class="fas fa-trash-alt"></i></div>
         </div>
 
-        <div class="relative flex justify-end">
-            <transition name="saving-icon">
-                <div class="absolute z-6 flex text-green-600 bg-gray-100 px-4 py-2 border border-green-200 shadow" 
-                    v-if="showSaving" 
-                    key="saving"
-                >
-                    <div class="spin"><i class="fas fa-sync-alt"></i></div>
-                    <div class="ml-2">SAVING</div>
-                </div>
-            </transition>
-
-            <transition name="draft">
-                <div class="absolute flex items-center z-5" v-if="!isPublished">
-                    <div class="flex items-center bg-yellow-100 pl-2 border border-yellow-300">
-                        <div class="font-bold relative">DRAFT</div>
-                        <div class="remove-icon ml-2" @click="removeDraft()"><i class="fas fa-times"></i></div>
-                    </div>
-                </div>
-            </transition>
-
-            <div class="flex bg-gray-300 px-2 py-1" v-if="contentElement.pivot.unlisted">
+        <div class="flex justify-end absolute w-full">
+            <div class="flex bg-gray-200 px-2 relative z-4" v-if="contentElement.pivot.unlisted">
                 <div class=""><i class="fas fa-eye-slash"></i></div>
                 <div class="ml-2">Hidden</div>
             </div>
 
-            <div class="flex bg-orange-200 px-2 py-1" v-if="contentElement.pivot.expandable">
+            <div class="flex bg-gray-200 px-2 relative z-4" v-if="contentElement.pivot.expandable">
                 <div class=""><i class="fas fa-angle-double-down"></i></div>
                 <div class="ml-2">Expandable</div>
             </div>
@@ -52,6 +31,26 @@
             <div class="absolute z-4" v-if="showPublishAt">
                 <date-time-picker v-model="contentElement.publish_at" :remove="true"></date-time-picker>
             </div>
+
+            <transition name="saving-icon">
+                <div class="absolute z-6 flex text-green-600 bg-gray-100 px-2 border border-green-200 shadow" 
+                    v-if="showSaving" 
+                    key="saving"
+                >
+                    <div class="spin"><i class="fas fa-sync-alt"></i></div>
+                    <div class="ml-2">Saving</div>
+                </div>
+            </transition>
+
+            <transition name="draft">
+                <div class="flex items-center relative z-4" v-if="!isPublished">
+                    <div class="flex items-center bg-yellow-100 px-3 border border-yellow-300">
+                        <div class="font-bold relative">Draft</div>
+                        <div class="remove-icon ml-1" @click="removeDraft()"><i class="fas fa-times"></i></div>
+                    </div>
+                </div>
+            </transition>
+
 
         </div>
 

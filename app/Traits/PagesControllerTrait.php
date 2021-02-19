@@ -79,6 +79,8 @@ trait PagesControllerTrait
 
         $page = (new PageResponse)->loadPageAttributes($page);
 
+        cache()->tags(['menu'])->flush();
+
         return response()->json([
             'success' => class_basename($page).' Published',
             'page' => $page,

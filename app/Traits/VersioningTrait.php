@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\Version;
 use App\Models\ContentElement;
+use Illuminate\Support\Str;
 
 trait VersioningTrait
 {
@@ -22,28 +23,27 @@ trait VersioningTrait
         return optional($this->publishedVersion)->published_at;
     }
 
-    public function publishContentElement(ContentElement $content_element) 
+    public function publishContentElement(ContentElement $content_element)
     {
         return $this->publish($content_element);
     }
 
     public function publish(ContentElement $publish_now_content_element = null)
     {
-
         if ($publish_now_content_element) {
             $publish_at_content_elements = collect([$publish_now_content_element]);
         } else {
             $publish_at_content_elements = $this->contentElements()
                                                 ->where('publish_at', '<', now())
                                                 ->get()
-                                                ->filter( function($content_element) {
+                                                ->filter(function ($content_element) {
                                                     return Version::find($content_element->pivot->version_id)->published_at ? false : true;
                                                 });
         }
 
         $new_draft_content_elements = $this->contentElements()
                                         ->get()
-                                        ->filter( function($content_element) {
+                                        ->filter(function ($content_element) {
                                             return Version::find($content_element->pivot->version_id)->published_at ? false : true;
                                         })
                                         ->filter(function ($content_element) use ($publish_at_content_elements) {
@@ -80,7 +80,7 @@ trait VersioningTrait
             $search_content_elements = $this->contentElements;
         }
 
-        $uuids = $search_content_elements->map(function($ce) {
+        $uuids = $search_content_elements->map(function ($ce) {
             return $ce->uuid;
         })
         ->flatten()
@@ -89,18 +89,17 @@ trait VersioningTrait
         $published_content_elements = collect();
 
         foreach ($uuids as $uuid) {
-            $pages = ContentElement::findPagesByUuid($uuid)->filter(function($page) {
+            $pages = ContentElement::findPagesByUuid($uuid)->filter(function ($page) {
                 return $page->id !== $this->id || get_class($page) !== get_class($this);
             });
 
             if ($pages->count()) {
                 foreach ($pages as $page) {
-                    $content_element = $page->content_elements->filter(function($ce) use ($uuid) {
+                    $content_element = $page->content_elements->filter(function ($ce) use ($uuid) {
                         return $ce->uuid === $uuid;
                     })->first();
 
                     if (!$published_content_elements->contains('id', $content_element)) {
-
                         if (!$content_element->getPageVersion($page)->published_at) {
                             $page->publishContentElement($content_element);
                         }
@@ -109,7 +108,6 @@ trait VersioningTrait
                     }
                 }
             }
-
         }
 
         return $this;
@@ -145,7 +143,7 @@ trait VersioningTrait
             return false;
         }
 
-        if (!auth()->user()->hasRole('publisher')) {
+        if (!auth()->user()->hasRole(Str::plural($this->type).'-publisher')) {
             return false;
         }
 

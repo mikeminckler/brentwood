@@ -21,6 +21,17 @@ class InquiryPolicy
     }
 
     /**
+     * Determine whether the user can manage inquiries
+     *
+     * @param  \App\Models\User  $user
+     * @return mixed
+     */
+    public function manage(User $user)
+    {
+        return $user->hasRole('inquiries-manager');
+    }
+
+    /**
      * Determine whether the user can view any models.
      *
      * @param  \App\Models\User  $user

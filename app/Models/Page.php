@@ -219,17 +219,15 @@ class Page extends Model
 
     public function getFooterColorAttribute($value)
     {
-        return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-footer-color', function () use ($value) {
-            if ($value) {
-                return $value;
+        if ($value) {
+            return $value;
+        } else {
+            if ($this->parent_page_id > 0) {
+                return Page::find($this->parent_page_id)->footer_color;
             } else {
-                if ($this->parent_page_id > 0) {
-                    return Page::find($this->parent_page_id)->footer_color;
-                } else {
-                    return null;
-                }
+                return null;
             }
-        });
+        }
     }
 
     public function getSubMenuAttribute()

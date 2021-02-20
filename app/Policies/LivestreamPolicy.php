@@ -32,6 +32,17 @@ class LivestreamPolicy
     }
 
     /**
+     * Determine whether the user can manage livestreams
+     *
+     * @param  \App\Models\User  $user
+     * @return mixed
+     */
+    public function manage(User $user)
+    {
+        return $user->hasRole('livestreams-manager');
+    }
+
+    /**
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
@@ -120,6 +131,13 @@ class LivestreamPolicy
         return $user->can('view', $livestream);
     }
 
+    /**
+     * Determine whether the user can send reminder emails.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Livestream  $livestream
+     * @return mixed
+     */
     public function sendReminderEmails(User $user, Livestream $livestream)
     {
         return $livestream->moderators->contains('id', $user->id);

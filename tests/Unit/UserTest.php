@@ -98,10 +98,10 @@ class UserTest extends TestCase
     }
 
     /** @test **/
-    public function a_role_can_be_found_by_name_with_periods_in_the_title()
+    public function a_role_can_be_found_by_name_with_dashes_in_the_title()
     {
         $role = Role::factory()->create([
-            'name' => 'foo.bar',
+            'name' => 'foo-bar',
         ]);
 
         $user = User::factory()->create();

@@ -23,7 +23,7 @@ class PagePreviewTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->post(route('editing-toggle'))
+        $this->post(route('editing-toggle', ['type' => $page->type]))
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Editing Enabled',

@@ -62,12 +62,12 @@
 
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('refresh-page-tree', refreshPageTree);
-                this.$echo.leave('role.editor');
+                this.$echo.leave('role.pages-editor');
             });
 
             this.loadPageTree();
 
-            this.$echo.private('role.editor')
+            this.$echo.private('role.pages-editor')
                 .listen('PageSaved', data => {
                     this.loadPageTree();
                 });

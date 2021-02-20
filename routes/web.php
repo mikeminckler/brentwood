@@ -53,7 +53,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/permissions/create', [PermissionsController::class, 'store'])->name('permissions.store');
     Route::post('/permissions/{id}/destroy', [PermissionsController::class, 'destroy'])->name('permissions.destroy')->where('id', '\d+');
 
-    Route::post('/editing-toggle', [SessionsController::class, 'editingToggle'])->name('editing-toggle');
+    Route::post('/editing-toggle/{type}', [SessionsController::class, 'editingToggle'])->name('editing-toggle');
 
     Route::post('/pages/create', [PagesController::class, 'store'])->name('pages.store');
     Route::post('/pages/{id}', [PagesController::class, 'store'])->name('pages.update')->where('id', '\d+');

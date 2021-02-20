@@ -52,8 +52,18 @@
 
         @auth
             @if (session()->get('editing') && !request('preview'))
-                <page-side-menu></page-side-menu>
+                <page-side-menu> </page-side-menu>
             @endif
+
+            <div class="">
+                @foreach (App\Utilities\Menu::getModules() as $module)
+                    <a href="{{ $module['url'] }}" class="flex pl-4 py-1 hover:bg-white">
+                        <div class="pr-2"><i class="{{ $module['icon'] }}"></i></div>
+                        <div class="">{{ $module['name'] }}</div>
+                    </a>
+                @endforeach
+            </div>
+
         @endauth
 
         <div id="main" class="relative flex-1 flex flex-col">
@@ -100,7 +110,7 @@
                                                     >
                                                         <div class="flex items-center h-full">
                                                             <a href="{{ $menu_page->full_slug }}" class="inline-flex items-center whitespace-nowrap px-2 md:px-4 flex-1 py-1 md:py-0 md:h-full
-                                                                {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->full_slug) ? 'text-primary bg-white' : 'hover:underline text-gray-600 hover:text-gray-700' }}"
+                                                                {{ Illuminate\Support\Str::contains(request()->path(), $menu_page->full_slug) ? 'bg-white' : 'hover:underline' }}"
                                                             >
                                                                 {{ $menu_page->name }}
                                                             </a>
@@ -123,11 +133,6 @@
 
                                                 @endif
                                             @endforeach 
-                                            @auth
-                                                <div class="md:hidden">
-                                                    @include ('side-menu')
-                                                </div>
-                                            @endauth
                                         </div>
 
                                         <div class="flex items-center md:items-end md:justify-center flex-col relative">
@@ -140,9 +145,9 @@
                                                 @auth
                                                     <user-menu :user='@json(auth()->user()->load("roles"))'></user-menu>
 
-                                                    @if (auth()->user()->hasRole('editor'))
+                                                    @if ((auth()->user()->hasRole('pages-editor') || auth()->user()->hasRole('blogs-editor')) && isset($page))
                                                         <div class="absolute -mr-10 right-0 hidden md:block">
-                                                            <editing-button v-show="{{ !request('preview') }}" class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}"></editing-button>
+                                                            <editing-button v-show="{{ !request('preview') }}" class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}" type="{{ Illuminate\Support\Str::plural($page->type) }}"></editing-button>
                                                         </div>
                                                     @endif
 
@@ -165,7 +170,7 @@
                         </div>
 
                         @auth
-                            @if (auth()->user()->hasRole('editor'))
+                            @if (auth()->user()->hasRole('pages-editor') || auth()->user()->hasRole('blogs-editor'))
                                 <echos :editing="{{ session()->get('editing') ? 'true' : 'false' }}"></echos>
                             @endif
                         @endauth

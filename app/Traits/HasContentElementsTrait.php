@@ -47,15 +47,15 @@ trait HasContentElementsTrait
     {
         $version_id = requestInput('version_id');
         
-        return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-content-elements', function () use ($version_id) {
-            if ($version_id > 0) {
+        if ($version_id > 0) {
+            return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-content-elements-'.$version_id, function () use ($version_id) {
                 return $this->contentElements()
-                    ->wherePivot('version_id', '<=', $version_id)
-                    ->get();
-            } else {
-                return $this->contentElements()->get();
-            }
-        });
+                        ->wherePivot('version_id', '<=', $version_id)
+                        ->get();
+            });
+        } else {
+            return $this->contentElements()->get();
+        }
     }
 
     public function getContentElementsAttribute()

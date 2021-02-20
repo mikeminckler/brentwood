@@ -193,10 +193,10 @@
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('save-page', savePageEvent);
                 this.$eventer.$off('load-page', loadPageEvent);
-                this.$echo.leave('role.editor');
+                this.$echo.leave('role.' + this.$store.state.page.type + 's-editor');
             });
 
-            this.$echo.private('role.editor')
+            this.$echo.private('role.' + this.$store.state.page.type + 's-editor')
                 .listen('PageSaved', data => {
                     if (this.page.id === data.page.id) {
                         console.log('LOAD PAGE FROM PAGE SAVED');

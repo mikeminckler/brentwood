@@ -26,6 +26,17 @@ class BlogPolicy
      * @param  \App\User  $user
      * @return mixed
      */
+    public function manage(User $user)
+    {
+        return $user->hasRole('blogs-manager');
+    }
+
+    /**
+     * Determine whether the user can view any models.
+     *
+     * @param  \App\User  $user
+     * @return mixed
+     */
     public function viewAny(User $user)
     {
         //
@@ -75,7 +86,7 @@ class BlogPolicy
      */
     public function publish(User $user, Blog $blog)
     {
-        return $user->hasRole('publisher');
+        return $user->hasRole('blogs-publisher');
     }
 
     /**

@@ -201,7 +201,7 @@
 
             this.$eventer.$on('save-content', listener);
 
-            this.$echo.private('role.editor')
+            this.$echo.private('role.' + this.$store.state.page.type + 's-editor')
                 .listen('ContentElementSaved', data => {
                     if (this.contentElement.uuid === data.content_element.uuid) {
                         console.log('LOAD FROM EVENT: ' + this.contentElement.uuid);
@@ -211,7 +211,7 @@
 
             this.$once('hook:destroyed', () => {
                 this.$eventer.$off('save-content', listener);
-                this.$echo.leave('role.editor');
+                this.$echo.leave('role.' + this.$store.state.page.type + 's-editor');
             });
 
         },

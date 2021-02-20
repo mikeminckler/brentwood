@@ -36,6 +36,6 @@ class BlogDraftCreated implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('role.editor');
+        return new PrivateChannel('role.blogs-editor');
     }
 }

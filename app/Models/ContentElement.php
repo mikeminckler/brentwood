@@ -40,24 +40,23 @@ class ContentElement extends Model
             $content_element = ContentElement::findOrFail($id);
             $uuid = $content_element->uuid;
 
-            $is_published = $content_element->contentables()->whereHas('version', function($query) {
+            $is_published = $content_element->contentables()->whereHas('version', function ($query) {
                 $query->whereNotNull('published_at');
             })->count();
 
             if (!$is_published) {
                 $new_version = false;
             } else {
-
                 $content_elements = ContentElement::where('uuid', $uuid)
-                    ->whereHas('contentables', function($query) use($contentable) {
+                    ->whereHas('contentables', function ($query) use ($contentable) {
                         $query->where('contentable_id', $contentable->id)
                               ->where('contentable_type', get_class($contentable))
-                                ->whereHas('version', function($query) {
+                                ->whereHas('version', function ($query) {
                                     $query->whereNull('published_at');
                                 });
                     })
                     ->get()
-                    ->sortByDesc(function ($content_element) use($contentable) {
+                    ->sortByDesc(function ($content_element) use ($contentable) {
                         return $content_element->getPageVersion($contentable)->id;
                     });
 
@@ -95,7 +94,6 @@ class ContentElement extends Model
         }
 
         foreach ($pages as $page) {
-
             if (!$page->contentElements()->get()->contains('id', $content_element->id)) {
                 $page->contentElements()->attach($content_element, [
                     'version_id' => $page->getDraftVersion()->id,
@@ -122,26 +120,26 @@ class ContentElement extends Model
         if ($new_version) {
             broadcast(new ContentElementCreated($content_element, $contentable))->toOthers();
         } else {
-            broadcast(new ContentElementSaved($content_element))->toOthers();
+            broadcast(new ContentElementSaved($content_element, $contentable))->toOthers();
         }
 
         return $content_element;
     }
 
-    public static function findPagesByUuid($uuid, $add_page = null) {
-
+    public static function findPagesByUuid($uuid, $add_page = null)
+    {
         $pages = ContentElement::where('uuid', $uuid)
              ->get()
-             ->map(function($ce) {
-                return $ce->contentables->map->pageable;
+             ->map(function ($ce) {
+                 return $ce->contentables->map->pageable;
              })
              ->flatten();
 
         if ($add_page) {
-             $pages->push($add_page);
+            $pages->push($add_page);
         }
 
-        return $pages->unique(function($item) {
+        return $pages->unique(function ($item) {
             return $item->type.$item->id;
         });
     }
@@ -209,13 +207,13 @@ class ContentElement extends Model
         }
 
         return ContentElement::where('uuid', $this->uuid)
-            ->whereHas('contentables', function($query) use($page, $version) {
+            ->whereHas('contentables', function ($query) use ($page, $version) {
                 $query->where('contentable_id', $page->id)
                     ->where('contentable_type', get_class($page))
                     ->where('version_id', '<', $version->id);
             })
             ->get()
-            ->sortByDesc(function ($content_element) use($page) {
+            ->sortByDesc(function ($content_element) use ($page) {
                 return $content_element->contentables()
                     ->where('contentable_id', $page->id)
                     ->where('contentable_type', get_class($page))
@@ -229,7 +227,7 @@ class ContentElement extends Model
         return $this->type === $type;
     }
 
-    public function getPageVersion($contentable) 
+    public function getPageVersion($contentable)
     {
         $contentables = $this->contentables()
                     ->where('contentable_id', $contentable->id)

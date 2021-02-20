@@ -145,7 +145,7 @@ trait VersioningTestTrait
         $this->signIn($user);
         $this->assertFalse($page->can_be_published);
 
-        $user->addRole('publisher');
+        $user->addRole(Str::plural($this->getClassname()).'-publisher');
         $user->refresh();
         $page->refresh();
 

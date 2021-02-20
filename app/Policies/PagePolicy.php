@@ -75,7 +75,7 @@ class PagePolicy
      */
     public function publish(User $user, Page $page)
     {
-        return $user->hasRole('publisher');
+        return $user->hasRole('pages-publisher');
     }
 
     /**

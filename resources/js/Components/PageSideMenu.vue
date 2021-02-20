@@ -14,11 +14,16 @@
             </div>
             <page-tree 
                 :sort="true" 
-                :expanded="true" 
+                :expanded="false" 
                 :show-changes="true" 
                 max-height="100%"
                 :insert="addPage ? true : false"
             ></page-tree>
+
+            <div class="py-2">
+                <slot></slot>
+            </div>
+
         </div>
     </div>
 

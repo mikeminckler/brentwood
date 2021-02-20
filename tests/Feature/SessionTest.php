@@ -14,18 +14,18 @@ class SessionTest extends TestCase
     /** @test **/
     public function editing_can_be_toggled_in_the_session()
     {
-        $this->postJson(route('editing-toggle'))
+        $this->postJson(route('editing-toggle', ['type' => 'page']))
              ->assertStatus(401);
 
         $this->signIn(User::factory()->create());
 
         $this->withoutExceptionHandling();
-        $this->post(route('editing-toggle'))
+        $this->post(route('editing-toggle', ['type' => 'page']))
              ->assertStatus(403);
 
         $this->signInAdmin();
 
-        $this->post(route('editing-toggle'))
+        $this->post(route('editing-toggle', ['type' => 'page']))
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Editing Enabled',
@@ -34,7 +34,7 @@ class SessionTest extends TestCase
 
         $this->assertTrue(session()->has('editing'));
 
-        $this->post(route('editing-toggle'))
+        $this->post(route('editing-toggle', ['type' => 'page']))
              ->assertSuccessful()
              ->assertJsonFragment([
                 'success' => 'Editing Disabled',

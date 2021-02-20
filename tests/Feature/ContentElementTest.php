@@ -16,7 +16,6 @@ use App\Models\ContentElement;
 
 class ContentElementTest extends TestCase
 {
-
     use WithFaker;
 
     /** @test **/
@@ -39,11 +38,11 @@ class ContentElementTest extends TestCase
 
         $this->signInAdmin();
 
-        $this->json('POST', route('content-elements.publish', ['id' => $content_element1->id]))
+        $this->json('POST', route('content-elements.publish', ['id' => $content_element1->id]), ['pivot.contentable_type' => $page->type])
              ->assertStatus(422)
              ->assertJsonValidationErrors([
                  'pivot.contentable_id',
-                 'pivot.contentable_type',
+                 //'pivot.contentable_type',
              ]);
 
         $this->withoutExceptionHandling();
@@ -60,7 +59,6 @@ class ContentElementTest extends TestCase
         $this->assertNotNull($content_element1->getPageVersion($page)->published_at);
         $this->assertNull($content_element2->getPageVersion($page)->published_at);
         $this->assertNull($content_element3->getPageVersion($page)->published_at);
-
     }
 
     /** @test **/
@@ -121,7 +119,6 @@ class ContentElementTest extends TestCase
                  'contentable_id' => $page->id,
                  'body' => $paragraph,
              ]);
-
     }
 
     /** @test **/
@@ -178,7 +175,5 @@ class ContentElementTest extends TestCase
 
         $this->assertNotNull(Arr::get($data, 'tags'));
         $this->assertTrue(collect(Arr::get($data, 'tags'))->contains('id', $tag->id));
-
-
     }
 }

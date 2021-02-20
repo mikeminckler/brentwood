@@ -14,7 +14,7 @@
     export default {
 
         mixins: [Feedback],
-        props: ['enabled'],
+        props: ['enabled', 'type'],
 
         computed: {
             editingEnabled() {
@@ -26,10 +26,14 @@
             this.$store.dispatch('setEditing', this.enabled);
 
             if (this.$store.state.editing) {
-                this.$echo.private('role.editor')
+                this.$echo.private('role.' + this.type + '-editor')
                     .listen('PageDraftCreated', (data) => {
                         this.$eventer.$emit('refresh-page-tree');
                     });
+
+                this.$once('hook:destroyed', () => {
+                    this.$echo.leave('role.' + this.type + '-editor');
+                });
             }
         },
 
@@ -37,7 +41,7 @@
 
             toggleEditing: function() {
 
-                this.$http.post('/editing-toggle').then( response => {
+                this.$http.post('/editing-toggle/' + this.type).then( response => {
                     location.reload();
                 }, error => {
                     this.processErrors(error.response);

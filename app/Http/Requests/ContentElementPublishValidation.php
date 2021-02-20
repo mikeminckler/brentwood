@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 use App\Models\ContentElement;
 
@@ -19,7 +20,12 @@ class ContentElementPublishValidation extends FormRequest
             return false;
         }
 
-        return auth()->user()->hasRole('publisher');
+        $type = requestInput('pivot.contentable_type');
+
+        if (!$type) {
+            return false;
+        }
+        return auth()->user()->hasRole(Str::plural($type).'-publisher');
     }
 
     /**

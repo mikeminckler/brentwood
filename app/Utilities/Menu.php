@@ -63,7 +63,7 @@ class Menu
             $pages->push([
                 'name' => 'Page Permissions',
                 'icon' => 'fas fa-user-lock',
-                'url' => '/permissions',
+                'url' => '/permissions/pages',
             ]);
 
             $pages->push([

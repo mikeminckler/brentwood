@@ -74,6 +74,7 @@ const app = new Vue({
         'echos': () => import(/* webpackChunkName: "echos" */ '@/Components/Echos.vue'),
         'editing-button': () => import(/* webpackChunkName: "editing-button" */ '@/Components/EditingButton'),
         'footer-editor': () => import(/* webpackChunkName: "footer-editor" */ '@/Components/FooterEditor'),
+        'form-login': () => import(/* webpackChunkName: "form-login" */ '@/Forms/Login.vue'),
         'feedback': () => import(/* webpackChunkName: "feedback" */ '@/Components/Feedback'),
         'inquiry': () => import(/* webpackChunkName: "inquiry" */ '@/Forms/Inquiry'),
         'page-editor': () => import(/* webpackChunkName: "page-editor" */ '@/Components/PageEditor'),

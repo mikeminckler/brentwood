@@ -55,10 +55,10 @@
                 <page-side-menu> </page-side-menu>
             @endif
 
-            <div class="">
+            <div class="hidden md:block">
                 @foreach (App\Utilities\Menu::getModules() as $module)
-                    <a href="{{ $module['url'] }}" class="flex pl-4 py-1 hover:bg-white">
-                        <div class="pr-2"><i class="{{ $module['icon'] }}"></i></div>
+                    <a href="{{ $module['url'] }}" class="flex pl-2 py-1 hover:bg-white">
+                        <div class="pr-2 w-6"><i class="{{ $module['icon'] }}"></i></div>
                         <div class="">{{ $module['name'] }}</div>
                     </a>
                 @endforeach
@@ -87,7 +87,7 @@
                             <nav class="flex-1 relative flex md:block items-center h-full py-1 md:py-0">
 
                                 <div class="relative md:hidden flex w-full items-center justify-end">
-                                    <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="button md:hidden mr-2 whitespace-no-wrap text-sm">Apply</a>
+                                    <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="md:hidden mr-2 bg-primary rounded text-white font-bold px-2 py-1 shadow-inner hover:shadow hover:bg-primaryHover leading-tight">Apply Now</a>
                                     <div class="button-icon mr-2 toggle" :class="$store.state.showMenu ? 'active' : ''" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
                                 </div>
 
@@ -100,7 +100,7 @@
                                         :class="[$store.state.showMenu ? 'shadow md:shadow-none' : '']"
                                     >
 
-                                        <div id="menu" class="flex-1 md:flex relative w-full justify-center md:px-4">
+                                        <div id="menu" class="flex-1 md:flex relative w-full justify-center md:px-2">
                                             @foreach (App\Utilities\Menu::getMenu()->sortBy->sort_order as $menu_page)
                                                 @if (!$menu_page->unlisted && $menu_page->published_version_id)
 
@@ -133,25 +133,25 @@
 
                                                 @endif
                                             @endforeach 
+
+                                                @guest
+                                                    <div class="font-oswald font-light text-base md:text-lg relative md:flex md:items-center">
+                                                        <a class="inline-flex items-center whitespace-nowrap px-2 md:px-4 flex-1 py-1 md:py-0 md:h-full" href="/login">Login</a>
+                                                    </div>
+                                                @endguest
+
                                         </div>
 
                                         <div class="flex items-center md:items-end md:justify-center flex-col relative">
 
                                             <div class="flex md:items-center mb-2 md:mb-0 relative">
-                                        
-                                                <a href="/admissions/apply" class="button hidden md:block mr-2 my-0 whitespace-no-wrap text-base">Apply Now</a>
-                                                <a href="#" class="hidden md:block text-lg text-gray-400 cursor-pointer mr-2"><i class="fas fa-search"></i></a>
 
                                                 @auth
-                                                    <user-menu :user='@json(auth()->user()->load("roles"))'></user-menu>
-
-                                                    @if ((auth()->user()->hasRole('pages-editor') || auth()->user()->hasRole('blogs-editor')) && isset($page))
-                                                        <div class="absolute -mr-10 right-0 hidden md:block">
-                                                            <editing-button v-show="{{ !request('preview') }}" class="ml-4" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}" type="{{ Illuminate\Support\Str::plural($page->type) }}"></editing-button>
-                                                        </div>
-                                                    @endif
-
+                                                    <user-menu class="w-8" :user='@json(auth()->user()->load("roles"))'></user-menu>
                                                 @endauth
+
+                                                <a href="#" class="hidden md:block text-lg text-gray-400 cursor-pointer w-6 mt-1 mr-2"><i class="fas fa-search"></i></a>
+                                                <a href="/admissions/apply" class="hidden md:block mr-2 my-0 whitespace-nowrap text-base bg-primary rounded text-white font-bold px-2 py-1 shadow-inner hover:shadow hover:bg-primaryHover">Apply Now</a>
                                             </div>
 
                                             <div class="text-sm leading-loose hidden text-center">
@@ -161,6 +161,17 @@
 
                                         </div>
 
+                                    </div>
+
+                                    <div class="hidden md:block relative h-full">
+                                        <div class="absolute flex items-center h-full pl-2">
+
+                                            @auth
+                                                @if ((auth()->user()->hasRole('pages-editor') || auth()->user()->hasRole('blogs-editor')) && isset($page))
+                                                    <editing-button v-show="{{ !request('preview') }}" :enabled="{{ session()->get('editing') ? 'true' : 'false'}}" type="{{ Illuminate\Support\Str::plural($page->type) }}"></editing-button>
+                                                @endif
+                                            @endauth
+                                        </div>
                                     </div>
                                     
                                 </div>

@@ -27,8 +27,14 @@
             ></autocomplete>
         </div>
 
-    </div>
+        <div class="">
+            <div class="button" @click="save()">
+                <div class="icon"><i class="fas fa-save"></i></div>
+                <div class="pl-2">Save User</div>
+            </div>
+        </div>
 
+    </div>
 
 </template>
 
@@ -47,9 +53,6 @@
 
         data() {
             return {
-                saveUser: _.debounce( function() {
-                    this.persist();
-                }, 500),
             }
         },
 
@@ -57,19 +60,13 @@
         },
 
         watch: {
-            user: {
-                handler: function(oldValue, newValue) {
-                    this.saveUser();
-                },
-                deep: true
-            },
         },
 
         mounted() {
         },
 
         methods: {
-            persist: function() {
+            save: function() {
                 this.$http.post('/users/' + this.user.id, this.user).then( response => {
                     this.processSuccess(response);
                 }, error => {

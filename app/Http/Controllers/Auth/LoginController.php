@@ -3,86 +3,138 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+
+use App\Http\Requests\LoginRequest;
 
 use Socialite;
 use App\Models\User;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
-    use AuthenticatesUsers;
-
     /**
-     * Where to redirect users after login.
+     * Display the login view.
      *
-     * @var string
+     * @return \Illuminate\View\View
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function create()
     {
-        $this->middleware('guest')->except('logout');
+        return view('auth.login');
+    }
+
+    public function store(LoginRequest $request)
+    {
+        $request->authenticate();
+        $request->session()->regenerate();
+        $this->setSessionTimeout();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => 'Login Complete',
+                'redirect' => '/',
+            ]);
+        } else {
+            return redirect()->intended('/');
+        }
     }
 
     /**
-     * The user has been authenticated.
+     * Destroy an authenticated session.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $user
-     * @return mixed
-    protected function authenticated(Request $request, $user)
-    {
-    }
+     * @return \Illuminate\Http\RedirectResponse
      */
+    public function destroy(Request $request)
+    {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                //'success' => 'Logout Complete',
+                'redirect' => '/login?'.(request('timeout') ? 'timeout=true' : 'logout=true'),
+            ]);
+        } else {
+            return redirect('/login')->with(['success' => 'Logout Complete']);
+        }
+    }
 
     /**
-     * The user has logged out of the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * Redirect to Google for OAuth
      */
-    protected function loggedOut(Request $request)
-    {
-        return redirect('/')->with('success', 'Logged Out');
-    }
-
-    public function redirectToProvider()
+    public function redirectToGoogle()
     {
         return Socialite::driver('google')->with(['hd' => 'brentwood.ca'])->redirect();
     }
 
-    public function handleProviderCallback()
+    /**
+     * Process the successful response from a Google Login
+     */
+    public function handleGoogleCallback()
     {
         $user = User::createOrUpdateFromGoogle(Socialite::driver('google')->user());
         $user->setGroupsFromGoogle();
         auth()->login($user);
+        $this->setSessionTimeout();
         return redirect()->intended('/');
     }
 
-    public function intendedUrl() 
+    /**
+     * Set the intended page that was being requested before we are redirected
+     * to the login page
+     */
+    public function intendedUrl()
     {
         if (request('url')) {
             session()->put('url.intended', request('url'));
         }
 
         return response()->json();
+    }
+
+    /**
+     * A json request to see if the authenticated users session is still valid
+     * otherwise we send a response code that will log them out
+     */
+    public function getTimeout()
+    {
+        if ($this->isTimedOut()) {
+            return response()->json(['error' => 'Session Expired'], 419);
+        } else {
+            return response()->json(['success' => 'Session Valied']);
+        }
+    }
+
+    protected function isTimedOut()
+    {
+        $timeout = session()->get('timeout');
+
+        if (!$timeout) {
+            true;
+        }
+
+        return $timeout->isPast();
+    }
+
+    /**
+     * After succesful login by the OAuth and regular functions in this controller
+     * set the session variables
+     */
+    protected function setSessionTimeout()
+    {
+        session()->put('timeout', now()->addMinutes(config('session.lifetime')));
+    }
+
+    public function setTimeout()
+    {
+        if (!$this->isTimedOut()) {
+            $this->setSessionTimeout();
+        }
+
+        return response()->json([
+            'success' => 'Session Updated',
+        ]);
     }
 }

@@ -26,16 +26,21 @@ use App\Http\Controllers\InquiriesController;
 use App\Http\Controllers\LivestreamsController;
 use App\Http\Controllers\ChatController;
 
-//Auth::routes();
-
-Route::get('login', [LoginController::class, 'redirectToProvider'])->name('login');
-Route::get('login/google/authorized', [LoginController::class, 'handleProviderCallback']);
-Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-Route::post('intended-url', [LoginController::class, 'intendedUrl'])->name('intended-url');
+Route::group(['middleware' => ['guest']], function () {
+    Route::get('/login', [LoginController::class, 'create'])->name('login');
+    Route::post('/login', [LoginController::class, 'store'])->name('login');
+    Route::get('/login/google', [LoginController::class, 'redirectToGoogle'])->name('google-login');
+    Route::get('/login/google/authorized', [LoginController::class, 'handleGoogleCallback']);
+    Route::post('/intended-url', [LoginController::class, 'intendedUrl'])->name('intended-url');
+});
 
 Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');
 
 Route::group(['middleware' => ['auth']], function () {
+    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+    Route::get('/session-timeout', [LoginController::class, 'getTimeout'])->name('session-timeout');
+    Route::post('/session-timeout', [LoginController::class, 'setTimeout'])->name('session-timeout');
+
     Route::get('/users', [UsersController::class, 'index'])->name('users.index');
     Route::get('/users/load', [UsersController::class, 'load'])->name('users.load');
     Route::post('/users/{id}', [UsersController::class, 'store'])->name('users.update')->where('id', '\d+');

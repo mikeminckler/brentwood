@@ -24,7 +24,7 @@ export default {
                 } else if (response.status == '403') {
 
                     if (response.data.redirect) {
-                        //this.$inertia.visit(response.data.redirect);
+                        window.location.href = response.data.redirect;
                     }
 
                     let error_message;
@@ -73,7 +73,7 @@ export default {
             }
 
             if (response.data.redirect) {
-                //this.$inertia.visit(response.data.redirect);
+                window.location.href = response.data.redirect;
             }
         },
 

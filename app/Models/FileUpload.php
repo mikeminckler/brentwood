@@ -17,7 +17,7 @@ class FileUpload extends Model
 
     protected $hidden = ['storage_filename'];
 
-    public $max_size = 1024;
+    public $max_size = 10240;
     public $extensions = [
         'jpg',
         'jpeg',
@@ -25,7 +25,7 @@ class FileUpload extends Model
         'pdf',
     ];
 
-    public $max_image_size = 20480;
+    public $max_image_size = 30720;
     public $image_extensions = [
         'jpg',
         'jpeg',

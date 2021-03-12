@@ -77,6 +77,15 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * After succesful login by the OAuth and regular functions in this controller
+     * set the session variables
+     */
+    public function setSessionTimeout()
+    {
+        session()->put('timeout', now()->addMinutes(config('session.lifetime')));
+    }
+
     public function saveUser(array $input, $id = null)
     {
         if ($id) {
@@ -227,6 +236,7 @@ class User extends Authenticatable
         $user->email = $data->getEmail();
         $user->name = $data->getName();
         $user->avatar = $data->getAvatar();
+        $user->email_verified_at = now();
         $user->save();
 
         return $user;
@@ -290,5 +300,10 @@ class User extends Authenticatable
     public function getEmailVerificationUrl()
     {
         return URL::temporarySignedRoute('users.verify-email', Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)), [ 'id' => $this->id ]);
+    }
+
+    public function getResetPasswordUrl()
+    {
+        return URL::temporarySignedRoute('users.reset-password', Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)), [ 'id' => $this->id ]);
     }
 }

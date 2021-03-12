@@ -4,17 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\User;
 use App\Models\Chat;
 use App\Models\Page;
 use App\Http\Requests\UserValidation;
+use App\Http\Requests\RequestPasswordResetValidation;
+use App\Http\Requests\ResetPasswordValidation;
 
 use App\Events\UserBanned;
 
 use App\Utilities\PageResponse;
 
 use App\Mail\EmailVerification;
+use App\Mail\ResetPassword;
 
 class UsersController extends Controller
 {
@@ -128,5 +132,50 @@ class UsersController extends Controller
         $user->save();
 
         return (new PageResponse)->view(Page::getHomePage(), 'pages.view')->with(['success' => 'Email Verification Complete']);
+    }
+
+    public function requestPasswordReset(RequestPasswordResetValidation $request)
+    {
+        $user = User::where('email', requestInput('email'))->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'There is no user with that email address'], 401);
+        }
+
+        if ($user->oauth_id) {
+            return response()->json(['error' => 'Please reset your password via Google'], 422);
+        }
+
+        Mail::to($user->email)
+                ->queue(new ResetPassword($user));
+
+        return response()->json([
+            'success' => 'Password Reset Email Sent',
+        ]);
+    }
+
+    public function viewResetPassword($id)
+    {
+        if (! request()->hasValidSignature()) {
+            abort(401);
+        }
+        
+        $user = User::findOrFail($id);
+
+        return view('auth.reset-password', compact('user'));
+    }
+
+    public function resetPassword(ResetPasswordValidation $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->password = Hash::make(requestInput('password'));
+        $user->save();
+        auth()->login($user);
+        auth()->user()->setSessionTimeout();
+
+        return response()->json([
+            'success' => 'Password Reset',
+        ]);
     }
 }

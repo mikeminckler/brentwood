@@ -201,7 +201,9 @@ class Page extends Model
             return $value;
         } else {
             if ($this->parent_page_id > 0) {
-                return Page::find($this->parent_page_id)->getFooterFgPhoto();
+                return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-parent-footer-fg-photo', function () {
+                    return Page::find($this->parent_page_id)->getFooterFgPhoto();
+                });
             } else {
                 return null;
             }
@@ -215,7 +217,9 @@ class Page extends Model
             return $value;
         } else {
             if ($this->parent_page_id > 0) {
-                return Page::find($this->parent_page_id)->getFooterBgPhoto();
+                return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-parent-footer-bg-photo', function () {
+                    return Page::find($this->parent_page_id)->getFooterBgPhoto();
+                });
             } else {
                 return null;
             }
@@ -228,7 +232,9 @@ class Page extends Model
             return $value;
         } else {
             if ($this->parent_page_id > 0) {
-                return Page::find($this->parent_page_id)->footer_color;
+                return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-parent-footer-color', function () {
+                    return Page::find($this->parent_page_id)->footer_color;
+                });
             } else {
                 return null;
             }

@@ -76,11 +76,11 @@
 
                         <div class="hidden border-r-4 border-primary absolute top-0 h-full md:ml-33p"></div>
 
-                        <div class="relative flex">
+                        <div class="relative flex items-center">
 
                             <div class="relative flex-1 flex items-center justify-center">
                                 <div class="ml-2 md:ml-0 flex justify-center items-center relative transition-all duration-500" :class="$store.state.scrollPosition > 64 ? 'h-6 md:h-6' : 'h-8 md:h-14'">
-                                    <a href="/"><img src="images/logo.svg" class="transition-all duration-500" :class="$store.state.scrollPosition > 64 ? 'h-6 md:h-8' : 'h-8 md:h-10'" /></a>
+                                    <a href="/"><img src="images/logo.svg" class="transition-all duration-500" style="max-height: 40px;" :class="$store.state.scrollPosition > 64 ? 'h-6 md:h-8' : 'h-8 md:h-10'" /></a>
                                 </div>
                             </div>
 
@@ -89,6 +89,9 @@
                                 <div class="relative md:hidden flex w-full items-center justify-end">
                                     <a href="https://www.brentwood.bc.ca/admissions/application-process/application-process/#/?c=2409" target="_blank" class="md:hidden mr-2 bg-primary rounded text-white font-bold px-2 py-1 shadow-inner hover:shadow hover:bg-primaryHover leading-tight">Apply Now</a>
                                     <div class="button-icon mr-2 toggle" :class="$store.state.showMenu ? 'active' : ''" @click="$store.dispatch('toggleMenu')"><i class="fas fa-bars"></i></div>
+                                    @auth
+                                        <user-menu class="w-8 mr-2 md:hidden" :user='@json(auth()->user()->load("roles"))'></user-menu>
+                                    @endauth
                                 </div>
 
                                 <div class="top-0 mt-10 border-l-4 md:border-l-0 border-primary bg-gray-100 md:bg-transparent absolute md:relative w-screen md:w-auto md:mt-0 right-0 md:right-auto md:h-full md:flex items-center z-5 md:overflow-visible overflow-hidden"
@@ -123,7 +126,7 @@
 
                                                         @if ($menu_page->pages->count())
                                                             @foreach ($menu_page->pages as $menu_sub_page)
-                                                                <div class="sub-menu overflow-hidden font-oswald text-base hover:bg-white md:hidden">
+                                                                <div class="sub-menu overflow-hidden font-oswald text-base bg-gray-200 hover:bg-white md:hidden">
                                                                     <a href="{{ $menu_sub_page->full_slug }}" class="px-4 py-1 block">{{ $menu_sub_page->name }}</a>
                                                                 </div>
                                                             @endforeach
@@ -147,7 +150,7 @@
                                             <div class="flex md:items-center mb-2 md:mb-0 relative">
 
                                                 @auth
-                                                    <user-menu class="w-8" :user='@json(auth()->user()->load("roles"))'></user-menu>
+                                                    <user-menu class="w-8 hidden md:block" :user='@json(auth()->user()->load("roles"))'></user-menu>
                                                 @endauth
 
                                                 <a href="#" class="hidden md:block text-lg text-gray-400 cursor-pointer w-6 mt-1 mr-2"><i class="fas fa-search"></i></a>
@@ -316,14 +319,13 @@
 
         <processing></processing>
 
-        <feedback 
-            {{ $errors->count() ? ':errors="'.json_encode($errors).'"' : '' }} 
-            {{ isset($error) ? ':error="'.json_encode($error).'"' : '' }} 
-            {{ isset($sucess) ? ':success="'.json_encode($sucess).'"' : '' }} 
-        ></feedback>
+        <feedback :errors='@json($errors)' :error='@json(isset($error) ? $error : null)' :success='@json(isset($success) ? $success : null)'></feedback>
 
         <photo-viewer></photo-viewer>
         <scroll-position></scroll-position>
+        @auth
+            <email-confirmer></email-confirmer>
+        @endauth
 
     </div>
 

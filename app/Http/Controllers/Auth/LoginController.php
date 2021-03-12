@@ -27,7 +27,7 @@ class LoginController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
-        $this->setSessionTimeout();
+        auth()->user()->setSessionTimeout();
 
         if (request()->expectsJson()) {
             return response()->json([
@@ -77,7 +77,7 @@ class LoginController extends Controller
         $user = User::createOrUpdateFromGoogle(Socialite::driver('google')->user());
         $user->setGroupsFromGoogle();
         auth()->login($user);
-        $this->setSessionTimeout();
+        auth()->user()->setSessionTimeout();
         return redirect()->intended('/');
     }
 
@@ -118,19 +118,10 @@ class LoginController extends Controller
         return $timeout->isPast();
     }
 
-    /**
-     * After succesful login by the OAuth and regular functions in this controller
-     * set the session variables
-     */
-    protected function setSessionTimeout()
-    {
-        session()->put('timeout', now()->addMinutes(config('session.lifetime')));
-    }
-
     public function setTimeout()
     {
         if (!$this->isTimedOut()) {
-            $this->setSessionTimeout();
+            auth()->user()->setSessionTimeout();
         }
 
         return response()->json([

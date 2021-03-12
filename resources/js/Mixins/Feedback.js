@@ -5,6 +5,7 @@ export default {
     data() {
         return {
             processing: false,
+            formErrors: [],
         }
     },
 
@@ -41,10 +42,15 @@ export default {
                         this.$store.dispatch('addFeedback', {'type': 'error', 'message': response.data.error});
                     }
 
+                    this.formErrors = [];
+
                     this.$lodash.forEach (response.data.errors, (errors, input) => {
 
                         this.$lodash.forEach (errors, error => {
                             this.$store.dispatch('addFeedback', {'type': 'error', 'message': error, 'input': input});
+                            let e = {};
+                            e[input] = error;
+                            this.formErrors.push(e);
                         });
 
                     });
@@ -62,6 +68,7 @@ export default {
         processSuccess: function(response) {
 
             this.$store.dispatch('clearErrorsFeedback');
+            this.formErrors = [];
             //this.$eventer.$emit('processing-finished');
 
             if (response.data.success) {

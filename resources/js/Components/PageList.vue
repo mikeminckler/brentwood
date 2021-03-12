@@ -1,11 +1,12 @@
 <template>
 
-    <div class="pl-4 relative w-full overflow-visible" 
+    <div class="relative w-full overflow-visible" 
         :id="'page' + page.id" 
         :data-page-id="page.id"
         :draggable="page.id > 1 ? 'true' : 'false'"
         @dragstart.stop="!insert ? startDrag($event, page) : null"
         :class="[
+            page.id > 1 ? 'pl-4' : '',
             page.parent_page_id > 0 && !insert ? 'cursor-move sort-item' : '',
             page.pages ? ( page.pages.length > 0 ? 'sort-container' : '') : '',
             page.unlisted ? '' : '', 

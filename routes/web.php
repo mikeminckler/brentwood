@@ -32,6 +32,10 @@ Route::group(['middleware' => ['guest']], function () {
     Route::get('/login/google', [LoginController::class, 'redirectToGoogle'])->name('google-login');
     Route::get('/login/google/authorized', [LoginController::class, 'handleGoogleCallback']);
     Route::post('/intended-url', [LoginController::class, 'intendedUrl'])->name('intended-url');
+
+    Route::post('/users/request-password-reset', [UsersController::class, 'requestPasswordReset'])->name('users.request-password-reset');
+    Route::get('/users/{id}/reset-password', [UsersController::class, 'viewResetPassword'])->name('users.reset-password')->where('id', '\d+');
+    Route::post('/users/{id}/reset-password', [UsersController::class, 'resetPassword'])->name('users.reset-password')->where('id', '\d+');
 });
 
 Route::get('/users/{id}/verify-email', [UsersController::class, 'verifyEmail'])->name('users.verify-email')->where('id', '\d+');
@@ -48,7 +52,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/users/{id}', [UsersController::class, 'store'])->name('users.update')->where('id', '\d+');
     Route::post('/users/search', [UsersController::class, 'search'])->name('users.search');
     Route::post('/users/{id}/ban', [UsersController::class, 'ban'])->name('users.ban')->where('id', '\d+');
-    Route::get('/users/{id}/send-email-verification', [UsersController::class, 'sendEmailVerification'])->name('users.send-email-verification')->where('id', '\d+');
+    Route::post('/users/{id}/send-email-verification', [UsersController::class, 'sendEmailVerification'])->name('users.send-email-verification')->where('id', '\d+');
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');
     Route::post('/roles/create', [RolesController::class, 'store'])->name('roles.store');

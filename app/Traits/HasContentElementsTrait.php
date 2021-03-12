@@ -54,7 +54,9 @@ trait HasContentElementsTrait
                         ->get();
             });
         } else {
-            return $this->contentElements()->get();
+            return cache()->tags([cache_name($this)])->rememberForever(cache_name($this).'-content-elements-current-version', function () {
+                return $this->contentElements()->get();
+            });
         }
     }
 

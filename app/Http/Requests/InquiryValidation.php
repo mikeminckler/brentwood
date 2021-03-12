@@ -33,7 +33,7 @@ class InquiryValidation extends FormRequest
             'name' => 'required|min:3',
             'email' => 'required|email',
             'phone' => 'nullable',
-            'password' => 'confirmed|min:6',
+            'password' => 'nullable|confirmed|min:6',
             'target_grade' => 'nullable|integer|between:8,12',
             'target_year' => 'nullable|date_format:Y',
             'student_type' => 'nullable',

@@ -66,6 +66,10 @@ const app = new Vue({
         'role-management': () => import(/* webpackChunkName: "role-management" */ '@/Pages/RoleManagement.vue'),
         'user-management': () => import(/* webpackChunkName: "user-management" */ '@/Pages/UserManagement.vue'),
 
+        // Forms
+        'form-login': () => import(/* webpackChunkName: "form-login" */ '@/Forms/Login.vue'),
+        'form-reset-password': () => import(/* webpackChunkName: "form-reset-password" */ '@/Forms/ResetPassword.vue'),
+
         // Components
         'blog-preview': () => import(/* webpackChunkName: "blog-preview" */ '@/Components/BlogPreview.vue'),
         'chat': () => import(/* webpackChunkName: "chat" */ '@/Components/Chat.vue'),
@@ -73,8 +77,8 @@ const app = new Vue({
         'content-elements-editor': () => import(/* webpackChunkName: "content-elements-editor" */ '@/Components/ContentElementsEditor'),
         'echos': () => import(/* webpackChunkName: "echos" */ '@/Components/Echos.vue'),
         'editing-button': () => import(/* webpackChunkName: "editing-button" */ '@/Components/EditingButton'),
+        'email-confirmer': () => import(/* webpackChunkName: "email-confirmer" */ '@/Components/EmailConfirmer.vue'),
         'footer-editor': () => import(/* webpackChunkName: "footer-editor" */ '@/Components/FooterEditor'),
-        'form-login': () => import(/* webpackChunkName: "form-login" */ '@/Forms/Login.vue'),
         'feedback': () => import(/* webpackChunkName: "feedback" */ '@/Components/Feedback'),
         'inquiry': () => import(/* webpackChunkName: "inquiry" */ '@/Forms/Inquiry'),
         'page-editor': () => import(/* webpackChunkName: "page-editor" */ '@/Components/PageEditor'),

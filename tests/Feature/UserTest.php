@@ -20,6 +20,7 @@ use App\Models\Chat;
 
 use App\Events\UserBanned;
 use App\Mail\EmailVerification;
+use App\Mail\ResetPassword;
 
 class UserTest extends TestCase
 {
@@ -350,13 +351,13 @@ class UserTest extends TestCase
 
         $email = $user->email;
 
-        $this->json('GET', route('users.send-email-verification', ['id' => $user->id]))
+        $this->json('POST', route('users.send-email-verification', ['id' => $user->id]))
             ->assertStatus(401);
 
         $this->signIn($user);
 
         $this->withoutExceptionHandling();
-        $this->json('GET', route('users.send-email-verification', ['id' => $user->id]))
+        $this->json('POST', route('users.send-email-verification', ['id' => $user->id]))
             ->assertSuccessful()
             ->assertJsonFragment([
                 'success' => 'Email Verification Sent',
@@ -372,10 +373,96 @@ class UserTest extends TestCase
                 'success' => 'Email Verification Complete',
              ]);
 
-        $this->json('GET', route('users.send-email-verification', ['id' => $user->id]))
+        $this->json('POST', route('users.send-email-verification', ['id' => $user->id]))
              ->assertStatus(422)
             ->assertJsonFragment([
                 'error' => 'Your email has already been confirmed',
+            ]);
+    }
+
+    /** @test **/
+    public function a_user_can_send_a_password_reset_email()
+    {
+        $user = User::factory()->create([
+            'oauth_id' => null,
+        ]);
+
+        $this->json('POST', route('users.request-password-reset'), [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([ 'email' ]);
+
+        $this->json('POST', route('users.request-password-reset'), ['email' => Str::random(8).'@foobar.com'])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([ 'email' ]);
+
+        Mail::fake();
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('users.request-password-reset'), ['email' => $user->email])
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                 'success' => 'Password Reset Email Sent',
+             ]);
+
+        Mail::assertQueued(ResetPassword::class, function ($mail) use ($user) {
+            return $mail->hasTo($user->email);
+        });
+    }
+
+    /** @test **/
+    public function a_user_can_reset_their_password()
+    {
+        $user = User::factory()->create();
+        $new_password = Str::random(8);
+
+        $url = $user->getResetPasswordUrl();
+
+        $this->get($url)
+             ->assertSuccessful();
+
+        $this->json('POST', route('users.reset-password', ['id' => $user->id]))
+            ->assertStatus(403);
+
+        $this->json('POST', $url, [])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                'password',
+             ]);
+
+        $this->json('POST', $url, ['password' => $new_password])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                'password',
+             ]);
+
+        $this->json('POST', $url, ['password' => $new_password, 'password_confirmation' => 'foobar'])
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                'password',
+             ]);
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', $url, ['password' => $new_password, 'password_confirmation' => $new_password])
+             ->assertSuccessful()
+             ->assertJsonFragment([
+                'success' => 'Password Reset',
+             ]);
+
+        $this->assertTrue(auth()->check());
+        $this->assertEquals($user->id, auth()->user()->id);
+    }
+
+    /** @test **/
+    public function a_user_with_oauth_cannot_reset_their_password()
+    {
+        $user = User::factory()->create([
+            'oauth_id' => Str::random(8),
+        ]);
+
+        $this->json('POST', route('users.request-password-reset'), ['email' => $user->email])
+             ->assertStatus(422)
+            ->assertJsonFragment([
+                'error' => 'Please reset your password via Google',
             ]);
     }
 }

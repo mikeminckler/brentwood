@@ -300,6 +300,10 @@ input[type=range]:hover {
     }
 }
 
+.form-label {
+    @apply text-sm text-gray-500 py-1 pl-4 bg-gray-200 bg-opacity-50 rounded-t;
+}
+
 button, .button {
     @apply inline-flex bg-white shadow-inner rounded text-gray-500 font-medium px-4 py-1 cursor-pointer whitespace-nowrap justify-center border-gray-300 border;
 }

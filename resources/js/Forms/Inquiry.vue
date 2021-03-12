@@ -12,22 +12,22 @@
                     <div class="input">
                         <form-label label="Contact Name" :value="form.name"></form-label>
                         <div class=""><input type="text" id="name" v-model="form.name" class="outline-none focus:border-gray-400" placeholder="Parent or Student Name" /></div>
-                        <form-error :errors="errors" name="name" :show="showErrors"></form-error>
+                        <form-error :errors="errors" name="name" :hide="!showErrors"></form-error>
                     </div>
 
                     <div class="input">
                         <form-label label="Contact Email" :value="form.email"></form-label>
                         <div class=""><input type="email" id="email" v-model="form.email" class="outline-none focus:border-gray-400" placeholder="Contact Email" /></div>
-                        <form-error :errors="errors" name="email" :show="showErrors"></form-error>
+                        <form-error :errors="errors" name="email" :hide="!showErrors"></form-error>
                     </div>
 
                     <div class="input hidden">
                         <form-label label="Contact Phone Number" :value="form.phone"></form-label>
                         <div class=""><input type="text" inputmode="tel" id="phone" v-model="form.phone" class="outline-none focus:border-gray-400" @keyup.enter="nextStep()" placeholder="Contact Phone Number" /></div>
-                        <form-error :errors="errors" name="phone" :show="showErrors"></form-error>
+                        <form-error :errors="errors" name="phone" :hide="!showErrors"></form-error>
                     </div>
 
-                    <div class="input" v-if="!createPassword">
+                    <div class="input" v-if="!createPassword && !this.$store.state.user.id">
                         <div class=""><checkbox-input v-model="showPasswordInput" label="I would like to create an account"></checkbox-input></div>
                     </div>
 
@@ -35,7 +35,7 @@
                         <div class="input" v-if="createPassword || showPasswordInput">
                             <form-label label="Create Password" :value="form.password"></form-label>
                             <div class=""><input type="password" id="password" v-model="form.password" class="outline-none focus:border-gray-400" placeholder="Create Password" /></div>
-                            <form-error :errors="errors" name="password" :show="showErrors"></form-error>
+                            <form-error :errors="errors" name="password" :hide="!showErrors"></form-error>
                         </div>
                     </transition>
 
@@ -43,7 +43,7 @@
                         <div class="input" v-if="form.password">
                             <form-label label="Confirm Password" :value="form.password_confirmation"></form-label>
                             <div class=""><input type="password" id="password_confirmation" v-model="form.password_confirmation" class="outline-none focus:border-gray-400" placeholder="Confirm Password" /></div>
-                            <form-error :errors="errors" name="password_confirmation" :show="showErrors"></form-error>
+                            <form-error :errors="errors" name="password_confirmation" :hide="!showErrors"></form-error>
                         </div>
                     </transition>
 
@@ -55,7 +55,7 @@
 
                     <div class="mt-4">
                         <div class="input-label">Start Year</div>
-                        <form-error :errors="errors" name="target_year" :show="showErrors"></form-error>
+                        <form-error :errors="errors" name="target_year" :hide="!showErrors"></form-error>
                         <div class="flex items-center flex-wrap">
                             <div v-for="year in years"
                                  :key="'year-' + year"
@@ -68,7 +68,7 @@
 
                     <div class="mt-4">
                         <div class="">Start Grade</div>
-                        <form-error :errors="errors" name="target_grade" :show="showErrors"></form-error>
+                        <form-error :errors="errors" name="target_grade" :hide="!showErrors"></form-error>
                         <div class="flex items-center flex-wrap">
                             <div v-for="grade in grades"
                                  :key="'grade-' + grade"
@@ -82,7 +82,7 @@
 
                     <div class="mt-4">
                         <div class="">Student Type</div>
-                        <form-error :errors="errors" name="student_type" :show="showErrors"></form-error>
+                        <form-error :errors="errors" name="student_type" :hide="!showErrors"></form-error>
                         <div class="flex items-center flex-wrap w-full">
                             <div v-for="type in types"
                                  :key="'type-' + type"
@@ -117,7 +117,7 @@
                         <p>We invite you to join our admissions team for an <span class="font-bold">interactive online presentation</span> where you can <span class="font-bold">ask questions</span> and find out why so many students choose Brentwood for their high school experience. Find a date that best suits your family below.</p>
                     </div>
 
-                    <form-error :errors="errors" name="livestream" :show="showErrors"></form-error>
+                    <form-error :errors="errors" name="livestream" :hide="!showErrors"></form-error>
                     <div class="mt-4">
                         <div class="flex cursor-pointer px-2 py-1" 
                              :class="form.livestream ? (form.livestream.id === livestream.id ? 'bg-green-100 text-gray-800' : 'bg-white odd:bg-gray-200 hover:text-gray-800') : 'bg-white odd:bg-gray-200 hover:text-gray-800'"
@@ -143,6 +143,11 @@
 
                             <form-label label="Contact Email" :value="form.email"></form-label>
                             <div class="fake-input">{{ form.email }}</div>
+
+                            <div class="flex pb-4" v-if="form.password && form.password === form.password_confirmation">
+                                <div class="icon"><i class="fas fa-check"></i></div>
+                                <div class="pl-2">Create Account</div>
+                            </div>
 
                             <form-label label="Contact Phone Number" :value="form.phone"></form-label>
                             <div class="fake-input hidden">{{ form.phone }}</div>

@@ -74,7 +74,7 @@ class FileUploadsTest extends TestCase
     public function a_file_upload_cannot_be_over_a_certain_size()
     {
         Storage::fake();
-        $too_big = UploadedFile::fake()->create('logo.jpg', 2048);
+        $too_big = UploadedFile::fake()->create('logo.jpg', 20048);
 
         $this->signInAdmin();
 
@@ -83,7 +83,7 @@ class FileUploadsTest extends TestCase
             ->assertJsonFragment([
                 'errors' => [
                     'file' => [
-                        'The file may not be greater than 1024 kilobytes.'
+                        'The file may not be greater than 10240 kilobytes.'
                     ],
                 ],
             ]);
@@ -93,7 +93,7 @@ class FileUploadsTest extends TestCase
     public function an_uploaded_image_needs_to_pass_validation()
     {
         Storage::fake();
-        $bad_image = UploadedFile::fake()->create('logo.pdf', 30124);
+        $bad_image = UploadedFile::fake()->create('logo.pdf', 40124);
         $good_image = UploadedFile::fake()->image('logo.png');
 
         $this->signInAdmin();
@@ -103,7 +103,7 @@ class FileUploadsTest extends TestCase
             ->assertJsonFragment([
                 'errors' => [
                     'file' => [
-                        'The file may not be greater than 20480 kilobytes.',
+                        'The file may not be greater than 30720 kilobytes.',
                         'The file must be a file of type: jpeg, png.',
                     ],
                 ],
@@ -127,7 +127,7 @@ class FileUploadsTest extends TestCase
         $this->signInAdmin();
 
         Storage::fake();
-        $file = UploadedFile::fake()->create('logo.gif', 10124);
+        $file = UploadedFile::fake()->create('logo.gif', 20124);
 
         $input = [
             'name' => $file->name,

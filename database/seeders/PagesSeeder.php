@@ -464,11 +464,22 @@ class PagesSeeder extends Seeder
         $inquiry_content->save();
         $inquiry_content->publish();
 
+        $register = new Page;
+        $register->name = 'Register';
+        $register->slug = 'register';
+        $register->title = 'Create an Account';
+        $register->parent_page_id = 1;
+        $register->sort_order = 9;
+        $register->unlisted = true;
+        $register->protected = true;
+        $register->save();
+        $register->publish();
+
         $livestream = new Page;
         $livestream->name = 'Livestream Registration';
         $livestream->slug = 'livestream-register';
         $livestream->parent_page_id = 1;
-        $livestream->sort_order = 9;
+        $livestream->sort_order = 10;
         $livestream->unlisted = true;
         $livestream->protected = true;
         $livestream->save();
@@ -478,7 +489,7 @@ class PagesSeeder extends Seeder
         $news = new Page;
         $news->name = 'News';
         $news->parent_page_id = 1;
-        $news->sort_order = 10;
+        $news->sort_order = 11;
         $news->unlisted = true;
         $news->save();
         $news->publish();
@@ -486,7 +497,7 @@ class PagesSeeder extends Seeder
         $parents = new Page;
         $parents->name = 'Parents';
         $parents->parent_page_id = 1;
-        $parents->sort_order = 11;
+        $parents->sort_order = 12;
         $parents->unlisted = true;
         $parents->save();
         $parents->publish();
@@ -494,7 +505,7 @@ class PagesSeeder extends Seeder
         $students = new Page;
         $students->name = 'Students';
         $students->parent_page_id = 1;
-        $students->sort_order = 12;
+        $students->sort_order = 13;
         $students->unlisted = true;
         $students->save();
         $students->publish();
@@ -502,7 +513,7 @@ class PagesSeeder extends Seeder
         $staff = new Page;
         $staff->name = 'Staff';
         $staff->parent_page_id = 1;
-        $staff->sort_order = 13;
+        $staff->sort_order = 14;
         $staff->unlisted = true;
         $staff->save();
         $staff->publish();
@@ -510,7 +521,7 @@ class PagesSeeder extends Seeder
         $alumni = new Page;
         $alumni->name = 'Alumni';
         $alumni->parent_page_id = 1;
-        $alumni->sort_order = 14;
+        $alumni->sort_order = 15;
         $alumni->unlisted = true;
         $alumni->save();
         $alumni->publish();
@@ -518,7 +529,7 @@ class PagesSeeder extends Seeder
         $advancement = new Page;
         $advancement->name = 'Advancement';
         $advancement->parent_page_id = 1;
-        $advancement->sort_order = 15;
+        $advancement->sort_order = 16;
         $advancement->unlisted = true;
         $advancement->save();
         $advancement->publish();
@@ -526,7 +537,7 @@ class PagesSeeder extends Seeder
         $employement = new Page;
         $employement->name = 'Employement';
         $employement->parent_page_id = 1;
-        $employement->sort_order = 16;
+        $employement->sort_order = 17;
         $employement->unlisted = true;
         $employement->save();
         $employement->publish();
@@ -534,7 +545,7 @@ class PagesSeeder extends Seeder
         $rentals = new Page;
         $rentals->name = 'Rentals';
         $rentals->parent_page_id = 1;
-        $rentals->sort_order = 17;
+        $rentals->sort_order = 18;
         $rentals->unlisted = true;
         $rentals->save();
         $rentals->publish();
@@ -542,7 +553,7 @@ class PagesSeeder extends Seeder
         $events = new Page;
         $events->name = 'Events';
         $events->parent_page_id = 1;
-        $events->sort_order = 18;
+        $events->sort_order = 19;
         $events->unlisted = true;
         $events->save();
         $events->publish();

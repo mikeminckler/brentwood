@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 use Illuminate\Support\Arr;
@@ -16,6 +19,7 @@ use App\Models\Inquiry;
 use App\Models\Chat;
 
 use App\Events\UserBanned;
+use App\Mail\EmailVerification;
 
 class UserTest extends TestCase
 {
@@ -301,5 +305,77 @@ class UserTest extends TestCase
 
         // banned messages are soft deleted
         $this->assertFalse(Chat::all()->contains('message', $message));
+    }
+
+    /** @test **/
+    public function a_user_can_verify_their_email_address()
+    {
+        $password = Str::random(8);
+        $user = User::factory()->create([
+            'email_verified_at' => null,
+            'password' => Hash::make($password),
+        ]);
+
+        $url = $user->getEmailVerificationUrl();
+
+        $this->get(route('users.verify-email', ['id' => $user->id]))
+             ->assertStatus(401);
+
+        $this->withoutExceptionHandling();
+        $this->get($url)
+             ->assertSuccessful()
+             ->assertViewHas([
+                'success' => 'Email Verification Complete',
+             ]);
+
+        $user->refresh();
+        $this->assertNotNull($user->email_verified_at);
+
+        $this->withoutExceptionHandling();
+        $this->get($url)
+             ->assertSuccessful()
+             ->assertViewHas([
+                'error' => 'Your email has already been confirmed',
+            ]);
+    }
+
+    /** @test **/
+    public function an_email_verification_can_be_requested()
+    {
+        Mail::fake();
+
+        $user = User::factory()->create([
+            'email_verified_at' => null,
+        ]);
+
+        $email = $user->email;
+
+        $this->json('GET', route('users.send-email-verification', ['id' => $user->id]))
+            ->assertStatus(401);
+
+        $this->signIn($user);
+
+        $this->withoutExceptionHandling();
+        $this->json('GET', route('users.send-email-verification', ['id' => $user->id]))
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Email Verification Sent',
+            ]);
+
+        Mail::assertQueued(EmailVerification::class, function ($mail) use ($email) {
+            return $mail->hasTo($email);
+        });
+
+        $this->get($user->getEmailVerificationUrl())
+             ->assertSuccessful()
+             ->assertViewHas([
+                'success' => 'Email Verification Complete',
+             ]);
+
+        $this->json('GET', route('users.send-email-verification', ['id' => $user->id]))
+             ->assertStatus(422)
+            ->assertJsonFragment([
+                'error' => 'Your email has already been confirmed',
+            ]);
     }
 }

@@ -1,46 +1,65 @@
 <template>
 
-    <div class="w-full flex flex-col items-center">
+    <div class="md:-mx-16 relative md:my-16">
+        <div class="hidden md:block photo fill z-2 rounded md:shadow-lg">
+            <img class="" src="/images/login.jpg" />
+        </div>
+        <div class="md:flex w-full md:my-8 relative z-4 p-4 md:px-32 md:py-24">
 
-        <div class="flex w-full my-4">
+            <div class="relative">
+                <div class="flex w-full items-center justify-center h-full md:py-4 relative">
+                    <a href="/login/google" class="h-full cursor-pointer flex items-center justify-center flex-col w-full md:p-4 bg-gray-100 md:shadow rounded-l px-8 relative z-3">
+                        <h2 class="text-gray-600">Staff &amp; Students</h2>
+                        <img class="p-4" srcset="/images/google_signin.png 1x, /images/google_signin@2x.png 2x" />
+                    </a>
+                </div>
+            </div>
 
-            <div class="flex-1">
-                <div class="flex w-full items-center justify-center h-full">
-                    <div class="cursor-pointer flex items-center flex-col w-full m-4 p-4 bg-gray-200 border rounded hover:border-gray-300" @click="redirectToGoogle()">
-                        <div class="">Staff &amp; Students</div>
-                        <div class="p-2"><img class="h-12" src="/images/logo.svg" /></div>
-                        <img src="/images/google_signin.png" />
+            <div class="flex-1 flex items-center justify-start">
+                <div class="p-4 md:px-16 md:py-8 md:bg-gray-100 rounded w-full h-full z-4 md:shadow-md flex justify-center">
+
+                    <div class="w-full max-w-sm">
+                        <h1>Login</h1>
+
+                        <div class="form mt-4">
+                            <div class="input">
+                                <input class="outline-none" type="email" autofocus v-model="email" placeholder="Email" />
+                            </div>
+                            <div class="input">
+                                <input class="outline-none" type="password" v-model="password" placeholder="Password" @key.enter="login()" />
+                            </div>
+
+                            <div class="flex items-center">
+                                <div class="flex-1">
+                                    <button @click.stop.prevent="login()">Login</button>
+                                </div>
+                                <div class="link whitespace-nowrap">Forgot Password</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+            <div class="relative">
+                <div class="flex w-full items-center justify-start h-full md:py-4 relative">
+                    <div class="h-full cursor-pointer flex items-center md:items-start justify-center flex-col w-full p-4 md:bg-gray-100 md:shadow rounded-r px-8 relative z-3">
+
+                        <h2>New Applicants</h2>
+
+                        <a href="/register" class="mt-4"><div class="button">Register Now</div></a>
+
                     </div>
                 </div>
             </div>
-            <div class="flex-2 flex items-center justify-center">
-                <div class="px-8 py-4 max-w-sm w-full bg-gray-200 rounded border">
-                    <h1>Login</h1>
 
-                    <div class="form mt-2">
-                        <div class="input">
-                            <input class="outline-none" type="email" autofocus v-model="email" placeholder="Email" />
-                        </div>
-                        <div class="input">
-                            <input class="outline-none" type="password" v-model="password" placeholder="Password" @key.enter="login()" />
-                        </div>
-
-                        <button @click.stop.prevent="login()">Login</button>
-
-                    </div>
-                </div>
-                <div class="py-4 h-full">
-                    <div class="bg-white rounded-r p-4 h-full border w-48">
-                        <h3>Register Now</h3>
-                        <p>Please complete our account sign up form to start your Brentwood experience</p>
-                    </div>
-                </div>
-            </div>
 
         </div>
-
-
     </div>
+
 
 </template>
 

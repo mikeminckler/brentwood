@@ -22,7 +22,13 @@ class InquiryFormFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'header' => $this->faker->sentence,
+            'body' => $this->faker->paragraph,
+            'show_student_info' => $this->faker->boolean(50),
+            'show_interests' => $this->faker->boolean(50),
+            'show_livestreams' => $this->faker->boolean(50),
+            'show_livestreams_first' => $this->faker->boolean(50),
+            'create_password' => $this->faker->boolean(50),
         ];
     }
 }

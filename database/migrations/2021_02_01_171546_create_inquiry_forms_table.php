@@ -21,6 +21,7 @@ class CreateInquiryFormsTable extends Migration
             $table->boolean('show_interests')->default(false);
             $table->boolean('show_livestreams')->default(false);
             $table->boolean('show_livestreams_first')->default(false);
+            $table->boolean('create_password')->default(false);
             $table->timestamps();
         });
     }

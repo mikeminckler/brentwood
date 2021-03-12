@@ -37,6 +37,7 @@
                             <div class=""><checkbox-input v-model="content.show_interests" label="Show Interests"></checkbox-input> </div>
                             <div class=""><checkbox-input v-model="content.show_livestreams" label="Show Livestreams"></checkbox-input> </div>
                             <div class=""><checkbox-input v-model="content.show_livestreams_first" label="Show Livestreams First"></checkbox-input> </div>
+                            <div class=""><checkbox-input v-model="content.create_password" label="Create Account"></checkbox-input> </div>
                         </div>
 
                     </div>
@@ -47,6 +48,7 @@
                     :show-interests="content.show_interests"
                     :show-livestreams="content.show_livestreams"
                     :show-livestreams-first="content.show_livestreams_first"
+                    :create-password="content.create_password"
                 ></inquiry>
             </div>
 

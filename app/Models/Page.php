@@ -123,6 +123,11 @@ class Page extends Model
         return $this->morphMany(Photo::class, 'content');
     }
 
+    public static function getHomePage()
+    {
+        return Page::find(1);
+    }
+
     public function parentPage()
     {
         if ($this->parent_page_id > 0) {

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 use Illuminate\Support\Arr;
@@ -18,6 +19,7 @@ use App\Models\TextBlock;
 use App\Models\Livestream;
 
 use App\Mail\InquiryConfirmation;
+use App\Mail\EmailVerification;
 
 class InquiryTest extends TestCase
 {
@@ -451,6 +453,131 @@ class InquiryTest extends TestCase
             ]);
 
         Mail::assertQueued(InquiryConfirmation::class, function ($mail) use ($email) {
+            return $mail->hasTo($email);
+        });
+    }
+
+    /** @test **/
+    public function a_user_can_create_a_password_when_signing_up()
+    {
+        $name = $this->faker->name;
+        $email = $this->faker->safeEmail;
+        $password = Str::random(8);
+
+        $input = [
+            'name' => $name,
+            'email' => $email,
+            'password' => 'short',
+        ];
+
+        $this->json('POST', route('inquiries.store'), $input)
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                'password',
+             ]);
+
+        $input['password'] = $password;
+
+        $this->json('POST', route('inquiries.store'), $input)
+             ->assertStatus(422)
+             ->assertJsonValidationErrors([
+                'password',
+             ]);
+
+        $input['password_confirmation'] = $password;
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('inquiries.store'), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Inquiry Saved',
+            ]);
+
+        $inquiry = Inquiry::all()->last();
+
+        $this->assertInstanceOf(Inquiry::class, $inquiry);
+
+        $this->assertEquals($name, $inquiry->user->name);
+        $this->assertEquals($email, $inquiry->user->email);
+
+        $this->assertTrue(auth()->attempt(['email' => $email, 'password' => $password]));
+    }
+
+    /** @test **/
+    public function a_user_cannot_change_a_password_for_an_existing_account_when_signing_up()
+    {
+        $password = Str::random(8);
+        $user = User::factory()->create([
+            'password' => Hash::make($password),
+        ]);
+        $this->assertNotNull($user->password);
+
+        $this->assertTrue(auth()->attempt(['email' => $user->email, 'password' => $password]));
+
+        auth()->logout();
+        $this->assertFalse(auth()->check());
+
+        $new_password = Str::random(8);
+
+        $input = [
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => $new_password,
+            'password_confirmation' => $new_password,
+        ];
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('inquiries.store'), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Inquiry Saved',
+            ]);
+
+        $inquiry = Inquiry::all()->last();
+
+        $this->assertInstanceOf(Inquiry::class, $inquiry);
+
+        $this->assertEquals($user->name, $inquiry->user->name);
+        $this->assertEquals($user->email, $inquiry->user->email);
+
+        $this->assertTrue(auth()->attempt(['email' => $user->email, 'password' => $password]));
+    }
+
+
+    /** @test **/
+    public function creating_an_inquiry_with_a_password_sends_an_email_confirmation_link()
+    {
+        Mail::fake();
+
+        $name = $this->faker->name;
+        $email = $this->faker->safeEmail;
+        $password = Str::random(8);
+
+        $input = [
+            'name' => $name,
+            'email' => $email,
+            'password' => $password,
+            'password_confirmation' => $password,
+        ];
+
+        $this->withoutExceptionHandling();
+        $this->json('POST', route('inquiries.store'), $input)
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'success' => 'Inquiry Saved',
+            ]);
+
+        $inquiry = Inquiry::all()->last();
+        $this->assertInstanceOf(Inquiry::class, $inquiry);
+
+        $user = $inquiry->user;
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->assertEquals($email, $user->email);
+
+        $this->assertTrue(auth()->attempt(['email' => $email, 'password' => $password]));
+
+        Mail::assertQueued(EmailVerification::class, function ($mail) use ($email) {
             return $mail->hasTo($email);
         });
     }

@@ -21,6 +21,7 @@
                 {{ $content->show_interests ? ':show-interests="true"' : '' }}
                 {{ $content->show_livestreams ? ':show-livestreams="true"' : '' }}
                 {{ $content->show_livestreams_first ? ':show-livestreams-first="true"' : '' }}
+                {{ $content->create_password ? ':create-password="true"' : '' }}
                 @if ($content->livestreams->count())
                     :livestreams='@json($content->livestreams)'
                 @endif

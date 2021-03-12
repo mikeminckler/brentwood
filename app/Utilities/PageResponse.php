@@ -2,12 +2,14 @@
 
 namespace App\Utilities;
 
+use App\Models\Page;
+
 class PageResponse
 {
     public function view($page, $view, array $attributes = null)
     {
         if (!$page) {
-            return abort(404);
+            $page = Page::getHomePage();
         }
 
         // if the page hasn't been published and we are not logged in dont show

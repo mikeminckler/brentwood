@@ -29,6 +29,7 @@ class InquiryFormValidation extends FormRequest
             'show_interests' => 'required|boolean',
             'show_livestreams' => 'required|boolean',
             'show_livestreams_first' => 'required|boolean',
+            'create_password' => 'required|boolean',
         ];
     }
 }

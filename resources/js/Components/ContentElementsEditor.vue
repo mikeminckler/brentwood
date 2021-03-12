@@ -295,6 +295,7 @@
                     show_interests: false,
                     show_livestreams: false,
                     show_livestreams_first: false,
+                    create_password: false,
                     tags: [],
                 };
 

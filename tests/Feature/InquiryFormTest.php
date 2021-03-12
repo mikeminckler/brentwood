@@ -16,7 +16,6 @@ use App\Models\Tag;
 
 class InquiryFormTest extends TestCase
 {
-
     use ContentElementsTestTrait;
 
     protected function getClassname()
@@ -88,6 +87,7 @@ class InquiryFormTest extends TestCase
                 'content.show_interests',
                 'content.show_livestreams',
                 'content.show_livestreams_first',
+                'content.create_password',
              ]);
 
         $input['content'] = $content;
@@ -106,7 +106,7 @@ class InquiryFormTest extends TestCase
         $this->assertEquals(Arr::get($input, 'content.show_interests'), $inquiry_form->show_interests);
         $this->assertEquals(Arr::get($input, 'content.show_livestreams'), $inquiry_form->show_livestreams);
         $this->assertEquals(Arr::get($input, 'content.show_livestreams_first'), $inquiry_form->show_livestreams_first);
+        $this->assertEquals(Arr::get($input, 'content.create_password'), $inquiry_form->create_password);
         $this->assertTrue($inquiry_form->tags->contains('id', $tag->id));
     }
-
 }

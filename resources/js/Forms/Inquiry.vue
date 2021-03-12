@@ -27,6 +27,26 @@
                         <form-error :errors="errors" name="phone" :show="showErrors"></form-error>
                     </div>
 
+                    <div class="input" v-if="!createPassword">
+                        <div class=""><checkbox-input v-model="showPasswordInput" label="I would like to create an account"></checkbox-input></div>
+                    </div>
+
+                    <transition name="input">
+                        <div class="input" v-if="createPassword || showPasswordInput">
+                            <form-label label="Create Password" :value="form.password"></form-label>
+                            <div class=""><input type="password" id="password" v-model="form.password" class="outline-none focus:border-gray-400" placeholder="Create Password" /></div>
+                            <form-error :errors="errors" name="password" :show="showErrors"></form-error>
+                        </div>
+                    </transition>
+
+                    <transition name="input">
+                        <div class="input" v-if="form.password">
+                            <form-label label="Confirm Password" :value="form.password_confirmation"></form-label>
+                            <div class=""><input type="password" id="password_confirmation" v-model="form.password_confirmation" class="outline-none focus:border-gray-400" placeholder="Confirm Password" /></div>
+                            <form-error :errors="errors" name="password_confirmation" :show="showErrors"></form-error>
+                        </div>
+                    </transition>
+
                 </div>
 
                 <div class="" key="step2" v-if="currentStep === 'Student Information'">
@@ -194,6 +214,7 @@
             'showInterests',
             'showLivestreams',
             'showLivestreamsFirst',
+            'createPassword',
             'livestream',
             'livestreams',
         ],
@@ -204,6 +225,7 @@
             'form-label': () => import(/* webpackChunkName: "form-label" */ '@/Components/FormLabel.vue'),
             'form-error': () => import(/* webpackChunkName: "form-error" */ '@/Components/FormError.vue'),
             'tags-selector': () => import(/* webpackChunkName: "tags-selector" */ '@/Components/TagsSelector.vue'),
+            'checkbox-input': () => import(/* webpackChunkName: "checkbox-input" */ '@/Components/CheckboxInput.vue'),
         },
 
         data() {
@@ -211,6 +233,7 @@
                 showErrors: false,
                 url: '',
                 transitionDirection: 'inquiry-form-forward',
+                showPasswordInput: false,
                 currentStep: null,
                 steps: [],
                 allSteps: [
@@ -228,6 +251,8 @@
                     name: '',
                     email: '',
                     phone: '',
+                    password: '',
+                    password_confirmation: '',
                     target_grade: null,
                     target_year: null,
                     student_type: null,
@@ -258,6 +283,20 @@
                         errors.push({email: 'Please provide a contact email'});
                     } else if (!this.validEmail) {
                         errors.push({email: 'Please provide a valid email address'});
+                    }
+
+                    if (this.createPassword) {
+                        if (!this.form.password) {
+                            errors.push({password: 'Please provide a password'});
+                        } else if (this.form.password.length < 6) {
+                            errors.push({password: 'The password must at least 6 characters'});
+                        }
+                    }
+
+                    if (this.form.password) {
+                        if (this.form.password !== this.form.password_confirmation) {
+                            errors.push({password_confirmation: 'The password confirmation does not match'});
+                        }
                     }
                 }
 

@@ -7,15 +7,20 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 use App\Models\Role;
 use App\Models\FileUpload;
 use App\Models\Permission;
 
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use App\Mail\EmailVerification;
 
 use Laravel\Socialite\Two\User as SocialiteUser;
 use Google_Client;
@@ -83,11 +88,22 @@ class User extends Authenticatable
         $user->name = Arr::get($input, 'name');
         $user->email = strtolower(Arr::get($input, 'email'));
 
-        if (!$id && !Arr::get($input, 'password')) {
-            $user->password = Hash::make(Str::random(40));
+        if (!$id) {
+            $user->password = Hash::make(Arr::get($input, 'password') ?? Str::random(40));
+        } else {
+            if (Arr::get($input, 'password') && auth()->check()) {
+                if (auth()->user()->can('update', $user)) {
+                    $user->password = Hash::make(Arr::get($input, 'password'));
+                }
+            }
         }
 
         $user->save();
+
+        if (!$id && Arr::get($input, 'password')) {
+            Mail::to($user->email)
+                ->queue(new EmailVerification($user));
+        }
 
         if (auth()->check()) {
             if (auth()->user()->hasRole('admin')) {
@@ -269,5 +285,10 @@ class User extends Authenticatable
     public function whispers()
     {
         return $this->belongsToMany(Chat::class, 'whispers');
+    }
+
+    public function getEmailVerificationUrl()
+    {
+        return URL::temporarySignedRoute('users.verify-email', Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)), [ 'id' => $this->id ]);
     }
 }

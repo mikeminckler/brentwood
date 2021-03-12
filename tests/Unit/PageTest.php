@@ -370,4 +370,12 @@ class PageTest extends TestCase
 
         $this->assertEquals($page->full_slug, 'parent-page/full-slug-page');
     }
+
+    /** @test **/
+    public function the_home_page_can_be_found()
+    {
+        $home_page = Page::getHomePage();
+        $this->assertInstanceOf(Page::class, $home_page);
+        $this->assertEquals(1, $home_page->id);
+    }
 }

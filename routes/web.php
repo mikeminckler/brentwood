@@ -34,6 +34,8 @@ Route::group(['middleware' => ['guest']], function () {
     Route::post('/intended-url', [LoginController::class, 'intendedUrl'])->name('intended-url');
 });
 
+Route::get('/users/{id}/verify-email', [UsersController::class, 'verifyEmail'])->name('users.verify-email')->where('id', '\d+');
+
 Route::get('/pages', [PagesController::class, 'index'])->name('pages.index');
 
 Route::group(['middleware' => ['auth']], function () {
@@ -46,6 +48,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/users/{id}', [UsersController::class, 'store'])->name('users.update')->where('id', '\d+');
     Route::post('/users/search', [UsersController::class, 'search'])->name('users.search');
     Route::post('/users/{id}/ban', [UsersController::class, 'ban'])->name('users.ban')->where('id', '\d+');
+    Route::get('/users/{id}/send-email-verification', [UsersController::class, 'sendEmailVerification'])->name('users.send-email-verification')->where('id', '\d+');
 
     Route::get('/roles', [RolesController::class, 'index'])->name('roles.index');
     Route::post('/roles/create', [RolesController::class, 'store'])->name('roles.store');

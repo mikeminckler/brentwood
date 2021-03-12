@@ -34,6 +34,7 @@ class InquiryForm extends Model
         $inquiry_form->show_interests = Arr::get($input, 'show_interests') ? true : false;
         $inquiry_form->show_livestreams = Arr::get($input, 'show_livestreams') ? true : false;
         $inquiry_form->show_livestreams_first = Arr::get($input, 'show_livestreams_first') ? true : false;
+        $inquiry_form->create_password = Arr::get($input, 'create_password') ? true : false;
 
         $inquiry_form->save();
 
@@ -43,17 +44,17 @@ class InquiryForm extends Model
         return $inquiry_form;
     }
 
-    public function getLivestreamsAttribute() 
+    public function getLivestreamsAttribute()
     {
         return Livestream::where('start_date', '>=', now())
             ->get()
-            ->filter(function($livestream) {
+            ->filter(function ($livestream) {
                 if (!$this->tags->count()) {
                     return true;
                 }
                 return $livestream->tags->intersect($this->tags)->count();
             })
-            ->sortBy(function($livestream) {
+            ->sortBy(function ($livestream) {
                 return $livestream->start_date;
             });
     }

@@ -3,12 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 use App\Models\User;
 use App\Models\Chat;
+use App\Models\Page;
 use App\Http\Requests\UserValidation;
 
 use App\Events\UserBanned;
+
+use App\Utilities\PageResponse;
+
+use App\Mail\EmailVerification;
 
 class UsersController extends Controller
 {
@@ -84,5 +90,43 @@ class UsersController extends Controller
         return response()->json([
             'success' => $user->name.' Banned',
         ]);
+    }
+
+    public function sendEmailVerification($id)
+    {
+        $user = User::findOrFail($id);
+
+        if (!auth()->user()->can('update', $user)) {
+            return response()->json(['error' => 'You do not have access to that user']);
+        }
+
+        if ($user->email_verified_at) {
+            return response()->json(['error' => 'Your email has already been confirmed'], 422);
+        }
+
+        Mail::to($user->email)
+                ->queue(new EmailVerification($user));
+
+        return response()->json([
+            'success' => 'Email Verification Sent',
+        ]);
+    }
+
+    public function verifyEmail($id)
+    {
+        if (! request()->hasValidSignature()) {
+            abort(401);
+        }
+
+        $user = User::findOrFail($id);
+
+        if ($user->email_verified_at) {
+            return (new PageResponse)->view(Page::getHomePage(), 'pages.view')->with(['error' => 'Your email has already been confirmed']);
+        }
+
+        $user->email_verified_at = now();
+        $user->save();
+
+        return (new PageResponse)->view(Page::getHomePage(), 'pages.view')->with(['success' => 'Email Verification Complete']);
     }
 }
